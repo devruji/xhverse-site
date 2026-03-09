@@ -1,0 +1,26 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+import { posts } from "../../data/blog";
+---
+
+<BaseLayout title="xhverse – blog">
+  <Header current="/blog" />
+  <main class="section">
+    <div class="container">
+      <h1>Blog</h1>
+      <div class="grid grid--blog">
+        {posts.map((post) => (
+          <article class="card card--blog">
+            <h2>{post.title}</h2>
+            <p class="muted">{post.date}</p>
+            <p>{post.excerpt}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </main>
+  <Footer />
+</BaseLayout>
+

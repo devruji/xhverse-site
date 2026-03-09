@@ -1,0 +1,14 @@
+---
+import { profile } from "../data/profile";
+---
+
+<section class="section" id="contact">
+  <div class="container contact">
+    <h2>Contact</h2>
+    <p>{profile.contactIntro}</p>
+    <a href={`mailto:${profile.email}`} class="button">
+      Email me
+    </a>
+  </div>
+</section>
+

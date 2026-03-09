@@ -1,0 +1,311 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+
+const featuredPosts = [
+  {
+    title: "Building a personal corner on the internet",
+    category: "Essay",
+    date: "March 2026",
+    excerpt:
+      "A quiet space for collecting thoughts, experiments, references, and the things worth keeping.",
+  },
+  {
+    title: "Notes from side projects and unfinished ideas",
+    category: "Notes",
+    date: "March 2026",
+    excerpt:
+      "Small learnings, half-formed directions, and the value of documenting progress before it looks polished.",
+  },
+  {
+    title: "Why personal archives still matter",
+    category: "Journal",
+    date: "March 2026",
+    excerpt:
+      "Not every interest has to become a product. Some things are worth keeping simply because they are meaningful.",
+  },
+];
+
+const galleryItems = [
+  "Light, contrast, and quiet details",
+  "Objects, textures, and visual references",
+  "Places, moods, and fragments of everyday life",
+  "Work in progress, behind the scenes, and collected frames",
+];
+
+const interests = [
+  "Projects",
+  "Writing",
+  "Photography",
+  "Systems",
+  "Design references",
+  "Personal notes",
+];
+---
+<BaseLayout title="xhverse – home">
+  <div class="min-h-screen bg-black font-[Inter] text-neutral-100 selection:bg-white/20 selection:text-white">
+    <!-- Ambient background glow -->
+    <div class="absolute inset-0 overflow-hidden">
+      <div class="absolute left-1/2 top-[-14rem] h-[34rem] w-[34rem] -translate-x-1/2 rounded-full bg-white/[0.08] blur-[100px]"></div>
+      <div class="absolute bottom-[-3rem] left-[-3rem] h-64 w-64 rounded-full bg-cyan-500/10 blur-[80px]"></div>
+      <div class="absolute right-0 top-28 h-72 w-72 rounded-full bg-indigo-500/8 blur-[80px]"></div>
+    </div>
+
+    <main class="relative mx-auto max-w-7xl px-5 pb-16 pt-6 sm:px-8 sm:pb-20 sm:pt-8 lg:px-10">
+      <header class="mb-4 flex items-start justify-between gap-4 sm:mb-6 sm:items-center">
+        <div>
+          <p class="text-[11px] uppercase tracking-[0.35em] text-neutral-500/80">xhverse.co</p>
+          <h1 class="mt-1.5 text-[1.5rem] font-semibold tracking-tight text-white sm:text-[1.75rem]">
+            XHVERSE
+          </h1>
+        </div>
+        <nav class="hidden gap-6 pt-2 text-sm text-neutral-400 md:flex" aria-label="Primary navigation">
+          <a href="#about" class="transition hover:text-white">About</a>
+          <a href="#blog" class="transition hover:text-white">Blog</a>
+          <a href="#gallery" class="transition hover:text-white">Gallery</a>
+          <a href="#contact" class="transition hover:text-white">Contact</a>
+        </nav>
+        <a
+          href="#contact"
+          class="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs uppercase tracking-[0.18em] text-neutral-300 backdrop-blur transition hover:bg-white/10 md:hidden"
+        >
+          Contact
+        </a>
+      </header>
+
+      <!-- Hero — Option C: Floating Circle, No Card -->
+      <section class="relative mt-4 sm:mt-8">
+        <div class="grid items-center gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:gap-16">
+          <!-- Left: Text content -->
+          <div class="max-w-xl">
+            <div class="mb-5 inline-flex items-center rounded-full border border-white/[0.08] bg-white/[0.04] px-3 py-1 text-[11px] uppercase tracking-[0.24em] text-neutral-400">
+              Personal archive by XH
+            </div>
+            <h2 class="text-[2.25rem] font-semibold leading-[0.93] tracking-tight text-white sm:text-5xl lg:text-[3.75rem]">
+              A personal space for
+              <span class="mt-1 block text-neutral-400/90">
+                thoughts, projects,<br class="hidden sm:inline" /> images, and collected<br class="hidden lg:inline" /> interests.
+              </span>
+            </h2>
+            <p class="mt-5 max-w-md text-[15px] leading-7 text-neutral-300">
+              xhverse is a digital home for the things I build, study, document, and return to over time.
+              Part journal, part archive, part ongoing work in progress.
+            </p>
+            <div class="mt-7 flex flex-col gap-3 sm:flex-row">
+              <a href="#about" class="inline-flex items-center justify-center rounded-2xl bg-white px-5 py-3 text-sm font-semibold !text-black no-underline opacity-100 transition hover:-translate-y-0.5 hover:bg-neutral-100">Enter xhverse</a>
+              <a
+                href="#blog"
+                class="inline-flex items-center justify-center rounded-2xl border border-white/10 bg-transparent px-5 py-3 text-sm font-medium text-white transition hover:bg-white/5"
+              >
+                Read the journal
+              </a>
+            </div>
+          </div>
+
+          <!-- Right: Floating circular portrait -->
+          <div class="relative mx-auto flex items-center justify-center">
+            <!-- Ambient glow behind circle -->
+            <div class="absolute h-[18rem] w-[18rem] rounded-full bg-gradient-to-br from-indigo-500/15 via-cyan-500/8 to-transparent blur-3xl sm:h-[22rem] sm:w-[22rem]"></div>
+            <div class="relative h-[16rem] w-[16rem] sm:h-[19rem] sm:w-[19rem] lg:h-[22rem] lg:w-[22rem]">
+              <div class="h-full w-full overflow-hidden rounded-full border border-white/[0.08] shadow-[6px_6px_40px_rgba(99,102,241,0.15)]">
+                <img
+                  src="/images/xh-profile.jpg"
+                  alt="Portrait of XH"
+                  width="640"
+                  height="640"
+                  decoding="async"
+                  fetchpriority="high"
+                  class="h-full w-full object-cover object-center"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- About + Current Focus row -->
+      <section id="about" class="mt-5 grid gap-4 sm:mt-6 lg:grid-cols-[1.2fr_0.8fr] lg:gap-5">
+        <div class="rounded-[1.6rem] border border-white/[0.07] bg-white/[0.03] p-5 text-neutral-300 backdrop-blur-xl sm:p-6">
+          <p class="text-[11px] uppercase tracking-[0.32em] text-neutral-500/70">About</p>
+          <h3 class="mt-2 text-lg font-semibold tracking-tight text-white sm:text-xl">
+            A quieter introduction.
+          </h3>
+          <p class="mt-3 text-[15px] leading-7 text-neutral-300">
+            I am XH. This space is where I keep the work, ideas, observations, and personal interests
+            that continue to shape how I think.
+          </p>
+          <div class="mt-4 flex flex-wrap gap-1.5">
+            {interests.map((item) => (
+              <span
+                class="rounded-full border border-white/[0.06] bg-white/[0.025] px-2.5 py-1 text-[11px] text-neutral-400"
+              >
+                {item}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <div class="rounded-[1.6rem] border border-white/[0.07] bg-white/[0.03] p-4 backdrop-blur-xl sm:p-5">
+          <p class="text-[11px] uppercase tracking-[0.32em] text-neutral-500/70">Current focus</p>
+          <div class="mt-4 space-y-2 text-sm text-neutral-300">
+            <div class="flex items-center justify-between gap-4 rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-2.5">
+              <span class="text-neutral-400">Documenting</span>
+              <span class="text-right text-neutral-200">Ideas worth keeping</span>
+            </div>
+            <div class="flex items-center justify-between gap-4 rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-2.5">
+              <span class="text-neutral-400">Exploring</span>
+              <span class="text-right text-neutral-200">Projects and references</span>
+            </div>
+            <div class="flex items-center justify-between gap-4 rounded-xl border border-white/[0.06] bg-white/[0.02] px-4 py-2.5">
+              <span class="text-neutral-400">Collecting</span>
+              <span class="text-right text-neutral-200">Images, notes, and details</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="blog" class="mt-14 sm:mt-20">
+        <div class="mb-6 grid gap-3 md:grid-cols-[1fr_auto] md:items-end sm:mb-8">
+          <div>
+            <p class="text-[12px] uppercase tracking-[0.32em] text-neutral-500/80">Blog</p>
+            <h3 class="mt-3 text-2xl font-semibold tracking-tight text-white sm:text-4xl">
+              Notes, essays, and ongoing thoughts.
+            </h3>
+          </div>
+          <p class="max-w-sm text-left text-sm leading-6 text-neutral-400 md:text-right">
+            A space for writing that does not need to be final in order to be worth publishing.
+          </p>
+        </div>
+
+        <div class="grid gap-4 md:grid-cols-3">
+          {featuredPosts.map((post) => (
+            <article
+              class="rounded-[2rem] border border-white/10 bg-white/5 p-5 backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:bg-white/[0.07]"
+            >
+              <div class="flex items-center justify-between text-xs uppercase tracking-[0.18em] text-neutral-500">
+                <span>{post.category}</span>
+                <span>{post.date}</span>
+              </div>
+              <h4 class="mt-5 max-w-[14ch] text-[2rem] font-semibold leading-[1.05] tracking-tight text-white">
+                {post.title}
+              </h4>
+              <p class="mt-3 max-w-[28ch] text-sm leading-7 text-neutral-400">{post.excerpt}</p>
+              <div class="mt-6 text-sm text-neutral-300">Read article</div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section id="gallery" class="mt-16 sm:mt-24">
+        <div class="mb-6 flex items-end justify-between gap-4 sm:mb-8">
+          <div>
+            <p class="text-[12px] uppercase tracking-[0.32em] text-neutral-500/80">Gallery</p>
+            <h3 class="mt-3 text-2xl font-semibold tracking-tight text-white sm:text-4xl">
+              Visual fragments and references.
+            </h3>
+          </div>
+          <p class="hidden max-w-md text-right text-sm leading-6 text-neutral-400 md:block">
+            A gallery for atmosphere, observation, and the details that stay in memory.
+          </p>
+        </div>
+
+        <div class="grid gap-4 sm:gap-5 md:grid-cols-2">
+          {galleryItems.map((item, index) => (
+            <div class="rounded-[2rem] border border-white/10 bg-white/5 p-4 backdrop-blur-xl sm:p-5">
+              <div class="flex aspect-[4/3] items-end rounded-[1.5rem] border border-white/10 bg-gradient-to-br from-white/[0.10] via-white/[0.04] to-transparent p-6">
+                <div>
+                  <p class="text-xs uppercase tracking-[0.18em] text-neutral-500">Frame {index + 1}</p>
+                  <p class="mt-2 max-w-xs text-lg font-medium text-white">{item}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section class="mt-16 sm:mt-24">
+        <div class="rounded-[2rem] border border-white/10 bg-gradient-to-br from-white/10 to-white/[0.03] p-6 backdrop-blur-xl sm:p-10">
+          <p class="text-[12px] uppercase tracking-[0.32em] text-neutral-500/80">Statement</p>
+          <blockquote class="mt-4 max-w-4xl text-2xl font-medium leading-tight text-white sm:text-3xl">
+            A place for what remains meaningful over time.
+          </blockquote>
+          <p class="mt-4 max-w-2xl text-sm leading-6 text-neutral-400 sm:text-base">
+            Not everything here needs to be optimized, monetized, or finalized. Some things can exist simply
+            because they are useful, beautiful, unfinished, or personally significant.
+          </p>
+        </div>
+      </section>
+
+      <section id="contact" class="mt-16 sm:mt-24">
+        <div class="mb-6 flex items-end justify-between gap-4 sm:mb-8">
+          <div>
+            <p class="text-[12px] uppercase tracking-[0.32em] text-neutral-500/80">Contact</p>
+            <h3 class="mt-3 text-2xl font-semibold tracking-tight text-white sm:text-4xl">
+              Writing, projects, and thoughtful conversations.
+            </h3>
+          </div>
+          <p class="hidden max-w-md text-right text-sm leading-6 text-neutral-400 md:block">
+            For selected collaborations, writing, or direct contact, the following channels are available.
+          </p>
+        </div>
+
+        <div class="grid gap-4 sm:gap-5 md:grid-cols-3">
+          <a
+            href="mailto:contact@xhverse.co"
+            class="rounded-[2rem] border border-white/10 bg-white/5 p-5 backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:bg-white/[0.07] sm:p-6"
+          >
+            <p class="text-xs uppercase tracking-[0.18em] text-neutral-500">Email</p>
+            <h4 class="mt-4 break-all text-lg font-semibold tracking-tight text-white sm:text-xl">
+              contact@xhverse.co
+            </h4>
+            <p class="mt-3 text-sm leading-6 text-neutral-400">
+              For direct inquiries, writing opportunities, and selected collaborations.
+            </p>
+          </a>
+
+          <a
+            href="https://medium.xhverse.co"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="rounded-[2rem] border border-white/10 bg-white/5 p-5 backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:bg-white/[0.07] sm:p-6"
+          >
+            <p class="text-xs uppercase tracking-[0.18em] text-neutral-500">Medium</p>
+            <h4 class="mt-4 break-all text-lg font-semibold tracking-tight text-white sm:text-xl">
+              medium.xhverse.co
+            </h4>
+            <p class="mt-3 text-sm leading-6 text-neutral-400">
+              Essays, reflections, and longer-form writing from xhverse.
+            </p>
+          </a>
+
+          <a
+            href="https://github.com/devruji"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="rounded-[2rem] border border-white/10 bg-white/5 p-5 backdrop-blur-xl transition duration-300 hover:-translate-y-1 hover:bg-white/[0.07] sm:p-6"
+          >
+            <p class="text-xs uppercase tracking-[0.18em] text-neutral-500">GitHub</p>
+            <h4 class="mt-4 break-all text-lg font-semibold tracking-tight text-white sm:text-xl">
+              github.com/devruji
+            </h4>
+            <p class="mt-3 text-sm leading-6 text-neutral-400">
+              Code, experiments, and technical work in public.
+            </p>
+          </a>
+        </div>
+      </section>
+
+      <footer class="mt-16 flex flex-col gap-4 border-t border-white/10 pt-6 text-sm text-neutral-400 sm:mt-24 sm:flex-row sm:items-center sm:justify-between sm:gap-5 sm:pt-8">
+        <div>
+          <p class="font-medium text-white">xhverse.co</p>
+          <p class="mt-1">A personal archive by XH.</p>
+        </div>
+        <div class="flex flex-wrap gap-4">
+          <a href="mailto:contact@xhverse.co" class="transition hover:text-white">Email</a>
+          <a href="https://medium.xhverse.co" target="_blank" rel="noopener noreferrer" class="transition hover:text-white">Medium</a>
+          <a href="https://github.com/devruji" target="_blank" rel="noopener noreferrer" class="transition hover:text-white">GitHub</a>
+        </div>
+      </footer>
+    </main>
+  </div>
+</BaseLayout>
+
