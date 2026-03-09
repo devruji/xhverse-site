@@ -1,0 +1,19 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Header from "../components/Header.astro";
+import About from "../components/About.astro";
+import Statement from "../components/Statement.astro";
+import Contact from "../components/Contact.astro";
+import Footer from "../components/Footer.astro";
+---
+
+<BaseLayout title="xhverse – about">
+  <Header current="/about" />
+  <main>
+    <About />
+    <Statement />
+    <Contact />
+  </main>
+  <Footer />
+</BaseLayout>
+

@@ -1,0 +1,28 @@
+---
+const { current } = Astro.props;
+
+const links = [
+  { href: "/", label: "Home" },
+  { href: "/about", label: "About" },
+  { href: "/blog", label: "Blog" },
+  { href: "/gallery", label: "Gallery" },
+  { href: "#contact", label: "Contact" },
+];
+---
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="/" class="logo">xhverse</a>
+    <nav class="nav">
+      {links.map((link) => (
+        <a
+          href={link.href}
+          class={`nav-link${current === link.href ? " nav-link--active" : ""}`}
+        >
+          {link.label}
+        </a>
+      ))}
+    </nav>
+  </div>
+</header>
+

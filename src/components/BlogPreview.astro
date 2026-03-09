@@ -1,0 +1,32 @@
+---
+import { posts } from "../data/blog";
+
+const {
+  heading = "Latest writing",
+  limit = 3,
+  showViewAllLink = true,
+} = Astro.props;
+
+const visiblePosts = posts.slice(0, limit);
+---
+
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <h2>{heading}</h2>
+      {showViewAllLink && (
+        <a href="/blog" class="link-underlined">View all</a>
+      )}
+    </div>
+    <div class="grid grid--blog">
+      {visiblePosts.map((post) => (
+        <article class="card card--blog">
+          <h3>{post.title}</h3>
+          <p class="muted">{post.date}</p>
+          <p>{post.excerpt}</p>
+        </article>
+      ))}
+    </div>
+  </div>
+</section>
+

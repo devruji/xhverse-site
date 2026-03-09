@@ -1,0 +1,31 @@
+---
+import { items } from "../data/gallery";
+
+const {
+  heading = "Selected work",
+  limit = 6,
+  showViewAllLink = true,
+} = Astro.props;
+
+const visibleItems = items.slice(0, limit);
+---
+
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <h2>{heading}</h2>
+      {showViewAllLink && (
+        <a href="/gallery" class="link-underlined">View gallery</a>
+      )}
+    </div>
+    <div class="grid grid--gallery">
+      {visibleItems.map((item) => (
+        <figure class="gallery-item">
+          <img src={item.src} alt={item.alt} loading="lazy" />
+          <figcaption>{item.caption}</figcaption>
+        </figure>
+      ))}
+    </div>
+  </div>
+</section>
+

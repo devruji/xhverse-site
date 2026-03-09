@@ -1,0 +1,25 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import { items } from "../data/gallery";
+---
+
+<BaseLayout title="xhverse – gallery">
+  <Header current="/gallery" />
+  <main class="section">
+    <div class="container">
+      <h1>Gallery</h1>
+      <div class="grid grid--gallery">
+        {items.map((item) => (
+          <figure class="gallery-item">
+            <img src={item.src} alt={item.alt} loading="lazy" />
+            <figcaption>{item.caption}</figcaption>
+          </figure>
+        ))}
+      </div>
+    </div>
+  </main>
+  <Footer />
+</BaseLayout>
+
