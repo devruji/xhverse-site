@@ -60,9 +60,8 @@ jobs:
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         uses: tj-actions/coverage-badge-js@v2
         with:
-          filename: ./coverage/coverage-summary.json
-          fallback-badge: "https://img.shields.io/badge/Coverage-0%25-red.svg"
-          badge-style: "flat"
+          report_path: coverage/coverage-summary.json
+          output_path: coverage/badge.svg
 
       - name: Add coverage summary
         if: always()
@@ -75,14 +74,14 @@ jobs:
         uses: tj-actions/verify-changed-files@v20
         id: verify-changed-files
         with:
-          files: README.md
+          files: coverage/badge.svg
 
       - name: Commit changes
         if: steps.verify-changed-files.outputs.files_changed == 'true'
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add README.md
+          git add coverage/badge.svg
           git commit -m "chore(docs): update coverage badge"
 
       - name: Push changes
