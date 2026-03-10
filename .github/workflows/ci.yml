@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
-      contents: read
+      contents: write
 
     steps:
       - name: Checkout
@@ -61,6 +61,23 @@ jobs:
         run: |
           echo "## Test Coverage" >> $GITHUB_STEP_SUMMARY
           node -e "const s=require('./coverage/coverage-summary.json').total; console.log('| Metric | % |\\n|---|---:|\\n| Lines | '+s.lines.pct+' |\\n| Statements | '+s.statements.pct+' |\\n| Functions | '+s.functions.pct+' |\\n| Branches | '+s.branches.pct+' |')" >> $GITHUB_STEP_SUMMARY
+
+      - name: Generate Coverage Badge
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          PERCENT=$(node -e "if(require('fs').existsSync('./coverage/coverage-summary.json')){console.log(require('./coverage/coverage-summary.json').total.statements.pct)}else{console.log('0')}")
+          COLOR=$(node -e "const p=$PERCENT; console.log(p>=80?'success':p>=60?'warning':'critical')")
+          mkdir -p .badges
+          curl -s "https://img.shields.io/badge/Coverage-${PERCENT}%25-${COLOR}.svg" > .badges/coverage.svg
+
+      - name: Deploy Badge to badges branch
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: .badges
+          publish_branch: badges
+          force_orphan: true
 
   deploy:
     name: Deploy to Cloudflare
