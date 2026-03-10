@@ -10,13 +10,13 @@ Welcome to the XHVerse Site repository! This is a modern static web application 
 - Automated testing with **Vitest** (Unit) and **Playwright** (E2E).
 - Continuous Integration & Deployment (CI/CD) via GitHub Actions.
 - Automated deployment to **Cloudflare Pages**.
+- Built and managed with **Bun** for maximum speed.
 
 ## Getting Started
 
 ### Prerequisites
 
-- Node.js (v20 or higher)
-- npm
+- [Bun](https://bun.sh/) (v1.0 or higher)
 
 ### Installation
 
@@ -25,7 +25,7 @@ Clone the repository and install dependencies:
 ```sh
 git clone https://github.com/devruji/xhverse-site.git
 cd xhverse-site
-npm install
+bun install
 ```
 
 ### Local Development
@@ -33,7 +33,7 @@ npm install
 Start the development server:
 
 ```sh
-npm run dev
+bun run dev
 ```
 
 The site will be available at `http://localhost:4321`.
@@ -43,13 +43,13 @@ The site will be available at `http://localhost:4321`.
 Run unit tests with coverage:
 
 ```sh
-npm run coverage
+bun run coverage
 ```
 
 Run end-to-end tests:
 
 ```sh
-npm run test:e2e
+bun run test:e2e
 ```
 
 ### Building for Production
@@ -57,7 +57,7 @@ npm run test:e2e
 Build the production site locally:
 
 ```sh
-npm run build
+bun run build
 ```
 
 The built output will be inside the `./dist/` directory.
