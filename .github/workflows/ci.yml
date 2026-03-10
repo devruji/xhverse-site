@@ -56,28 +56,41 @@ jobs:
           path: playwright-report/
           retention-days: 7
 
+      - name: Generate Coverage Badge
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: tj-actions/coverage-badge-js@v2
+        with:
+          filename: ./coverage/coverage-summary.json
+          fallback-badge: "https://img.shields.io/badge/Coverage-0%25-red.svg"
+          badge-style: "flat"
+
       - name: Add coverage summary
         if: always()
         run: |
           echo "## Test Coverage" >> $GITHUB_STEP_SUMMARY
           node -e "const s=require('./coverage/coverage-summary.json').total; console.log('| Metric | % |\\n|---|---:|\\n| Lines | '+s.lines.pct+' |\\n| Statements | '+s.statements.pct+' |\\n| Functions | '+s.functions.pct+' |\\n| Branches | '+s.branches.pct+' |')" >> $GITHUB_STEP_SUMMARY
 
-      - name: Generate Coverage Badge
+      - name: Verify Changed files
         if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        run: |
-          PERCENT=$(node -e "if(require('fs').existsSync('./coverage/coverage-summary.json')){console.log(require('./coverage/coverage-summary.json').total.statements.pct)}else{console.log('0')}")
-          COLOR=$(node -e "const p=$PERCENT; console.log(p>=80?'success':p>=60?'warning':'critical')")
-          mkdir -p .badges
-          curl -s "https://img.shields.io/badge/Coverage-${PERCENT}%25-${COLOR}.svg" > .badges/coverage.svg
+        uses: tj-actions/verify-changed-files@v20
+        id: verify-changed-files
+        with:
+          files: README.md
 
-      - name: Deploy Badge to badges branch
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        uses: peaceiris/actions-gh-pages@v4
+      - name: Commit changes
+        if: steps.verify-changed-files.outputs.files_changed == 'true'
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add README.md
+          git commit -m "chore(docs): update coverage badge"
+
+      - name: Push changes
+        if: steps.verify-changed-files.outputs.files_changed == 'true'
+        uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: .badges
-          publish_branch: badges
-          force_orphan: true
+          branch: ${{ github.ref }}
 
   deploy:
     name: Deploy to Cloudflare
