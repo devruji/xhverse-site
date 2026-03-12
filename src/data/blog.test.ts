@@ -16,4 +16,14 @@ describe("Blog Data", () => {
     expect(post).toHaveProperty("tags");
     expect(Array.isArray(post.tags)).toBe(true);
   });
+
+  it("should have unique slugs and valid ISO dates", () => {
+    const slugs = posts.map((post) => post.slug);
+    expect(new Set(slugs).size).toBe(posts.length);
+
+    for (const post of posts) {
+      expect(post.date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+      expect(Number.isNaN(Date.parse(post.date))).toBe(false);
+    }
+  });
 });

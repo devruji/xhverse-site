@@ -16,4 +16,8 @@ describe("Profile Data", () => {
     expect(profile).toHaveProperty("email");
     expect(profile).toHaveProperty("contactIntro");
   });
+
+  it("should expose a valid contact email", () => {
+    expect(profile.email).toMatch(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
+  });
 });

@@ -13,5 +13,18 @@ describe("Gallery Data", () => {
     expect(item).toHaveProperty("src");
     expect(item).toHaveProperty("alt");
     expect(item).toHaveProperty("caption");
+    expect(item).toHaveProperty("width");
+    expect(item).toHaveProperty("height");
+  });
+
+  it("should have unique ids and valid dimensions", () => {
+    const ids = items.map((item) => item.id);
+    expect(new Set(ids).size).toBe(items.length);
+
+    for (const item of items) {
+      expect(item.width).toBeGreaterThan(0);
+      expect(item.height).toBeGreaterThan(0);
+      expect(item.src.startsWith("/images/")).toBe(true);
+    }
   });
 });

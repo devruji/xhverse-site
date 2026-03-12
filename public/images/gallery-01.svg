@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1200" viewBox="0 0 1600 1200" role="img" aria-labelledby="title desc">
+  <title id="title">Gallery frame 1</title>
+  <desc id="desc">Abstract cinematic landscape in deep blues and warm accents.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0b1228"/>
+      <stop offset="50%" stop-color="#1d4ed8"/>
+      <stop offset="100%" stop-color="#ea580c"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="70%" cy="28%" r="48%">
+      <stop offset="0%" stop-color="#f8fafc" stop-opacity="0.65"/>
+      <stop offset="100%" stop-color="#f8fafc" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1600" height="1200" fill="url(#bg)"/>
+  <rect x="0" y="700" width="1600" height="500" fill="#020617" fill-opacity="0.55"/>
+  <circle cx="1080" cy="320" r="340" fill="url(#glow)"/>
+  <path d="M0 820C220 760 350 820 520 860C690 900 860 860 1040 820C1220 780 1400 790 1600 860V1200H0Z" fill="#0f172a" fill-opacity="0.9"/>
+</svg>

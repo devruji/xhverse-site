@@ -21,11 +21,17 @@ const visibleItems = items.slice(0, limit);
     <div class="grid grid--gallery">
       {visibleItems.map((item) => (
         <figure class="gallery-item">
-          <img src={item.src} alt={item.alt} loading="lazy" />
+          <img
+            src={item.src}
+            alt={item.alt}
+            width={item.width}
+            height={item.height}
+            loading="lazy"
+            decoding="async"
+          />
           <figcaption>{item.caption}</figcaption>
         </figure>
       ))}
     </div>
   </div>
 </section>
-

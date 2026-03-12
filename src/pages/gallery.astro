@@ -13,7 +13,14 @@ import { items } from "../data/gallery";
       <div class="grid grid--gallery">
         {items.map((item) => (
           <figure class="gallery-item">
-            <img src={item.src} alt={item.alt} loading="lazy" />
+            <img
+              src={item.src}
+              alt={item.alt}
+              width={item.width}
+              height={item.height}
+              loading="lazy"
+              decoding="async"
+            />
             <figcaption>{item.caption}</figcaption>
           </figure>
         ))}
@@ -22,4 +29,3 @@ import { items } from "../data/gallery";
   </main>
   <Footer />
 </BaseLayout>
-

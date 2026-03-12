@@ -7,11 +7,12 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
+    "typecheck": "astro check",
     "test": "vitest run",
     "test:watch": "vitest",
     "coverage": "vitest run --coverage",
     "test:e2e": "playwright test",
-    "check": "bun run build && bun run coverage && bun run test:e2e"
+    "check": "bun run typecheck && bun run build && bun run coverage && bun run test:e2e"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.2.1",
@@ -19,9 +20,11 @@
     "tailwindcss": "^4.2.1"
   },
   "devDependencies": {
+    "@astrojs/check": "^0.9.7",
     "@playwright/test": "^1.58.2",
     "@types/node": "^25.3.5",
     "@vitest/coverage-v8": "^4.0.18",
+    "typescript": "^5.9.3",
     "vitest": "^4.0.18"
   }
 }
