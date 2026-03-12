@@ -1,7 +1,6 @@
 # XHVerse Site
 
 [![CI](https://github.com/devruji/xhverse-site/actions/workflows/ci.yml/badge.svg)](https://github.com/devruji/xhverse-site/actions/workflows/ci.yml)
-[![Coverage](./coverage/badge.svg)](https://github.com/devruji/xhverse-site/actions/workflows/ci.yml)
 [![Built with Astro](https://astro.badg.es/v2/built-with-astro/tiny.svg)](https://astro.build)
 [![Bun](https://img.shields.io/badge/Bun-%23000000.svg?style=flat&logo=bun&logoColor=white)](https://bun.sh/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -56,6 +55,12 @@ Run unit tests with coverage:
 
 ```sh
 bun run coverage
+```
+
+Run type/content checks:
+
+```sh
+bun run typecheck
 ```
 
 Run end-to-end tests:

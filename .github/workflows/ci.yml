@@ -9,13 +9,14 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
+permissions:
+  contents: read
+
 jobs:
   test:
     name: Test and Build
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    permissions:
-      contents: write
 
     steps:
       - name: Checkout
@@ -24,10 +25,13 @@ jobs:
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version: latest
+          bun-version: 1.2.21
 
       - name: Install dependencies
-        run: bun install
+        run: bun install --frozen-lockfile
+
+      - name: Run Astro type/content checks
+        run: bun run typecheck
 
       - name: Install Playwright browsers
         run: bunx playwright install --with-deps
@@ -40,6 +44,13 @@ jobs:
 
       - name: Run E2E tests
         run: bun run test:e2e
+
+      - name: Upload dist artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: site-dist
+          path: dist/
+          retention-days: 7
 
       - name: Upload coverage artifact
         uses: actions/upload-artifact@v4
@@ -56,40 +67,11 @@ jobs:
           path: playwright-report/
           retention-days: 7
 
-      - name: Generate Coverage Badge
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        uses: tj-actions/coverage-badge-js@v2
-        with:
-          report_path: coverage/coverage-summary.json
-          output_path: coverage/badge.svg
-
       - name: Add coverage summary
         if: always()
         run: |
           echo "## Test Coverage" >> $GITHUB_STEP_SUMMARY
           node -e "const s=require('./coverage/coverage-summary.json').total; console.log('| Metric | % |\\n|---|---:|\\n| Lines | '+s.lines.pct+' |\\n| Statements | '+s.statements.pct+' |\\n| Functions | '+s.functions.pct+' |\\n| Branches | '+s.branches.pct+' |')" >> $GITHUB_STEP_SUMMARY
-
-      - name: Verify Changed files
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-        uses: tj-actions/verify-changed-files@v20
-        id: verify-changed-files
-        with:
-          files: coverage/badge.svg
-
-      - name: Commit changes
-        if: steps.verify-changed-files.outputs.files_changed == 'true'
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add coverage/badge.svg
-          git commit -m "chore(docs): update coverage badge"
-
-      - name: Push changes
-        if: steps.verify-changed-files.outputs.files_changed == 'true'
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: ${{ github.ref }}
 
   deploy:
     name: Deploy to Cloudflare
@@ -102,19 +84,11 @@ jobs:
       deployments: write
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
+      - name: Download tested dist artifact
+        uses: actions/download-artifact@v4
         with:
-          bun-version: latest
-
-      - name: Install dependencies
-        run: bun install
-
-      - name: Build site
-        run: bun run build
+          name: site-dist
+          path: dist
 
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/pages-action@v1
