@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main, development]
   pull_request:
 
 concurrency:
@@ -72,29 +72,3 @@ jobs:
         run: |
           echo "## Test Coverage" >> $GITHUB_STEP_SUMMARY
           node -e "const s=require('./coverage/coverage-summary.json').total; console.log('| Metric | % |\\n|---|---:|\\n| Lines | '+s.lines.pct+' |\\n| Statements | '+s.statements.pct+' |\\n| Functions | '+s.functions.pct+' |\\n| Branches | '+s.branches.pct+' |')" >> $GITHUB_STEP_SUMMARY
-
-  deploy:
-    name: Deploy to Cloudflare
-    needs: test
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    permissions:
-      contents: read
-      deployments: write
-
-    steps:
-      - name: Download tested dist artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: site-dist
-          path: dist
-
-      - name: Deploy to Cloudflare Pages
-        uses: cloudflare/pages-action@v1
-        with:
-          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: xhverse-site
-          directory: dist
-          gitHubToken: ${{ secrets.GITHUB_TOKEN }}

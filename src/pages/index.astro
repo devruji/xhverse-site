@@ -1,5 +1,7 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import { profile } from "../data/profile";
+import { site } from "../data/site";
 
 const featuredPosts = [
   {
@@ -40,8 +42,26 @@ const interests = [
   "Design references",
   "Personal notes",
 ];
+
+const homeStructuredData = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: "XHVERSE",
+  url: site.siteUrl,
+  description: site.description,
+  author: {
+    "@type": "Person",
+    name: profile.name,
+    description: profile.longBio,
+  },
+  sameAs: [site.github, site.medium],
+};
 ---
-<BaseLayout title="xhverse – home">
+<BaseLayout
+  title="Home"
+  description="XHVERSE is a personal archive for projects, writing, images, and collected interests by XH."
+  structuredData={homeStructuredData}
+>
   <div class="min-h-screen bg-black font-[Inter] text-neutral-100 selection:bg-white/20 selection:text-white">
     <!-- Ambient background glow -->
     <div class="absolute inset-0 overflow-hidden">

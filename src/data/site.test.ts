@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { normalizeUrl } from "./site";
+import { buildCanonicalUrl, normalizeUrl } from "./site";
 
 describe("normalizeUrl", () => {
   it("removes the trailing slash from a URL", () => {
@@ -12,5 +12,15 @@ describe("normalizeUrl", () => {
     const urlWithoutSlash = "https://example.com";
     const normalized = normalizeUrl(urlWithoutSlash);
     expect(normalized).toBe("https://example.com");
+  });
+});
+
+describe("buildCanonicalUrl", () => {
+  it("keeps the root URL canonical", () => {
+    expect(buildCanonicalUrl("/")).toBe("https://xhverse.co/");
+  });
+
+  it("removes trailing slashes for nested routes", () => {
+    expect(buildCanonicalUrl("/blog/")).toBe("https://xhverse.co/blog");
   });
 });
