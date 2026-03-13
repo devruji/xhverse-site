@@ -1,23 +1,24 @@
 ---
-import { buildCanonicalUrl, site } from "../data/site";
-import { shouldNoIndex } from "../data/seo.js";
+import { buildCanonicalUrl, normalizeUrl, site } from "../data/site";
 import "../styles/global.css";
 
-const inferredNoindex = shouldNoIndex(import.meta.env);
+const deploymentSite = (Astro.site ?? site.siteUrl).toString();
+const isPreviewDeployment =
+  normalizeUrl(deploymentSite) !== normalizeUrl(site.siteUrl);
 
 const {
   title = site.title,
   description = site.description,
   image = site.ogImage,
   type = "website",
-  noindex = inferredNoindex,
+  noindex = isPreviewDeployment,
   structuredData,
   bodyClass = "",
 } = Astro.props;
 
 const pageTitle = title === site.title ? site.title : `${title} | ${site.title}`;
-const canonicalUrl = buildCanonicalUrl(Astro.url.pathname);
-const socialImage = new URL(image, Astro.site ?? site.siteUrl).toString();
+const canonicalUrl = buildCanonicalUrl(Astro.url.pathname, deploymentSite);
+const socialImage = new URL(image, deploymentSite).toString();
 ---
 
 <html lang="en">

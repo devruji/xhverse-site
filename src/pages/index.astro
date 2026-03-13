@@ -43,11 +43,13 @@ const interests = [
   "Personal notes",
 ];
 
+const deploymentSite = (Astro.site ?? site.siteUrl).toString();
+
 const homeStructuredData = {
   "@context": "https://schema.org",
   "@type": "WebSite",
   name: "XHVERSE",
-  url: site.siteUrl,
+  url: deploymentSite,
   description: site.description,
   author: {
     "@type": "Person",

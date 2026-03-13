@@ -8,6 +8,7 @@ import { site } from "../../data/site";
 const sortedPosts = [...posts].sort((left, right) =>
   right.date.localeCompare(left.date),
 );
+const deploymentSite = (Astro.site ?? site.siteUrl).toString();
 ---
 
 <BaseLayout
@@ -17,7 +18,7 @@ const sortedPosts = [...posts].sort((left, right) =>
     "@context": "https://schema.org",
     "@type": "CollectionPage",
     name: "XHVERSE Writing Hub",
-    url: "https://xhverse.co/blog",
+    url: new URL("/blog", deploymentSite).toString(),
     description:
       "Summaries and archive links for essays, notes, and ongoing thoughts published from XHVERSE.",
     hasPart: sortedPosts.map((post) => ({

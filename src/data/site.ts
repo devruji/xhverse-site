@@ -15,8 +15,11 @@ export function normalizeUrl(url: string) {
   return url.endsWith("/") ? url.slice(0, -1) : url;
 }
 
-export function buildCanonicalUrl(pathname: string) {
+export function buildCanonicalUrl(
+  pathname: string,
+  baseUrl: string = site.siteUrl,
+) {
   const normalizedPath =
     pathname === "/" ? "/" : pathname.replace(/\/+$/, "");
-  return new URL(normalizedPath, site.siteUrl).toString();
+  return new URL(normalizedPath, baseUrl).toString();
 }

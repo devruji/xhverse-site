@@ -6,6 +6,9 @@ import Statement from "../components/Statement.astro";
 import Contact from "../components/Contact.astro";
 import Footer from "../components/Footer.astro";
 import { profile } from "../data/profile";
+import { site } from "../data/site";
+
+const deploymentSite = (Astro.site ?? site.siteUrl).toString();
 ---
 
 <BaseLayout
@@ -15,12 +18,12 @@ import { profile } from "../data/profile";
     "@context": "https://schema.org",
     "@type": "AboutPage",
     name: "About XHVERSE",
-    url: "https://xhverse.co/about",
+    url: new URL("/about", deploymentSite).toString(),
     mainEntity: {
       "@type": "Person",
       name: profile.name,
       description: profile.longBio,
-      image: `https://xhverse.co${profile.avatar}`,
+      image: new URL(profile.avatar, deploymentSite).toString(),
       email: profile.email,
     },
   }}

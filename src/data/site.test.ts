@@ -23,4 +23,10 @@ describe("buildCanonicalUrl", () => {
   it("removes trailing slashes for nested routes", () => {
     expect(buildCanonicalUrl("/blog/")).toBe("https://xhverse.co/blog");
   });
+
+  it("uses the provided deployment base URL", () => {
+    expect(
+      buildCanonicalUrl("/blog/", "https://preview.xhverse.pages.dev"),
+    ).toBe("https://preview.xhverse.pages.dev/blog");
+  });
 });

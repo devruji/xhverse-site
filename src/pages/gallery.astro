@@ -3,6 +3,9 @@ import BaseLayout from "../layouts/BaseLayout.astro";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import { items } from "../data/gallery";
+import { site } from "../data/site";
+
+const deploymentSite = (Astro.site ?? site.siteUrl).toString();
 ---
 
 <BaseLayout
@@ -12,7 +15,7 @@ import { items } from "../data/gallery";
     "@context": "https://schema.org",
     "@type": "CollectionPage",
     name: "XHVERSE Gallery",
-    url: "https://xhverse.co/gallery",
+    url: new URL("/gallery", deploymentSite).toString(),
     description:
       "Visual fragments, references, and collected frames from the XHVERSE archive.",
   }}
