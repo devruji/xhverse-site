@@ -19,8 +19,8 @@ Welcome to the XHVerse Site repository! This is a modern static web application 
 
 - Rapid frontend development and high performance.
 - Automated testing with Unit and E2E tools.
-- Continuous Integration & Deployment (CI/CD) via GitHub Actions.
-- Automated deployment to Cloudflare Pages.
+- Continuous Integration (CI) via GitHub Actions.
+- Automated production and preview deployments via Cloudflare Pages Git integration.
 - Built and managed with Bun for maximum speed.
 
 ## Getting Started
