@@ -1,10 +1,24 @@
 ---
+import { buildCanonicalUrl, normalizeUrl, site } from "../data/site";
+import "../styles/global.css";
+
+const deploymentSite = (Astro.site ?? site.siteUrl).toString();
+const isPreviewDeployment =
+  normalizeUrl(deploymentSite) !== normalizeUrl(site.siteUrl);
+
 const {
-  title = "xhverse",
-  description = "xhverse – creative portfolio and writing.",
+  title = site.title,
+  description = site.description,
+  image = site.ogImage,
+  type = "website",
+  noindex = isPreviewDeployment,
+  structuredData,
+  bodyClass = "",
 } = Astro.props;
 
-import "../styles/global.css";
+const pageTitle = title === site.title ? site.title : `${title} | ${site.title}`;
+const canonicalUrl = buildCanonicalUrl(Astro.url.pathname, deploymentSite);
+const socialImage = new URL(image, deploymentSite).toString();
 ---
 
 <html lang="en">
@@ -12,7 +26,21 @@ import "../styles/global.css";
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
+    <link rel="canonical" href={canonicalUrl} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
     <meta name="generator" content={Astro.generator} />
+    <meta property="og:site_name" content={site.title} />
+    <meta property="og:locale" content={site.locale} />
+    <meta property="og:type" content={type} />
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={socialImage} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={socialImage} />
+    <meta name="twitter:site" content={site.xHandle} />
     <meta
       http-equiv="Content-Security-Policy"
       content="default-src 'self'; img-src 'self' data: https:; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests"
@@ -30,9 +58,16 @@ import "../styles/global.css";
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
     />
-    <title>{title}</title>
+    <title>{pageTitle}</title>
+    {structuredData && (
+      <script
+        is:inline
+        type="application/ld+json"
+        set:html={JSON.stringify(structuredData)}
+      />
+    )}
   </head>
-  <body>
+  <body class={bodyClass}>
     <div class="page">
       <slot />
     </div>

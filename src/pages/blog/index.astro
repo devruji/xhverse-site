@@ -3,19 +3,55 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import Header from "../../components/Header.astro";
 import Footer from "../../components/Footer.astro";
 import { posts } from "../../data/blog";
+import { site } from "../../data/site";
+
+const sortedPosts = [...posts].sort((left, right) =>
+  right.date.localeCompare(left.date),
+);
+const deploymentSite = (Astro.site ?? site.siteUrl).toString();
 ---
 
-<BaseLayout title="xhverse – blog">
+<BaseLayout
+  title="Writing Hub"
+  description="A curated writing hub on xhverse.co linking to full articles on Medium without duplicating the full text."
+  structuredData={{
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: "XHVERSE Writing Hub",
+    url: new URL("/blog", deploymentSite).toString(),
+    description:
+      "Summaries and archive links for essays, notes, and ongoing thoughts published from XHVERSE.",
+    hasPart: sortedPosts.map((post) => ({
+      "@type": "BlogPosting",
+      headline: post.title,
+      datePublished: post.date,
+      url: post.mediumUrl,
+      keywords: post.tags.join(", "),
+      description: post.excerpt,
+    })),
+  }}
+>
   <Header current="/blog" />
   <main class="section">
     <div class="container">
-      <h1>Blog</h1>
+      <p class="eyebrow">Writing hub</p>
+      <h1>Notes, essays, and ongoing thoughts.</h1>
+      <p class="lede">
+        xhverse.co is the archive and discovery layer. Full articles live on
+        <a href={site.medium} target="_blank" rel="noreferrer"> Medium</a> for now, while this page keeps the summaries, tags, and chronology on the main domain.
+      </p>
       <div class="grid grid--blog">
-        {posts.map((post) => (
+        {sortedPosts.map((post) => (
           <article class="card card--blog">
             <h2>{post.title}</h2>
-            <p class="muted">{post.date}</p>
+            <p class="muted">{post.date} · {post.readingTime}</p>
             <p>{post.excerpt}</p>
+            <p class="muted">Tags: {post.tags.join(", ")}</p>
+            <p>
+              <a href={post.mediumUrl} target="_blank" rel="noreferrer">
+                Read full article on Medium
+              </a>
+            </p>
           </article>
         ))}
       </div>
@@ -23,4 +59,3 @@ import { posts } from "../../data/blog";
   </main>
   <Footer />
 </BaseLayout>
-
