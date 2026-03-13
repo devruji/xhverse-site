@@ -81,10 +81,36 @@ The built output will be inside the `./dist/` directory.
 
 ## Deployment
 
-This project uses GitHub Actions for CI/CD and is deployed natively to **Cloudflare Pages**.
-On every `push` to the `main` branch, the `CI` workflow automatically runs tests and deploys the `dist` directory.
+This project uses GitHub Actions for CI only. Deployments should be handled by **Cloudflare Pages Git integration** so Cloudflare can build the site with the correct production or preview environment variables.
 
-> **Note:** Ensure you have configured your `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, and `GITHUB_TOKEN` repository secrets for the Cloudflare deployment job to succeed.
+Current branch flow:
+
+- `feat/*` -> preview deployment on Cloudflare Pages
+- `development` -> preview deployment on Cloudflare Pages
+- `main` -> production deployment to `https://xhverse.co`
+
+Recommended Cloudflare Pages settings:
+
+- Production branch: `main`
+- Build command: `bun run build`
+- Build output directory: `dist`
+
+Recommended environment variables:
+
+- Production:
+  - `PUBLIC_PRODUCTION_BRANCH=main`
+  - `PUBLIC_SITE_URL=https://xhverse.co`
+- Preview:
+  - `PUBLIC_PRODUCTION_BRANCH=main`
+
+This setup matches the SEO behavior in the app:
+
+- Production builds emit canonical URLs for `https://xhverse.co`
+- Preview builds fall back to their preview URL and add `noindex, nofollow`
+
+Important Cloudflare limitation:
+
+- If the current Pages project was created as a Direct Upload project, Cloudflare does not let you convert it to Git integration later. In that case, create a new Pages project connected to the GitHub repository and migrate the custom domain to that project.
 
 ## © License & Copyright
 
