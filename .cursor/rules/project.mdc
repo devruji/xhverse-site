@@ -1,0 +1,17 @@
+---
+description: Project-wide rule for xhverse site
+alwaysApply: true
+---
+
+Follow the repository `AGENTS.md` as the primary source of truth.
+
+For implementation work:
+- prefer minimal, production-grade diffs
+- preserve existing behavior unless the task explicitly requires change
+- do not modify generated folders such as `coverage`, `dist`, `playwright-report`, `test-results`, or `.astro`
+- for complex tasks, produce a plan first before editing
+
+For final responses:
+- keep reports concise
+- report only what was actually changed or verified
+- do not claim checks were run unless they were explicitly run or evidenced
