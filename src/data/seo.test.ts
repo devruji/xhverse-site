@@ -17,6 +17,12 @@ describe("normalizeEnvUrl", () => {
   it("trims whitespace and trailing slashes", () => {
     expect(normalizeEnvUrl(" https://xhverse.co/ ")).toBe("https://xhverse.co");
   });
+
+  it("returns an empty string for missing or blank input", () => {
+    expect(normalizeEnvUrl("")).toBe("");
+    expect(normalizeEnvUrl("   ")).toBe("");
+    expect(normalizeEnvUrl()).toBe("");
+  });
 });
 
 describe("resolveSiteUrl", () => {
@@ -55,6 +61,17 @@ describe("resolveProductionBranch", () => {
 });
 
 describe("shouldNoIndex", () => {
+  it("returns false when not running on Cloudflare Pages", () => {
+    expect(shouldNoIndex({ CF_PAGES: "0" })).toBe(false);
+    expect(shouldNoIndex({ CF_PAGES_BRANCH: "preview" })).toBe(false);
+  });
+
+  it("returns false when the branch is missing or blank on Pages", () => {
+    expect(shouldNoIndex({ CF_PAGES: "1" })).toBe(false);
+    expect(shouldNoIndex({ CF_PAGES: "1", CF_PAGES_BRANCH: "" })).toBe(false);
+    expect(shouldNoIndex({ CF_PAGES: "1", CF_PAGES_BRANCH: "   " })).toBe(false);
+  });
+
   it("returns false for the production branch", () => {
     expect(
       shouldNoIndex({

@@ -6,6 +6,7 @@ const deploymentSite = (Astro.site ?? site.siteUrl).toString();
 const isPreviewDeployment =
   normalizeUrl(deploymentSite) !== normalizeUrl(site.siteUrl);
 
+// Optional same-origin LCP image path (e.g. home hero); adds `<link rel="preload" as="image">` when set.
 const {
   title = site.title,
   description = site.description,
@@ -14,6 +15,7 @@ const {
   noindex = isPreviewDeployment,
   structuredData,
   bodyClass = "",
+  lcpImage = "",
 } = Astro.props;
 
 const pageTitle = title === site.title ? site.title : `${title} | ${site.title}`;
@@ -52,6 +54,9 @@ const socialImage = new URL(image, deploymentSite).toString();
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" href="/favicon.ico" />
     <!-- Font preconnect + stylesheet load -->
+    {lcpImage ? (
+      <link rel="preload" as="image" href={lcpImage} fetchpriority="high" />
+    ) : null}
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
