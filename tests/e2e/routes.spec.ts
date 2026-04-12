@@ -16,8 +16,16 @@ test("blog page loads posts", async ({ page }) => {
   ).toBeVisible();
   await expect(page.getByText(/Building xhverse/i)).toBeVisible();
   await expect(
-    page.getByRole("link", { name: /Read full article on Medium/i }).first(),
+    page.getByRole("link", { name: /^Read article$/i }).first(),
   ).toBeVisible();
+});
+
+test("blog article page renders markdown body", async ({ page }) => {
+  await page.goto("/blog/building-xhverse");
+  await expect(
+    page.getByRole("heading", { name: "Building xhverse" }),
+  ).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Why this site exists" })).toBeVisible();
 });
 
 test("gallery page renders images", async ({ page }) => {

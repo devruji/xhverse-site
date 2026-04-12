@@ -16,6 +16,9 @@ describe("Blog Data", () => {
     expect(post).toHaveProperty("tags");
     expect(post).toHaveProperty("mediumUrl");
     expect(post).toHaveProperty("readingTime");
+    expect(post).toHaveProperty("bodyMarkdown");
+    expect(typeof post.bodyMarkdown).toBe("string");
+    expect(post.bodyMarkdown.length).toBeGreaterThan(0);
     expect(Array.isArray(post.tags)).toBe(true);
   });
 
@@ -26,7 +29,9 @@ describe("Blog Data", () => {
     for (const post of posts) {
       expect(post.date).toMatch(/^\d{4}-\d{2}-\d{2}$/);
       expect(Number.isNaN(Date.parse(post.date))).toBe(false);
-      expect(post.mediumUrl.startsWith("https://")).toBe(true);
+      if (post.mediumUrl) {
+        expect(post.mediumUrl.startsWith("https://")).toBe(true);
+      }
     }
   });
 });
