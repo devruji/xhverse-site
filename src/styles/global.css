@@ -338,6 +338,82 @@ p {
   max-width: 26rem;
 }
 
+.article-body {
+  margin-top: 2rem;
+  max-width: 42rem;
+}
+
+.article-body :where(h2, h3, h4) {
+  margin: 1.75rem 0 0.65rem;
+  color: #f9fafb;
+  letter-spacing: -0.03em;
+}
+
+.article-body h2 {
+  font-size: 1.35rem;
+}
+
+.article-body h3 {
+  font-size: 1.15rem;
+}
+
+.article-body p {
+  margin: 0 0 1rem;
+}
+
+.article-body ul,
+.article-body ol {
+  margin: 0 0 1rem;
+  padding-left: 1.35rem;
+}
+
+.article-body li {
+  margin-bottom: 0.35rem;
+}
+
+.article-body blockquote {
+  margin: 1rem 0;
+  padding-left: 1rem;
+  border-left: 2px solid rgba(148, 163, 184, 0.45);
+  color: var(--muted);
+}
+
+.article-body pre {
+  margin: 1rem 0;
+  padding: 1rem 1.1rem;
+  overflow-x: auto;
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(148, 163, 184, 0.25);
+  font-size: 0.88rem;
+}
+
+.article-body code {
+  font-size: 0.9em;
+}
+
+.article-body pre code {
+  font-size: inherit;
+}
+
+.article-body a {
+  color: #e5e7eb;
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+
+.article-body a:hover {
+  color: #fff;
+}
+
+.article-actions {
+  margin-top: 0.5rem;
+}
+
+.article-actions a {
+  font-size: 0.9rem;
+}
+
 @media (max-width: 768px) {
   .header-inner {
     padding-inline: 0.15rem;

@@ -1,0 +1,78 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+import { posts as staticFallback } from "../../data/blog";
+import { site } from "../../data/site";
+import { renderMarkdownToHtml } from "../../lib/render-markdown";
+import {
+  createSupabaseClientForBuild,
+  loadPublishedPostsForBuild,
+} from "../../lib/blog/load-posts";
+
+export async function getStaticPaths() {
+  const client = createSupabaseClientForBuild({
+    SUPABASE_URL: import.meta.env.SUPABASE_URL,
+    SUPABASE_SECRET_KEY: import.meta.env.SUPABASE_SECRET_KEY,
+  });
+  const allPosts = await loadPublishedPostsForBuild(client, staticFallback);
+  return allPosts.map((post) => ({
+    params: { slug: post.slug },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const deploymentSite = (Astro.site ?? site.siteUrl).toString();
+const canonicalUrl = new URL(`/blog/${post.slug}`, deploymentSite).toString();
+const html = renderMarkdownToHtml(post.bodyMarkdown);
+
+const articleStructuredData = {
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  headline: post.title,
+  datePublished: post.date,
+  description: post.excerpt,
+  url: canonicalUrl,
+  keywords: post.tags.join(", "),
+  ...(post.mediumUrl
+    ? { isBasedOn: post.mediumUrl }
+    : {}),
+};
+---
+
+<BaseLayout
+  title={post.title}
+  description={post.excerpt}
+  structuredData={articleStructuredData}
+>
+  <Header current="/blog" />
+  <main class="section">
+    <div class="container">
+      <p class="eyebrow">
+        <a href="/blog">Writing hub</a>
+      </p>
+      <h1>{post.title}</h1>
+      <p class="muted">
+        {post.date} · {post.readingTime}
+        {post.tags.length > 0 && (
+          <>
+            {" "}
+            · Tags: {post.tags.join(", ")}
+          </>
+        )}
+      </p>
+      <div class="article-actions">
+        {post.mediumUrl ? (
+          <p>
+            <a href={post.mediumUrl} target="_blank" rel="noreferrer">
+              Also on Medium
+            </a>
+          </p>
+        ) : null}
+      </div>
+      <article class="article-body" set:html={html} />
+    </div>
+  </main>
+  <Footer />
+</BaseLayout>
