@@ -4,8 +4,11 @@ export type BlogPost = {
   excerpt: string;
   date: string;
   tags: string[];
+  /** Optional syndication link; empty when the piece is site-only. */
   mediumUrl: string;
   readingTime: string;
+  /** Full post body (Markdown); used on `/blog/[slug]` and when Supabase is empty. */
+  bodyMarkdown: string;
 };
 
 export const posts: BlogPost[] = [
@@ -18,6 +21,19 @@ export const posts: BlogPost[] = [
     tags: ["process", "astro", "design"],
     mediumUrl: "https://medium.xhverse.co/building-xhverse",
     readingTime: "6 min read",
+    bodyMarkdown: `## Why this site exists
+
+xhverse is a **personal archive**: a stable place on my own domain for projects, writing, and references.
+
+## What I optimized for
+
+- **Clarity** over novelty
+- **Fast static delivery** with Astro
+- **Honest metadata** and readable structure
+
+## Medium
+
+A longer version of some pieces may also appear on [Medium](https://medium.xhverse.co); this page is the canonical, full-text home when published here.`,
   },
   {
     slug: "images-as-interfaces",
@@ -28,6 +44,13 @@ export const posts: BlogPost[] = [
     tags: ["visuals", "interaction"],
     mediumUrl: "https://medium.xhverse.co/images-as-interfaces",
     readingTime: "4 min read",
+    bodyMarkdown: `## Beyond illustration
+
+Images can do more than illustrate a paragraph. They can **carry hierarchy**, suggest sequence, and invite exploration.
+
+## Quiet interaction
+
+Not every interface needs motion. Sometimes contrast, cropping, and placement are enough to signal *where to look next*.`,
   },
   {
     slug: "fragments-and-worlds",
@@ -38,5 +61,12 @@ export const posts: BlogPost[] = [
     tags: ["writing", "worldbuilding"],
     mediumUrl: "https://medium.xhverse.co/fragments-and-worlds",
     readingTime: "5 min read",
+    bodyMarkdown: `## Small pieces, large implication
+
+A single line can imply history, geography, or conflict if the reader meets it in the right context.
+
+## Leaving room
+
+Worldbuilding does not require a wiki. **Strategic gaps** often feel more alive than exhaustive explanation.`,
   },
 ];

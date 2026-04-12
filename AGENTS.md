@@ -50,6 +50,12 @@ Primary goals: clean UX, strong content presentation, minimal design, SEO hygien
 - Avoid duplicate or weak metadata.
 - Do not ship placeholder OG/meta text.
 
+## Release flow
+- Merge feature work into `development` first.
+- Promote releases from `development` to `main`.
+- Prefer a PR from `development` to `main` for release promotion unless the user explicitly asks for a direct merge.
+- Before any merge, verify the source branch and target branch explicitly.
+
 ## Done when
 - requested change is implemented
 - relevant checks have been run
