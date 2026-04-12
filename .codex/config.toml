@@ -1,0 +1,6 @@
+model_reasoning_effort = "medium"
+sandbox_mode = "workspace-write"
+
+[agents]
+max_threads = 4
+max_depth = 1

@@ -61,11 +61,11 @@ const homeStructuredData = {
 ---
 <BaseLayout
   title="Home"
-  description="XHVERSE is a personal archive for projects, writing, images, and collected interests by XH."
+  description="XHVERSE is a personal archive for projects, writing, images, and notes by XH."
   structuredData={homeStructuredData}
+  lcpImage="/images/xh-profile-960.jpg"
 >
   <div class="min-h-screen bg-black font-[Inter] text-neutral-100 selection:bg-white/20 selection:text-white">
-    <!-- Ambient background glow -->
     <div class="absolute inset-0 overflow-hidden">
       <div class="absolute left-1/2 top-[-14rem] h-[34rem] w-[34rem] -translate-x-1/2 rounded-full bg-white/[0.08] blur-[100px]"></div>
       <div class="absolute bottom-[-3rem] left-[-3rem] h-64 w-64 rounded-full bg-cyan-500/10 blur-[80px]"></div>
@@ -94,25 +94,22 @@ const homeStructuredData = {
         </a>
       </header>
 
-      <!-- Hero — Option C: Floating Circle, No Card -->
-      <section class="relative mt-4 sm:mt-8">
-        <div class="grid items-center gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:gap-16">
-          <!-- Left: Text content -->
+      <section class="relative mt-3 sm:mt-6">
+        <div class="grid items-center gap-8 lg:grid-cols-[1.15fr_0.85fr] lg:gap-12">
           <div class="max-w-xl">
-            <div class="mb-5 inline-flex items-center rounded-full border border-white/[0.08] bg-white/[0.04] px-3 py-1 text-[11px] uppercase tracking-[0.24em] text-neutral-400">
+            <div class="mb-4 inline-flex items-center rounded-full border border-white/[0.08] bg-white/[0.04] px-3 py-1 text-[11px] uppercase tracking-[0.24em] text-neutral-400">
               Personal archive by XH
             </div>
             <h2 class="text-[2.25rem] font-semibold leading-[0.93] tracking-tight text-white sm:text-5xl lg:text-[3.75rem]">
               A personal space for
               <span class="mt-1 block text-neutral-400/90">
-                thoughts, projects,<br class="hidden sm:inline" /> images, and collected<br class="hidden lg:inline" /> interests.
+                projects, writing,<br class="hidden sm:inline" /> images, and notes<br class="hidden lg:inline" /> I revisit over time.
               </span>
             </h2>
-            <p class="mt-5 max-w-md text-[15px] leading-7 text-neutral-300">
-              xhverse is a digital home for the things I build, study, document, and return to over time.
-              Part journal, part archive, part ongoing work in progress.
+            <p class="mt-4 max-w-md text-[15px] leading-7 text-neutral-300">
+              xhverse is where I gather what I build, study, and want to find again: part journal, part archive, and ongoing work in progress.
             </p>
-            <div class="mt-7 flex flex-col gap-3 sm:flex-row">
+            <div class="mt-6 flex flex-col gap-3 sm:flex-row">
               <a href="#about" class="inline-flex items-center justify-center rounded-2xl bg-white px-5 py-3 text-sm font-semibold !text-black no-underline opacity-100 transition hover:-translate-y-0.5 hover:bg-neutral-100">Enter xhverse</a>
               <a
                 href="#blog"
@@ -123,9 +120,7 @@ const homeStructuredData = {
             </div>
           </div>
 
-          <!-- Right: Floating circular portrait -->
           <div class="relative mx-auto flex items-center justify-center">
-            <!-- Ambient glow behind circle -->
             <div class="absolute h-[18rem] w-[18rem] rounded-full bg-gradient-to-br from-indigo-500/15 via-cyan-500/8 to-transparent blur-3xl sm:h-[22rem] sm:w-[22rem]"></div>
             <div class="relative h-[16rem] w-[16rem] sm:h-[19rem] sm:w-[19rem] lg:h-[22rem] lg:w-[22rem]">
               <div class="h-full w-full overflow-hidden rounded-full border border-white/[0.08] shadow-[6px_6px_40px_rgba(99,102,241,0.15)]">
@@ -134,6 +129,7 @@ const homeStructuredData = {
                   alt="Portrait of XH"
                   width="960"
                   height="960"
+                  loading="eager"
                   decoding="async"
                   fetchpriority="high"
                   class="h-full w-full object-cover object-center"
@@ -144,7 +140,6 @@ const homeStructuredData = {
         </div>
       </section>
 
-      <!-- About + Current Focus row -->
       <section id="about" class="mt-5 grid gap-4 sm:mt-6 lg:grid-cols-[1.2fr_0.8fr] lg:gap-5">
         <div class="rounded-[1.6rem] border border-white/[0.07] bg-white/[0.03] p-5 text-neutral-300 backdrop-blur-xl sm:p-6">
           <p class="text-[11px] uppercase tracking-[0.32em] text-neutral-500/70">About</p>
@@ -338,16 +333,16 @@ const homeStructuredData = {
         </div>
         <div class="flex flex-wrap items-center gap-5">
           <a href="mailto:contact@xhverse.co" class="opacity-60 transition hover:opacity-100" aria-label="Email">
-            <img src="/images/icon_email.svg" alt="" class="h-5 w-5 object-contain invert" />
+            <img src="/images/icon_email.svg" alt="" width="20" height="20" loading="lazy" decoding="async" class="h-5 w-5 object-contain invert" />
           </a>
           <a href="https://medium.xhverse.co" target="_blank" rel="noopener noreferrer" class="opacity-60 transition hover:opacity-100" aria-label="Medium">
-            <img src="/images/icon_medium.svg" alt="" class="h-5 w-5 object-contain invert" />
+            <img src="/images/icon_medium.svg" alt="" width="20" height="20" loading="lazy" decoding="async" class="h-5 w-5 object-contain invert" />
           </a>
           <a href="https://github.com/devruji" target="_blank" rel="noopener noreferrer" class="opacity-60 transition hover:opacity-100" aria-label="GitHub">
-            <img src="/images/icon_github.svg" alt="" class="h-5 w-5 object-contain invert" />
+            <img src="/images/icon_github.svg" alt="" width="20" height="20" loading="lazy" decoding="async" class="h-5 w-5 object-contain invert" />
           </a>
           <a href="https://www.linkedin.com/in/rujikorn/" target="_blank" rel="noopener noreferrer" class="opacity-60 transition hover:opacity-100" aria-label="LinkedIn">
-            <img src="/images/icon_linkedin.svg" alt="" class="h-5 w-5 object-contain invert" />
+            <img src="/images/icon_linkedin.svg" alt="" width="20" height="20" loading="lazy" decoding="async" class="h-5 w-5 object-contain invert" />
           </a>
         </div>
       </footer>
