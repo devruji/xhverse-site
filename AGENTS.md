@@ -1,0 +1,57 @@
+# xhverse Site Agent Guide
+
+## Repo purpose
+Production website and blog for xhverse, built with Astro.
+Primary goals: clean UX, strong content presentation, minimal design, SEO hygiene, and safe production-quality changes.
+
+## Priority directories
+- `src/pages` for routes
+- `src/components` for reusable UI
+- `src/layouts` for page shells
+- `public` for static assets
+- `tests` for automated coverage where applicable
+
+## Before editing
+- Read the relevant page, layout, and shared component first.
+- Reuse existing patterns before creating new abstractions.
+- Prefer minimal, reviewable diffs.
+
+## Commands
+- install: `bun install`
+- dev: `bun run dev`
+- build: `bun run build`
+- preview: `bun run preview`
+- typecheck: `bun run typecheck`
+- unit test: `bun run test`
+- unit test (watch): `bun run test:watch`
+- coverage: `bun run coverage`
+- e2e test: `bun run test:e2e`
+- full verification: `bun run check`
+
+## Engineering rules
+- Treat this repo as production code.
+- Preserve existing behavior unless the task explicitly changes it.
+- Do not edit generated folders such as `coverage`, `playwright-report`, `dist`, or `.astro`.
+- Avoid unrelated refactors.
+- Keep changes small and explainable.
+- Prefer existing components, spacing, and typography patterns.
+- For complex tasks, produce a plan first before editing.
+- Report only checks that were actually run.
+
+## Content rules
+- Tone: concise, professional, minimal, credible.
+- Avoid generic marketing copy.
+- Keep CTAs subtle.
+- Write for clarity first.
+
+## SEO rules
+- Important pages should have strong title and description metadata.
+- Preserve clean heading hierarchy.
+- Avoid duplicate or weak metadata.
+- Do not ship placeholder OG/meta text.
+
+## Done when
+- requested change is implemented
+- relevant checks have been run
+- edited area has no obvious regression
+- final summary includes changed files, risks, and verification status
