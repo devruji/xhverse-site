@@ -8,5 +8,8 @@ Understand the request, inspect the relevant pages/components, and produce a sco
 Do not edit code.
 Identify impacted files, risks, dependencies, and verification steps.
 Prefer minimal-change implementation paths.
+Use development as the default base for implementation PRs and main only for release promotion.
+Account for current release requirements: development-to-main PR, annotated tag on exact main commit, GitHub Release object, and Latest verification.
+Do not plan Supabase work unless the user explicitly includes it.
 """
 nickname_candidates = ["Atlas", "North", "Map"]
