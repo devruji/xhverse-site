@@ -18,7 +18,7 @@
     "check": "bun run typecheck && bun run build && bun run coverage && bun run test:e2e"
   },
   "dependencies": {
-    "@astrojs/sitemap": "^3.7.1",
+    "@astrojs/sitemap": "^3.7.2",
     "@supabase/supabase-js": "^2.103.0",
     "@tailwindcss/vite": "^4.2.1",
     "astro": "^6.1.9",
