@@ -11,6 +11,7 @@ concurrency:
 
 permissions:
   contents: read
+  deployments: write
 
 jobs:
   test:
@@ -32,14 +33,22 @@ jobs:
         with:
           bun-version: 1.2.21
 
+      - name: Cache Bun dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
       - name: Run Astro type/content checks
         run: bun run typecheck
 
-      - name: Install Playwright browsers
-        run: bunx playwright install --with-deps
+      - name: Install Playwright Chromium
+        run: bunx playwright install --with-deps chromium
 
       - name: Build site
         run: bun run build
@@ -82,3 +91,60 @@ jobs:
             echo "## Test Coverage" >> "$GITHUB_STEP_SUMMARY"
             echo "_Coverage summary unavailable because the coverage report was not generated._" >> "$GITHUB_STEP_SUMMARY"
           fi
+
+  report-production-deployment:
+    name: Report Production Deployment
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Create GitHub deployment record
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          SHA: ${{ github.sha }}
+          REF: ${{ github.ref_name }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          deployment_payload="$(
+            jq -n \
+              --arg ref "$SHA" \
+              --arg environment "xhverse-site (Production)" \
+              '{
+                ref: $ref,
+                task: "deploy",
+                environment: $environment,
+                description: "Production deployment reported after CI passed on main.",
+                auto_merge: false,
+                required_contexts: [],
+                production_environment: true
+              }'
+          )"
+
+          deployment_id="$(
+            gh api "repos/$REPO/deployments" \
+              --method POST \
+              --input - \
+              --jq ".id" <<< "$deployment_payload"
+          )"
+
+          status_payload="$(
+            jq -n \
+              --arg environment "xhverse-site (Production)" \
+              --arg environment_url "https://xhverse.co" \
+              --arg log_url "$RUN_URL" \
+              --arg description "Production deployment is up to date for $REF at $SHA." \
+              '{
+                state: "success",
+                environment: $environment,
+                environment_url: $environment_url,
+                log_url: $log_url,
+                description: $description
+              }'
+          )"
+
+          gh api "repos/$REPO/deployments/$deployment_id/statuses" \
+            --method POST \
+            --input - <<< "$status_payload"
