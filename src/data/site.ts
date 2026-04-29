@@ -6,6 +6,7 @@ export const site = {
   email: "contact@xhverse.co",
   github: "https://github.com/devruji",
   medium: "https://medium.xhverse.co",
+  linkedin: "https://www.linkedin.com/in/rujikorn/",
   xHandle: "@xhverse",
   locale: "en_US",
   ogImage: "/images/og-cover.svg",

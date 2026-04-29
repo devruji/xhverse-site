@@ -1,11 +1,66 @@
 ---
 import { profile } from "../data/profile";
+import { site } from "../data/site";
+
+const strengths = [
+  {
+    title: "Platform direction",
+    description:
+      "I help shape clearer data platform foundations across Azure, Databricks, Microsoft Fabric, and enterprise analytics environments.",
+  },
+  {
+    title: "Governance that runs",
+    description:
+      "I care about access models, ownership, standards, and documentation that operators can verify and maintain.",
+  },
+  {
+    title: "Architecture communication",
+    description:
+      "I translate complex platform topics into practical narratives for project teams, stakeholders, and leadership.",
+  },
+];
 ---
 
 <section class="section">
   <div class="container">
-    <h2>About</h2>
-    <p>{profile.longBio}</p>
+    <p class="eyebrow">About</p>
+    <h1>Data Engineering and Data Architecture, with a practical platform mindset.</h1>
+    <p class="about-lead">{profile.longBio}</p>
+    <p class="muted">
+      My work focuses on making data systems clearer, easier to govern, and easier to operate over time. I am interested
+      in the decisions behind scalable platforms: where standards belong, how teams should use shared services, and how
+      architecture can support delivery without becoming detached from execution.
+    </p>
+    <div class="about-actions">
+      <a href={site.linkedin} target="_blank" rel="noopener noreferrer" class="link-underlined">LinkedIn profile</a>
+      <a href={site.medium} target="_blank" rel="noopener noreferrer" class="link-underlined">Medium writing</a>
+    </div>
+    <div class="grid grid--blog about-grid">
+      {strengths.map((item) => (
+        <article class="card card--blog">
+          <h2>{item.title}</h2>
+          <p class="muted">{item.description}</p>
+        </article>
+      ))}
+    </div>
   </div>
 </section>
 
+<style>
+  .about-lead {
+    max-width: 58rem;
+    font-size: clamp(1.15rem, 2vw, 1.35rem);
+    line-height: 1.75;
+  }
+
+  .about-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+    margin-top: 1.75rem;
+  }
+
+  .about-grid {
+    margin-top: 3rem;
+  }
+</style>
