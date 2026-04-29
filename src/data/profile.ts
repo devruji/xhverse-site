@@ -1,15 +1,15 @@
 export const profile = {
   name: "XH",
-  title: "Creative developer & visual artist",
-  bio: "Exploring the space between code, image, and narrative.",
+  title: "Data Engineer / Data Architect",
+  bio: "Focused on modern data platforms, analytics architecture, governance, and practical data strategy.",
   longBio:
-    "XH is a multidisciplinary creator working at the intersection of code, image, and story. xhverse is an evolving space for experiments in generative visuals, interfaces, and writing.",
+    "XH is a Data Engineer / Data Architect working at the intersection of data platform engineering, analytics architecture, and business-aligned technology strategy. His work focuses on building and improving enterprise data ecosystems across Azure, Databricks, Microsoft Fabric, and related analytics stacks.",
   statement:
-    "I treat the browser as a studio—part sketchbook, part instrument. Through xhverse I explore how small interactions and fragments of text can feel like signals from a larger, unseen world.",
+    "I care less about hype and more about building systems that are clear, maintainable, governed, and useful for the people who rely on them. This space is where I share thoughts, notes, and work around architecture, platform strategy, and the realities of building data foundations that can actually support the business.",
   avatar: "/images/xh-profile-960.jpg",
   email: "contact@xhverse.co",
   contactIntro:
-    "For collaborations, commissions, or just to say hi, send a message and I’ll get back to you.",
+    "For data platform architecture, governance, analytics engineering, or thoughtful technical conversations, send a message and I’ll get back to you.",
 };
 
 export type Profile = typeof profile;

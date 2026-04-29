@@ -112,6 +112,10 @@ This setup matches the SEO behavior in the app:
 - Production builds emit canonical URLs for `https://xhverse.co`
 - Preview builds fall back to their preview URL and add `noindex, nofollow`
 
+Release note:
+
+- Production releases should be promoted from `development` to `main`, tagged on the exact merged `main` commit, and published as a GitHub Release for that same tag. The GitHub Releases page only shows Release objects, so verify the newest release appears as `Latest` after publishing.
+
 Important Cloudflare limitation:
 
 - If the current Pages project was created as a Direct Upload project, Cloudflare does not let you convert it to Git integration later. In that case, create a new Pages project connected to the GitHub repository and migrate the custom domain to that project.

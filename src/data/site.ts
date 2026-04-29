@@ -2,10 +2,11 @@ export const site = {
   title: "xhverse",
   siteUrl: "https://xhverse.co",
   description:
-    "XHVERSE is a personal archive for projects, writing, images, and notes by XH.",
+    "XHVERSE is a data architecture journal and portfolio by XH, focused on modern data platforms, governance, analytics architecture, and practical data strategy.",
   email: "contact@xhverse.co",
   github: "https://github.com/devruji",
   medium: "https://medium.xhverse.co",
+  linkedin: "https://www.linkedin.com/in/rujikorn/",
   xHandle: "@xhverse",
   locale: "en_US",
   ogImage: "/images/og-cover.svg",

@@ -63,6 +63,8 @@ Primary goals: clean UX, strong content presentation, minimal design, SEO hygien
 - Every release promotion to `main` must include a useful release message that summarizes user-visible changes, security/runtime changes, verification, and known risks.
 - After a release is merged to `main`, create and push a release tag for that exact `main` commit.
 - Prefer annotated release tags such as `v1.2.3` with a concise message that explains what shipped and why it matters.
+- After pushing the tag, create or update the matching GitHub Release and mark the newest production release as `Latest`; a git tag alone is not enough because the repository Releases panel only tracks GitHub Release objects.
+- Verify the GitHub Releases page/list shows the new version as `Latest` before considering the release complete.
 - Do not tag unreleased `development` commits or preview-only work.
 
 ## Branch hygiene
