@@ -18,21 +18,21 @@
     "check": "bun run typecheck && bun run build && bun run coverage && bun run test:e2e"
   },
   "dependencies": {
-    "@astrojs/sitemap": "^3.7.1",
+    "@astrojs/sitemap": "^3.7.2",
     "@supabase/supabase-js": "^2.103.0",
     "@tailwindcss/vite": "^4.2.1",
     "astro": "^6.1.9",
     "marked": "^18.0.0",
-    "sanitize-html": "^2.17.2",
+    "sanitize-html": "^2.17.3",
     "tailwindcss": "^4.2.1"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.7",
-    "@playwright/test": "^1.58.2",
+    "@playwright/test": "^1.59.1",
     "@types/node": "^25.3.5",
     "@types/sanitize-html": "^2.16.1",
-    "@vitest/coverage-v8": "^4.0.18",
+    "@vitest/coverage-v8": "^4.1.5",
     "typescript": "^6.0.3",
-    "vitest": "^4.0.18"
+    "vitest": "^4.1.5"
   }
 }
