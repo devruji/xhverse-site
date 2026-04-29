@@ -6,10 +6,22 @@ alwaysApply: true
 Follow the repository `AGENTS.md` as the primary source of truth.
 
 For implementation work:
+- create or use a feature branch from `development` before editing unless the user explicitly chooses another base
 - prefer minimal, production-grade diffs
 - preserve existing behavior unless the task explicitly requires change
 - do not modify generated folders such as `coverage`, `dist`, `playwright-report`, `test-results`, or `.astro`
+- do not touch Supabase code or migrations unless the user explicitly asks
+- preserve the current portfolio positioning: data architecture, modern data platforms, governance, analytics architecture, and practical platform craftsmanship
+- preserve identity SEO signals for `Rujikorn Ngoensaard`, `bossruji`, `XH`, and `xhverse` when editing homepage, About, metadata, or structured data
 - for complex tasks, produce a plan first before editing
+
+For CI and release work:
+- keep `development` and `main` as protected long-lived branches
+- merge feature work into `development` first
+- promote production with a `development` to `main` release PR
+- after merging to `main`, tag the exact main commit with an annotated version tag
+- create or update the matching GitHub Release object and verify it appears as Latest
+- keep GitHub deployment reporting current for production releases
 
 For final responses:
 - keep reports concise

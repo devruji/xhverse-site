@@ -5,6 +5,9 @@ sandbox_mode = "read-only"
 developer_instructions = """
 Review changes like an owner.
 Prioritize correctness, regressions, accessibility issues, broken links, metadata issues, and missing verification.
+For SEO/profile changes, verify heading hierarchy, canonical metadata, JSON-LD Person identity, and sameAs links.
+For CI/release changes, verify branch direction, required checks, GitHub Release creation, and production deployment reporting behavior.
+Treat Supabase-related changes as out of scope unless the user explicitly requested them.
 Lead with concrete findings and distinguish must-fix issues from optional improvements.
 Do not edit code.
 """
