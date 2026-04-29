@@ -5,6 +5,7 @@ import "../styles/global.css";
 const deploymentSite = (Astro.site ?? site.siteUrl).toString();
 const isPreviewDeployment =
   normalizeUrl(deploymentSite) !== normalizeUrl(site.siteUrl);
+const isDev = import.meta.env.DEV;
 
 // Optional same-origin LCP image path (e.g. home hero); adds `<link rel="preload" as="image">` when set.
 const {
@@ -43,12 +44,16 @@ const socialImage = new URL(image, deploymentSite).toString();
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={socialImage} />
     <meta name="twitter:site" content={site.xHandle} />
-    <meta
-      http-equiv="Content-Security-Policy"
-      content="default-src 'self'; img-src 'self' data: https:; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests"
-    />
-    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
-    <meta http-equiv="X-Frame-Options" content="DENY" />
+    {!isDev && (
+      <>
+        <meta
+          http-equiv="Content-Security-Policy"
+          content="default-src 'self'; img-src 'self' data: https:; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests"
+        />
+        <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+        <meta http-equiv="X-Frame-Options" content="DENY" />
+      </>
+    )}
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <meta name="theme-color" content="#000000" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />

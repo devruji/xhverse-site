@@ -27,6 +27,7 @@ Welcome to the XHVerse Site repository! This is a modern static web application 
 
 ### Prerequisites
 
+- [Node.js](https://nodejs.org/) `22.12.0` or higher
 - [Bun](https://bun.sh/) (v1.0 or higher)
 
 ### Installation
@@ -38,6 +39,8 @@ git clone https://github.com/devruji/xhverse-site.git
 cd xhverse-site
 bun install
 ```
+
+This repository pins the CI and Cloudflare Pages runtime with `/.node-version` to keep Astro-compatible Node behavior consistent across local development and deployment.
 
 ### Local Development
 
@@ -94,6 +97,7 @@ Recommended Cloudflare Pages settings:
 - Production branch: `main`
 - Build command: `bun run build`
 - Build output directory: `dist`
+- Node.js version: `22.16.0` (or read from `/.node-version`)
 
 Recommended environment variables:
 
