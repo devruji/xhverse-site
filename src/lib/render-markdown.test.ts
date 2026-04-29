@@ -18,4 +18,14 @@ describe("renderMarkdownToHtml", () => {
     const html = renderMarkdownToHtml("[x](https://example.com/path)");
     expect(html).toContain('href="https://example.com/path"');
   });
+
+  it("strips unsafe javascript links", () => {
+    const html = renderMarkdownToHtml("[x](javascript:alert(1))");
+    expect(html.toLowerCase()).not.toContain("javascript:");
+  });
+
+  it("strips data image sources", () => {
+    const html = renderMarkdownToHtml("![x](data:image/svg+xml,<svg></svg>)");
+    expect(html.toLowerCase()).not.toContain("data:image");
+  });
 });

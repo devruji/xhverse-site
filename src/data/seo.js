@@ -54,3 +54,24 @@ export function shouldNoIndex(env = {}) {
 
   return branch !== resolveProductionBranch(env);
 }
+
+export function shouldNoIndexDeployment(
+  deploymentSite,
+  productionSiteUrl = DEFAULT_SITE_URL,
+  env = {},
+) {
+  if (env.PUBLIC_ALLOW_INDEXING === "true") {
+    return false;
+  }
+
+  if (shouldNoIndex(env)) {
+    return true;
+  }
+
+  const normalizedDeploymentSite = normalizeEnvUrl(deploymentSite);
+  if (!normalizedDeploymentSite) {
+    return false;
+  }
+
+  return normalizedDeploymentSite !== normalizeEnvUrl(productionSiteUrl);
+}
