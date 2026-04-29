@@ -25,7 +25,9 @@ const strengths = [
   <div class="container">
     <p class="eyebrow">About</p>
     <h1>Data Engineering and Data Architecture, with a practical platform mindset.</h1>
+    <p class="identity-line">{profile.fullName} · {profile.name} · @{profile.handle} · xhverse</p>
     <p class="about-lead">{profile.longBio}</p>
+    <p class="craft-line">{profile.craftLine}</p>
     <p class="muted">
       My work focuses on making data systems clearer, easier to govern, and easier to operate over time. I am interested
       in the decisions behind scalable platforms: where standards belong, how teams should use shared services, and how
@@ -51,6 +53,22 @@ const strengths = [
     max-width: 58rem;
     font-size: clamp(1.15rem, 2vw, 1.35rem);
     line-height: 1.75;
+  }
+
+  .identity-line {
+    margin: -0.35rem 0 1.5rem;
+    color: var(--muted);
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .craft-line {
+    max-width: 54rem;
+    margin: 0 0 1.25rem;
+    padding-left: 1rem;
+    border-left: 1px solid rgba(103, 232, 249, 0.45);
+    color: #d4d4d8;
   }
 
   .about-actions {
