@@ -15,6 +15,7 @@ Primary goals: clean UX, strong content presentation, minimal design, SEO hygien
 - Read the relevant page, layout, and shared component first.
 - Reuse existing patterns before creating new abstractions.
 - Prefer minimal, reviewable diffs.
+- Before making changes, open a new branch from the correct base branch; do not work directly on `development` or `main` unless the user explicitly asks.
 
 ## Commands
 - install: `bun install`
@@ -62,6 +63,9 @@ Primary goals: clean UX, strong content presentation, minimal design, SEO hygien
 
 ## Branch hygiene
 - Treat `development` and `main` as the long-lived branches.
+- Always mention and confirm the branch plan before edits: open a new branch first, and state whether the base is currently `development` or `main`.
+- Use `development` as the default base for feature, dependency, CI, and content work unless the user explicitly chooses `main`.
+- Keep `main` for production release promotion only.
 - Delete merged or abandoned feature branches after confirming they are no longer needed.
 - Prune stale remote-tracking branches when branch state has drifted from GitHub.
 - Verify PR state before deleting any remote branch.
