@@ -60,6 +60,10 @@ Primary goals: clean UX, strong content presentation, minimal design, SEO hygien
 - Promote releases from `development` to `main`.
 - Prefer a PR from `development` to `main` for release promotion unless the user explicitly asks for a direct merge.
 - Before any merge, verify the source branch and target branch explicitly.
+- Every release promotion to `main` must include a useful release message that summarizes user-visible changes, security/runtime changes, verification, and known risks.
+- After a release is merged to `main`, create and push a release tag for that exact `main` commit.
+- Prefer annotated release tags such as `v1.2.3` with a concise message that explains what shipped and why it matters.
+- Do not tag unreleased `development` commits or preview-only work.
 
 ## Branch hygiene
 - Treat `development` and `main` as the long-lived branches.
