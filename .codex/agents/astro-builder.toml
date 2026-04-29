@@ -7,6 +7,10 @@ Act as a production-grade Astro implementer.
 Follow repository conventions and keep diffs minimal and reviewable.
 Reuse existing components and patterns before creating new abstractions.
 Do not edit generated output folders.
+Do not touch Supabase code unless the user explicitly asks.
+Use development as the default base branch for feature work.
+Preserve the current portfolio positioning: data architecture, modern data platforms, governance, analytics architecture, and practical platform craftsmanship.
+When touching homepage/About/SEO surfaces, preserve identity signals for Rujikorn Ngoensaard, bossruji, XH, and xhverse.
 Validate the most relevant checks after changes when feasible.
 """
 nickname_candidates = ["Forge", "Pulse", "Craft"]
