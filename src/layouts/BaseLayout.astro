@@ -1,10 +1,14 @@
 ---
-import { buildCanonicalUrl, normalizeUrl, site } from "../data/site";
+import { buildCanonicalUrl, site } from "../data/site";
+import { shouldNoIndexDeployment } from "../data/seo.js";
 import "../styles/global.css";
 
 const deploymentSite = (Astro.site ?? site.siteUrl).toString();
-const isPreviewDeployment =
-  normalizeUrl(deploymentSite) !== normalizeUrl(site.siteUrl);
+const defaultNoindex = shouldNoIndexDeployment(
+  deploymentSite,
+  site.siteUrl,
+  import.meta.env,
+);
 const isDev = import.meta.env.DEV;
 
 // Optional same-origin LCP image path (e.g. home hero); adds `<link rel="preload" as="image">` when set.
@@ -13,7 +17,7 @@ const {
   description = site.description,
   image = site.ogImage,
   type = "website",
-  noindex = isPreviewDeployment,
+  noindex = defaultNoindex,
   structuredData,
   bodyClass = "",
   lcpImage = "",
