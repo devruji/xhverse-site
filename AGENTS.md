@@ -36,6 +36,7 @@ Primary goals: clean UX, strong content presentation, minimal design, SEO hygien
 - Keep changes small and explainable.
 - Prefer existing components, spacing, and typography patterns.
 - For complex tasks, produce a plan first before editing.
+- Keep the pinned Node runtime aligned across `/.node-version`, CI, and Cloudflare Pages when Astro or tooling requirements change.
 - Keep `bun.lock` in sync with any dependency manifest changes; do not relax `--frozen-lockfile` to hide drift.
 - Keep CI reporting steps non-fatal when their input artifacts were not produced because an earlier step failed.
 - Report only checks that were actually run.
