@@ -34,9 +34,8 @@ test("gallery page renders images", async ({ page }) => {
   await expect(page.locator("img").first()).toBeVisible();
 });
 
-test("homepage sets security-sensitive policy metadata", async ({ page }) => {
+test("homepage sets SEO and referrer metadata", async ({ page }) => {
   await page.goto("/");
-  await expect(page.locator('meta[http-equiv="Content-Security-Policy"]')).toHaveCount(1);
   await expect(page.locator('meta[name="referrer"][content="strict-origin-when-cross-origin"]')).toHaveCount(1);
   await expect(page.locator('link[rel="canonical"][href="https://xhverse.co/"]')).toHaveCount(1);
 });

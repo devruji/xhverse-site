@@ -3,15 +3,15 @@ import { mapPostRowToBlogPost } from "./post-row";
 
 export type PostsQueryInterpretation =
   | { kind: "use_remote"; rows: unknown[] }
-  | { kind: "use_fallback" };
+  | { kind: "use_fallback"; reason: "query_error" | "empty_result" };
 
 export function interpretSupabasePostsResponse(
   data: unknown,
   error: { message: string } | null,
 ): PostsQueryInterpretation {
-  if (error) return { kind: "use_fallback" };
+  if (error) return { kind: "use_fallback", reason: "query_error" };
   if (!Array.isArray(data) || data.length === 0) {
-    return { kind: "use_fallback" };
+    return { kind: "use_fallback", reason: "empty_result" };
   }
   return { kind: "use_remote", rows: data };
 }

@@ -68,8 +68,13 @@ describe("createSupabaseClientForBuild", () => {
 });
 
 describe("loadPublishedPostsForBuild", () => {
+  const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+  const infoSpy = vi.spyOn(console, "info").mockImplementation(() => {});
+
   beforeEach(() => {
     vi.mocked(createClient).mockReset();
+    warnSpy.mockClear();
+    infoSpy.mockClear();
   });
 
   it("returns sorted static posts when client is null", async () => {
@@ -78,6 +83,9 @@ describe("loadPublishedPostsForBuild", () => {
     const dates = posts.map((p) => p.date);
     const sorted = [...dates].sort((a, b) => b.localeCompare(a));
     expect(dates).toEqual(sorted);
+    expect(warnSpy).toHaveBeenCalledWith(
+      "[blog] Supabase build credentials missing; using static fallback posts.",
+    );
   });
 
   it("falls back when the query returns an error", async () => {
@@ -94,6 +102,46 @@ describe("loadPublishedPostsForBuild", () => {
     const posts = await loadPublishedPostsForBuild(client, staticFallback);
     expect(posts.map((p) => p.slug).sort()).toEqual(
       staticFallback.map((p) => p.slug).sort(),
+    );
+    expect(warnSpy).toHaveBeenCalledWith(
+      "[blog] Supabase posts query failed; using static fallback posts. failed",
+    );
+  });
+
+  it("falls back when the query returns an error without a message", async () => {
+    const order = vi.fn().mockResolvedValue({
+      data: null,
+      error: {},
+    });
+    const not = vi.fn().mockReturnValue({ order });
+    const eq = vi.fn().mockReturnValue({ not });
+    const select = vi.fn().mockReturnValue({ eq });
+    const from = vi.fn().mockReturnValue({ select });
+    const client = { from } as never;
+
+    await loadPublishedPostsForBuild(client, staticFallback);
+    expect(warnSpy).toHaveBeenCalledWith(
+      "[blog] Supabase posts query failed; using static fallback posts.",
+    );
+  });
+
+  it("falls back when the query returns no published rows", async () => {
+    const order = vi.fn().mockResolvedValue({
+      data: [],
+      error: null,
+    });
+    const not = vi.fn().mockReturnValue({ order });
+    const eq = vi.fn().mockReturnValue({ not });
+    const select = vi.fn().mockReturnValue({ eq });
+    const from = vi.fn().mockReturnValue({ select });
+    const client = { from } as never;
+
+    const posts = await loadPublishedPostsForBuild(client, staticFallback);
+    expect(posts.map((p) => p.slug).sort()).toEqual(
+      staticFallback.map((p) => p.slug).sort(),
+    );
+    expect(warnSpy).toHaveBeenCalledWith(
+      "[blog] Supabase returned no published posts; using static fallback posts.",
     );
   });
 
@@ -122,5 +170,8 @@ describe("loadPublishedPostsForBuild", () => {
     const posts = await loadPublishedPostsForBuild(client, staticFallback);
     expect(posts.some((p) => p.slug === "db-post")).toBe(true);
     expect(from).toHaveBeenCalledWith("posts");
+    expect(infoSpy).toHaveBeenCalledWith(
+      "[blog] Loaded 1 published post(s) from Supabase.",
+    );
   });
 });

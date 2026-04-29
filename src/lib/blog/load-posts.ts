@@ -39,6 +39,9 @@ export async function loadPublishedPostsForBuild(
   staticFallback: BlogPost[],
 ): Promise<BlogPost[]> {
   if (!client) {
+    console.warn(
+      "[blog] Supabase build credentials missing; using static fallback posts.",
+    );
     return sortPostsByDateDesc(staticFallback);
   }
   const { data, error } = await client
@@ -48,6 +51,23 @@ export async function loadPublishedPostsForBuild(
     .not("published_at", "is", null)
     .order("published_at", { ascending: false });
   const interpretation = interpretSupabasePostsResponse(data, error);
+
+  if (interpretation.kind === "use_fallback") {
+    if (interpretation.reason === "query_error") {
+      console.warn(
+        `[blog] Supabase posts query failed; using static fallback posts. ${error?.message ?? ""}`.trim(),
+      );
+    } else {
+      console.warn(
+        "[blog] Supabase returned no published posts; using static fallback posts.",
+      );
+    }
+  } else {
+    console.info(
+      `[blog] Loaded ${interpretation.rows.length} published post(s) from Supabase.`,
+    );
+  }
+
   const merged = mergePostsWithStaticFallback(interpretation, staticFallback);
   return sortPostsByDateDesc(merged);
 }

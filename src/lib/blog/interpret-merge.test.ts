@@ -10,15 +10,17 @@ describe("interpretSupabasePostsResponse", () => {
   it("falls back on error", () => {
     expect(
       interpretSupabasePostsResponse([], { message: "nope" }),
-    ).toEqual({ kind: "use_fallback" });
+    ).toEqual({ kind: "use_fallback", reason: "query_error" });
   });
 
   it("falls back on empty or non-array data", () => {
     expect(interpretSupabasePostsResponse([], null)).toEqual({
       kind: "use_fallback",
+      reason: "empty_result",
     });
     expect(interpretSupabasePostsResponse(null, null)).toEqual({
       kind: "use_fallback",
+      reason: "empty_result",
     });
   });
 
@@ -34,7 +36,7 @@ describe("interpretSupabasePostsResponse", () => {
 describe("mergePostsWithStaticFallback", () => {
   it("returns fallback copy when interpretation is fallback", () => {
     const out = mergePostsWithStaticFallback(
-      { kind: "use_fallback" },
+      { kind: "use_fallback", reason: "empty_result" },
       posts,
     );
     expect(out).toEqual(posts);

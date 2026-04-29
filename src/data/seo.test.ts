@@ -4,6 +4,7 @@ import {
   normalizeEnvUrl,
   resolveProductionBranch,
   resolveSiteUrl,
+  shouldNoIndexDeployment,
   shouldNoIndex,
 } from "./seo.js";
 
@@ -99,6 +100,44 @@ describe("shouldNoIndex", () => {
         CF_PAGES_BRANCH: "preview",
         PUBLIC_ALLOW_INDEXING: "true",
       }),
+    ).toBe(false);
+  });
+});
+
+describe("shouldNoIndexDeployment", () => {
+  it("returns false for the production deployment URL", () => {
+    expect(shouldNoIndexDeployment("https://xhverse.co")).toBe(false);
+    expect(shouldNoIndexDeployment("https://xhverse.co/")).toBe(false);
+  });
+
+  it("returns true when the deployment URL is not production", () => {
+    expect(shouldNoIndexDeployment("https://preview.xhverse.pages.dev")).toBe(
+      true,
+    );
+  });
+
+  it("returns false when the deployment URL is missing", () => {
+    expect(shouldNoIndexDeployment("")).toBe(false);
+    expect(shouldNoIndexDeployment("   ")).toBe(false);
+  });
+
+  it("returns true for non-production Cloudflare branches even if the site URL is production", () => {
+    expect(
+      shouldNoIndexDeployment("https://xhverse.co", "https://xhverse.co", {
+        CF_PAGES: "1",
+        CF_PAGES_BRANCH: "feature/security-hardening",
+        PUBLIC_PRODUCTION_BRANCH: "main",
+      }),
+    ).toBe(true);
+  });
+
+  it("allows an explicit indexing override", () => {
+    expect(
+      shouldNoIndexDeployment(
+        "https://preview.xhverse.pages.dev",
+        "https://xhverse.co",
+        { PUBLIC_ALLOW_INDEXING: "true" },
+      ),
     ).toBe(false);
   });
 });
