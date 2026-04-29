@@ -3,16 +3,18 @@ import { test, expect } from "@playwright/test";
 test("homepage loads", async ({ page }) => {
   await page.goto("/");
   await expect(page).toHaveTitle(/xhverse/i);
-  await expect(page.getByText(/A personal space for/i)).toBeVisible();
+  await expect(
+    page.getByText(/Data platforms, architecture, and practical systems thinking/i),
+  ).toBeVisible();
 });
 
 test("primary links are visible", async ({ page }) => {
   await page.goto("/");
   await expect(
-    page.getByRole("link", { name: /Enter xhverse/i }),
+    page.getByRole("link", { name: /View focus areas/i }),
   ).toBeVisible();
   await expect(
-    page.getByRole("link", { name: /Read the journal/i }),
+    page.getByRole("link", { name: /Read architecture notes/i }),
   ).toBeVisible();
 });
 
