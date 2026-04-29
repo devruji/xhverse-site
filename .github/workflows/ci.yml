@@ -70,5 +70,10 @@ jobs:
       - name: Add coverage summary
         if: always()
         run: |
-          echo "## Test Coverage" >> $GITHUB_STEP_SUMMARY
-          node -e "const s=require('./coverage/coverage-summary.json').total; console.log('| Metric | % |\\n|---|---:|\\n| Lines | '+s.lines.pct+' |\\n| Statements | '+s.statements.pct+' |\\n| Functions | '+s.functions.pct+' |\\n| Branches | '+s.branches.pct+' |')" >> $GITHUB_STEP_SUMMARY
+          if [ -f coverage/coverage-summary.json ]; then
+            echo "## Test Coverage" >> "$GITHUB_STEP_SUMMARY"
+            node -e "const s=require('./coverage/coverage-summary.json').total; console.log('| Metric | % |\\n|---|---:|\\n| Lines | '+s.lines.pct+' |\\n| Statements | '+s.statements.pct+' |\\n| Functions | '+s.functions.pct+' |\\n| Branches | '+s.branches.pct+' |')" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "## Test Coverage" >> "$GITHUB_STEP_SUMMARY"
+            echo "_Coverage summary unavailable because the coverage report was not generated._" >> "$GITHUB_STEP_SUMMARY"
+          fi

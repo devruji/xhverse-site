@@ -36,6 +36,8 @@ Primary goals: clean UX, strong content presentation, minimal design, SEO hygien
 - Keep changes small and explainable.
 - Prefer existing components, spacing, and typography patterns.
 - For complex tasks, produce a plan first before editing.
+- Keep `bun.lock` in sync with any dependency manifest changes; do not relax `--frozen-lockfile` to hide drift.
+- Keep CI reporting steps non-fatal when their input artifacts were not produced because an earlier step failed.
 - Report only checks that were actually run.
 
 ## Content rules
@@ -52,9 +54,16 @@ Primary goals: clean UX, strong content presentation, minimal design, SEO hygien
 
 ## Release flow
 - Merge feature work into `development` first.
+- Target automated dependency and CI update PRs at `development` first unless the user explicitly asks otherwise.
 - Promote releases from `development` to `main`.
 - Prefer a PR from `development` to `main` for release promotion unless the user explicitly asks for a direct merge.
 - Before any merge, verify the source branch and target branch explicitly.
+
+## Branch hygiene
+- Treat `development` and `main` as the long-lived branches.
+- Delete merged or abandoned feature branches after confirming they are no longer needed.
+- Prune stale remote-tracking branches when branch state has drifted from GitHub.
+- Verify PR state before deleting any remote branch.
 
 ## Done when
 - requested change is implemented
