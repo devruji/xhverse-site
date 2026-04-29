@@ -12,19 +12,21 @@ const deploymentSite = (Astro.site ?? site.siteUrl).toString();
 ---
 
 <BaseLayout
-  title="About"
+  title={`About ${profile.fullName}`}
   description={profile.longBio}
   structuredData={{
     "@context": "https://schema.org",
     "@type": "AboutPage",
-    name: "About XHVERSE",
+    name: `About ${profile.fullName}`,
     url: new URL("/about", deploymentSite).toString(),
     mainEntity: {
       "@type": "Person",
-      name: profile.name,
+      name: profile.fullName,
+      alternateName: profile.alternateNames,
       description: profile.longBio,
       image: new URL(profile.avatar, deploymentSite).toString(),
       email: profile.email,
+      sameAs: [site.github, site.medium, site.linkedin],
     },
   }}
 >
