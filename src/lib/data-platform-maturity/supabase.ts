@@ -13,7 +13,7 @@ import {
   type MaturityTier,
 } from "./scoring";
 
-const BENCHMARK_VIEW = "data_platform_maturity_benchmark";
+const BENCHMARK_RELATION = "data_platform_maturity_benchmark";
 
 type BrowserSupabaseEnv = {
   PUBLIC_SUPABASE_URL?: string;
@@ -179,7 +179,7 @@ export async function loadBenchmarkSummary(
   if (!client) return fallbackBenchmark;
 
   const { data, error } = await client
-    .from(BENCHMARK_VIEW)
+    .from(BENCHMARK_RELATION)
     .select(
       "submission_count,average_overall_score,average_category_scores,tier_distribution",
     )
