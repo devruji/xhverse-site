@@ -20,4 +20,20 @@ describe("Profile Data", () => {
   it("should expose a valid contact email", () => {
     expect(profile.email).toMatch(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
   });
+
+  it("keeps branded search identity terms explicit", () => {
+    expect(profile.alternateNames).toEqual(
+      expect.arrayContaining([
+        "XH",
+        "XHVERSE",
+        "xhverse.co",
+        "bossruji",
+        "Rujikorn Ngoensaard",
+      ]),
+    );
+    expect(profile.keywords).toEqual(
+      expect.arrayContaining(["xhverse", "bossruji", "Rujikorn Ngoensaard"]),
+    );
+    expect(profile.knowsAbout).toContain("Data platform architecture");
+  });
 });

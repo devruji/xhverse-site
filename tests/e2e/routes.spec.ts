@@ -43,4 +43,6 @@ test("homepage sets SEO and referrer metadata", async ({ page }) => {
   await page.goto("/");
   await expect(page.locator('meta[name="referrer"][content="strict-origin-when-cross-origin"]')).toHaveCount(1);
   await expect(page.locator('link[rel="canonical"][href="https://xhverse.co/"]')).toHaveCount(1);
+  await expect(page.locator('meta[name="author"][content="Rujikorn Ngoensaard"]')).toHaveCount(1);
+  await expect(page.locator('link[rel="manifest"][href="/site.webmanifest"]')).toHaveCount(1);
 });

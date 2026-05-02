@@ -4,7 +4,7 @@ test("homepage loads", async ({ page }) => {
   await page.goto("/");
   await expect(page).toHaveTitle(/xhverse/i);
   await expect(
-    page.getByText(/Data platforms, architecture, and practical systems thinking/i),
+    page.getByText(/Rujikorn Ngoensaard \(XH \/ bossruji\) - xhverse\.co/i),
   ).toBeVisible();
 });
 

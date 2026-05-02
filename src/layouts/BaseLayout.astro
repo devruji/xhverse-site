@@ -33,7 +33,13 @@ const {
   lcpImage = "",
 } = Astro.props;
 
-const pageTitle = title === site.title ? site.title : `${title} | ${site.title}`;
+const titleIncludesSiteName = title
+  .toLocaleLowerCase()
+  .includes(site.title.toLocaleLowerCase());
+const pageTitle =
+  title === site.title || titleIncludesSiteName
+    ? title
+    : `${title} | ${site.title}`;
 const canonicalUrl = buildCanonicalUrl(Astro.url.pathname, deploymentSite);
 const socialImage = new URL(image, deploymentSite).toString();
 ---
@@ -62,7 +68,7 @@ const socialImage = new URL(image, deploymentSite).toString();
       <>
         <meta
           http-equiv="Content-Security-Policy"
-          content={`default-src 'self'; img-src 'self' data: https:; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src ${connectSrc}; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests`}
+          content={`default-src 'self'; img-src 'self' data: https:; style-src 'self'; font-src 'self' data:; connect-src ${connectSrc}; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests`}
         />
         <meta http-equiv="X-Content-Type-Options" content="nosniff" />
         <meta http-equiv="X-Frame-Options" content="DENY" />
@@ -70,18 +76,15 @@ const socialImage = new URL(image, deploymentSite).toString();
     )}
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <meta name="theme-color" content="#000000" />
+    <meta name="author" content="Rujikorn Ngoensaard" />
+    <meta name="application-name" content="XHVERSE" />
+    <meta name="apple-mobile-web-app-title" content="XHVERSE" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" href="/favicon.ico" />
-    <!-- Font preconnect + stylesheet load -->
+    <link rel="manifest" href={site.manifest} />
     {lcpImage ? (
       <link rel="preload" as="image" href={lcpImage} fetchpriority="high" />
     ) : null}
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-    />
     <title>{pageTitle}</title>
     {structuredData && (
       <script
