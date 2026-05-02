@@ -26,7 +26,7 @@ const categoryDescriptions = {
 ---
 
 <BaseLayout title={pageTitle} description={pageDescription}>
-  <main class="min-h-screen bg-[#070809] font-[Inter] text-zinc-100 selection:bg-emerald-300/30 selection:text-white">
+  <main class="min-h-screen bg-[#070809] font-sans text-zinc-100 selection:bg-emerald-300/30 selection:text-white">
     <div class="mx-auto max-w-7xl px-5 py-6 sm:px-8 sm:py-8 lg:px-10">
       <header class="flex items-start justify-between gap-5 border-b border-white/10 pb-5 sm:items-center">
         <a href="/" class="group">
@@ -266,13 +266,7 @@ const categoryDescriptions = {
       maturityTiers,
       type BenchmarkSummary,
     } from "../../lib/data-platform-maturity/scoring";
-    import {
-      buildSubmissionPayload,
-      createBrowserSupabaseClient,
-      fallbackBenchmark,
-      loadBenchmarkSummary,
-      saveAssessmentSubmission,
-    } from "../../lib/data-platform-maturity/supabase";
+    import type { AssessmentSubmissionPayload } from "../../lib/data-platform-maturity/supabase";
 
     const form = document.querySelector<HTMLFormElement>("#maturity-form");
     const resultPanel = document.querySelector<HTMLElement>("#result-panel");
@@ -284,8 +278,23 @@ const categoryDescriptions = {
     const briefTextarea = document.querySelector<HTMLTextAreaElement>("#readiness-brief");
     const copyStatus = document.querySelector<HTMLElement>("#copy-status");
     const saveStatus = document.querySelector<HTMLElement>("#save-status");
-    const client = createBrowserSupabaseClient(import.meta.env);
+    const fallbackBenchmark: BenchmarkSummary = {
+      submissionCount: 0,
+      averageOverallScore: null,
+      averageCategoryScores: Object.fromEntries(
+        maturityCategories.map((category) => [category, null]),
+      ) as BenchmarkSummary["averageCategoryScores"],
+      tierDistribution: Object.fromEntries(
+        maturityTiers.map((tier) => [tier, 0]),
+      ) as BenchmarkSummary["tierDistribution"],
+    };
     let benchmark: BenchmarkSummary = fallbackBenchmark;
+    let supabaseHelpersPromise: Promise<typeof import("../../lib/data-platform-maturity/supabase")> | null = null;
+
+    function loadSupabaseHelpers(): Promise<typeof import("../../lib/data-platform-maturity/supabase")> {
+      supabaseHelpersPromise ??= import("../../lib/data-platform-maturity/supabase");
+      return supabaseHelpersPromise;
+    }
 
     function setText(selector: string, value: string): void {
       const element = document.querySelector<HTMLElement>(selector);
@@ -356,6 +365,12 @@ const categoryDescriptions = {
       ) as AssessmentAnswers;
     }
 
+    function updateReadinessBrief(result: ReturnType<typeof calculateAssessmentResult>): void {
+      if (briefTextarea) {
+        briefTextarea.value = buildReadinessBrief(result, benchmark);
+      }
+    }
+
     function renderResult(answers: AssessmentAnswers): void {
       const result = calculateAssessmentResult(answers);
       setText("#overall-score", `${result.overallScore}/100`);
@@ -384,15 +399,26 @@ const categoryDescriptions = {
       }
 
       renderBenchmark(result.overallScore);
-      if (briefTextarea) {
-        briefTextarea.value = buildReadinessBrief(result, benchmark);
-      }
+      updateReadinessBrief(result);
       resultPanel?.classList.remove("hidden");
       resultPanel?.scrollIntoView({ block: "start", behavior: "smooth" });
 
       const contactEmail = followUpConsent?.checked ? (emailInput?.value ?? "") : "";
-      const payload = buildSubmissionPayload(result, answers, contactEmail);
-      void saveAssessmentSubmission(client, payload).then((state) => {
+      void loadSupabaseHelpers().then(async ({
+        buildSubmissionPayload,
+        createBrowserSupabaseClient,
+        loadBenchmarkSummary,
+        saveAssessmentSubmission,
+      }) => {
+        const client = createBrowserSupabaseClient(import.meta.env);
+        const payload: AssessmentSubmissionPayload = buildSubmissionPayload(result, answers, contactEmail);
+        const state = await saveAssessmentSubmission(client, payload);
+        if (client) {
+          benchmark = await loadBenchmarkSummary(client);
+          renderBenchmark(result.overallScore);
+          updateReadinessBrief(result);
+        }
+
         if (!saveStatus) return;
         if (state.kind === "saved") {
           saveStatus.textContent = "Anonymous assessment saved to the public benchmark aggregate.";
@@ -445,9 +471,6 @@ const categoryDescriptions = {
       }
     });
 
-    void loadBenchmarkSummary(client).then((summary) => {
-      benchmark = summary;
-      renderBenchmark(0);
-    });
+    renderBenchmark(0);
   </script>
 </BaseLayout>

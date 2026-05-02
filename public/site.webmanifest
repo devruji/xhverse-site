@@ -1,0 +1,23 @@
+{
+  "name": "XHVERSE - Rujikorn Ngoensaard",
+  "short_name": "XHVERSE",
+  "description": "Official xhverse.co profile and data architecture journal of Rujikorn Ngoensaard, also known as XH and bossruji.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "minimal-ui",
+  "background_color": "#070809",
+  "theme_color": "#000000",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon"
+    }
+  ]
+}
