@@ -10,6 +10,16 @@ const defaultNoindex = shouldNoIndexDeployment(
   import.meta.env,
 );
 const isDev = import.meta.env.DEV;
+const publicSupabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
+const supabaseConnectOrigin = (() => {
+  if (!publicSupabaseUrl) return "";
+  try {
+    return new URL(publicSupabaseUrl).origin;
+  } catch {
+    return "";
+  }
+})();
+const connectSrc = ["'self'", supabaseConnectOrigin].filter(Boolean).join(" ");
 
 // Optional same-origin LCP image path (e.g. home hero); adds `<link rel="preload" as="image">` when set.
 const {
@@ -52,7 +62,7 @@ const socialImage = new URL(image, deploymentSite).toString();
       <>
         <meta
           http-equiv="Content-Security-Policy"
-          content="default-src 'self'; img-src 'self' data: https:; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests"
+          content={`default-src 'self'; img-src 'self' data: https:; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src ${connectSrc}; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests`}
         />
         <meta http-equiv="X-Content-Type-Options" content="nosniff" />
         <meta http-equiv="X-Frame-Options" content="DENY" />
