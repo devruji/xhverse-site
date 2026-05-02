@@ -17,6 +17,10 @@ describe("Profile Data", () => {
     expect(profile).toHaveProperty("contactIntro");
   });
 
+  it("uses a PNG avatar URL so crawlers preserve transparency", () => {
+    expect(profile.avatar).toBe("/images/xh-profile-960.png");
+  });
+
   it("should expose a valid contact email", () => {
     expect(profile.email).toMatch(/^[^\s@]+@[^\s@]+\.[^\s@]+$/);
   });

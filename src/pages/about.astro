@@ -15,6 +15,7 @@ const aboutUrl = new URL("/about", deploymentSite).toString();
 <BaseLayout
   title={`About ${profile.fullName}`}
   description={profile.longBio}
+  image={profile.avatar}
   structuredData={{
     "@context": "https://schema.org",
     "@type": "AboutPage",

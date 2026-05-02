@@ -44,6 +44,8 @@ test("homepage sets SEO and referrer metadata", async ({ page }) => {
   await expect(page.locator('meta[name="referrer"][content="strict-origin-when-cross-origin"]')).toHaveCount(1);
   await expect(page.locator('link[rel="canonical"][href="https://xhverse.co/"]')).toHaveCount(1);
   await expect(page.locator('meta[name="author"][content="Rujikorn Ngoensaard"]')).toHaveCount(1);
+  await expect(page.locator('meta[property="og:image"][content="https://xhverse.co/images/xh-profile-960.png"]')).toHaveCount(1);
+  await expect(page.locator('meta[name="twitter:image"][content="https://xhverse.co/images/xh-profile-960.png"]')).toHaveCount(1);
   await expect(page.locator('link[rel="icon"][type="image/svg+xml"][href="/favicon.svg"]')).toHaveCount(1);
   await expect(page.locator('link[rel="icon"][sizes="192x192"][href="/icon-192.png"]')).toHaveCount(1);
   await expect(page.locator('link[rel="icon"][sizes="32x32"][href="/favicon-32x32.png"]')).toHaveCount(1);
