@@ -19,18 +19,18 @@ test("blog page loads posts", async ({ page }) => {
   await expect(
     page.getByRole("heading", { name: "Notes, essays, and ongoing thoughts." }),
   ).toBeVisible();
-  await expect(page.getByText(/Building xhverse/i)).toBeVisible();
   await expect(
     page.getByRole("link", { name: /^Read article$/i }).first(),
   ).toBeVisible();
+  await expect(page.locator("article.card--blog").first()).toBeVisible();
 });
 
 test("blog article page renders markdown body", async ({ page }) => {
-  await page.goto("/blog/building-xhverse");
-  await expect(
-    page.getByRole("heading", { name: "Building xhverse" }),
-  ).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Why this site exists" })).toBeVisible();
+  await page.goto("/blog");
+  await page.getByRole("link", { name: /^Read article$/i }).first().click();
+  await expect(page).toHaveURL(/\/blog\/[^/]+\/?$/);
+  await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+  await expect(page.locator(".article-body")).toBeVisible();
 });
 
 test("gallery page renders images", async ({ page }) => {

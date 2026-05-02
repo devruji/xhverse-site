@@ -1,0 +1,453 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import {
+  assessmentOptions,
+  assessmentQuestions,
+  categoryLabels,
+  maturityCategories,
+} from "../../lib/data-platform-maturity/questions";
+
+const pageTitle = "Data Platform Maturity Checker";
+const pageDescription =
+  "A lightweight, anonymous maturity signal for data platform architecture, governance, analytics delivery, operations, and documentation.";
+
+const categoryDescriptions = {
+  platform_architecture:
+    "Architecture clarity, environment boundaries, and repeatable workload patterns.",
+  governance:
+    "Ownership, access controls, exceptions, and audit-ready platform rules.",
+  analytics_delivery:
+    "Trusted data products, semantic consistency, testing, and release quality.",
+  operations:
+    "Service ownership, runbooks, incident paths, reliability, and cost review.",
+  documentation:
+    "Useful architecture records, standards, operating procedures, and onboarding paths.",
+};
+---
+
+<BaseLayout title={pageTitle} description={pageDescription}>
+  <main class="min-h-screen bg-[#070809] font-[Inter] text-zinc-100 selection:bg-emerald-300/30 selection:text-white">
+    <div class="mx-auto max-w-7xl px-5 py-6 sm:px-8 sm:py-8 lg:px-10">
+      <header class="flex items-start justify-between gap-5 border-b border-white/10 pb-5 sm:items-center">
+        <a href="/" class="group">
+          <p class="text-[11px] uppercase tracking-[0.35em] text-zinc-500">xhverse.co</p>
+          <span class="mt-1 block text-[1.35rem] font-semibold tracking-tight text-white sm:text-[1.55rem]">
+            XHVERSE
+          </span>
+        </a>
+        <nav class="flex items-center gap-5 text-sm text-zinc-400" aria-label="Tool navigation">
+          <a href="/" class="transition hover:text-white">Home</a>
+          <a href="/blog" class="transition hover:text-white">Writing</a>
+        </nav>
+      </header>
+
+      <section class="grid gap-10 py-10 sm:py-12 lg:grid-cols-[0.95fr_1.05fr] lg:py-14">
+        <div>
+          <p class="text-[12px] uppercase tracking-[0.32em] text-emerald-200">Data platform tool</p>
+          <h1 class="mt-4 max-w-4xl text-[2.6rem] font-semibold leading-[0.98] tracking-tight text-white sm:text-[4.4rem]">
+            Data Platform Maturity Checker
+          </h1>
+          <p class="mt-6 max-w-2xl text-base leading-8 text-zinc-300 sm:text-lg">
+            A lightweight assessment for platform architecture, governance, analytics delivery, operations, and
+            documentation. Use it as a directional signal, not a final judgment.
+          </p>
+          <div class="mt-7 border border-cyan-300/20 bg-cyan-300/8 p-4 text-sm leading-7 text-cyan-50">
+            Assessment data is stored anonymously unless you provide an email. Do not submit confidential company or
+            platform details.
+          </div>
+        </div>
+
+        <aside class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+          <p class="text-[11px] uppercase tracking-[0.24em] text-zinc-500">What this checks</p>
+          <div class="mt-5 grid gap-3">
+            {maturityCategories.map((category) => (
+              <div class="border border-white/10 bg-black/20 p-4">
+                <h2 class="text-base font-semibold tracking-tight text-white">{categoryLabels[category]}</h2>
+                <p class="mt-2 text-sm leading-6 text-zinc-400">{categoryDescriptions[category]}</p>
+              </div>
+            ))}
+          </div>
+        </aside>
+      </section>
+
+      <section class="grid gap-8 border-t border-white/10 py-10 lg:grid-cols-[1fr_21rem]">
+        <form id="maturity-form" class="space-y-6" data-testid="maturity-form">
+          <div class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+            <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Assessment</p>
+            <h2 class="mt-3 text-3xl font-semibold tracking-tight text-white">Rate the current operating reality.</h2>
+            <p class="mt-4 text-sm leading-7 text-zinc-400">
+              Choose the closest answer for each question. Avoid sensitive internal names, architecture details, system
+              identifiers, or confidential platform context.
+            </p>
+          </div>
+
+          {assessmentQuestions.map((question, index) => (
+            <fieldset class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+              <legend class="text-sm font-semibold text-emerald-200">
+                {String(index + 1).padStart(2, "0")} · {categoryLabels[question.category]}
+              </legend>
+              <h3 class="mt-3 text-xl font-semibold tracking-tight text-white">{question.prompt}</h3>
+              <p class="mt-2 text-sm leading-6 text-zinc-400">{question.helpText}</p>
+              <div class="mt-5 grid gap-2 sm:grid-cols-5">
+                {assessmentOptions.map((option) => (
+                  <label class="block cursor-pointer border border-white/10 bg-black/20 p-3 transition has-[:checked]:border-emerald-300/80 has-[:checked]:bg-emerald-300/10">
+                    <input
+                      class="peer sr-only"
+                      type="radio"
+                      name={question.id}
+                      value={option.value}
+                      required
+                      data-testid={`answer-${question.id}-${option.value}`}
+                    />
+                    <span class="block text-sm font-semibold text-white">{option.value}. {option.label}</span>
+                    <span class="mt-1 block text-xs leading-5 text-zinc-500 peer-checked:text-zinc-300">
+                      {option.description}
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+          ))}
+
+          <section class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+            <label class="flex items-start gap-3 text-sm leading-6 text-zinc-300">
+              <input id="follow-up-consent" type="checkbox" class="mt-1 accent-emerald-300" />
+              <span>I want follow-up about an architecture review and choose to provide my email.</span>
+            </label>
+            <div id="email-field" class="mt-4 hidden">
+              <label for="contact-email" class="text-sm font-medium text-zinc-200">Email for follow-up</label>
+              <input
+                id="contact-email"
+                type="email"
+                autocomplete="email"
+                disabled
+                class="mt-2 w-full border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-emerald-300/70"
+                placeholder="you@example.com"
+              />
+            </div>
+            <p class="mt-4 text-xs leading-6 text-zinc-500">
+              No auth, no company name, and no hidden tracking. Email is optional and only included when you explicitly
+              enable follow-up.
+            </p>
+          </section>
+
+          <div class="flex flex-col gap-3 sm:flex-row">
+            <button
+              type="submit"
+              class="inline-flex items-center justify-center bg-white px-5 py-3 text-sm font-semibold text-black transition hover:bg-emerald-100"
+            >
+              Show maturity result
+            </button>
+            <button
+              id="reset-button"
+              type="button"
+              class="inline-flex items-center justify-center border border-white/15 px-5 py-3 text-sm font-medium text-white transition hover:border-emerald-300/70"
+            >
+              Reset
+            </button>
+          </div>
+        </form>
+
+        <aside class="h-fit border border-white/10 bg-white/[0.03] p-5 text-sm leading-7 text-zinc-400 lg:sticky lg:top-6">
+          <p class="text-[11px] uppercase tracking-[0.24em] text-zinc-500">Positioning</p>
+          <p class="mt-4">
+            This checker gives a lightweight maturity signal and directional public benchmark. Enterprise-grade
+            comparison requires deeper architecture context across operating model, governance, delivery, security, and
+            business goals.
+          </p>
+          <a
+            href="mailto:contact@xhverse.co?subject=Architecture%20review%20request"
+            class="mt-5 inline-flex text-sm font-medium text-emerald-200 transition hover:text-white"
+          >
+            For enterprise-grade comparison, request an architecture review.
+          </a>
+        </aside>
+      </section>
+
+      <section id="result-panel" class="hidden border-t border-white/10 py-10" data-testid="result-panel" aria-live="polite">
+        <div class="grid gap-6 lg:grid-cols-[1fr_0.9fr]">
+          <div class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+            <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Result</p>
+            <div class="mt-4 grid gap-4 sm:grid-cols-2">
+              <div class="border border-white/10 bg-black/20 p-5">
+                <p class="text-sm text-zinc-500">Overall score</p>
+                <p id="overall-score" class="mt-2 text-5xl font-semibold tracking-tight text-white">0/100</p>
+              </div>
+              <div class="border border-white/10 bg-black/20 p-5">
+                <p class="text-sm text-zinc-500">Maturity tier</p>
+                <p id="maturity-tier" class="mt-2 text-3xl font-semibold tracking-tight text-emerald-200">Foundational</p>
+              </div>
+            </div>
+            <div class="mt-5 grid gap-3 sm:grid-cols-2">
+              <div class="border border-white/10 bg-black/20 p-4">
+                <p class="text-xs uppercase tracking-[0.2em] text-zinc-500">Strongest category</p>
+                <p id="strongest-category" class="mt-2 text-base font-semibold text-white"></p>
+              </div>
+              <div class="border border-white/10 bg-black/20 p-4">
+                <p class="text-xs uppercase tracking-[0.2em] text-zinc-500">Weakest category</p>
+                <p id="weakest-category" class="mt-2 text-base font-semibold text-white"></p>
+              </div>
+            </div>
+            <div class="mt-6">
+              <h2 class="text-xl font-semibold tracking-tight text-white">Category breakdown</h2>
+              <div id="category-breakdown" class="mt-4 grid gap-3"></div>
+            </div>
+            <div class="mt-6">
+              <h2 class="text-xl font-semibold tracking-tight text-white">Recommended next actions</h2>
+              <ul id="next-actions" class="mt-4 space-y-2"></ul>
+            </div>
+            <p id="save-status" class="mt-5 text-xs leading-6 text-zinc-500"></p>
+          </div>
+
+          <div class="grid gap-6">
+            <section class="border border-white/10 bg-white/[0.03] p-5 sm:p-6" data-testid="benchmark-panel">
+              <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Anonymous benchmark</p>
+              <p id="benchmark-message" class="mt-4 text-lg font-semibold leading-7 text-white"></p>
+              <div class="mt-5 grid gap-3 sm:grid-cols-2">
+                <div class="border border-white/10 bg-black/20 p-4">
+                  <p class="text-sm text-zinc-500">Average overall score</p>
+                  <p id="benchmark-average" class="mt-2 text-3xl font-semibold tracking-tight text-white">Not available</p>
+                </div>
+                <div class="border border-white/10 bg-black/20 p-4">
+                  <p class="text-sm text-zinc-500">Submission count</p>
+                  <p id="benchmark-count" class="mt-2 text-3xl font-semibold tracking-tight text-white">0</p>
+                </div>
+              </div>
+              <div class="mt-5">
+                <h2 class="text-base font-semibold tracking-tight text-white">Average category scores</h2>
+                <div id="benchmark-categories" class="mt-3 grid gap-2"></div>
+              </div>
+              <div class="mt-5">
+                <h2 class="text-base font-semibold tracking-tight text-white">Tier distribution</h2>
+                <div id="tier-distribution" class="mt-3 grid gap-2"></div>
+              </div>
+            </section>
+
+            <section class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+              <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Architecture Readiness Brief</p>
+                  <h2 class="mt-2 text-xl font-semibold tracking-tight text-white">Copyable summary</h2>
+                </div>
+                <button
+                  id="copy-brief"
+                  type="button"
+                  class="inline-flex items-center justify-center border border-white/15 px-4 py-2 text-sm font-medium text-white transition hover:border-emerald-300/70"
+                >
+                  Copy brief
+                </button>
+              </div>
+              <textarea
+                id="readiness-brief"
+                readonly
+                data-testid="readiness-brief"
+                class="mt-4 min-h-[22rem] w-full resize-y border border-white/10 bg-black/30 p-4 font-mono text-xs leading-6 text-zinc-300 outline-none"
+              ></textarea>
+              <p id="copy-status" class="mt-3 text-xs text-zinc-500"></p>
+            </section>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    import {
+      assessmentQuestions,
+      categoryLabels,
+      maturityCategories,
+      type AssessmentAnswers,
+    } from "../../lib/data-platform-maturity/questions";
+    import {
+      buildReadinessBrief,
+      calculateAssessmentResult,
+      getBenchmarkMessage,
+      getBenchmarkPosition,
+      maturityTiers,
+      type BenchmarkSummary,
+    } from "../../lib/data-platform-maturity/scoring";
+    import {
+      buildSubmissionPayload,
+      createBrowserSupabaseClient,
+      fallbackBenchmark,
+      loadBenchmarkSummary,
+      saveAssessmentSubmission,
+    } from "../../lib/data-platform-maturity/supabase";
+
+    const form = document.querySelector<HTMLFormElement>("#maturity-form");
+    const resultPanel = document.querySelector<HTMLElement>("#result-panel");
+    const followUpConsent = document.querySelector<HTMLInputElement>("#follow-up-consent");
+    const emailField = document.querySelector<HTMLElement>("#email-field");
+    const emailInput = document.querySelector<HTMLInputElement>("#contact-email");
+    const resetButton = document.querySelector<HTMLButtonElement>("#reset-button");
+    const copyButton = document.querySelector<HTMLButtonElement>("#copy-brief");
+    const briefTextarea = document.querySelector<HTMLTextAreaElement>("#readiness-brief");
+    const copyStatus = document.querySelector<HTMLElement>("#copy-status");
+    const saveStatus = document.querySelector<HTMLElement>("#save-status");
+    const client = createBrowserSupabaseClient(import.meta.env);
+    let benchmark: BenchmarkSummary = fallbackBenchmark;
+
+    function setText(selector: string, value: string): void {
+      const element = document.querySelector<HTMLElement>(selector);
+      if (element) element.textContent = value;
+    }
+
+    function scoreBar(label: string, score: number | null): string {
+      const displayScore = score === null ? "Not available" : `${score}/100`;
+      const width = score === null ? 0 : score;
+      return `
+        <div class="border border-white/10 bg-black/20 p-3">
+          <div class="flex items-center justify-between gap-3 text-sm">
+            <span class="font-medium text-zinc-200">${label}</span>
+            <span class="text-zinc-500">${displayScore}</span>
+          </div>
+          <div class="mt-2 h-1.5 bg-white/10">
+            <div class="h-full bg-emerald-300" style="width: ${width}%"></div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderBenchmark(currentScore: number): void {
+      const position = getBenchmarkPosition(currentScore, benchmark.averageOverallScore);
+      setText("#benchmark-message", getBenchmarkMessage(position));
+      setText(
+        "#benchmark-average",
+        benchmark.averageOverallScore === null ? "Not available" : `${benchmark.averageOverallScore}/100`,
+      );
+      setText("#benchmark-count", String(benchmark.submissionCount));
+
+      const benchmarkCategories = document.querySelector<HTMLElement>("#benchmark-categories");
+      if (benchmarkCategories) {
+        benchmarkCategories.innerHTML = maturityCategories
+          .map((category) => scoreBar(categoryLabels[category], benchmark.averageCategoryScores[category]))
+          .join("");
+      }
+
+      const tierDistribution = document.querySelector<HTMLElement>("#tier-distribution");
+      if (tierDistribution) {
+        tierDistribution.innerHTML = maturityTiers
+          .map((tier) => {
+            const count = benchmark.tierDistribution[tier];
+            const total = Math.max(benchmark.submissionCount, 1);
+            const width = Math.round((count / total) * 100);
+            return `
+              <div class="border border-white/10 bg-black/20 p-3">
+                <div class="flex items-center justify-between gap-3 text-sm">
+                  <span class="font-medium text-zinc-200">${tier}</span>
+                  <span class="text-zinc-500">${count}</span>
+                </div>
+                <div class="mt-2 h-1.5 bg-white/10">
+                  <div class="h-full bg-cyan-300" style="width: ${width}%"></div>
+                </div>
+              </div>
+            `;
+          })
+          .join("");
+      }
+    }
+
+    function collectAnswers(formData: FormData): AssessmentAnswers {
+      return Object.fromEntries(
+        assessmentQuestions.map((question) => [
+          question.id,
+          Number(formData.get(question.id)),
+        ]),
+      ) as AssessmentAnswers;
+    }
+
+    function renderResult(answers: AssessmentAnswers): void {
+      const result = calculateAssessmentResult(answers);
+      setText("#overall-score", `${result.overallScore}/100`);
+      setText("#maturity-tier", result.tier);
+      setText(
+        "#strongest-category",
+        `${result.strongestCategory.label} (${result.strongestCategory.score}/100)`,
+      );
+      setText(
+        "#weakest-category",
+        `${result.weakestCategory.label} (${result.weakestCategory.score}/100)`,
+      );
+
+      const breakdown = document.querySelector<HTMLElement>("#category-breakdown");
+      if (breakdown) {
+        breakdown.innerHTML = result.categoryScores
+          .map((item) => scoreBar(item.label, item.score))
+          .join("");
+      }
+
+      const actions = document.querySelector<HTMLElement>("#next-actions");
+      if (actions) {
+        actions.innerHTML = result.nextActions
+          .map((action) => `<li class="border-l border-emerald-300/40 pl-3 text-sm leading-6 text-zinc-300">${action}</li>`)
+          .join("");
+      }
+
+      renderBenchmark(result.overallScore);
+      if (briefTextarea) {
+        briefTextarea.value = buildReadinessBrief(result, benchmark);
+      }
+      resultPanel?.classList.remove("hidden");
+      resultPanel?.scrollIntoView({ block: "start", behavior: "smooth" });
+
+      const contactEmail = followUpConsent?.checked ? (emailInput?.value ?? "") : "";
+      const payload = buildSubmissionPayload(result, answers, contactEmail);
+      void saveAssessmentSubmission(client, payload).then((state) => {
+        if (!saveStatus) return;
+        if (state.kind === "saved") {
+          saveStatus.textContent = "Anonymous assessment saved to the public benchmark aggregate.";
+        } else if (state.kind === "skipped") {
+          saveStatus.textContent = "Benchmark storage is not configured in this environment; your result was calculated locally.";
+        } else {
+          saveStatus.textContent = "Your result was calculated locally, but benchmark storage failed validation or submission.";
+        }
+      });
+    }
+
+    followUpConsent?.addEventListener("change", () => {
+      const enabled = Boolean(followUpConsent.checked);
+      emailField?.classList.toggle("hidden", !enabled);
+      if (emailInput) {
+        emailInput.disabled = !enabled;
+        emailInput.required = enabled;
+        if (!enabled) emailInput.value = "";
+      }
+    });
+
+    form?.addEventListener("submit", (event) => {
+      event.preventDefault();
+      if (!form.reportValidity()) return;
+      renderResult(collectAnswers(new FormData(form)));
+    });
+
+    resetButton?.addEventListener("click", () => {
+      form?.reset();
+      emailField?.classList.add("hidden");
+      if (emailInput) {
+        emailInput.disabled = true;
+        emailInput.required = false;
+      }
+      resultPanel?.classList.add("hidden");
+      if (briefTextarea) briefTextarea.value = "";
+      if (copyStatus) copyStatus.textContent = "";
+      if (saveStatus) saveStatus.textContent = "";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    copyButton?.addEventListener("click", async () => {
+      if (!briefTextarea) return;
+      briefTextarea.select();
+      try {
+        await navigator.clipboard.writeText(briefTextarea.value);
+        if (copyStatus) copyStatus.textContent = "Brief copied.";
+      } catch {
+        if (copyStatus) copyStatus.textContent = "Select the brief text and copy it from your browser.";
+      }
+    });
+
+    void loadBenchmarkSummary(client).then((summary) => {
+      benchmark = summary;
+      renderBenchmark(0);
+    });
+  </script>
+</BaseLayout>
