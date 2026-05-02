@@ -1,0 +1,12 @@
+/* TEAM */
+Owner: Rujikorn Ngoensaard
+Alias: XH, bossruji
+Site: XHVERSE
+Canonical URL: https://xhverse.co
+Contact: contact@xhverse.co
+Focus: data platform architecture, data engineering, governance, analytics architecture
+
+/* SITE */
+Language: English
+Primary keywords: xh, xhverse, xhverse co, bossruji, Rujikorn Ngoensaard
+Stack: Astro, Cloudflare Pages, Supabase

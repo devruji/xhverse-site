@@ -10,6 +10,7 @@ export const site = {
   xHandle: "@xhverse",
   locale: "en_US",
   ogImage: "/images/og-cover.svg",
+  manifest: "/site.webmanifest",
 };
 
 export function normalizeUrl(url: string) {

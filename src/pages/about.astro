@@ -9,6 +9,7 @@ import { profile } from "../data/profile";
 import { site } from "../data/site";
 
 const deploymentSite = (Astro.site ?? site.siteUrl).toString();
+const aboutUrl = new URL("/about", deploymentSite).toString();
 ---
 
 <BaseLayout
@@ -17,15 +18,21 @@ const deploymentSite = (Astro.site ?? site.siteUrl).toString();
   structuredData={{
     "@context": "https://schema.org",
     "@type": "AboutPage",
-    name: `About ${profile.fullName}`,
-    url: new URL("/about", deploymentSite).toString(),
+    "@id": `${aboutUrl}#about-page`,
+    name: `About ${profile.fullName} (XH / bossruji)`,
+    alternateName: ["About XH", "About bossruji", "About xhverse"],
+    url: aboutUrl,
     mainEntity: {
       "@type": "Person",
+      "@id": `${deploymentSite}#person`,
       name: profile.fullName,
       alternateName: profile.alternateNames,
+      additionalName: ["XH", "bossruji"],
+      url: deploymentSite,
       description: profile.longBio,
       image: new URL(profile.avatar, deploymentSite).toString(),
       email: profile.email,
+      knowsAbout: profile.knowsAbout,
       sameAs: [site.github, site.medium, site.linkedin],
     },
   }}

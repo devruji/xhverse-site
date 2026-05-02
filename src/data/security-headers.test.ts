@@ -11,6 +11,9 @@ describe("Cloudflare security headers", () => {
     expect(headers).toContain(
       "Referrer-Policy: strict-origin-when-cross-origin",
     );
+    expect(headers).toContain("X-DNS-Prefetch-Control: off");
+    expect(headers).toContain("X-Permitted-Cross-Domain-Policies: none");
+    expect(headers).toContain("Cross-Origin-Opener-Policy: same-origin");
     expect(headers).toContain(
       "Permissions-Policy: camera=(), geolocation=(), microphone=()",
     );
@@ -22,8 +25,15 @@ describe("Cloudflare security headers", () => {
     expect(headers).toContain("object-src 'none'");
     expect(headers).toContain("frame-ancestors 'none'");
     expect(headers).toContain("base-uri 'self'");
+    expect(headers).toContain("style-src 'self'");
+    expect(headers).toContain("font-src 'self' data:");
+    expect(headers).toContain(
+      "connect-src 'self' https://jxfpnfliioqbhzznaphd.supabase.co",
+    );
     expect(headers).toContain("upgrade-insecure-requests");
     expect(headers).not.toContain("'unsafe-inline'");
+    expect(headers).not.toContain("fonts.googleapis.com");
+    expect(headers).not.toContain("fonts.gstatic.com");
   });
 
   it("uses immutable caching only for fingerprinted Astro assets", () => {

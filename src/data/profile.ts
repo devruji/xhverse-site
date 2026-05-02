@@ -2,7 +2,14 @@ export const profile = {
   name: "XH",
   fullName: "Rujikorn Ngoensaard",
   handle: "bossruji",
-  alternateNames: ["XH", "xhverse", "bossruji", "Rujikorn Ngoensaard"],
+  alternateNames: [
+    "XH",
+    "XHVERSE",
+    "xhverse",
+    "xhverse.co",
+    "bossruji",
+    "Rujikorn Ngoensaard",
+  ],
   title: "Data Engineer / Data Architect",
   bio: "Focused on modern data platforms, analytics architecture, governance, and practical data strategy.",
   craftLine:
@@ -13,6 +20,26 @@ export const profile = {
     "I care less about hype and more about building systems that are clear, maintainable, governed, and useful for the people who rely on them. This space is where I share thoughts, notes, and work around architecture, platform strategy, and the realities of building data foundations that can actually support the business.",
   avatar: "/images/xh-profile-960.jpg",
   email: "contact@xhverse.co",
+  keywords: [
+    "xh",
+    "xhverse",
+    "xhverse co",
+    "bossruji",
+    "Rujikorn Ngoensaard",
+    "data platform architecture",
+    "data engineering",
+    "analytics architecture",
+  ],
+  knowsAbout: [
+    "Data platform architecture",
+    "Data engineering",
+    "Analytics architecture",
+    "Data governance",
+    "Azure",
+    "Databricks",
+    "Microsoft Fabric",
+    "Power BI",
+  ],
   contactIntro:
     "For data platform architecture, governance, analytics engineering, or thoughtful technical conversations, send a message and I’ll get back to you.",
 };
