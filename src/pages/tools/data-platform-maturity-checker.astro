@@ -301,17 +301,37 @@ const categoryDescriptions = {
       if (element) element.textContent = value;
     }
 
+    function scoreTone(score: number | null): string {
+      if (score === null) return "bg-white/20";
+      if (score < 40) return "bg-rose-300";
+      if (score < 60) return "bg-amber-300";
+      if (score < 80) return "bg-cyan-300";
+      return "bg-emerald-300";
+    }
+
+    function segmentedBar(score: number | null): string {
+      const filledSegments = score === null ? 0 : Math.max(0, Math.min(10, Math.round(score / 10)));
+      const filledClass = scoreTone(score);
+
+      return Array.from({ length: 10 }, (_, index) => {
+        const segmentClass = index < filledSegments ? filledClass : "bg-white/10";
+        return `<span class="h-1.5 ${segmentClass}"></span>`;
+      }).join("");
+    }
+
     function scoreBar(label: string, score: number | null): string {
       const displayScore = score === null ? "Not available" : `${score}/100`;
-      const width = score === null ? 0 : score;
+      const meterAttributes = score === null
+        ? 'aria-valuetext="Not available"'
+        : `aria-valuenow="${score}" aria-valuemin="0" aria-valuemax="100"`;
       return `
         <div class="border border-white/10 bg-black/20 p-3">
           <div class="flex items-center justify-between gap-3 text-sm">
             <span class="font-medium text-zinc-200">${label}</span>
             <span class="text-zinc-500">${displayScore}</span>
           </div>
-          <div class="mt-2 h-1.5 bg-white/10">
-            <div class="h-full bg-emerald-300" style="width: ${width}%"></div>
+          <div class="mt-2 grid grid-cols-10 gap-1" role="meter" aria-label="${label}" ${meterAttributes}>
+            ${segmentedBar(score)}
           </div>
         </div>
       `;
@@ -339,15 +359,15 @@ const categoryDescriptions = {
           .map((tier) => {
             const count = benchmark.tierDistribution[tier];
             const total = Math.max(benchmark.submissionCount, 1);
-            const width = Math.round((count / total) * 100);
+            const distributionScore = Math.round((count / total) * 100);
             return `
               <div class="border border-white/10 bg-black/20 p-3">
                 <div class="flex items-center justify-between gap-3 text-sm">
                   <span class="font-medium text-zinc-200">${tier}</span>
                   <span class="text-zinc-500">${count}</span>
                 </div>
-                <div class="mt-2 h-1.5 bg-white/10">
-                  <div class="h-full bg-cyan-300" style="width: ${width}%"></div>
+                <div class="mt-2 grid grid-cols-10 gap-1" role="meter" aria-label="${tier} distribution" aria-valuenow="${distributionScore}" aria-valuemin="0" aria-valuemax="100">
+                  ${segmentedBar(distributionScore)}
                 </div>
               </div>
             `;
