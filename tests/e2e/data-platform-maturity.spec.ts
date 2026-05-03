@@ -25,6 +25,15 @@ test("data platform maturity checker completes assessment and supports copy/rese
   await expect(page.getByTestId("result-panel")).toBeVisible();
   await expect(page.getByText("80/100").first()).toBeVisible();
   await expect(page.getByText("Advanced").first()).toBeVisible();
+  await expect(
+    page.getByRole("meter", { name: "Platform architecture" }).first(),
+  ).toHaveAttribute("aria-valuenow", "80");
+  await expect(
+    page.getByRole("meter", { name: "Platform architecture" }).first().locator("span.bg-emerald-300"),
+  ).toHaveCount(8);
+  await expect(
+    page.getByRole("meter", { name: "Platform architecture" }).first().locator("[style]"),
+  ).toHaveCount(0);
   await expect(page.getByTestId("benchmark-panel")).toBeVisible();
   await expect(
     page.getByText("For enterprise-grade comparison, request an architecture review."),

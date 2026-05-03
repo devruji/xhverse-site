@@ -4,8 +4,9 @@ test("homepage loads", async ({ page }) => {
   await page.goto("/");
   await expect(page).toHaveTitle(/xhverse/i);
   await expect(
-    page.getByText(/Rujikorn Ngoensaard \(XH \/ bossruji\) - xhverse\.co/i),
+    page.getByRole("heading", { name: "Rujikorn Ngoensaard" }),
   ).toBeVisible();
+  await expect(page.getByText(/XH \/ bossruji · xhverse\.co/i)).toBeVisible();
 });
 
 test("primary links are visible", async ({ page }) => {
