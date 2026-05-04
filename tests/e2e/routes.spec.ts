@@ -1,5 +1,8 @@
 import { test, expect } from "@playwright/test";
 
+const cvPdfUrl =
+  "https://jxfpnfliioqbhzznaphd.supabase.co/storage/v1/object/public/documents/cv/rujikorn-ngoensaard-cv.pdf";
+
 test("about page loads expected sections", async ({ page }) => {
   await page.goto("/about");
   await expect(
@@ -47,13 +50,13 @@ test("cv page exposes a viewable and downloadable PDF", async ({ page }) => {
   ).toBeVisible();
   await expect(page.getByRole("link", { name: /^View CV$/i })).toHaveAttribute(
     "href",
-    "/documents/rujikorn-ngoensaard-cv.pdf",
+    cvPdfUrl,
   );
   await expect(
     page.getByRole("link", { name: /^Download PDF$/i }),
   ).toHaveAttribute(
     "href",
-    "/documents/rujikorn-ngoensaard-cv.pdf?download=Rujikorn-Ngoensaard-CV.pdf",
+    `${cvPdfUrl}?download=Rujikorn-Ngoensaard-CV.pdf`,
   );
 });
 

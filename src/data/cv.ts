@@ -1,11 +1,12 @@
 const cvFileName = "Rujikorn-Ngoensaard-CV.pdf";
-const fallbackCvPath = "/documents/rujikorn-ngoensaard-cv.pdf";
+const defaultCvPdfUrl =
+  "https://jxfpnfliioqbhzznaphd.supabase.co/storage/v1/object/public/documents/cv/rujikorn-ngoensaard-cv.pdf";
 
 export const cvStorage = {
   bucket: "documents",
   path: "cv/rujikorn-ngoensaard-cv.pdf",
   fileName: cvFileName,
-  localPath: fallbackCvPath,
+  publicUrl: defaultCvPdfUrl,
 };
 
 type CvEnvironment = Pick<ImportMetaEnv, "PUBLIC_CV_PDF_URL">;
@@ -14,7 +15,7 @@ export function resolveCvPdfUrl(env: CvEnvironment = import.meta.env) {
   const configuredUrl = env.PUBLIC_CV_PDF_URL?.trim();
 
   if (!configuredUrl) {
-    return fallbackCvPath;
+    return defaultCvPdfUrl;
   }
 
   let parsedUrl: URL;
