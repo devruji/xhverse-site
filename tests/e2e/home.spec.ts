@@ -17,6 +17,7 @@ test("primary links are visible", async ({ page }) => {
   await expect(
     page.getByRole("link", { name: /Read architecture notes/i }),
   ).toBeVisible();
+  await expect(page.getByRole("link", { name: /^View CV$/i })).toBeVisible();
 });
 
 test("contact links are visible", async ({ page }) => {
