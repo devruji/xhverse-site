@@ -13,7 +13,6 @@ const deploymentSite = (Astro.site ?? site.siteUrl).toString();
 const cvUrl = new URL("/cv", deploymentSite).toString();
 const pdfUrl = resolveCvPdfUrl();
 const downloadUrl = buildCvDownloadUrl(pdfUrl);
-const isLocalCv = pdfUrl === cvStorage.localPath;
 
 const cvStructuredData = {
   "@context": "https://schema.org",
@@ -105,7 +104,7 @@ const cvStructuredData = {
             <div>
               <p class="text-[11px] uppercase tracking-[0.24em] text-zinc-500">Document status</p>
               <h2 class="mt-3 text-2xl font-semibold tracking-tight text-white">
-                {isLocalCv ? "Local CV ready for review" : "CV PDF available"}
+                CV PDF available
               </h2>
             </div>
             <span class="border border-emerald-300/25 bg-emerald-300/8 px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-emerald-200">
@@ -113,9 +112,7 @@ const cvStructuredData = {
             </span>
           </div>
           <p class="mt-5 text-sm leading-7 text-zinc-400">
-            {isLocalCv
-              ? "This page is wired to the local PDF until the Supabase Storage public URL is configured."
-              : "This page is wired to the configured public Supabase Storage PDF URL."}
+            This page is wired to the public Supabase Storage PDF URL.
           </p>
           <dl class="mt-6 grid gap-4 border-t border-white/10 pt-5 text-sm">
             <div>
