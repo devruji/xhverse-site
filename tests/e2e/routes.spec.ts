@@ -39,6 +39,24 @@ test("gallery page renders images", async ({ page }) => {
   await expect(page.locator("img").first()).toBeVisible();
 });
 
+test("cv page exposes a viewable and downloadable PDF", async ({ page }) => {
+  await page.goto("/cv");
+  await expect(page).toHaveTitle(/Rujikorn Ngoensaard CV/i);
+  await expect(
+    page.getByRole("heading", { name: "Rujikorn Ngoensaard" }),
+  ).toBeVisible();
+  await expect(page.getByRole("link", { name: /^View CV$/i })).toHaveAttribute(
+    "href",
+    "/documents/rujikorn-ngoensaard-cv.pdf",
+  );
+  await expect(
+    page.getByRole("link", { name: /^Download PDF$/i }),
+  ).toHaveAttribute(
+    "href",
+    "/documents/rujikorn-ngoensaard-cv.pdf?download=Rujikorn-Ngoensaard-CV.pdf",
+  );
+});
+
 test("homepage sets SEO and referrer metadata", async ({ page }) => {
   await page.goto("/");
   await expect(page.locator('meta[name="referrer"][content="strict-origin-when-cross-origin"]')).toHaveCount(1);
