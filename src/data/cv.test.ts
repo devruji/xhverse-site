@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 import { buildCvDownloadUrl, cvStorage, resolveCvPdfUrl } from "./cv";
 
 describe("CV asset configuration", () => {
-  it("uses the local PDF until the Supabase public URL is configured", () => {
-    expect(resolveCvPdfUrl({})).toBe(cvStorage.localPath);
+  it("uses the Supabase Storage PDF by default", () => {
+    expect(resolveCvPdfUrl({})).toBe(cvStorage.publicUrl);
   });
 
   it("uses the configured public CV URL when present", () => {
@@ -40,8 +40,8 @@ describe("CV asset configuration", () => {
   });
 
   it("preserves existing query parameters when adding download behavior", () => {
-    expect(buildCvDownloadUrl("/documents/mock.pdf?cache=1")).toBe(
-      "/documents/mock.pdf?cache=1&download=Rujikorn-Ngoensaard-CV.pdf",
+    expect(buildCvDownloadUrl(`${cvStorage.publicUrl}?cache=1`)).toBe(
+      `${cvStorage.publicUrl}?cache=1&download=Rujikorn-Ngoensaard-CV.pdf`,
     );
   });
 });
