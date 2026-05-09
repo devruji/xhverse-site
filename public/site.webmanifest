@@ -6,7 +6,10 @@
   "scope": "/",
   "display": "minimal-ui",
   "background_color": "#070809",
-  "theme_color": "#000000",
+  "theme_color": "#070809",
+  "lang": "en",
+  "dir": "ltr",
+  "categories": ["portfolio", "technology", "education"],
   "icons": [
     {
       "src": "/favicon.svg",
@@ -18,13 +21,13 @@
       "src": "/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "any maskable"
     },
     {
       "src": "/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any"
+      "purpose": "any maskable"
     }
   ]
 }
