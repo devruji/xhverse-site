@@ -17,36 +17,47 @@
 </button>
 
 <script is:inline>
-(function() {
-  const toggle = document.getElementById('theme-toggle');
-  const sunIcon = document.getElementById('theme-icon-sun');
-  const moonIcon = document.getElementById('theme-icon-moon');
+function initThemeToggle() {
+  var toggle = document.getElementById('theme-toggle');
+  var sunIcon = document.getElementById('theme-icon-sun');
+  var moonIcon = document.getElementById('theme-icon-moon');
+  if (!toggle || !sunIcon || !moonIcon) return;
 
   function getTheme() {
-    const stored = localStorage.getItem('theme');
+    var stored = localStorage.getItem('theme');
     if (stored === 'light' || stored === 'dark') return stored;
     return window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
   }
 
-  function applyTheme(theme) {
-    document.documentElement.classList.toggle('light', theme === 'light');
+  function applyIcons(theme) {
     sunIcon.classList.toggle('hidden', theme !== 'dark');
     moonIcon.classList.toggle('hidden', theme !== 'light');
   }
 
-  applyTheme(getTheme());
+  applyIcons(getTheme());
 
-  toggle.addEventListener('click', function() {
-    const current = document.documentElement.classList.contains('light') ? 'light' : 'dark';
-    const next = current === 'dark' ? 'light' : 'dark';
-    localStorage.setItem('theme', next);
-    applyTheme(next);
-  });
+  if (!toggle._themeInit) {
+    toggle._themeInit = true;
+    toggle.addEventListener('click', function() {
+      var current = document.documentElement.classList.contains('light') ? 'light' : 'dark';
+      var next = current === 'dark' ? 'light' : 'dark';
+      localStorage.setItem('theme', next);
+      document.documentElement.classList.toggle('light', next === 'light');
+      applyIcons(next);
+    });
+  }
+}
 
+initThemeToggle();
+document.addEventListener('astro:page-load', initThemeToggle);
+
+if (!window._themeMediaInit) {
+  window._themeMediaInit = true;
   window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', function(e) {
     if (!localStorage.getItem('theme')) {
-      applyTheme(e.matches ? 'light' : 'dark');
+      document.documentElement.classList.toggle('light', e.matches);
+      initThemeToggle();
     }
   });
-})();
+}
 </script>
