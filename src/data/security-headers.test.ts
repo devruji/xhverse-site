@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
+import { resolveSupabaseOrigin } from "./supabase-config";
 
 const headers = readFileSync(resolve("public/_headers"), "utf8");
 
@@ -28,7 +29,7 @@ describe("Cloudflare security headers", () => {
     expect(headers).toContain("style-src 'self'");
     expect(headers).toContain("font-src 'self' data:");
     expect(headers).toContain(
-      "connect-src 'self' https://jxfpnfliioqbhzznaphd.supabase.co",
+      `connect-src 'self' ${resolveSupabaseOrigin()}`,
     );
     expect(headers).toContain("upgrade-insecure-requests");
     expect(headers).not.toContain("'unsafe-inline'");

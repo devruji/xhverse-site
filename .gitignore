@@ -29,3 +29,10 @@ pnpm-debug.log*
 coverage/
 playwright-report/
 test-results/
+
+# agent evaluation workspaces (iteration outputs, timing, grading)
+.agents/skills/*-workspace/
+
+# internal AI workflow notes
+CLAUDE.md
+docs/agent-prompts.md
