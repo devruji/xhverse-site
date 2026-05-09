@@ -1,0 +1,36 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(bun run *)",
+      "Bash(bun install *)",
+      "Bash(bunx vitest *)",
+      "Bash(bunx playwright *)",
+      "Bash(git status *)",
+      "Bash(git log *)",
+      "Bash(git diff *)",
+      "Bash(git branch *)",
+      "Bash(git checkout *)",
+      "Bash(git switch *)",
+      "Bash(git fetch *)",
+      "Bash(git pull *)",
+      "Bash(git stash *)",
+      "Bash(gh pr *)",
+      "Bash(gh run *)",
+      "Bash(gh release *)",
+      "Bash(gh api *)",
+      "Bash(curl -s *)",
+      "Bash(lsof -ti :4321 *)",
+      "Bash(find . *)",
+      "Bash(ls *)",
+      "Bash(cat package.json *)",
+      "Bash(wc *)",
+      "Read(src/**)",
+      "Read(public/**)",
+      "Read(tests/**)",
+      "Read(scripts/**)",
+      "Read(.github/**)",
+      "Read(.claude/**)",
+      "Read(.agents/**)"
+    ]
+  }
+}
