@@ -32,7 +32,7 @@ describe("Cloudflare security headers", () => {
       `connect-src 'self' ${resolveSupabaseOrigin()}`,
     );
     expect(headers).toContain("upgrade-insecure-requests");
-    expect(headers).not.toContain("'unsafe-inline'");
+    expect(headers).toContain("script-src 'self' 'unsafe-inline'");
     expect(headers).not.toContain("fonts.googleapis.com");
     expect(headers).not.toContain("fonts.gstatic.com");
   });
