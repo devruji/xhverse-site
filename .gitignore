@@ -34,6 +34,6 @@ test-results/
 .agents/skills/*-workspace/
 
 # internal AI workflow notes
-CLAUDE.md
 docs/agent-prompts.md
 .claude/worktrees/
+.claude/settings.local.json

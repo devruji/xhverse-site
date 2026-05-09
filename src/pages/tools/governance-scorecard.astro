@@ -1,0 +1,310 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import {
+  governanceQuestions,
+  governanceCategories,
+  categoryLabels,
+  categoryDescriptions,
+} from "../../lib/governance-scorecard/questions";
+
+const pageTitle = "Governance Readiness Scorecard";
+const pageDescription =
+  "Assess your organization's readiness to implement or scale a data governance program. Get a readiness tier, blockers, and a 90-day action plan.";
+---
+
+<BaseLayout title={pageTitle} description={pageDescription}>
+  <main class="min-h-screen bg-[var(--bg-page)] font-sans text-[var(--text)] selection:bg-emerald-300/30 selection:text-white">
+    <div class="mx-auto max-w-7xl px-5 py-6 sm:px-8 sm:py-8 lg:px-10">
+      <header class="flex items-start justify-between gap-5 border-b border-white/10 pb-5 sm:items-center">
+        <a href="/" class="group">
+          <p class="text-[11px] uppercase tracking-[0.35em] text-zinc-500">xhverse.co</p>
+          <span class="mt-1 block text-[1.35rem] font-semibold tracking-tight text-white sm:text-[1.55rem]">XHVERSE</span>
+        </a>
+        <nav class="flex items-center gap-5 text-sm text-zinc-400" aria-label="Tool navigation">
+          <a href="/" class="transition hover:text-white">Home</a>
+          <a href="/tools" class="transition hover:text-white">Tools</a>
+        </nav>
+      </header>
+
+      <section class="grid gap-10 py-10 sm:py-12 lg:grid-cols-[0.95fr_1.05fr] lg:py-14">
+        <div>
+          <p class="text-[12px] uppercase tracking-[0.32em] text-emerald-200">Governance tool</p>
+          <h1 class="mt-4 max-w-4xl text-[2.6rem] font-semibold leading-[0.98] tracking-tight text-white sm:text-[4.4rem]">
+            Governance Readiness Scorecard
+          </h1>
+          <p class="mt-6 max-w-2xl text-base leading-8 text-zinc-300 sm:text-lg">
+            Are you ready to implement a governance program? This tool evaluates organizational readiness across
+            sponsorship, policy, tooling, process, and regulatory dimensions.
+          </p>
+          <div class="mt-7 border border-cyan-300/20 bg-cyan-300/8 p-4 text-sm leading-7 text-cyan-50">
+            This assessment evaluates readiness to govern — not current maturity. Use the
+            <a href="/tools/data-platform-maturity-checker" class="underline decoration-cyan-300/40 hover:decoration-cyan-300">
+              Maturity Checker
+            </a> for platform maturity assessment.
+          </div>
+        </div>
+
+        <aside class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+          <p class="text-[11px] uppercase tracking-[0.24em] text-zinc-500">Dimensions assessed</p>
+          <div class="mt-5 grid gap-3">
+            {governanceCategories.map((category) => (
+              <div class="border border-white/10 bg-black/20 p-4">
+                <h2 class="text-base font-semibold tracking-tight text-white">{categoryLabels[category]}</h2>
+                <p class="mt-2 text-sm leading-6 text-zinc-400">{categoryDescriptions[category]}</p>
+              </div>
+            ))}
+          </div>
+        </aside>
+      </section>
+
+      <section class="border-t border-white/10 py-10">
+        <form id="governance-form" class="space-y-5" data-testid="governance-form">
+          <div class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+            <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Assessment</p>
+            <h2 class="mt-3 text-3xl font-semibold tracking-tight text-white">Rate your current state honestly.</h2>
+            <p class="mt-4 text-sm leading-7 text-zinc-400">
+              Choose the option that best describes your organization today — not where you plan to be.
+            </p>
+          </div>
+
+          {governanceQuestions.map((question, index) => (
+            <fieldset class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+              <legend class="text-sm font-semibold text-emerald-200">
+                {String(index + 1).padStart(2, "0")} · {categoryLabels[question.category]}
+              </legend>
+              <h3 class="mt-3 text-xl font-semibold tracking-tight text-white">{question.prompt}</h3>
+              <div class="mt-5 grid gap-2">
+                {question.options.map((option) => (
+                  <label class="block cursor-pointer border border-white/10 bg-black/20 p-3 transition has-[:checked]:border-emerald-300/80 has-[:checked]:bg-emerald-300/10">
+                    <input
+                      class="peer sr-only"
+                      type="radio"
+                      name={question.id}
+                      value={option.value}
+                      required
+                      data-testid={`answer-${question.id}-${option.value}`}
+                    />
+                    <span class="block text-sm font-semibold text-white">{option.value}. {option.label}</span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+          ))}
+
+          <div class="flex flex-col gap-3 sm:flex-row">
+            <button
+              type="submit"
+              class="inline-flex items-center justify-center bg-white px-5 py-3 text-sm font-semibold text-black transition hover:bg-emerald-100"
+            >
+              Show readiness result
+            </button>
+            <button
+              id="reset-button"
+              type="button"
+              class="inline-flex items-center justify-center border border-white/15 px-5 py-3 text-sm font-medium text-white transition hover:border-emerald-300/70"
+            >
+              Reset
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <section id="result-panel" class="hidden border-t border-white/10 py-10" data-testid="result-panel" aria-live="polite">
+        <div class="grid gap-6 lg:grid-cols-[1fr_0.9fr]">
+          <div class="space-y-6">
+            <div class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+              <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Result</p>
+              <div class="mt-4 grid gap-4 sm:grid-cols-2">
+                <div class="border border-white/10 bg-black/20 p-5">
+                  <p class="text-sm text-zinc-500">Readiness score</p>
+                  <p id="overall-score" class="mt-2 text-5xl font-semibold tracking-tight text-white">0%</p>
+                </div>
+                <div class="border border-white/10 bg-black/20 p-5">
+                  <p class="text-sm text-zinc-500">Readiness tier</p>
+                  <p id="readiness-tier" class="mt-2 text-2xl font-semibold tracking-tight text-emerald-200">Not Ready</p>
+                </div>
+              </div>
+              <div class="mt-6">
+                <h2 class="text-xl font-semibold tracking-tight text-white">Category breakdown</h2>
+                <div id="category-breakdown" class="mt-4 grid gap-3"></div>
+              </div>
+            </div>
+
+            <div class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+              <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Top blockers</p>
+              <div id="blockers-list" class="mt-4 space-y-3"></div>
+            </div>
+          </div>
+
+          <div class="space-y-6">
+            <div class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+              <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">90-day action plan</p>
+              <div id="action-plan" class="mt-4 space-y-3"></div>
+            </div>
+
+            <div class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+              <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Readiness brief</p>
+                  <h2 class="mt-2 text-xl font-semibold tracking-tight text-white">Copyable summary</h2>
+                </div>
+                <button
+                  id="copy-brief"
+                  type="button"
+                  class="inline-flex items-center justify-center border border-white/15 px-4 py-2 text-sm font-medium text-white transition hover:border-emerald-300/70"
+                >
+                  Copy brief
+                </button>
+              </div>
+              <textarea
+                id="readiness-brief"
+                readonly
+                data-testid="readiness-brief"
+                class="mt-4 min-h-[20rem] w-full resize-y border border-white/10 bg-black/30 p-4 font-mono text-xs leading-6 text-zinc-300 outline-none"
+              ></textarea>
+              <p id="copy-status" class="mt-3 text-xs text-zinc-500"></p>
+            </div>
+
+            <div class="border border-emerald-300/20 bg-emerald-300/5 p-5">
+              <p class="text-sm font-semibold text-emerald-200">Need help executing this plan?</p>
+              <p class="mt-2 text-sm leading-7 text-zinc-400">
+                XH has implemented governance frameworks across regulated industries. Book a session to turn
+                this action plan into an execution roadmap with your team.
+              </p>
+              <a href="/services" class="mt-4 inline-flex text-sm font-medium text-emerald-200 transition hover:text-white">
+                View advisory services →
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <script>
+    import {
+      governanceQuestions,
+      categoryLabels,
+      governanceCategories,
+      type GovernanceAnswers,
+    } from "../../lib/governance-scorecard/questions";
+    import {
+      calculateGovernanceResult,
+      buildGovernanceBrief,
+    } from "../../lib/governance-scorecard/scoring";
+
+    const form = document.querySelector<HTMLFormElement>("#governance-form");
+    const resultPanel = document.querySelector<HTMLElement>("#result-panel");
+    const resetButton = document.querySelector<HTMLButtonElement>("#reset-button");
+    const copyButton = document.querySelector<HTMLButtonElement>("#copy-brief");
+    const briefTextarea = document.querySelector<HTMLTextAreaElement>("#readiness-brief");
+    const copyStatus = document.querySelector<HTMLElement>("#copy-status");
+
+    function setText(selector: string, value: string): void {
+      const el = document.querySelector<HTMLElement>(selector);
+      if (el) el.textContent = value;
+    }
+
+    function scoreTone(pct: number): string {
+      if (pct < 40) return "bg-rose-300";
+      if (pct < 65) return "bg-amber-300";
+      if (pct < 85) return "bg-cyan-300";
+      return "bg-emerald-300";
+    }
+
+    function segmentedBar(pct: number): string {
+      const filled = Math.max(0, Math.min(10, Math.round(pct / 10)));
+      const tone = scoreTone(pct);
+      return Array.from({ length: 10 }, (_, i) =>
+        `<span class="h-1.5 ${i < filled ? tone : "bg-white/10"}"></span>`
+      ).join("");
+    }
+
+    function renderResult(answers: GovernanceAnswers): void {
+      const result = calculateGovernanceResult(answers);
+
+      setText("#overall-score", `${result.overallPercentage}%`);
+      setText("#readiness-tier", result.tier);
+
+      const breakdown = document.querySelector<HTMLElement>("#category-breakdown");
+      if (breakdown) {
+        breakdown.innerHTML = result.categoryScores.map((c) => `
+          <div class="border border-white/10 bg-black/20 p-3">
+            <div class="flex items-center justify-between gap-3 text-sm">
+              <span class="font-medium text-zinc-200">${c.label}</span>
+              <span class="text-zinc-500">${c.percentage}%</span>
+            </div>
+            <div class="mt-2 grid grid-cols-10 gap-1" role="meter" aria-label="${c.label}" aria-valuenow="${c.percentage}" aria-valuemin="0" aria-valuemax="100">
+              ${segmentedBar(c.percentage)}
+            </div>
+          </div>
+        `).join("");
+      }
+
+      const blockersList = document.querySelector<HTMLElement>("#blockers-list");
+      if (blockersList) {
+        if (result.topBlockers.length === 0) {
+          blockersList.innerHTML = `<p class="text-sm text-zinc-400">No critical blockers identified. You're in good shape to proceed.</p>`;
+        } else {
+          blockersList.innerHTML = result.topBlockers.map((b) => `
+            <div class="border-l-2 border-rose-300/60 pl-3">
+              <p class="text-sm font-semibold text-white">${b.label}</p>
+              <p class="mt-1 text-sm leading-6 text-zinc-400">${b.reason}</p>
+            </div>
+          `).join("");
+        }
+      }
+
+      const actionPlan = document.querySelector<HTMLElement>("#action-plan");
+      if (actionPlan) {
+        actionPlan.innerHTML = result.actionPlan.map((a) => `
+          <div class="border border-white/10 bg-black/20 p-3">
+            <div class="flex items-center justify-between gap-3">
+              <span class="text-sm font-medium text-zinc-200">${a.action}</span>
+            </div>
+            <div class="mt-2 flex items-center gap-2">
+              <span class="text-[10px] uppercase tracking-wider text-emerald-200">${a.timeframe}</span>
+              <span class="text-[10px] uppercase tracking-wider text-zinc-600">${categoryLabels[a.category]}</span>
+            </div>
+          </div>
+        `).join("");
+      }
+
+      if (briefTextarea) {
+        briefTextarea.value = buildGovernanceBrief(result);
+      }
+
+      resultPanel?.classList.remove("hidden");
+      resultPanel?.scrollIntoView({ block: "start", behavior: "smooth" });
+    }
+
+    form?.addEventListener("submit", (event) => {
+      event.preventDefault();
+      if (!form.reportValidity()) return;
+      const formData = new FormData(form);
+      const answers = Object.fromEntries(
+        governanceQuestions.map((q) => [q.id, Number(formData.get(q.id))]),
+      ) as GovernanceAnswers;
+      renderResult(answers);
+    });
+
+    resetButton?.addEventListener("click", () => {
+      form?.reset();
+      resultPanel?.classList.add("hidden");
+      if (briefTextarea) briefTextarea.value = "";
+      if (copyStatus) copyStatus.textContent = "";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    copyButton?.addEventListener("click", async () => {
+      if (!briefTextarea) return;
+      briefTextarea.select();
+      try {
+        await navigator.clipboard.writeText(briefTextarea.value);
+        if (copyStatus) copyStatus.textContent = "Brief copied.";
+      } catch {
+        if (copyStatus) copyStatus.textContent = "Select the brief text and copy it from your browser.";
+      }
+    });
+  </script>
+</BaseLayout>
