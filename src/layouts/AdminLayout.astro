@@ -1,0 +1,266 @@
+---
+import "../styles/global.css";
+
+const publicSupabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
+const supabaseConnectOrigin = (() => {
+  if (!publicSupabaseUrl) return "";
+  try {
+    return new URL(publicSupabaseUrl).origin;
+  } catch {
+    return "";
+  }
+})();
+const connectSrc = ["'self'", supabaseConnectOrigin].filter(Boolean).join(" ");
+const isDev = import.meta.env.DEV;
+
+const { title = "Admin", activePage = "dashboard" } = Astro.props;
+const pageTitle = `${title} | Admin | XHVERSE`;
+
+const navItems = [
+  { id: "dashboard", label: "Dashboard", href: "/admin/" },
+  { id: "cv-requests", label: "CV Requests", href: "/admin/cv-requests/" },
+  { id: "maturity", label: "Maturity Checker", href: "/admin/tools/maturity/" },
+  { id: "leads", label: "Leads", href: "/admin/leads/" },
+];
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    {!isDev && (
+      <>
+        <meta
+          http-equiv="Content-Security-Policy"
+          content={`default-src 'self'; script-src 'self' 'unsafe-inline'; img-src 'self' data: https:; style-src 'self' 'unsafe-inline'; font-src 'self' data:; connect-src ${connectSrc}; object-src 'none'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests`}
+        />
+        <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+        <meta http-equiv="X-Frame-Options" content="DENY" />
+      </>
+    )}
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
+    <meta name="theme-color" content="#000000" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{pageTitle}</title>
+  </head>
+  <body class="min-h-screen bg-[var(--bg-page)] font-sans text-[var(--text)]">
+    <section id="admin-login-section" class="flex min-h-screen items-center justify-center px-5">
+      <div class="w-full max-w-sm">
+        <a href="/" class="group inline-block">
+          <p class="text-[10px] uppercase tracking-[0.35em] text-zinc-500">xhverse.co</p>
+          <span class="mt-1 block text-[1.35rem] font-semibold tracking-tight text-white">XHVERSE</span>
+        </a>
+        <p class="mt-8 text-[12px] uppercase tracking-[0.32em] text-zinc-500">Admin access</p>
+        <h1 class="mt-3 text-3xl font-semibold tracking-tight text-white">Sign in</h1>
+        <form id="admin-login-form" class="mt-8 space-y-4" novalidate>
+          <div>
+            <label for="admin-email" class="block text-[11px] uppercase tracking-[0.22em] text-zinc-500">Email</label>
+            <input
+              id="admin-email"
+              name="email"
+              type="email"
+              required
+              class="mt-2 w-full border border-white/15 bg-black/30 px-4 py-2.5 text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-emerald-300/70"
+              placeholder="admin@xhverse.co"
+            />
+          </div>
+          <div>
+            <label for="admin-password" class="block text-[11px] uppercase tracking-[0.22em] text-zinc-500">Password</label>
+            <input
+              id="admin-password"
+              name="password"
+              type="password"
+              required
+              class="mt-2 w-full border border-white/15 bg-black/30 px-4 py-2.5 text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-emerald-300/70"
+            />
+          </div>
+          <div id="admin-login-error" class="hidden border border-red-300/20 bg-red-300/8 p-3 text-sm text-red-200"></div>
+          <button
+            id="admin-login-btn"
+            type="submit"
+            class="w-full bg-white px-5 py-3 text-sm font-semibold text-black transition hover:bg-emerald-100"
+          >
+            Sign in
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <div id="admin-shell" class="hidden min-h-screen lg:grid lg:grid-cols-[240px_1fr]">
+      <aside id="admin-sidebar" class="fixed inset-y-0 left-0 z-40 w-[240px] -translate-x-full border-r border-white/10 bg-[#0a0b0d] transition-transform lg:static lg:translate-x-0">
+        <div class="flex h-full flex-col">
+          <div class="flex items-center justify-between border-b border-white/10 px-5 py-4">
+            <a href="/admin/" class="group">
+              <p class="text-[10px] uppercase tracking-[0.35em] text-zinc-500">admin</p>
+              <span class="mt-0.5 block text-sm font-semibold tracking-tight text-white">XHVERSE</span>
+            </a>
+            <button
+              id="sidebar-close"
+              type="button"
+              class="border border-white/15 p-1.5 text-zinc-400 lg:hidden"
+              aria-label="Close sidebar"
+            >
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          <nav class="flex-1 px-3 py-4">
+            <ul class="space-y-1">
+              {navItems.map((item) => (
+                <li>
+                  <a
+                    href={item.href}
+                    class:list={[
+                      "block px-3 py-2 text-xs uppercase tracking-[0.18em] transition",
+                      item.id === activePage
+                        ? "border-l-2 border-emerald-300/70 bg-white/[0.05] text-white"
+                        : "text-zinc-400 hover:bg-white/[0.03] hover:text-zinc-200",
+                    ]}
+                  >
+                    {item.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+          <div class="border-t border-white/10 px-5 py-4">
+            <p id="admin-user-email" class="truncate text-[11px] text-zinc-500"></p>
+            <button
+              id="admin-logout"
+              type="button"
+              class="mt-2 text-[11px] uppercase tracking-[0.18em] text-zinc-400 transition hover:text-red-300"
+            >
+              Logout
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      <div id="sidebar-backdrop" class="fixed inset-0 z-30 hidden bg-black/60 lg:hidden"></div>
+
+      <main class="min-w-0">
+        <header class="flex items-center justify-between border-b border-white/10 px-5 py-3 lg:hidden">
+          <button
+            id="sidebar-toggle"
+            type="button"
+            class="border border-white/15 p-1.5 text-zinc-400"
+            aria-label="Open sidebar"
+          >
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+          <span class="text-xs font-semibold uppercase tracking-[0.18em] text-zinc-400">{title}</span>
+          <span id="admin-user-mobile" class="text-[10px] text-zinc-500"></span>
+        </header>
+
+        <div class="px-5 py-6 sm:px-8 sm:py-8 lg:px-10">
+          <slot />
+        </div>
+      </main>
+    </div>
+
+    <script>
+      import { createAdminClient } from "../lib/admin/supabase";
+
+      const loginSection = document.querySelector<HTMLElement>("#admin-login-section");
+      const shell = document.querySelector<HTMLElement>("#admin-shell");
+      const loginForm = document.querySelector<HTMLFormElement>("#admin-login-form");
+      const loginError = document.querySelector<HTMLElement>("#admin-login-error");
+      const loginBtn = document.querySelector<HTMLButtonElement>("#admin-login-btn");
+      const logoutBtn = document.querySelector<HTMLButtonElement>("#admin-logout");
+      const userEmail = document.querySelector<HTMLElement>("#admin-user-email");
+      const userMobile = document.querySelector<HTMLElement>("#admin-user-mobile");
+      const sidebar = document.querySelector<HTMLElement>("#admin-sidebar");
+      const sidebarToggle = document.querySelector<HTMLButtonElement>("#sidebar-toggle");
+      const sidebarClose = document.querySelector<HTMLButtonElement>("#sidebar-close");
+      const sidebarBackdrop = document.querySelector<HTMLElement>("#sidebar-backdrop");
+
+      const supabaseClient = createAdminClient(import.meta.env);
+
+      function showShell(email: string): void {
+        if (loginSection) loginSection.classList.add("hidden");
+        if (shell) shell.classList.remove("hidden");
+        if (userEmail) userEmail.textContent = email;
+        if (userMobile) userMobile.textContent = email;
+        window.dispatchEvent(new CustomEvent("admin:authenticated"));
+      }
+
+      function showLogin(): void {
+        if (loginSection) loginSection.classList.remove("hidden");
+        if (shell) shell.classList.add("hidden");
+      }
+
+      function showLoginError(msg: string): void {
+        if (!loginError) return;
+        loginError.textContent = msg;
+        loginError.classList.remove("hidden");
+      }
+
+      function openSidebar(): void {
+        if (sidebar) sidebar.classList.remove("-translate-x-full");
+        if (sidebarBackdrop) sidebarBackdrop.classList.remove("hidden");
+      }
+
+      function closeSidebar(): void {
+        if (sidebar) sidebar.classList.add("-translate-x-full");
+        if (sidebarBackdrop) sidebarBackdrop.classList.add("hidden");
+      }
+
+      sidebarToggle?.addEventListener("click", openSidebar);
+      sidebarClose?.addEventListener("click", closeSidebar);
+      sidebarBackdrop?.addEventListener("click", closeSidebar);
+
+      loginForm?.addEventListener("submit", async (e: Event) => {
+        e.preventDefault();
+        if (!supabaseClient || !loginBtn) return;
+
+        if (loginError) loginError.classList.add("hidden");
+        loginBtn.disabled = true;
+        loginBtn.textContent = "Signing in...";
+
+        const emailInput = document.querySelector<HTMLInputElement>("#admin-email");
+        const passwordInput = document.querySelector<HTMLInputElement>("#admin-password");
+        const email = emailInput?.value ?? "";
+        const password = passwordInput?.value ?? "";
+
+        const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+
+        if (error) {
+          showLoginError(error.message);
+          loginBtn.disabled = false;
+          loginBtn.textContent = "Sign in";
+          return;
+        }
+
+        showShell(email);
+        loginBtn.disabled = false;
+        loginBtn.textContent = "Sign in";
+      });
+
+      logoutBtn?.addEventListener("click", async () => {
+        if (!supabaseClient) return;
+        await supabaseClient.auth.signOut();
+        showLogin();
+      });
+
+      (window as unknown as Record<string, unknown>).__adminSupabase = supabaseClient;
+
+      async function init(): Promise<void> {
+        if (!supabaseClient) {
+          showLoginError("Supabase not configured.");
+          return;
+        }
+
+        const { data } = await supabaseClient.auth.getSession();
+        if (data?.session) {
+          showShell(data.session.user.email ?? "admin");
+        }
+      }
+
+      init();
+    </script>
+  </body>
+</html>

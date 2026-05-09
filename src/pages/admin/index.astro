@@ -1,0 +1,123 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+---
+
+<AdminLayout title="Dashboard" activePage="dashboard">
+  <div id="alert-strip" class="mb-6 hidden border border-amber-300/20 bg-amber-300/8 px-4 py-3">
+    <p class="text-sm text-amber-200">
+      <span id="alert-pending-count">0</span> CV request(s) pending review.
+      <a href="/admin/cv-requests/" class="ml-2 underline underline-offset-2 transition hover:text-white">View</a>
+    </p>
+  </div>
+
+  <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+    <div class="border border-white/10 bg-white/[0.03] p-4">
+      <p class="text-[11px] uppercase tracking-[0.22em] text-zinc-500">CV Requests</p>
+      <p id="stat-cv" class="mt-2 text-2xl font-semibold text-white">-</p>
+    </div>
+    <div class="border border-white/10 bg-white/[0.03] p-4">
+      <p class="text-[11px] uppercase tracking-[0.22em] text-zinc-500">Maturity Submissions</p>
+      <p id="stat-maturity" class="mt-2 text-2xl font-semibold text-white">-</p>
+    </div>
+    <div class="border border-white/10 bg-white/[0.03] p-4">
+      <p class="text-[11px] uppercase tracking-[0.22em] text-zinc-500">Leads</p>
+      <p id="stat-leads" class="mt-2 text-2xl font-semibold text-white">-</p>
+    </div>
+    <div class="border border-white/10 bg-white/[0.03] p-4">
+      <p class="text-[11px] uppercase tracking-[0.22em] text-zinc-500">Blog Posts</p>
+      <p id="stat-posts" class="mt-2 text-2xl font-semibold text-white">-</p>
+    </div>
+  </div>
+
+  <div class="mt-8">
+    <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Recent activity</p>
+    <div id="activity-feed" class="mt-4 space-y-2">
+      <p id="activity-loading" class="py-8 text-center text-sm text-zinc-500">Loading...</p>
+    </div>
+  </div>
+
+  <script>
+    import { createAdminClient } from "../../lib/admin/supabase";
+
+    const client = createAdminClient(import.meta.env);
+
+    type ActivityItem = { type: string; email: string; date: string };
+
+    async function loadDashboard(): Promise<void> {
+      if (!client) return;
+
+      const [cvResult, maturityResult, leadsResult, postsResult] = await Promise.all([
+        client.from("cv_download_requests").select("id, status, email, requested_at", { count: "exact", head: false }),
+        client.from("data_platform_maturity_submissions").select("id, contact_email, created_at", { count: "exact", head: false }),
+        client.from("leads").select("id", { count: "exact", head: true }),
+        client.from("posts").select("id", { count: "exact", head: true }),
+      ]);
+
+      const statCv = document.querySelector("#stat-cv");
+      const statMaturity = document.querySelector("#stat-maturity");
+      const statLeads = document.querySelector("#stat-leads");
+      const statPosts = document.querySelector("#stat-posts");
+      const alertStrip = document.querySelector("#alert-strip");
+      const alertCount = document.querySelector("#alert-pending-count");
+
+      if (statCv) statCv.textContent = String(cvResult.count ?? cvResult.data?.length ?? 0);
+      if (statMaturity) statMaturity.textContent = String(maturityResult.count ?? maturityResult.data?.length ?? 0);
+      if (statLeads) statLeads.textContent = String(leadsResult.count ?? 0);
+      if (statPosts) statPosts.textContent = String(postsResult.count ?? 0);
+
+      const pendingCount = (cvResult.data ?? []).filter(
+        (r: { status: string }) => r.status === "pending",
+      ).length;
+      if (pendingCount > 0 && alertStrip && alertCount) {
+        alertCount.textContent = String(pendingCount);
+        alertStrip.classList.remove("hidden");
+      }
+
+      const feed = document.querySelector("#activity-feed");
+      const loading = document.querySelector("#activity-loading");
+      if (loading) loading.remove();
+      if (!feed) return;
+
+      const items: ActivityItem[] = [
+        ...(cvResult.data ?? []).map((r: { email: string; requested_at: string }) => ({
+          type: "CV Request", email: r.email, date: r.requested_at,
+        })),
+        ...(maturityResult.data ?? [])
+          .filter((r: { contact_email: string | null }) => r.contact_email)
+          .map((r: { contact_email: string | null; created_at: string }) => ({
+            type: "Maturity Submission", email: r.contact_email as string, date: r.created_at,
+          })),
+      ];
+
+      items.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+      const recent = items.slice(0, 10);
+
+      if (recent.length === 0) {
+        feed.innerHTML = '<p class="py-8 text-center text-sm text-zinc-500">No activity yet.</p>';
+        return;
+      }
+
+      feed.innerHTML = recent.map((item) => `
+        <div class="flex items-center justify-between border-b border-white/5 py-2.5">
+          <div class="min-w-0 flex-1">
+            <span class="inline-block border border-white/10 px-1.5 py-0.5 text-[10px] uppercase tracking-[0.12em] text-zinc-400">${escapeHtml(item.type)}</span>
+            <span class="ml-2 text-sm text-zinc-300">${escapeHtml(item.email)}</span>
+          </div>
+          <span class="ml-3 shrink-0 text-[11px] text-zinc-500">${formatDate(item.date)}</span>
+        </div>
+      `).join("");
+    }
+
+    function formatDate(iso: string): string {
+      return new Date(iso).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+    }
+
+    function escapeHtml(text: string): string {
+      const div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    window.addEventListener("admin:authenticated", () => { loadDashboard(); });
+  </script>
+</AdminLayout>

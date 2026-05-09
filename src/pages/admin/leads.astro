@@ -1,0 +1,133 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+---
+
+<AdminLayout title="Leads" activePage="leads">
+  <div class="flex items-center justify-between">
+    <div>
+      <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">CRM</p>
+      <h1 class="mt-3 text-3xl font-semibold tracking-tight text-white">Leads</h1>
+    </div>
+    <button id="leads-refresh" type="button" class="border border-white/15 px-4 py-2 text-xs uppercase tracking-[0.18em] text-zinc-300 transition hover:border-emerald-300/70 hover:text-white">Refresh</button>
+  </div>
+
+  <div id="leads-filter" class="mt-6 flex gap-2">
+    <button data-filter="all" class="border border-emerald-300/50 bg-emerald-300/10 px-3 py-1.5 text-[10px] uppercase tracking-[0.15em] text-emerald-200 transition">All</button>
+    <button data-filter="new" class="border border-white/15 px-3 py-1.5 text-[10px] uppercase tracking-[0.15em] text-zinc-400 transition hover:border-white/30 hover:text-zinc-200">New</button>
+    <button data-filter="contacted" class="border border-white/15 px-3 py-1.5 text-[10px] uppercase tracking-[0.15em] text-zinc-400 transition hover:border-white/30 hover:text-zinc-200">Contacted</button>
+    <button data-filter="converted" class="border border-white/15 px-3 py-1.5 text-[10px] uppercase tracking-[0.15em] text-zinc-400 transition hover:border-white/30 hover:text-zinc-200">Converted</button>
+  </div>
+
+  <div class="mt-6 overflow-x-auto">
+    <table class="w-full border-collapse text-sm">
+      <thead>
+        <tr class="border-b border-white/10 text-left text-[11px] uppercase tracking-[0.22em] text-zinc-500">
+          <th class="px-3 py-3">Email</th>
+          <th class="px-3 py-3">Name</th>
+          <th class="px-3 py-3">Source</th>
+          <th class="px-3 py-3">Status</th>
+          <th class="px-3 py-3">Collected</th>
+          <th class="px-3 py-3">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="leads-table-body"></tbody>
+    </table>
+    <p id="leads-empty" class="hidden py-12 text-center text-sm text-zinc-500">No leads yet.</p>
+    <p id="leads-loading" class="py-12 text-center text-sm text-zinc-500">Loading...</p>
+  </div>
+
+  <script>
+    import { createAdminClient } from "../../lib/admin/supabase";
+    import { sourceLabels, type LeadStatus } from "../../lib/leads/types";
+    import { fetchLeads, updateLeadStatus } from "../../lib/leads/supabase";
+
+    type LeadRow = { id: string; email: string; name: string | null; source: string; status: string; collected_at: string };
+
+    const client = createAdminClient(import.meta.env);
+    const refreshBtn = document.querySelector<HTMLButtonElement>("#leads-refresh");
+    const filterContainer = document.querySelector<HTMLElement>("#leads-filter");
+    const tableBody = document.querySelector<HTMLElement>("#leads-table-body");
+    const emptyMsg = document.querySelector<HTMLElement>("#leads-empty");
+    const loadingMsg = document.querySelector<HTMLElement>("#leads-loading");
+
+    let currentFilter: LeadStatus | undefined;
+
+    async function loadLeads(): Promise<void> {
+      if (!client) return;
+      if (loadingMsg) loadingMsg.classList.remove("hidden");
+      if (emptyMsg) emptyMsg.classList.add("hidden");
+
+      const result = await fetchLeads(client, currentFilter);
+      if (loadingMsg) loadingMsg.classList.add("hidden");
+
+      if (result.kind === "loaded") { renderTable(result.data); }
+      else if (result.kind === "failed") {
+        if (tableBody) tableBody.innerHTML = "";
+        if (emptyMsg) { emptyMsg.textContent = `Error: ${result.message}`; emptyMsg.classList.remove("hidden"); }
+      }
+    }
+
+    function renderTable(leads: LeadRow[]): void {
+      if (!tableBody) return;
+      if (leads.length === 0) { tableBody.innerHTML = ""; if (emptyMsg) emptyMsg.classList.remove("hidden"); return; }
+      if (emptyMsg) emptyMsg.classList.add("hidden");
+      tableBody.innerHTML = leads.map((lead) => `
+        <tr class="border-b border-white/5 hover:bg-white/[0.02]" data-id="${lead.id}">
+          <td class="px-3 py-3 text-zinc-300">${escapeHtml(lead.email)}</td>
+          <td class="px-3 py-3 text-zinc-400">${lead.name ? escapeHtml(lead.name) : "—"}</td>
+          <td class="px-3 py-3 text-zinc-400">${escapeHtml(sourceLabels[lead.source as keyof typeof sourceLabels] ?? lead.source)}</td>
+          <td class="px-3 py-3">${statusBadge(lead.status)}</td>
+          <td class="px-3 py-3 text-zinc-500">${formatDate(lead.collected_at)}</td>
+          <td class="px-3 py-3">${actionButtons(lead)}</td>
+        </tr>
+      `).join("");
+      tableBody.querySelectorAll("[data-lead-action]").forEach((btn) => { btn.addEventListener("click", handleAction); });
+    }
+
+    function statusBadge(status: string): string {
+      const colors: Record<string, string> = { new: "border-amber-300/25 bg-amber-300/8 text-amber-200", contacted: "border-sky-300/25 bg-sky-300/8 text-sky-200", converted: "border-emerald-300/25 bg-emerald-300/8 text-emerald-200", archived: "border-zinc-300/25 bg-zinc-300/8 text-zinc-300" };
+      return `<span class="inline-block border px-2 py-0.5 text-[10px] uppercase tracking-[0.15em] ${colors[status] ?? ""}">${escapeHtml(status)}</span>`;
+    }
+
+    function actionButtons(lead: LeadRow): string {
+      const buttons: string[] = [];
+      if (lead.status !== "contacted") buttons.push(`<button data-lead-action="contacted" data-id="${lead.id}" class="border border-sky-300/30 px-2 py-1 text-[10px] uppercase tracking-[0.12em] text-sky-200 transition hover:bg-sky-300/10">Contacted</button>`);
+      if (lead.status !== "converted") buttons.push(`<button data-lead-action="converted" data-id="${lead.id}" class="border border-emerald-300/30 px-2 py-1 text-[10px] uppercase tracking-[0.12em] text-emerald-200 transition hover:bg-emerald-300/10">Converted</button>`);
+      if (lead.status !== "archived") buttons.push(`<button data-lead-action="archived" data-id="${lead.id}" class="border border-zinc-300/30 px-2 py-1 text-[10px] uppercase tracking-[0.12em] text-zinc-400 transition hover:bg-zinc-300/10">Archive</button>`);
+      return `<div class="flex gap-2">${buttons.join("")}</div>`;
+    }
+
+    async function handleAction(e: Event): Promise<void> {
+      const btn = e.currentTarget as HTMLElement;
+      const action = btn.dataset.leadAction as LeadStatus;
+      const id = btn.dataset.id;
+      if (!action || !id || !client) return;
+      btn.textContent = "...";
+      const result = await updateLeadStatus(client, id, action);
+      if (result.kind === "updated") { await loadLeads(); }
+      else if (result.kind === "failed") { btn.textContent = "Error"; }
+    }
+
+    function setActiveFilter(btn: HTMLElement): void {
+      filterContainer?.querySelectorAll("button").forEach((b) => {
+        b.className = "border border-white/15 px-3 py-1.5 text-[10px] uppercase tracking-[0.15em] text-zinc-400 transition hover:border-white/30 hover:text-zinc-200";
+      });
+      btn.className = "border border-emerald-300/50 bg-emerald-300/10 px-3 py-1.5 text-[10px] uppercase tracking-[0.15em] text-emerald-200 transition";
+    }
+
+    filterContainer?.querySelectorAll("button[data-filter]").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const filter = (btn as HTMLElement).dataset.filter;
+        currentFilter = filter === "all" ? undefined : (filter as LeadStatus);
+        setActiveFilter(btn as HTMLElement);
+        loadLeads();
+      });
+    });
+
+    function formatDate(iso: string): string { return new Date(iso).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" }); }
+    function escapeHtml(text: string): string { const div = document.createElement("div"); div.textContent = text; return div.innerHTML; }
+
+    refreshBtn?.addEventListener("click", () => { loadLeads(); });
+    window.addEventListener("admin:authenticated", () => { loadLeads(); });
+  </script>
+</AdminLayout>

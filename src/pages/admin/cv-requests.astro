@@ -1,0 +1,158 @@
+---
+import AdminLayout from "../../layouts/AdminLayout.astro";
+---
+
+<AdminLayout title="CV Requests" activePage="cv-requests">
+  <div class="flex items-center justify-between">
+    <div>
+      <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Dashboard</p>
+      <h1 class="mt-3 text-3xl font-semibold tracking-tight text-white">CV Requests</h1>
+    </div>
+    <button id="admin-refresh" type="button" class="border border-white/15 px-4 py-2 text-xs uppercase tracking-[0.18em] text-zinc-300 transition hover:border-emerald-300/70 hover:text-white">Refresh</button>
+  </div>
+
+  <div class="mt-6 grid gap-3 sm:grid-cols-4">
+    <div class="border border-white/10 bg-white/[0.03] p-4">
+      <p class="text-[11px] uppercase tracking-[0.22em] text-zinc-500">Total</p>
+      <p id="stat-total" class="mt-2 text-2xl font-semibold text-white">0</p>
+    </div>
+    <div class="border border-white/10 bg-white/[0.03] p-4">
+      <p class="text-[11px] uppercase tracking-[0.22em] text-zinc-500">Pending</p>
+      <p id="stat-pending" class="mt-2 text-2xl font-semibold text-amber-200">0</p>
+    </div>
+    <div class="border border-white/10 bg-white/[0.03] p-4">
+      <p class="text-[11px] uppercase tracking-[0.22em] text-zinc-500">Approved</p>
+      <p id="stat-approved" class="mt-2 text-2xl font-semibold text-emerald-200">0</p>
+    </div>
+    <div class="border border-white/10 bg-white/[0.03] p-4">
+      <p class="text-[11px] uppercase tracking-[0.22em] text-zinc-500">Rejected</p>
+      <p id="stat-rejected" class="mt-2 text-2xl font-semibold text-red-200">0</p>
+    </div>
+  </div>
+
+  <div class="mt-8 overflow-x-auto">
+    <table class="w-full border-collapse text-sm">
+      <thead>
+        <tr class="border-b border-white/10 text-left text-[11px] uppercase tracking-[0.22em] text-zinc-500">
+          <th class="px-3 py-3">Email</th>
+          <th class="px-3 py-3">Name</th>
+          <th class="px-3 py-3">Context</th>
+          <th class="px-3 py-3">Date</th>
+          <th class="px-3 py-3">Status</th>
+          <th class="px-3 py-3">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="admin-table-body"></tbody>
+    </table>
+    <p id="admin-empty" class="hidden py-12 text-center text-sm text-zinc-500">No requests yet.</p>
+    <p id="admin-loading" class="py-12 text-center text-sm text-zinc-500">Loading...</p>
+  </div>
+
+  <script>
+    import { createAdminClient } from "../../lib/admin/supabase";
+
+    type CvRequest = { id: string; email: string; name: string | null; context: string | null; status: string; requested_at: string };
+
+    const client = createAdminClient(import.meta.env);
+    const refreshBtn = document.querySelector<HTMLButtonElement>("#admin-refresh");
+    const tableBody = document.querySelector<HTMLElement>("#admin-table-body");
+    const emptyMsg = document.querySelector<HTMLElement>("#admin-empty");
+    const loadingMsg = document.querySelector<HTMLElement>("#admin-loading");
+
+    let requests: CvRequest[] = [];
+
+    const contextLabels: Record<string, string> = {
+      engagement: "Potential engagement",
+      evaluation: "Evaluating fit",
+      networking: "Networking / research",
+      other: "Other",
+    };
+
+    async function loadRequests(): Promise<void> {
+      if (!client) return;
+      if (loadingMsg) loadingMsg.classList.remove("hidden");
+      if (emptyMsg) emptyMsg.classList.add("hidden");
+
+      const { data, error } = await client.from("cv_download_requests").select("*").order("requested_at", { ascending: false });
+      if (loadingMsg) loadingMsg.classList.add("hidden");
+
+      if (error) {
+        if (tableBody) tableBody.innerHTML = "";
+        if (emptyMsg) { emptyMsg.textContent = `Error: ${error.message}`; emptyMsg.classList.remove("hidden"); }
+        return;
+      }
+
+      requests = (data ?? []) as CvRequest[];
+      renderTable();
+      updateStats();
+    }
+
+    function updateStats(): void {
+      const total = document.querySelector("#stat-total");
+      const pending = document.querySelector("#stat-pending");
+      const approved = document.querySelector("#stat-approved");
+      const rejected = document.querySelector("#stat-rejected");
+      if (total) total.textContent = String(requests.length);
+      if (pending) pending.textContent = String(requests.filter((r) => r.status === "pending").length);
+      if (approved) approved.textContent = String(requests.filter((r) => r.status === "approved").length);
+      if (rejected) rejected.textContent = String(requests.filter((r) => r.status === "rejected" || r.status === "blocked").length);
+    }
+
+    function renderTable(): void {
+      if (!tableBody) return;
+      if (requests.length === 0) { tableBody.innerHTML = ""; if (emptyMsg) emptyMsg.classList.remove("hidden"); return; }
+      if (emptyMsg) emptyMsg.classList.add("hidden");
+      tableBody.innerHTML = requests.map((req) => `
+        <tr class="border-b border-white/5 hover:bg-white/[0.02]" data-id="${req.id}">
+          <td class="px-3 py-3 text-zinc-300">${escapeHtml(req.email)}</td>
+          <td class="px-3 py-3 text-zinc-400">${req.name ? escapeHtml(req.name) : "—"}</td>
+          <td class="px-3 py-3 text-zinc-400">${req.context ? (contextLabels[req.context] ?? req.context) : "—"}</td>
+          <td class="px-3 py-3 text-zinc-500">${formatDate(req.requested_at)}</td>
+          <td class="px-3 py-3">${statusBadge(req.status)}</td>
+          <td class="px-3 py-3">${actionButtons(req)}</td>
+        </tr>
+      `).join("");
+      tableBody.querySelectorAll("[data-action]").forEach((btn) => { btn.addEventListener("click", handleAction); });
+    }
+
+    function statusBadge(status: string): string {
+      const colors: Record<string, string> = { pending: "border-amber-300/25 bg-amber-300/8 text-amber-200", approved: "border-emerald-300/25 bg-emerald-300/8 text-emerald-200", rejected: "border-red-300/25 bg-red-300/8 text-red-200", blocked: "border-zinc-300/25 bg-zinc-300/8 text-zinc-300" };
+      return `<span class="inline-block border px-2 py-0.5 text-[10px] uppercase tracking-[0.15em] ${colors[status] ?? ""}">${escapeHtml(status)}</span>`;
+    }
+
+    function actionButtons(req: CvRequest): string {
+      if (req.status !== "pending") return "";
+      return `<div class="flex gap-2">
+        <button data-action="approved" data-id="${req.id}" class="border border-emerald-300/30 px-2 py-1 text-[10px] uppercase tracking-[0.12em] text-emerald-200 transition hover:bg-emerald-300/10">Approve</button>
+        <button data-action="rejected" data-id="${req.id}" class="border border-red-300/30 px-2 py-1 text-[10px] uppercase tracking-[0.12em] text-red-200 transition hover:bg-red-300/10">Reject</button>
+        <button data-action="blocked" data-id="${req.id}" class="border border-zinc-300/30 px-2 py-1 text-[10px] uppercase tracking-[0.12em] text-zinc-400 transition hover:bg-zinc-300/10">Block</button>
+      </div>`;
+    }
+
+    async function handleAction(e: Event): Promise<void> {
+      const btn = e.currentTarget as HTMLElement;
+      const action = btn.dataset.action;
+      const id = btn.dataset.id;
+      if (!action || !id || !client) return;
+      btn.textContent = "...";
+      const updates: Record<string, unknown> = { status: action };
+      if (action === "approved") updates.approved_at = new Date().toISOString();
+      const { error } = await client.from("cv_download_requests").update(updates).eq("id", id);
+      if (error) { btn.textContent = "Error"; return; }
+      await loadRequests();
+    }
+
+    function formatDate(iso: string): string {
+      return new Date(iso).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+    }
+
+    function escapeHtml(text: string): string {
+      const div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    refreshBtn?.addEventListener("click", () => { loadRequests(); });
+    window.addEventListener("admin:authenticated", () => { loadRequests(); });
+  </script>
+</AdminLayout>

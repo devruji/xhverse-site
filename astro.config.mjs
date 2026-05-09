@@ -7,7 +7,11 @@ const site = resolveSiteUrl(process.env);
 
 export default defineConfig({
   site,
-  integrations: [sitemap()],
+  integrations: [
+    sitemap({
+      filter: (page) => !page.includes("/admin/"),
+    }),
+  ],
   vite: {
     plugins: [tailwindcss()],
   },
