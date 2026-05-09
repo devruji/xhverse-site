@@ -4,6 +4,7 @@ import Header from "../../components/Header.astro";
 import Footer from "../../components/Footer.astro";
 import { posts as staticFallback } from "../../data/blog";
 import { site } from "../../data/site";
+import { profile } from "../../data/profile";
 import {
   createSupabaseClientForBuild,
   loadPublishedPostsForBuild,
@@ -34,6 +35,8 @@ const deploymentSite = (Astro.site ?? site.siteUrl).toString();
       url: new URL(`/blog/${post.slug}`, deploymentSite).toString(),
       keywords: post.tags.join(", "),
       description: post.excerpt,
+      author: { "@type": "Person", "@id": `${deploymentSite}#person`, name: profile.fullName },
+      image: new URL(site.ogImage, deploymentSite).toString(),
     })),
   }}
 >
