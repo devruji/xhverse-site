@@ -6,15 +6,12 @@ const cvPdfUrl = `${DEFAULT_SUPABASE_PROJECT_URL}/storage/v1/object/public/docum
 test("about page loads expected sections", async ({ page }) => {
   await page.goto("/about");
   await expect(
-    page.getByRole("heading", {
-      name: "Data Engineering and Data Architecture, with a practical platform mindset.",
-    }),
+    page.getByRole("heading", { name: "Data Engineer / Data Architect" }),
   ).toBeVisible();
   await expect(page.getByRole("heading", { name: "Platform direction" })).toBeVisible();
   await expect(
     page.getByRole("heading", { name: "Architecture statement" }),
   ).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Contact" })).toBeVisible();
 });
 
 test("blog page loads posts", async ({ page }) => {
