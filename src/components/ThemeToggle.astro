@@ -5,7 +5,9 @@
   id="theme-toggle"
   type="button"
   aria-label="Toggle theme"
-  class="fixed bottom-6 right-6 z-[9999] flex h-12 w-12 items-center justify-center rounded-full border border-zinc-700 bg-zinc-900 text-zinc-200 shadow-xl transition hover:scale-110 hover:border-emerald-400 active:scale-95"
+  data-astro-transition-persist="theme-toggle"
+  class="fixed bottom-6 right-6 z-[9999] flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border border-zinc-700 bg-zinc-900 text-zinc-200 shadow-xl transition hover:scale-110 hover:border-emerald-400 active:scale-95"
+  onclick="(function(btn){var d=document.documentElement;var isLight=d.classList.contains('light');if(isLight){d.classList.remove('light');localStorage.setItem('theme','dark');btn.querySelector('#theme-icon-sun').classList.remove('hidden');btn.querySelector('#theme-icon-moon').classList.add('hidden');btn.classList.remove('border-zinc-300','bg-white','text-zinc-700');btn.classList.add('border-zinc-700','bg-zinc-900','text-zinc-200');}else{d.classList.add('light');localStorage.setItem('theme','light');btn.querySelector('#theme-icon-sun').classList.add('hidden');btn.querySelector('#theme-icon-moon').classList.remove('hidden');btn.classList.remove('border-zinc-700','bg-zinc-900','text-zinc-200');btn.classList.add('border-zinc-300','bg-white','text-zinc-700');}})(this)"
 >
   <svg id="theme-icon-sun" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
     <circle cx="12" cy="12" r="5"></circle>
@@ -17,47 +19,19 @@
 </button>
 
 <script is:inline>
-function initThemeToggle() {
+(function(){
   var toggle = document.getElementById('theme-toggle');
-  var sunIcon = document.getElementById('theme-icon-sun');
-  var moonIcon = document.getElementById('theme-icon-moon');
-  if (!toggle || !sunIcon || !moonIcon) return;
-
-  var theme = document.documentElement.classList.contains('light') ? 'light' : 'dark';
-  sunIcon.classList.toggle('hidden', theme !== 'dark');
-  moonIcon.classList.toggle('hidden', theme !== 'light');
-
-  // Light mode button style
-  if (theme === 'light') {
-    toggle.classList.remove('border-zinc-700', 'bg-zinc-900', 'text-zinc-200');
-    toggle.classList.add('border-zinc-300', 'bg-white', 'text-zinc-700');
-  } else {
-    toggle.classList.remove('border-zinc-300', 'bg-white', 'text-zinc-700');
-    toggle.classList.add('border-zinc-700', 'bg-zinc-900', 'text-zinc-200');
+  if (!toggle) return;
+  var isLight = document.documentElement.classList.contains('light');
+  var sun = document.getElementById('theme-icon-sun');
+  var moon = document.getElementById('theme-icon-moon');
+  if (sun && moon) {
+    sun.classList.toggle('hidden', isLight);
+    moon.classList.toggle('hidden', !isLight);
   }
-
-  if (!toggle._themeInit) {
-    toggle._themeInit = true;
-    toggle.addEventListener('click', function() {
-      var current = document.documentElement.classList.contains('light') ? 'light' : 'dark';
-      var next = current === 'dark' ? 'light' : 'dark';
-      localStorage.setItem('theme', next);
-      document.documentElement.classList.toggle('light', next === 'light');
-      initThemeToggle();
-    });
+  if (isLight) {
+    toggle.classList.remove('border-zinc-700','bg-zinc-900','text-zinc-200');
+    toggle.classList.add('border-zinc-300','bg-white','text-zinc-700');
   }
-}
-
-initThemeToggle();
-document.addEventListener('astro:page-load', initThemeToggle);
-
-if (!window._themeMediaInit) {
-  window._themeMediaInit = true;
-  window.matchMedia('(prefers-color-scheme: light)').addEventListener('change', function(e) {
-    if (!localStorage.getItem('theme')) {
-      document.documentElement.classList.toggle('light', e.matches);
-      initThemeToggle();
-    }
-  });
-}
+})();
 </script>
