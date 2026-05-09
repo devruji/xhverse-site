@@ -42,12 +42,24 @@ const profilePlatformStack = [
   {
     name: "AWS",
     src: "/images/platform-stack/aws.png",
-    darkSrc: "/images/platform-stack/aws-dark.png",
+    lightSrc: "/images/platform-stack/aws-light.png",
   },
   {
     name: "Google Cloud",
     src: "/images/platform-stack/google-cloud.png",
   },
+];
+
+const aiStack = [
+  { name: "OpenAI", src: "/images/ai-stack/openai.png", darkSrc: "/images/ai-stack/openai-dark.png" },
+  { name: "Claude", src: "/images/ai-stack/claude.png", darkSrc: "/images/ai-stack/claude-dark.png" },
+  { name: "Gemini", src: "/images/ai-stack/gemini.png", darkSrc: "/images/ai-stack/gemini-dark.png" },
+  { name: "MS Foundry", src: "/images/ai-stack/ms-foundry.png" },
+  { name: "Claude Code", src: "/images/ai-stack/claude-code.png" },
+  { name: "Codex", src: "/images/ai-stack/codex.png" },
+  { name: "Gemini CLI", src: "/images/ai-stack/gemini-cli.png" },
+  { name: "GitHub Copilot", src: "/images/ai-stack/github-copilot.png", darkSrc: "/images/ai-stack/github-copilot-dark.png" },
+  { name: "Cursor", src: "/images/ai-stack/cursor.png", darkSrc: "/images/ai-stack/cursor-dark.png" },
 ];
 
 const capabilityGroups = [
@@ -306,10 +318,10 @@ const homeStructuredData = {
                   title={item.name}
                   aria-label={item.name}
                 >
-                  {item.darkSrc ? (
+                  {item.lightSrc ? (
                     <>
-                      <img src={item.src} alt={`${item.name} logo`} width="512" height="512" loading="lazy" decoding="async" class="aws-logo-light h-8 w-8 object-contain" />
-                      <img src={item.darkSrc} alt={`${item.name} logo`} width="512" height="512" loading="lazy" decoding="async" class="aws-logo-dark h-8 w-8 object-contain" />
+                      <img src={item.src} alt={`${item.name} logo`} width="512" height="512" loading="lazy" decoding="async" class="theme-dark-only h-8 w-8 object-contain" />
+                      <img src={item.lightSrc} alt={`${item.name} logo`} width="512" height="512" loading="lazy" decoding="async" class="theme-light-only h-8 w-8 object-contain" />
                     </>
                   ) : (
                     <img
@@ -319,7 +331,36 @@ const homeStructuredData = {
                       height="512"
                       loading="lazy"
                       decoding="async"
-                      class="h-8 w-8 object-contain opacity-80 saturate-[0.82] transition group-hover:opacity-100 group-hover:saturate-100"
+                      class="h-8 w-8 object-contain"
+                    />
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+          <div class="mt-5 border-t border-white/10 pt-5">
+            <p class="text-[11px] uppercase tracking-[0.28em] text-zinc-500">AI stack</p>
+            <div class="mt-3 grid grid-cols-4 gap-2 sm:grid-cols-6 lg:grid-cols-4 xl:grid-cols-6">
+              {aiStack.map((item) => (
+                <div
+                  class="group flex h-14 w-14 items-center justify-center border border-white/10 bg-black/20 p-2.5 transition hover:border-emerald-300/40 hover:bg-white/[0.04]"
+                  title={item.name}
+                  aria-label={item.name}
+                >
+                  {item.darkSrc ? (
+                    <>
+                      <img src={item.darkSrc} alt={`${item.name} logo`} width="512" height="512" loading="lazy" decoding="async" class="theme-dark-only h-8 w-8 object-contain" />
+                      <img src={item.src} alt={`${item.name} logo`} width="512" height="512" loading="lazy" decoding="async" class="theme-light-only h-8 w-8 object-contain" />
+                    </>
+                  ) : (
+                    <img
+                      src={item.src}
+                      alt={`${item.name} logo`}
+                      width="512"
+                      height="512"
+                      loading="lazy"
+                      decoding="async"
+                      class="h-8 w-8 object-contain"
                     />
                   )}
                 </div>
