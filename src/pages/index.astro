@@ -42,6 +42,7 @@ const profilePlatformStack = [
   {
     name: "AWS",
     src: "/images/platform-stack/aws.png",
+    darkSrc: "/images/platform-stack/aws-dark.png",
   },
   {
     name: "Google Cloud",
@@ -305,15 +306,22 @@ const homeStructuredData = {
                   title={item.name}
                   aria-label={item.name}
                 >
-                  <img
-                    src={item.src}
-                    alt={`${item.name} logo`}
-                    width="512"
-                    height="512"
-                    loading="lazy"
-                    decoding="async"
-                    class="h-8 w-8 object-contain opacity-80 saturate-[0.82] transition group-hover:opacity-100 group-hover:saturate-100"
-                  />
+                  {item.darkSrc ? (
+                    <>
+                      <img src={item.src} alt={`${item.name} logo`} width="512" height="512" loading="lazy" decoding="async" class="aws-logo-light h-8 w-8 object-contain" />
+                      <img src={item.darkSrc} alt={`${item.name} logo`} width="512" height="512" loading="lazy" decoding="async" class="aws-logo-dark h-8 w-8 object-contain" />
+                    </>
+                  ) : (
+                    <img
+                      src={item.src}
+                      alt={`${item.name} logo`}
+                      width="512"
+                      height="512"
+                      loading="lazy"
+                      decoding="async"
+                      class="h-8 w-8 object-contain opacity-80 saturate-[0.82] transition group-hover:opacity-100 group-hover:saturate-100"
+                    />
+                  )}
                 </div>
               ))}
             </div>
