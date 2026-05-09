@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
+import { DEFAULT_SUPABASE_PROJECT_URL } from "../../src/data/supabase-config";
 
-const cvPdfUrl =
-  "https://jxfpnfliioqbhzznaphd.supabase.co/storage/v1/object/public/documents/cv/rujikorn-ngoensaard-cv.pdf";
+const cvPdfUrl = `${DEFAULT_SUPABASE_PROJECT_URL}/storage/v1/object/public/documents/cv/rujikorn-ngoensaard-cv.pdf`;
 
 test("about page loads expected sections", async ({ page }) => {
   await page.goto("/about");

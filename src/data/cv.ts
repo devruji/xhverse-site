@@ -1,6 +1,9 @@
+import { resolveSupabaseOrigin } from "./supabase-config";
+
 const cvFileName = "Rujikorn-Ngoensaard-CV.pdf";
-const defaultCvPdfUrl =
-  "https://jxfpnfliioqbhzznaphd.supabase.co/storage/v1/object/public/documents/cv/rujikorn-ngoensaard-cv.pdf";
+const cvStoragePath =
+  "storage/v1/object/public/documents/cv/rujikorn-ngoensaard-cv.pdf";
+const defaultCvPdfUrl = `${resolveSupabaseOrigin()}/${cvStoragePath}`;
 
 export const cvStorage = {
   bucket: "documents",
