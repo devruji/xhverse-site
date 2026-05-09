@@ -17,44 +17,38 @@
   </svg>
 </button>
 
-<script>
-  function setupThemeToggle() {
-    const toggle = document.getElementById('theme-toggle');
-    if (!toggle) return;
+<script is:inline data-cfasync="false">
+(function(){
+  var toggle = document.getElementById('theme-toggle');
+  if (!toggle || toggle._init) return;
+  toggle._init = true;
 
-    const sun = document.getElementById('theme-icon-sun');
-    const moon = document.getElementById('theme-icon-moon');
+  var sun = document.getElementById('theme-icon-sun');
+  var moon = document.getElementById('theme-icon-moon');
 
-    function applyState() {
-      const isLight = document.documentElement.classList.contains('light');
-      if (sun && moon) {
-        sun.classList.toggle('hidden', isLight);
-        moon.classList.toggle('hidden', !isLight);
-      }
-      if (isLight) {
-        toggle.classList.remove('border-zinc-700', 'bg-zinc-900', 'text-zinc-200');
-        toggle.classList.add('border-zinc-300', 'bg-white', 'text-zinc-700');
-      } else {
-        toggle.classList.remove('border-zinc-300', 'bg-white', 'text-zinc-700');
-        toggle.classList.add('border-zinc-700', 'bg-zinc-900', 'text-zinc-200');
-      }
+  function apply() {
+    var isLight = document.documentElement.classList.contains('light');
+    if (sun) sun.classList.toggle('hidden', isLight);
+    if (moon) moon.classList.toggle('hidden', !isLight);
+    if (isLight) {
+      toggle.className = 'fixed bottom-6 right-6 z-[9999] flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border border-zinc-300 bg-white text-zinc-700 shadow-xl transition hover:scale-110 hover:border-emerald-400 active:scale-95';
+    } else {
+      toggle.className = 'fixed bottom-6 right-6 z-[9999] flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border border-zinc-700 bg-zinc-900 text-zinc-200 shadow-xl transition hover:scale-110 hover:border-emerald-400 active:scale-95';
     }
-
-    applyState();
-
-    toggle.addEventListener('click', () => {
-      const isLight = document.documentElement.classList.contains('light');
-      if (isLight) {
-        document.documentElement.classList.remove('light');
-        localStorage.setItem('theme', 'dark');
-      } else {
-        document.documentElement.classList.add('light');
-        localStorage.setItem('theme', 'light');
-      }
-      applyState();
-    });
   }
 
-  setupThemeToggle();
-  document.addEventListener('astro:page-load', setupThemeToggle);
+  apply();
+
+  toggle.addEventListener('click', function() {
+    var isLight = document.documentElement.classList.contains('light');
+    if (isLight) {
+      document.documentElement.classList.remove('light');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.add('light');
+      localStorage.setItem('theme', 'light');
+    }
+    apply();
+  });
+})();
 </script>
