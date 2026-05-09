@@ -89,6 +89,10 @@ html.light .border-emerald-300\/80 { border-color: rgba(5, 150, 105, 0.6); }
 html.light .bg-emerald-300\/10 { background-color: rgba(5, 150, 105, 0.08); }
 html.light .opacity-80 { opacity: 1; }
 html.light .saturate-\[0\.82\] { filter: saturate(1); }
+html.light .invert { filter: none; }
+html.light .brightness-\[0\.4\] { filter: brightness(0.5); }
+html.light .group:hover .group-hover\:brightness-\[0\.6\] { filter: brightness(0.3); }
+html.light .group:hover .group-hover\:invert { filter: none; }
 html:not(.light) .aws-logo-light { display: none; }
 html:not(.light) .aws-logo-dark { display: block; }
 html.light .aws-logo-light { display: block; }
