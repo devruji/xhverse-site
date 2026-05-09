@@ -414,6 +414,198 @@ p {
   font-size: 0.9rem;
 }
 
+/* ─── Animations & Effects ─── */
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes subtle-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes glow-pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+/* Scroll-triggered reveal: elements with [data-animate] start hidden and animate in */
+[data-animate] {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+[data-animate="fade-in"] {
+  transform: none;
+}
+
+[data-animate="slide-left"] {
+  transform: translateX(-20px);
+}
+
+[data-animate].is-visible {
+  opacity: 1;
+  transform: translateY(0) translateX(0);
+}
+
+/* Staggered children: cards, grid items */
+[data-stagger] > * {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+}
+
+[data-stagger].is-visible > *:nth-child(1) { transition-delay: 0ms; }
+[data-stagger].is-visible > *:nth-child(2) { transition-delay: 80ms; }
+[data-stagger].is-visible > *:nth-child(3) { transition-delay: 160ms; }
+[data-stagger].is-visible > *:nth-child(4) { transition-delay: 240ms; }
+[data-stagger].is-visible > *:nth-child(5) { transition-delay: 320ms; }
+[data-stagger].is-visible > *:nth-child(6) { transition-delay: 400ms; }
+
+[data-stagger].is-visible > * {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Card hover lift */
+.card {
+  transition: transform 0.22s ease-out, border-color 0.22s ease-out, box-shadow 0.22s ease-out;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(148, 163, 184, 0.4);
+  box-shadow: 0 24px 50px rgba(15, 23, 42, 0.8);
+}
+
+/* Gallery items: scale on hover */
+.gallery-item {
+  transition: transform 0.25s ease-out, box-shadow 0.25s ease-out;
+}
+
+.gallery-item:hover {
+  transform: scale(1.02);
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.7);
+}
+
+/* Button pulse glow on hover */
+.button {
+  transition: filter 0.2s ease-out, box-shadow 0.2s ease-out, transform 0.2s ease-out;
+}
+
+.button:hover {
+  filter: brightness(1.08);
+  box-shadow: 0 8px 30px rgba(249, 115, 22, 0.3), var(--shadow-soft);
+  transform: translateY(-1px);
+}
+
+/* Hero avatar floating effect */
+.hero-avatar {
+  animation: subtle-float 6s ease-in-out infinite;
+}
+
+/* Hero media glow pulse */
+.hero-media::before {
+  animation: glow-pulse 4s ease-in-out infinite;
+}
+
+/* Metallic shimmer for hero name */
+.text-gradient {
+  background: linear-gradient(
+    120deg,
+    #f9fafb 0%,
+    #f9fafb 40%,
+    #94a3b8 50%,
+    #f9fafb 60%,
+    #f9fafb 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 4s ease-in-out infinite;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Link hover glow */
+.nav-link {
+  transition: color 0.18s ease-out;
+}
+
+.nav-link:hover {
+  color: #f9fafb;
+}
+
+/* Section border shimmer (subtle) */
+.section--muted {
+  position: relative;
+}
+
+.section--muted::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(249, 115, 22, 0.4), transparent);
+  opacity: 0;
+  transition: opacity 0.4s ease-out;
+}
+
+.section--muted:hover::before {
+  opacity: 1;
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  [data-animate],
+  [data-stagger] > * {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .hero-avatar { animation: none; }
+  .hero-media::before { animation: none; }
+  .text-gradient { animation: none; }
+  .card, .gallery-item, .button { transition: none; }
+}
+
 @media (max-width: 768px) {
   .header-inner {
     padding-inline: 0.15rem;

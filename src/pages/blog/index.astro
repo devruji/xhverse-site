@@ -50,7 +50,7 @@ const deploymentSite = (Astro.site ?? site.siteUrl).toString();
         <a href={site.medium} target="_blank" rel="noreferrer">Medium</a>, a
         second link is shown for readers who prefer that surface.
       </p>
-      <div class="grid grid--blog">
+      <div class="grid grid--blog" data-stagger>
         {sortedPosts.map((post) => (
           <article class="card card--blog">
             <h2>

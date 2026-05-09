@@ -1,5 +1,6 @@
 ---
 import { buildCanonicalUrl, site } from "../data/site";
+import { profile } from "../data/profile";
 import { shouldNoIndexDeployment } from "../data/seo.js";
 import "../styles/global.css";
 
@@ -76,7 +77,7 @@ const socialImage = new URL(image, deploymentSite).toString();
     )}
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <meta name="theme-color" content="#000000" />
-    <meta name="author" content="Rujikorn Ngoensaard" />
+    <meta name="author" content={profile.fullName} />
     <meta name="application-name" content="XHVERSE" />
     <meta name="apple-mobile-web-app-title" content="XHVERSE" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -102,5 +103,21 @@ const socialImage = new URL(image, deploymentSite).toString();
     <div class="page">
       <slot />
     </div>
+    <script is:inline>
+      (function() {
+        const observer = new IntersectionObserver(function(entries) {
+          entries.forEach(function(entry) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('is-visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+        document.querySelectorAll('[data-animate],[data-stagger]').forEach(function(el) {
+          observer.observe(el);
+        });
+      })();
+    </script>
   </body>
 </html>

@@ -201,11 +201,10 @@ const homeStructuredData = {
     {
       "@type": "ProfilePage",
       "@id": `${deploymentSite}#profile-page`,
-      name: "Rujikorn Ngoensaard - XHVERSE",
+      name: `${profile.fullName} - XHVERSE`,
       alternateName: ["xhverse", "xhverse.co", "bossruji", "XH"],
       url: deploymentSite,
-      description:
-        "XHVERSE is the data architecture journal and portfolio of Rujikorn Ngoensaard, also known as XH or bossruji.",
+      description: site.description,
       about: { "@id": `${deploymentSite}#person` },
       mainEntity: { "@id": `${deploymentSite}#person` },
       isPartOf: { "@id": `${deploymentSite}#website` },
@@ -215,8 +214,8 @@ const homeStructuredData = {
 };
 ---
 <BaseLayout
-  title="Rujikorn Ngoensaard | XHVERSE"
-  description="Official xhverse.co profile of Rujikorn Ngoensaard, also known as XH and bossruji, focused on data platform architecture, governance, analytics architecture, and practical data strategy."
+  title={`${profile.fullName} | XHVERSE`}
+  description={`Official xhverse.co profile of ${profile.fullName}, also known as XH and bossruji, focused on data platform architecture, governance, analytics architecture, and practical data strategy.`}
   structuredData={homeStructuredData}
   image={profile.avatar}
   lcpImage={profile.avatar}
@@ -246,7 +245,7 @@ const homeStructuredData = {
         </a>
       </header>
 
-      <section id="profile" class="grid items-start gap-10 py-10 sm:py-12 lg:grid-cols-[1.05fr_0.95fr] lg:py-14">
+      <section id="profile" data-animate class="grid items-start gap-10 py-10 sm:py-12 lg:grid-cols-[1.05fr_0.95fr] lg:py-14">
         <div>
           <div class="mb-5 flex flex-wrap gap-2">
             <span class="border border-emerald-300/25 bg-emerald-300/8 px-3 py-1 text-[11px] uppercase tracking-[0.22em] text-emerald-200">
@@ -259,8 +258,8 @@ const homeStructuredData = {
               Azure · Databricks · Fabric
             </span>
           </div>
-          <h1 class="max-w-4xl text-[2.75rem] font-semibold leading-[0.96] tracking-tight text-white sm:text-[4.6rem] lg:text-[5.4rem]">
-            Rujikorn Ngoensaard
+          <h1 class="max-w-4xl text-[2.75rem] font-semibold leading-[0.96] tracking-tight sm:text-[4.6rem] lg:text-[5.4rem]">
+            <span class="text-gradient">Rujikorn Ngoensaard</span>
           </h1>
           <p class="mt-4 text-sm font-medium uppercase tracking-[0.22em] text-emerald-200">
             XH / bossruji · xhverse.co
@@ -330,7 +329,7 @@ const homeStructuredData = {
         </aside>
       </section>
 
-      <section id="work" class="border-t border-white/10 py-14 sm:py-20">
+      <section id="work" data-animate class="border-t border-white/10 py-14 sm:py-20">
         <div class="grid gap-8 lg:grid-cols-[0.75fr_1.25fr]">
           <div>
             <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Work focus</p>
@@ -342,7 +341,7 @@ const homeStructuredData = {
               monitor, and explain with confidence.
             </p>
           </div>
-          <div class="grid gap-px overflow-hidden border border-white/10 bg-white/10 sm:grid-cols-2">
+          <div data-stagger class="grid gap-px overflow-hidden border border-white/10 bg-white/10 sm:grid-cols-2">
             {focusAreas.map((item) => (
               <article class="bg-[#070809] p-5 sm:p-6">
                 <h4 class="text-lg font-semibold tracking-tight text-white">{item.title}</h4>
@@ -414,7 +413,7 @@ const homeStructuredData = {
             A focused view of the platform problems, engineering decisions, and operating outcomes that shape the work.
           </p>
         </div>
-        <div class="grid gap-4 lg:grid-cols-3">
+        <div data-stagger class="grid gap-4 lg:grid-cols-3">
           {workThemes.map((item) => (
             <article class="flex min-h-[26rem] flex-col border border-white/10 bg-white/[0.03] p-5 transition hover:border-emerald-300/50 sm:p-6">
               <div class="flex items-start justify-between gap-4">
@@ -438,7 +437,7 @@ const homeStructuredData = {
         </div>
       </section>
 
-      <section id="proof" class="border-t border-white/10 py-14 sm:py-20">
+      <section id="proof" data-animate class="border-t border-white/10 py-14 sm:py-20">
         <div class="grid gap-8 lg:grid-cols-[0.8fr_1.2fr] lg:items-end">
           <div>
             <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Public proof</p>
@@ -490,7 +489,7 @@ const homeStructuredData = {
             Open writing hub
           </a>
         </div>
-        <div class="grid gap-4 md:grid-cols-3">
+        <div data-stagger class="grid gap-4 md:grid-cols-3">
           {writingThemes.map((item) => (
             <article class="border border-white/10 bg-white/[0.03] p-5 transition hover:border-emerald-300/50">
               <p class="text-[11px] uppercase tracking-[0.22em] text-zinc-500">{item.label}</p>

@@ -19,10 +19,9 @@ const cvStructuredData = {
   "@type": "ProfilePage",
   "@id": `${cvUrl}#cv-page`,
   name: `${profile.fullName} CV`,
-  alternateName: ["Rujikorn Ngoensaard resume", "bossruji CV", "XH CV"],
+  alternateName: [`${profile.fullName} resume`, "bossruji CV", "XH CV"],
   url: cvUrl,
-  description:
-    "Public CV and professional background for Rujikorn Ngoensaard, also known as XH and bossruji.",
+  description: `Public CV and professional background for ${profile.fullName}, also known as XH and bossruji.`,
   about: {
     "@type": "Person",
     "@id": `${deploymentSite}#person`,
@@ -39,7 +38,7 @@ const cvStructuredData = {
 
 <BaseLayout
   title={`${profile.fullName} CV`}
-  description="View and download the public CV for Rujikorn Ngoensaard, also known as XH and bossruji, focused on data platform architecture, governance, and analytics engineering."
+  description={`View and download the public CV for ${profile.fullName}, also known as XH and bossruji, focused on data platform architecture, governance, and analytics engineering.`}
   image={profile.avatar}
   structuredData={cvStructuredData}
 >

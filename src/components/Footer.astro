@@ -1,3 +1,7 @@
+---
+import { profile } from "../data/profile";
+---
+
 <footer class="site-footer">
   <div class="container footer-inner">
     <nav class="flex gap-4 text-sm">
@@ -6,7 +10,7 @@
       <a href="/tools" class="nav-link">Tools</a>
       <a href="/cv" class="nav-link">CV</a>
     </nav>
-    <p>&copy; 2026 Rujikorn Ngoensaard. All rights reserved.</p>
+    <p>&copy; 2026 {profile.fullName}. All rights reserved.</p>
   </div>
 </footer>
 
