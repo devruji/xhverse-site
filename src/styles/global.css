@@ -89,7 +89,11 @@ html.light .border-emerald-300\/80 { border-color: rgba(5, 150, 105, 0.6); }
 html.light .bg-emerald-300\/10 { background-color: rgba(5, 150, 105, 0.08); }
 html.light .opacity-80 { opacity: 1; }
 html.light .saturate-\[0\.82\] { filter: saturate(1); }
-html:not(.light) img[src*="platform-stack/aws"] { filter: invert(1) hue-rotate(180deg) brightness(1.2); }
+html:not(.light) .aws-logo-light { display: none; }
+html:not(.light) .aws-logo-dark { display: block; }
+html.light .aws-logo-light { display: block; }
+html.light .aws-logo-dark { display: none; }
+
 html.light .bg-black\/20 { background-color: rgba(0, 0, 0, 0.03); }
 html.light .text-cyan-100 { color: #0e7490; }
 html.light .text-cyan-300 { color: #0891b2; }
