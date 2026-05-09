@@ -48,7 +48,7 @@ const socialImage = new URL(image, deploymentSite).toString();
 
 <html lang="en">
   <head>
-    <script is:inline>
+    <script is:inline data-cfasync="false">
       (function(){var t=localStorage.getItem('theme');var l=(t==='light')||((!t)&&window.matchMedia('(prefers-color-scheme: light)').matches);if(l)document.documentElement.classList.add('light');})();
     </script>
     <meta charset="utf-8" />
@@ -109,7 +109,7 @@ const socialImage = new URL(image, deploymentSite).toString();
       <slot />
     </div>
     <ThemeToggle />
-    <script is:inline>
+    <script is:inline data-cfasync="false">
       function initPageEffects() {
         var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
