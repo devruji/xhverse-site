@@ -102,14 +102,27 @@ Current tools: Data Platform Maturity Checker, Governance Readiness Scorecard.
 
 ## Development Workflow
 
+### Before Starting ANY Task
+
+```bash
+git status --short          # Check for uncommitted changes
+git clean -fd --dry-run     # Check for untracked contamination from other sessions
+git clean -fd               # Remove if found — NEVER chase build errors from files you didn't create
+```
+
+### Making Changes
+
 1. Create feature branch from `development`
 2. Implement + run `bun run check` locally
-3. **Start dev server and show user** before pushing:
+3. **Verify `git diff --stat` shows ONLY your intended changes** — if unrelated files appear, investigate before committing
+4. **Start dev server and show user** before pushing:
    ```bash
    lsof -ti :4321 | xargs kill -9 2>/dev/null; bun run dev
    ```
-4. Wait for user approval in browser (both themes, mobile viewport)
-5. Once approved: commit, push, create PR to `development`
+5. Wait for user approval in browser (both themes, mobile viewport)
+6. Once approved: commit, push, create PR to `development`
+7. **NEVER push without user seeing it in browser first**
+8. **NEVER create PRs targeting `main`** — always target `development`. Only release PRs go to `main`.
 
 ### Pre-Release Gate
 
@@ -169,6 +182,9 @@ Auto-applied by file glob — read these before working on matching files:
 
 _Update this section when you hit a non-obvious issue._
 
+- **CLEAN WORKSPACE FIRST**: Other sessions/agents leave untracked files (admin panels, migrations, functions). If build fails on files you didn't touch — STOP. Run `git clean -fd`. Never reactively delete source files to fix cascading errors.
+- **ALWAYS show user locally before push**: Start dev server, let user check in browser. No exceptions. Skipping this has caused multiple hotfixes.
+- **ALL PRs target `development`**: Never target `main` directly. Release PRs (`development` → `main`) are a separate explicit step only during release flow.
 - **Branch convention**: Always branch from `development`, never `main`. Agents default to `main` without explicit guidance.
 - **Cloudflare Rocket Loader**: Blocks ALL inline `onclick`/`onX` handlers and rewrites `<script>` type attributes. Fix: `<script is:inline data-cfasync="false">` with `addEventListener`.
 - **CSP must include `'unsafe-inline'`**: Both `script-src` and `style-src` need it for Astro inline scripts and Tailwind.
