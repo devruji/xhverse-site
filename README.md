@@ -15,6 +15,35 @@ Welcome to the XHVerse Site repository! This is a modern static web application 
 - **Testing:** [Vitest](https://vitest.dev/) (Unit) & [Playwright](https://playwright.dev/) (E2E)
 - **Deployment:** [Cloudflare Pages](https://pages.cloudflare.com/)
 
+## Architecture
+
+```mermaid
+graph LR
+    subgraph Developer
+        A[Local Dev] -->|git push| B[GitHub]
+    end
+
+    subgraph GitHub
+        B -->|PR / push| C[CI: Tests + Build]
+    end
+
+    subgraph Cloudflare
+        B -->|Git integration| D[Cloudflare Pages]
+        D -->|serves| E["Static Site<br/>xhverse.co"]
+    end
+
+    subgraph Supabase
+        F["PostgreSQL<br/>(posts, benchmarks)"]
+        G["Storage<br/>(CV PDF)"]
+    end
+
+    C -->|build-time fetch| F
+    E -->|client INSERT/SELECT| F
+    E -->|direct download| G
+```
+
+See [docs/architecture.md](docs/architecture.md) for detailed data flow and security model.
+
 ## Features
 
 - Rapid frontend development and high performance.

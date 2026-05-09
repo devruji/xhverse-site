@@ -4,6 +4,7 @@ import Header from "../../components/Header.astro";
 import Footer from "../../components/Footer.astro";
 import { posts as staticFallback } from "../../data/blog";
 import { site } from "../../data/site";
+import { profile } from "../../data/profile";
 import { renderMarkdownToHtml } from "../../lib/render-markdown";
 import {
   createSupabaseClientForBuild,
@@ -30,20 +31,37 @@ const html = renderMarkdownToHtml(post.bodyMarkdown);
 const articleStructuredData = {
   "@context": "https://schema.org",
   "@type": "BlogPosting",
+  "@id": canonicalUrl,
   headline: post.title,
-  datePublished: post.date,
   description: post.excerpt,
   url: canonicalUrl,
+  datePublished: post.date,
+  dateModified: post.date,
   keywords: post.tags.join(", "),
-  ...(post.mediumUrl
-    ? { isBasedOn: post.mediumUrl }
-    : {}),
+  wordCount: post.bodyMarkdown.split(/\s+/).length,
+  inLanguage: "en",
+  mainEntityOfPage: { "@type": "WebPage", "@id": canonicalUrl },
+  author: {
+    "@type": "Person",
+    "@id": `${deploymentSite}#person`,
+    name: profile.fullName,
+    url: deploymentSite,
+  },
+  publisher: {
+    "@type": "Person",
+    "@id": `${deploymentSite}#person`,
+    name: profile.fullName,
+    image: new URL(profile.avatar, deploymentSite).toString(),
+  },
+  image: new URL(site.ogImage, deploymentSite).toString(),
+  ...(post.mediumUrl ? { sameAs: post.mediumUrl } : {}),
 };
 ---
 
 <BaseLayout
   title={post.title}
   description={post.excerpt}
+  type="article"
   structuredData={articleStructuredData}
 >
   <Header current="/blog" />

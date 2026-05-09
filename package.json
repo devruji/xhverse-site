@@ -7,7 +7,7 @@
   },
   "scripts": {
     "dev": "astro dev",
-    "build": "astro build",
+    "build": "bun run scripts/generate-headers.ts && astro build",
     "preview": "astro preview",
     "astro": "astro",
     "typecheck": "astro check",
@@ -32,8 +32,10 @@
     "@types/node": "^25.6.0",
     "@types/sanitize-html": "^2.16.1",
     "@vitest/coverage-v8": "^4.1.5",
+    "supabase": "^2.98.2",
     "typescript": "^6.0.3",
-    "vitest": "^4.1.5"
+    "vitest": "^4.1.5",
+    "wrangler": "^4.90.0"
   },
   "overrides": {
     "devalue": "^5.7.1",
