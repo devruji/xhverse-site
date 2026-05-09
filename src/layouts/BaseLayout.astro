@@ -110,11 +110,12 @@ const socialImage = new URL(image, deploymentSite).toString();
     </div>
     <ThemeToggle />
     <script is:inline>
-      (function() {
+      function initPageEffects() {
         var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
         // Scroll-reveal + stagger observer
-        if (!reduced) {
+        var els = document.querySelectorAll('.animate-on-scroll:not(.is-visible)');
+        if (!reduced && els.length) {
           var observer = new IntersectionObserver(function(entries) {
             entries.forEach(function(entry) {
               if (entry.isIntersecting) {
@@ -123,12 +124,13 @@ const socialImage = new URL(image, deploymentSite).toString();
               }
             });
           }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
-          document.querySelectorAll('.animate-on-scroll').forEach(function(el) { observer.observe(el); });
+          els.forEach(function(el) { observer.observe(el); });
         }
 
         // Cursor spotlight
         var spotlight = document.querySelector('.hero-spotlight');
-        if (spotlight && !reduced) {
+        if (spotlight && !reduced && !spotlight._spotlightInit) {
+          spotlight._spotlightInit = true;
           spotlight.addEventListener('mousemove', function(e) {
             var rect = spotlight.getBoundingClientRect();
             spotlight.style.setProperty('--spotlight-x', (e.clientX - rect.left) + 'px');
@@ -142,26 +144,35 @@ const socialImage = new URL(image, deploymentSite).toString();
 
         // Parallax on hero avatar
         var parallax = document.querySelector('.hero-parallax');
-        if (parallax && !reduced) {
+        if (parallax && !reduced && !window._parallaxInit) {
+          window._parallaxInit = true;
           window.addEventListener('scroll', function() {
-            var scroll = window.scrollY;
-            if (scroll < 800) {
-              parallax.style.transform = 'translateY(' + (scroll * 0.08) + 'px)';
+            var p = document.querySelector('.hero-parallax');
+            if (p) {
+              var scroll = window.scrollY;
+              if (scroll < 800) p.style.transform = 'translateY(' + (scroll * 0.08) + 'px)';
             }
           }, { passive: true });
         }
 
         // Reading progress bar
         var progressBar = document.querySelector('.reading-progress');
-        if (progressBar) {
+        if (progressBar && !window._progressInit) {
+          window._progressInit = true;
           window.addEventListener('scroll', function() {
-            var scrollTop = window.scrollY;
-            var docHeight = document.documentElement.scrollHeight - window.innerHeight;
-            var progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
-            progressBar.style.width = progress + '%';
+            var bar = document.querySelector('.reading-progress');
+            if (bar) {
+              var scrollTop = window.scrollY;
+              var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+              bar.style.width = (docHeight > 0 ? (scrollTop / docHeight) * 100 : 0) + '%';
+            }
           }, { passive: true });
         }
-      })();
+      }
+
+      // Run on initial load and after View Transitions
+      initPageEffects();
+      document.addEventListener('astro:page-load', initPageEffects);
     </script>
   </body>
 </html>
