@@ -1,6 +1,7 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
 import { profile } from "../data/profile";
 import { site } from "../data/site";
 
@@ -520,10 +521,7 @@ const homeStructuredData = {
         </div>
       </section>
 
-      <footer class="flex flex-col gap-4 border-t border-white/10 py-6 text-sm text-zinc-500 sm:flex-row sm:items-center sm:justify-between">
-        <p>xhverse.co · Data architecture journal by XH</p>
-        <p>Azure · Databricks · Microsoft Fabric</p>
-      </footer>
     </main>
+    <Footer />
   </div>
 </BaseLayout>
