@@ -17,7 +17,7 @@ jobs:
   test:
     name: Test and Build
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 8
 
     steps:
       - name: Checkout
@@ -33,42 +33,30 @@ jobs:
         with:
           bun-version: 1.2.21
 
-      - name: Cache Bun dependencies
+      - name: Cache dependencies + Playwright
+        id: cache
         uses: actions/cache@v4
         with:
-          path: ~/.bun/install/cache
-          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock') }}
+          path: |
+            ~/.bun/install/cache
+            ~/.cache/ms-playwright
+          key: ${{ runner.os }}-deps-${{ hashFiles('bun.lock') }}
           restore-keys: |
-            ${{ runner.os }}-bun-
-
-      - name: Cache Playwright browsers
-        id: playwright-cache
-        uses: actions/cache@v4
-        with:
-          path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ hashFiles('bun.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-playwright-
+            ${{ runner.os }}-deps-
 
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
-      - name: Install Playwright Chromium
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
-        run: bunx playwright install --with-deps chromium
+      - name: Install Playwright
+        run: |
+          if [ "${{ steps.cache.outputs.cache-hit }}" = "true" ]; then
+            bunx playwright install-deps chromium 2>/dev/null || true
+          else
+            bunx playwright install --with-deps chromium
+          fi
 
-      - name: Install Playwright deps (cached)
-        if: steps.playwright-cache.outputs.cache-hit == 'true'
-        run: bunx playwright install-deps chromium
-
-      - name: Typecheck and Build
-        run: bun run typecheck && bun run build
-
-      - name: Run unit tests with coverage
-        run: bun run coverage
-
-      - name: Run E2E tests
-        run: bun run test:e2e
+      - name: Typecheck + Build + Test
+        run: bun run check
 
       - name: Upload artifacts
         if: github.event_name == 'push'
@@ -76,15 +64,7 @@ jobs:
         with:
           name: site-dist
           path: dist/
-          retention-days: 7
-
-      - name: Upload coverage artifact
-        if: github.event_name == 'push'
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-report
-          path: coverage/
-          retention-days: 7
+          retention-days: 5
 
       - name: Upload Playwright report
         if: failure()
@@ -92,23 +72,20 @@ jobs:
         with:
           name: playwright-report
           path: playwright-report/
-          retention-days: 7
+          retention-days: 5
 
-      - name: Add coverage summary
+      - name: Coverage summary
         if: always()
         run: |
           if [ -f coverage/coverage-summary.json ]; then
             echo "## Test Coverage" >> "$GITHUB_STEP_SUMMARY"
             node -e "const s=require('./coverage/coverage-summary.json').total; console.log('| Metric | % |\\n|---|---:|\\n| Lines | '+s.lines.pct+' |\\n| Statements | '+s.statements.pct+' |\\n| Functions | '+s.functions.pct+' |\\n| Branches | '+s.branches.pct+' |')" >> "$GITHUB_STEP_SUMMARY"
-          else
-            echo "## Test Coverage" >> "$GITHUB_STEP_SUMMARY"
-            echo "_Coverage summary unavailable because the coverage report was not generated._" >> "$GITHUB_STEP_SUMMARY"
           fi
 
   report-production-deployment:
     name: Report Production Deployment
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 3
     needs: test
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
