@@ -78,6 +78,7 @@ Subagents with isolated context, specialized knowledge, and specific tool access
 
 | Agent | Role | Model | When to spawn |
 |-------|------|-------|---------------|
+| `product-manager` | Feature discovery, roadmap, competitive research | Opus | "What should we build?", feature ideas, site improvements, content strategy |
 | `engineering-lead` | Tech lead, architect, coordinator | Opus | Planning, architecture decisions, code review, team coordination |
 | `frontend-engineer` | UI, components, styling, a11y, perf | Opus | Page implementation, responsive fixes, theme work, animations |
 | `backend-engineer` | Data layer, tests, types, Supabase | Opus | Data modules, test coverage, type errors, blog system |
