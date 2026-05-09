@@ -1,0 +1,21 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+---
+
+<BaseLayout title="Page not found | xhverse" noindex={true}>
+  <Header />
+  <main class="container section flex flex-col items-center text-center">
+    <h1 class="text-5xl font-bold mb-4">404</h1>
+    <p class="text-lg text-[var(--muted)] mb-8">
+      The page you're looking for doesn't exist.
+    </p>
+    <nav class="flex gap-4 text-sm">
+      <a href="/" class="nav-link">Home</a>
+      <a href="/blog" class="nav-link">Blog</a>
+      <a href="/about" class="nav-link">About</a>
+    </nav>
+  </main>
+  <Footer />
+</BaseLayout>
