@@ -36,3 +36,4 @@ test-results/
 # internal AI workflow notes
 CLAUDE.md
 docs/agent-prompts.md
+.claude/worktrees/
