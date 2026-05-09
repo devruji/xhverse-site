@@ -37,7 +37,7 @@ test("gallery page renders images", async ({ page }) => {
   await expect(page.locator("img").first()).toBeVisible();
 });
 
-test("cv page exposes a viewable and downloadable PDF", async ({ page }) => {
+test("cv page exposes a viewable PDF and gated copy request", async ({ page }) => {
   await page.goto("/cv");
   await expect(page).toHaveTitle(/Rujikorn Ngoensaard CV/i);
   await expect(
@@ -48,11 +48,8 @@ test("cv page exposes a viewable and downloadable PDF", async ({ page }) => {
     cvPdfUrl,
   );
   await expect(
-    page.getByRole("link", { name: /^Download PDF$/i }),
-  ).toHaveAttribute(
-    "href",
-    `${cvPdfUrl}?download=Rujikorn-Ngoensaard-CV.pdf`,
-  );
+    page.getByRole("button", { name: /Get a Copy/i }).first(),
+  ).toBeVisible();
 });
 
 test("homepage sets SEO and referrer metadata", async ({ page }) => {
@@ -60,8 +57,8 @@ test("homepage sets SEO and referrer metadata", async ({ page }) => {
   await expect(page.locator('meta[name="referrer"][content="strict-origin-when-cross-origin"]')).toHaveCount(1);
   await expect(page.locator('link[rel="canonical"][href="https://xhverse.co/"]')).toHaveCount(1);
   await expect(page.locator('meta[name="author"][content="Rujikorn Ngoensaard"]')).toHaveCount(1);
-  await expect(page.locator('meta[property="og:image"][content="https://xhverse.co/images/xh-profile-960.png"]')).toHaveCount(1);
-  await expect(page.locator('meta[name="twitter:image"][content="https://xhverse.co/images/xh-profile-960.png"]')).toHaveCount(1);
+  await expect(page.locator('meta[property="og:image"][content="https://xhverse.co/images/og-cover.png"]')).toHaveCount(1);
+  await expect(page.locator('meta[name="twitter:image"][content="https://xhverse.co/images/og-cover.png"]')).toHaveCount(1);
   await expect(page.locator('link[rel="icon"][type="image/svg+xml"][href="/favicon.svg"]')).toHaveCount(1);
   await expect(page.locator('link[rel="icon"][sizes="192x192"][href="/icon-192.png"]')).toHaveCount(1);
   await expect(page.locator('link[rel="icon"][sizes="32x32"][href="/favicon-32x32.png"]')).toHaveCount(1);
