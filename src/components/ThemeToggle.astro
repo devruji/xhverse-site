@@ -7,7 +7,6 @@
   aria-label="Toggle theme"
   data-astro-transition-persist="theme-toggle"
   class="fixed bottom-6 right-6 z-[9999] flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border border-zinc-700 bg-zinc-900 text-zinc-200 shadow-xl transition hover:scale-110 hover:border-emerald-400 active:scale-95"
-  onclick="(function(btn){var d=document.documentElement;var isLight=d.classList.contains('light');if(isLight){d.classList.remove('light');localStorage.setItem('theme','dark');btn.querySelector('#theme-icon-sun').classList.remove('hidden');btn.querySelector('#theme-icon-moon').classList.add('hidden');btn.classList.remove('border-zinc-300','bg-white','text-zinc-700');btn.classList.add('border-zinc-700','bg-zinc-900','text-zinc-200');}else{d.classList.add('light');localStorage.setItem('theme','light');btn.querySelector('#theme-icon-sun').classList.add('hidden');btn.querySelector('#theme-icon-moon').classList.remove('hidden');btn.classList.remove('border-zinc-700','bg-zinc-900','text-zinc-200');btn.classList.add('border-zinc-300','bg-white','text-zinc-700');}})(this)"
 >
   <svg id="theme-icon-sun" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
     <circle cx="12" cy="12" r="5"></circle>
@@ -18,20 +17,40 @@
   </svg>
 </button>
 
-<script is:inline>
+<script is:inline data-cfasync="false">
 (function(){
   var toggle = document.getElementById('theme-toggle');
   if (!toggle) return;
-  var isLight = document.documentElement.classList.contains('light');
-  var sun = document.getElementById('theme-icon-sun');
-  var moon = document.getElementById('theme-icon-moon');
-  if (sun && moon) {
-    sun.classList.toggle('hidden', isLight);
-    moon.classList.toggle('hidden', !isLight);
+
+  function applyState() {
+    var isLight = document.documentElement.classList.contains('light');
+    var sun = document.getElementById('theme-icon-sun');
+    var moon = document.getElementById('theme-icon-moon');
+    if (sun && moon) {
+      sun.classList.toggle('hidden', isLight);
+      moon.classList.toggle('hidden', !isLight);
+    }
+    if (isLight) {
+      toggle.classList.remove('border-zinc-700','bg-zinc-900','text-zinc-200');
+      toggle.classList.add('border-zinc-300','bg-white','text-zinc-700');
+    } else {
+      toggle.classList.remove('border-zinc-300','bg-white','text-zinc-700');
+      toggle.classList.add('border-zinc-700','bg-zinc-900','text-zinc-200');
+    }
   }
-  if (isLight) {
-    toggle.classList.remove('border-zinc-700','bg-zinc-900','text-zinc-200');
-    toggle.classList.add('border-zinc-300','bg-white','text-zinc-700');
-  }
+
+  applyState();
+
+  toggle.addEventListener('click', function() {
+    var isLight = document.documentElement.classList.contains('light');
+    if (isLight) {
+      document.documentElement.classList.remove('light');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.add('light');
+      localStorage.setItem('theme', 'light');
+    }
+    applyState();
+  });
 })();
 </script>
