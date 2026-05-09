@@ -1,5 +1,6 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
+import Footer from "../components/Footer.astro";
 import {
   buildCvDownloadUrl,
   cvHighlights,
@@ -43,7 +44,7 @@ const cvStructuredData = {
   image={profile.avatar}
   structuredData={cvStructuredData}
 >
-  <div class="min-h-screen bg-[#070809] font-sans text-zinc-100">
+  <div class="min-h-screen bg-[var(--bg-page)] font-sans text-[var(--text)]">
     <main class="mx-auto max-w-6xl px-5 py-6 sm:px-8 sm:py-8 lg:px-10">
       <header class="flex items-start justify-between gap-5 border-b border-white/10 pb-5 sm:items-center">
         <a href="/" class="group">
@@ -159,10 +160,7 @@ const cvStructuredData = {
         </div>
       </section>
 
-      <footer class="flex flex-col gap-4 border-t border-white/10 py-6 text-sm text-zinc-500 sm:flex-row sm:items-center sm:justify-between">
-        <p>xhverse.co · CV by Rujikorn Ngoensaard</p>
-        <p>Azure · Databricks · Microsoft Fabric</p>
-      </footer>
     </main>
+    <Footer />
   </div>
 </BaseLayout>
