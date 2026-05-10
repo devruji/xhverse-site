@@ -46,19 +46,19 @@ import AdminLayout from "../../layouts/AdminLayout.astro";
       <tbody id="admin-table-body"></tbody>
     </table>
     <p id="admin-empty" class="hidden py-12 text-center text-sm text-zinc-500">No requests yet.</p>
-    <p id="admin-loading" class="py-12 text-center text-sm text-zinc-500">Loading...</p>
+    <p id="cv-loading" class="py-12 text-center text-sm text-zinc-500">Loading...</p>
   </div>
 
   <script>
     import { createAdminClient } from "../../lib/admin/supabase";
 
-    type CvRequest = { id: string; email: string; name: string | null; context: string | null; status: string; requested_at: string; delivery_status: string | null; resend_message_id: string | null };
+    type CvRequest = { id: string; email: string; name: string | null; context: string | null; context_other: string | null; status: string; requested_at: string; delivery_status: string | null; resend_message_id: string | null };
 
     const client = createAdminClient(import.meta.env);
     const refreshBtn = document.querySelector<HTMLButtonElement>("#admin-refresh");
     const tableBody = document.querySelector<HTMLElement>("#admin-table-body");
     const emptyMsg = document.querySelector<HTMLElement>("#admin-empty");
-    const loadingMsg = document.querySelector<HTMLElement>("#admin-loading");
+    const loadingMsg = document.querySelector<HTMLElement>("#cv-loading");
 
     let requests: CvRequest[] = [];
 
@@ -107,7 +107,7 @@ import AdminLayout from "../../layouts/AdminLayout.astro";
         <tr class="border-b border-white/5 hover:bg-white/[0.02]" data-id="${req.id}">
           <td class="px-3 py-3 text-zinc-300">${escapeHtml(req.email)}</td>
           <td class="px-3 py-3 text-zinc-400">${req.name ? escapeHtml(req.name) : "—"}</td>
-          <td class="px-3 py-3 text-zinc-400">${req.context ? (contextLabels[req.context] ?? req.context) : "—"}</td>
+          <td class="px-3 py-3 text-zinc-400">${req.context === "other" && req.context_other ? `Other: ${escapeHtml(req.context_other)}` : req.context ? (contextLabels[req.context] ?? req.context) : "—"}</td>
           <td class="px-3 py-3 text-zinc-500">${formatDate(req.requested_at)}</td>
           <td class="px-3 py-3">${statusBadge(req.status)}</td>
           <td class="px-3 py-3">${deliveryBadge(req.delivery_status, req.resend_message_id)}</td>

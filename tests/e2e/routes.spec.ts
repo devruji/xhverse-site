@@ -43,16 +43,16 @@ test("cv page exposes a viewable PDF and gated copy request", async ({ page }) =
   await expect(
     page.getByRole("heading", { name: "Rujikorn Ngoensaard" }),
   ).toBeVisible();
-  await expect(page.getByRole("link", { name: /^View CV$/i })).toHaveAttribute(
+  await expect(page.getByRole("link", { name: /^Open PDF$/i }).first()).toHaveAttribute(
     "href",
     cvPdfUrl,
   );
-  const getCopyBtn = page.getByRole("button", { name: /Get a Copy/i }).first();
+  const getCopyBtn = page.getByRole("button", { name: /Send me a copy/i }).first();
   await expect(getCopyBtn).toBeVisible();
   await getCopyBtn.click();
   const modal = page.locator("#cv-request-modal");
   await expect(modal).toBeVisible();
-  await expect(modal.getByRole("heading", { name: "Get a Copy" })).toBeVisible();
+  await expect(modal.getByRole("heading", { name: "Get the CV in your inbox" })).toBeVisible();
   await page.keyboard.press("Escape");
   await expect(modal).toBeHidden();
 });

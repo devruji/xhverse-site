@@ -33,6 +33,7 @@ export type CvRequestSubmission = {
   email: string;
   name: string | null;
   context: CvRequestContext | null;
+  contextOther: string | null;
   honeypot: string;
 };
 

@@ -58,12 +58,14 @@ const cvStructuredData = {
           <a href="/cv" aria-current="page" class="text-white">CV</a>
           <a href="/#contact" class="transition hover:text-white">Contact</a>
         </nav>
-        <button
-          type="button"
-          class="cv-request-open border border-white/15 px-3 py-1.5 text-xs uppercase tracking-[0.18em] text-zinc-300 transition hover:border-emerald-300/70 hover:text-white md:hidden"
+        <a
+          href={pdfUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="border border-white/15 px-3 py-1.5 text-xs uppercase tracking-[0.18em] text-zinc-300 transition hover:border-emerald-300/70 hover:text-white md:hidden"
         >
-          Get a Copy
-        </button>
+          Open PDF
+        </a>
       </header>
 
       <section class="grid gap-10 py-12 sm:py-16 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
@@ -85,13 +87,13 @@ const cvStructuredData = {
               rel="noopener noreferrer"
               class="inline-flex items-center justify-center bg-white px-5 py-3 text-sm font-semibold text-black transition hover:bg-emerald-100"
             >
-              View CV
+              Open PDF
             </a>
             <button
               type="button"
               class="cv-request-open inline-flex items-center justify-center border border-white/15 px-5 py-3 text-sm font-medium text-white transition hover:border-emerald-300/70"
             >
-              Get a Copy
+              Send me a copy
             </button>
           </div>
         </div>
@@ -184,6 +186,16 @@ const cvStructuredData = {
 
       if (!modal || !panel || !form || !formView || !successView || !errorEl || !submitBtn || !submitText || !submitLoading || !closeBtn || !successCloseBtn) return;
 
+      const contextSelect = document.getElementById("cv-context") as HTMLSelectElement | null;
+      const contextOtherWrap = document.getElementById("cv-context-other-wrap");
+      const contextOtherInput = document.getElementById("cv-context-other") as HTMLTextAreaElement | null;
+
+      contextSelect?.addEventListener("change", () => {
+        if (contextOtherWrap) {
+          contextOtherWrap.classList.toggle("hidden", contextSelect.value !== "other");
+        }
+      });
+
       const openButtons = document.querySelectorAll(".cv-request-open");
 
       function openModal() {
@@ -194,6 +206,7 @@ const cvStructuredData = {
         errorEl!.classList.add("hidden");
         errorEl!.textContent = "";
         form!.reset();
+        if (contextOtherWrap) contextOtherWrap.classList.add("hidden");
       }
 
       function closeModal() {
@@ -262,11 +275,16 @@ const cvStructuredData = {
             email: emailInput,
             name: nameInput || null,
             context,
+            contextOther: context === "other" ? (contextOtherInput?.value || null) : null,
             honeypot: honeypotInput,
           });
 
           switch (result.kind) {
             case "saved":
+              formView!.classList.add("hidden");
+              successView!.classList.remove("hidden");
+              break;
+            case "duplicate_pending":
               formView!.classList.add("hidden");
               successView!.classList.remove("hidden");
               break;
