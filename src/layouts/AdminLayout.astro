@@ -169,7 +169,12 @@ const navItems = [
               class="mt-2 w-full border border-white/15 bg-black/30 px-4 py-2.5 text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-emerald-300/70"
             />
           </div>
-          <div id="admin-login-error" class="hidden border border-red-300/20 bg-red-300/8 p-3 text-sm text-red-200"></div>
+          <div id="admin-login-error" class="hidden items-center gap-2.5 border border-red-300/20 bg-red-300/8 p-3 text-sm text-red-200">
+            <svg class="size-4 shrink-0" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.28 7.22a.75.75 0 00-1.06 1.06L8.94 10l-1.72 1.72a.75.75 0 101.06 1.06L10 11.06l1.72 1.72a.75.75 0 101.06-1.06L11.06 10l1.72-1.72a.75.75 0 00-1.06-1.06L10 8.94 8.28 7.22z" clip-rule="evenodd"/>
+            </svg>
+            <span id="admin-login-error-text"></span>
+          </div>
           <button
             id="admin-login-btn"
             type="submit"
@@ -296,8 +301,10 @@ const navItems = [
 
       function showLoginError(msg: string): void {
         if (!loginError) return;
-        loginError.textContent = msg;
+        const textEl = loginError.querySelector("#admin-login-error-text");
+        if (textEl) textEl.textContent = msg;
         loginError.classList.remove("hidden");
+        loginError.classList.add("flex");
       }
 
       function openSidebar(): void {
@@ -310,6 +317,23 @@ const navItems = [
         if (sidebarBackdrop) sidebarBackdrop.classList.add("hidden");
       }
 
+      function mapAuthError(raw: string): string {
+        const lower = raw.toLowerCase();
+        if (lower.includes("missing email or phone") || lower.includes("email") && lower.includes("required")) {
+          return "Please enter your email and password.";
+        }
+        if (lower.includes("invalid login credentials") || lower.includes("invalid password")) {
+          return "Invalid email or password.";
+        }
+        if (lower.includes("email not confirmed")) {
+          return "Email not confirmed. Please check your inbox.";
+        }
+        if (lower.includes("too many requests") || lower.includes("rate limit")) {
+          return "Too many attempts. Please wait a moment and try again.";
+        }
+        return "Sign in failed. Please check your credentials.";
+      }
+
       sidebarToggle?.addEventListener("click", openSidebar);
       sidebarClose?.addEventListener("click", closeSidebar);
       sidebarBackdrop?.addEventListener("click", closeSidebar);
@@ -318,7 +342,7 @@ const navItems = [
         e.preventDefault();
         if (!supabaseClient || !loginBtn) return;
 
-        if (loginError) loginError.classList.add("hidden");
+        if (loginError) { loginError.classList.add("hidden"); loginError.classList.remove("flex"); }
         loginBtn.disabled = true;
         loginBtn.textContent = "Signing in...";
 
@@ -330,7 +354,8 @@ const navItems = [
         const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
 
         if (error) {
-          showLoginError(error.message);
+          const friendly = mapAuthError(error.message);
+          showLoginError(friendly);
           loginBtn.disabled = false;
           loginBtn.textContent = "Sign in";
           return;
