@@ -16,10 +16,9 @@ interface SubmitPayload {
 }
 
 const VALID_CONTEXTS = [
-  "evaluating_fit",
-  "sharing_with_team",
-  "reference",
-  "personal_file",
+  "engagement",
+  "evaluation",
+  "networking",
   "other",
 ];
 
