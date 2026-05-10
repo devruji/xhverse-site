@@ -8,6 +8,7 @@ XHVerse is the portfolio, blog, and tools site for Rujikorn Ngoensaard (XH / bos
 
 - **Production**: https://xhverse.co
 - **Repo**: https://github.com/devruji/xhverse-site
+- **Current version**: v2.11.0
 - **Business model**: Consulting/advisory — site drives inbound leads via content + tools
 
 ## Commands
@@ -35,7 +36,8 @@ Kill dev server: `lsof -ti :4321 | xargs kill -9 2>/dev/null`
 - **Tailwind CSS v4** via `@tailwindcss/vite` plugin (CSS-first config, no tailwind.config.js)
 - **Bun** (package manager + script runner), Node 22.16.0 (pinned in `.node-version`)
 - **Cloudflare Pages** (Git integration auto-deploy from `main`)
-- **Supabase** (build-time only — blog posts + tool benchmarks, with static fallback)
+- **Supabase** (build-time blog overlay + runtime for CV requests, leads, tool benchmarks)
+- **Resend** (transactional email — CV delivery + admin notifications)
 
 ### Data Flow
 ```
@@ -51,15 +53,75 @@ dist/ (deployed to Cloudflare CDN)
 All content is defined in TypeScript modules. Supabase overlays blog posts at build time but the site builds without it.
 
 ### Key Directories
-- `src/data/` — Static content modules + tests (profile, blog, cv, gallery, services, site, seo)
-- `src/lib/` — Business logic + tests (blog/, data-platform-maturity/, governance-scorecard/, cv-requests/, leads/, admin/, render-markdown)
-- `src/pages/` — Route pages (index, about, blog/, cv, gallery, services, tools/, admin/)
-- `src/components/` — Shared Astro components (Header, Footer, ThemeToggle, CvRequestModal)
-- `src/layouts/` — BaseLayout.astro (SEO, CSP, structured data), AdminLayout.astro (admin panel)
-- `scripts/generate-headers.ts` — Generates `public/_headers` with CSP (runs before astro build)
-- `tests/e2e/` — Playwright tests (chromium desktop + mobile)
-- `supabase/functions/` — Edge Functions (Deno runtime, deployed separately)
-- `supabase/migrations/` — Database migrations (RLS, tables, views)
+```
+src/
+├── components/          # Shared Astro components
+│   ├── About.astro
+│   ├── BlogPreview.astro
+│   ├── Contact.astro
+│   ├── CvRequestModal.astro
+│   ├── Footer.astro
+│   ├── GalleryPreview.astro
+│   ├── Header.astro
+│   ├── Hero.astro
+│   ├── Statement.astro
+│   └── ThemeToggle.astro
+├── data/                # Static content modules + tests
+│   ├── blog.ts          # Blog post definitions
+│   ├── cv.ts            # CV highlights + metadata
+│   ├── gallery.ts       # Gallery items
+│   ├── profile.ts       # Identity, social links
+│   ├── services.ts      # Service offerings
+│   ├── site.ts          # Site-wide config
+│   ├── seo.js           # SEO defaults
+│   └── supabase-config.ts  # Single Supabase config source
+├── layouts/
+│   ├── BaseLayout.astro    # SEO, CSP meta, structured data, OG tags
+│   └── AdminLayout.astro   # Admin panel layout with nav
+├── lib/                 # Business logic + tests (100% coverage)
+│   ├── admin/           # Admin utilities
+│   ├── blog/            # Blog merge logic (static + Supabase)
+│   ├── cv-requests/     # CV request submission + dedup
+│   ├── data-platform-maturity/  # Maturity tool scoring
+│   ├── governance-scorecard/    # Governance tool scoring
+│   ├── leads/           # Lead tracking
+│   └── render-markdown.ts       # Markdown → HTML
+├── pages/
+│   ├── index.astro      # Homepage
+│   ├── about.astro      # About page
+│   ├── cv.astro         # CV page (gated via email capture)
+│   ├── gallery.astro    # Photo gallery
+│   ├── services.astro   # Consulting services
+│   ├── 404.astro        # Custom 404
+│   ├── blog/
+│   │   ├── index.astro  # Blog listing
+│   │   └── [slug].astro # Blog post (dynamic route)
+│   ├── tools/
+│   │   ├── index.astro  # Tools listing
+│   │   ├── data-platform-maturity-checker.astro
+│   │   └── governance-scorecard.astro
+│   └── admin/
+│       ├── index.astro          # Dashboard
+│       ├── cv-requests.astro    # CV request management
+│       ├── leads.astro          # Lead tracking
+│       └── tools/maturity.astro # Maturity submissions
+└── styles/
+    └── global.css       # Theme variables, base styles
+
+scripts/
+└── generate-headers.ts  # Generates public/_headers with CSP
+
+tests/e2e/
+├── data-platform-maturity.spec.ts
+├── home.spec.ts
+└── routes.spec.ts
+
+supabase/
+├── functions/
+│   ├── send-cv/index.ts            # Sends CV PDF on approval (UPDATE webhook)
+│   └── notify-cv-request/index.ts  # Emails admin on new request (INSERT webhook)
+└── migrations/                     # 9 migrations (posts, benchmarks, cv_requests, leads)
+```
 
 ### CSP Dual-Layer Architecture
 
@@ -108,13 +170,20 @@ Admin pages fetch data client-side from Supabase using the anon key + RLS polici
 ### CV Download Gate
 
 ```
-User clicks "Get a Copy" → CvRequestModal opens
+User clicks "Request CV" → CvRequestModal opens
 → Submits email → INSERT cv_download_requests (status: pending)
+→ notify-cv-request Edge Function → emails admin@xhverse.co
 → Admin approves at /admin/cv-requests → UPDATE status = approved
-→ Supabase webhook → send-cv Edge Function → email via Resend
+→ send-cv Edge Function → CV PDF emailed via Resend (with /services CTA)
 ```
 
-Deploy: `bunx supabase functions deploy send-cv`
+Dedup: Partial unique index on `(email) WHERE status = 'pending'` — allows re-requests after approval.
+
+Deploy edge functions:
+```bash
+bunx supabase functions deploy send-cv
+bunx supabase functions deploy notify-cv-request
+```
 Secrets: `bunx supabase secrets set RESEND_API_KEY=re_xxxxx`
 
 ## Branch & Release Flow
