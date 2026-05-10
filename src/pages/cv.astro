@@ -250,13 +250,10 @@ const cvStructuredData = {
           setTimeout(renderTurnstile, 300);
           return;
         }
-        if (turnstileWidgetId !== null) {
-          window.turnstile.remove(turnstileWidgetId);
-          turnstileWidgetId = null;
-        }
+        if (container.childElementCount > 0) return;
         const theme = document.documentElement.classList.contains("light") ? "light" : "dark";
         turnstileWidgetId = window.turnstile.render(container, {
-          sitekey: "0x4AAAAADMcLyUUQWUEWNgW",
+          sitekey: "0x4AAAAAADMcLyUUQWUEWNgW",
           theme,
           size: "flexible",
         });
@@ -335,6 +332,11 @@ const cvStructuredData = {
             ? (contextInput as CvRequestContext)
             : null;
 
+        if (context === "other" && !contextOtherInput?.value.trim()) {
+          showError("Please provide a reason when selecting 'Other'.");
+          return;
+        }
+
         setLoading(true);
 
         try {
@@ -376,7 +378,9 @@ const cvStructuredData = {
               break;
             case "turnstile_failed":
               showError("Verification failed. Please try again.");
-              renderTurnstile();
+              if (turnstileWidgetId !== null && window.turnstile) {
+                window.turnstile.reset(turnstileWidgetId);
+              }
               break;
             case "validation_error":
               showError(result.message);
@@ -393,7 +397,6 @@ const cvStructuredData = {
       });
     }
 
-    initCvModal();
     document.addEventListener("astro:page-load", initCvModal);
   </script>
 </BaseLayout>
