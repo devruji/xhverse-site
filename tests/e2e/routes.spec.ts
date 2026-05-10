@@ -1,7 +1,4 @@
 import { test, expect } from "@playwright/test";
-import { DEFAULT_SUPABASE_PROJECT_URL } from "../../src/data/supabase-config";
-
-const cvPdfUrl = `${DEFAULT_SUPABASE_PROJECT_URL}/storage/v1/object/public/documents/cv/rujikorn-ngoensaard-cv.pdf`;
 
 test("about page loads expected sections", async ({ page }) => {
   await page.goto("/about");
@@ -37,17 +34,13 @@ test("gallery page renders images", async ({ page }) => {
   await expect(page.locator("img").first()).toBeVisible();
 });
 
-test("cv page exposes a viewable PDF and gated copy request", async ({ page }) => {
+test("cv page gates CV access via email capture modal", async ({ page }) => {
   await page.goto("/cv");
   await expect(page).toHaveTitle(/Rujikorn Ngoensaard CV/i);
   await expect(
     page.getByRole("heading", { name: "Rujikorn Ngoensaard" }),
   ).toBeVisible();
-  await expect(page.getByRole("link", { name: /^Open PDF$/i }).first()).toHaveAttribute(
-    "href",
-    cvPdfUrl,
-  );
-  const getCopyBtn = page.getByRole("button", { name: /Send me a copy/i }).first();
+  const getCopyBtn = page.getByRole("button", { name: /Send me the PDF/i }).first();
   await expect(getCopyBtn).toBeVisible();
   await getCopyBtn.click();
   const modal = page.locator("#cv-request-modal");
