@@ -250,15 +250,13 @@ const cvStructuredData = {
           setTimeout(renderTurnstile, 300);
           return;
         }
-        if (turnstileWidgetId !== null) {
-          window.turnstile.remove(turnstileWidgetId);
-          turnstileWidgetId = null;
-        }
+        if (container.childElementCount > 0) return;
         const theme = document.documentElement.classList.contains("light") ? "light" : "dark";
         turnstileWidgetId = window.turnstile.render(container, {
-          sitekey: "0x4AAAAADMcLyUUQWUEWNgW",
+          sitekey: "0x4AAAAAADMcLyUUQWUEWNgW",
           theme,
           size: "flexible",
+          appearance: "always",
         });
       }
 
