@@ -227,10 +227,25 @@ const cvStructuredData = {
       const openButtons = document.querySelectorAll(".cv-request-open");
 
       let turnstileWidgetId: string | null = null;
+      let turnstileScriptLoaded = false;
+
+      function loadTurnstileScript() {
+        if (turnstileScriptLoaded) return;
+        if (document.querySelector('script[src*="challenges.cloudflare.com/turnstile"]')) {
+          turnstileScriptLoaded = true;
+          return;
+        }
+        const script = document.createElement("script");
+        script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+        script.async = true;
+        document.head.appendChild(script);
+        turnstileScriptLoaded = true;
+      }
 
       function renderTurnstile() {
         const container = document.getElementById("cv-turnstile");
         if (!container) return;
+        loadTurnstileScript();
         if (!window.turnstile) {
           setTimeout(renderTurnstile, 300);
           return;
@@ -381,5 +396,4 @@ const cvStructuredData = {
     initCvModal();
     document.addEventListener("astro:page-load", initCvModal);
   </script>
-  <script is:inline data-cfasync="false" src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
 </BaseLayout>
