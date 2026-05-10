@@ -186,12 +186,14 @@ const cvStructuredData = {
   </div>
 
   <script>
-    import {
-      createCvRequestsPublicClient,
-      submitCvRequest,
-    } from "../lib/cv-requests/supabase";
     import { validateEmail } from "../lib/cv-requests/validation";
     import { cvRequestContexts, type CvRequestContext } from "../lib/cv-requests/types";
+
+    declare global {
+      interface Window {
+        turnstile?: { reset: (container: HTMLElement) => void };
+      }
+    }
 
     function initCvModal() {
       const modal = document.getElementById("cv-request-modal");
@@ -220,6 +222,13 @@ const cvStructuredData = {
 
       const openButtons = document.querySelectorAll(".cv-request-open");
 
+      function resetTurnstile() {
+        if (window.turnstile) {
+          const container = document.getElementById("cv-turnstile");
+          if (container) window.turnstile.reset(container);
+        }
+      }
+
       function openModal() {
         modal!.classList.remove("hidden");
         modal!.classList.add("flex");
@@ -229,6 +238,7 @@ const cvStructuredData = {
         errorEl!.textContent = "";
         form!.reset();
         if (contextOtherWrap) contextOtherWrap.classList.add("hidden");
+        resetTurnstile();
       }
 
       function closeModal() {
@@ -273,9 +283,17 @@ const cvStructuredData = {
         const contextInput = (document.getElementById("cv-context") as HTMLSelectElement).value;
         const honeypotInput = (document.getElementById("cv-website") as HTMLInputElement).value;
 
+        if (honeypotInput) return;
+
         const emailCheck = validateEmail(emailInput);
         if (!emailCheck.valid) {
           showError(emailCheck.error);
+          return;
+        }
+
+        const turnstileResponse = (document.querySelector('[name="cf-turnstile-response"]') as HTMLInputElement)?.value;
+        if (!turnstileResponse) {
+          showError("Please complete the verification challenge.");
           return;
         }
 
@@ -287,20 +305,26 @@ const cvStructuredData = {
         setLoading(true);
 
         try {
-          const client = createCvRequestsPublicClient({
-            PUBLIC_SUPABASE_URL: import.meta.env.PUBLIC_SUPABASE_URL,
-            PUBLIC_SUPABASE_PUBLISHABLE_KEY: import.meta.env.PUBLIC_SUPABASE_PUBLISHABLE_KEY,
-            PUBLIC_SUPABASE_ANON_KEY: import.meta.env.PUBLIC_SUPABASE_ANON_KEY,
+          const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
+          if (!supabaseUrl) {
+            formView!.classList.add("hidden");
+            successView!.classList.remove("hidden");
+            return;
+          }
+
+          const res = await fetch(`${supabaseUrl}/functions/v1/submit-cv-request`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email: emailInput,
+              name: nameInput || null,
+              context,
+              contextOther: context === "other" ? (contextOtherInput?.value || null) : null,
+              turnstileToken: turnstileResponse,
+            }),
           });
 
-          const result = await submitCvRequest(client, {
-            email: emailInput,
-            name: nameInput || null,
-            context,
-            contextOther: context === "other" ? (contextOtherInput?.value || null) : null,
-            honeypot: honeypotInput,
-          });
-
+          const result = await res.json();
           const successTitle = document.getElementById("cv-success-title");
           const successMessage = document.getElementById("cv-success-message");
 
@@ -317,16 +341,14 @@ const cvStructuredData = {
               formView!.classList.add("hidden");
               successView!.classList.remove("hidden");
               break;
+            case "turnstile_failed":
+              showError("Verification failed. Please try again.");
+              resetTurnstile();
+              break;
             case "validation_error":
               showError(result.message);
               break;
-            case "skipped":
-              if (successTitle) successTitle.textContent = "Request Received";
-              if (successMessage) successMessage.textContent = "Thank you. I will review your request and deliver the CV to your email within 24 hours.";
-              formView!.classList.add("hidden");
-              successView!.classList.remove("hidden");
-              break;
-            case "failed":
+            default:
               showError("Something went wrong. Please try again later.");
               break;
           }
@@ -341,4 +363,5 @@ const cvStructuredData = {
     initCvModal();
     document.addEventListener("astro:page-load", initCvModal);
   </script>
+  <script is:inline data-cfasync="false" src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 </BaseLayout>
