@@ -115,21 +115,35 @@ serve(async (req: Request): Promise<Response> => {
       }),
     });
 
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+
     if (!emailResponse.ok) {
+      if (supabaseUrl && supabaseKey) {
+        const supabase = createClient(supabaseUrl, supabaseKey);
+        await supabase
+          .from("cv_download_requests")
+          .update({ delivery_status: "failed" })
+          .eq("id", payload.record.id);
+      }
       return new Response(
         JSON.stringify({ error: "Failed to send email" }),
         { status: 500, headers: { "Content-Type": "application/json" } },
       );
     }
 
-    const supabaseUrl = Deno.env.get("SUPABASE_URL");
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    const emailResult = await emailResponse.json();
+    const resendMessageId: string | null = emailResult?.id ?? null;
 
     if (supabaseUrl && supabaseKey) {
       const supabase = createClient(supabaseUrl, supabaseKey);
       await supabase
         .from("cv_download_requests")
-        .update({ sent_at: new Date().toISOString() })
+        .update({
+          sent_at: new Date().toISOString(),
+          resend_message_id: resendMessageId,
+          delivery_status: "delivered",
+        })
         .eq("id", payload.record.id);
     }
 
