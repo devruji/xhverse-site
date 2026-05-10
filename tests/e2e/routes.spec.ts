@@ -3,7 +3,7 @@ import { test, expect } from "@playwright/test";
 test("about page loads expected sections", async ({ page }) => {
   await page.goto("/about");
   await expect(
-    page.getByRole("heading", { name: "Data Engineer / Data Architect" }),
+    page.getByRole("heading", { name: /Senior Data Engineer/i }),
   ).toBeVisible();
   await expect(page.getByRole("heading", { name: "Platform direction" })).toBeVisible();
   await expect(
