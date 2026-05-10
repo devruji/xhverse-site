@@ -40,8 +40,8 @@ function buildEmailHtml(name: string | null): string {
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #1a1a1a; max-width: 600px; margin: 0 auto; padding: 24px;">
   <p>${greeting}</p>
   <p>Thank you for your interest. Please find my CV attached.</p>
-  <p>For the latest version, you can always visit:<br>
-    <a href="https://xhverse.co/cv" style="color: #2563eb;">https://xhverse.co/cv</a>
+  <p>If you would like to discuss an engagement or explore how I can help your team, feel free to reply to this email or visit:<br>
+    <a href="https://xhverse.co/services" style="color: #2563eb;">https://xhverse.co/services</a>
   </p>
   <p>Best regards,<br>Rujikorn Ngoensaard (XH)</p>
   <hr style="border: none; border-top: 1px solid #e5e5e5; margin: 24px 0;">
