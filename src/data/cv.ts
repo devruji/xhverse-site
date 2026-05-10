@@ -41,7 +41,8 @@ export function buildCvDownloadUrl(pdfUrl: string, fileName = cvFileName) {
 }
 
 export const cvHighlights = [
-  "Data Engineer / Data Architect focused on governed enterprise data platforms.",
-  "Hands-on platform work across Azure, Databricks, Microsoft Fabric, Spark, Power BI, and Terraform.",
-  "Strong operating focus around access design, documentation, delivery handover, and analytics reliability.",
+  "6+ years across enterprise data platforms — E-Commerce, Manufacturing, and Marketplace industries.",
+  "Azure, Databricks, Fabric, Spark, Terraform, Power BI — lakehouse design through to production CI/CD.",
+  "Delivered governance frameworks for orgs with 50+ data consumers — access control, lineage, and cataloging.",
+  "End-to-end ownership: architecture, data product delivery, ML pipelines, and platform operations.",
 ];

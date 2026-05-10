@@ -12,12 +12,12 @@ test("homepage loads", async ({ page }) => {
 test("primary links are visible", async ({ page }) => {
   await page.goto("/");
   await expect(
-    page.getByRole("link", { name: /View focus areas/i }),
+    page.getByRole("link", { name: /Focus areas/i }),
   ).toBeVisible();
   await expect(
-    page.getByRole("link", { name: /Architecture notes/i }),
+    page.getByRole("link", { name: /Writing/i }).first(),
   ).toBeVisible();
-  await expect(page.getByRole("link", { name: /^View CV$/i })).toBeVisible();
+  await expect(page.getByRole("link", { name: /Request CV/i })).toBeVisible();
 });
 
 test("contact links are visible", async ({ page }) => {
