@@ -1,0 +1,35 @@
+---
+description: Cloudflare deployment and security rules
+globs: ["src/**/*.astro", "scripts/**", "public/_headers"]
+---
+
+## Rocket Loader Constraints
+- All `<script is:inline>` MUST have `data-cfasync="false"`
+- No inline `onclick`/`onchange`/`onsubmit`/`onX` handlers — use `addEventListener`
+- Module scripts (`<script>` without is:inline) compile to `type="module"` and may not execute on first load with View Transitions
+- For critical DOM scripts, use `is:inline data-cfasync="false"` with `addEventListener`
+- Use `astro:page-load` event for DOM re-initialization after navigation
+
+## CSP Dual-Layer (CRITICAL — must stay synced)
+Two places define Content Security Policy:
+1. `scripts/generate-headers.ts` → generates `public/_headers`
+2. `src/layouts/BaseLayout.astro` → `<meta http-equiv="Content-Security-Policy">`
+
+Both MUST contain identical directives. To add a new domain:
+1. Update `generate-headers.ts`
+2. Update `BaseLayout.astro`
+3. Verify: `bun run build && grep "new-domain" dist/_headers`
+
+## Current CSP
+- `script-src 'self' 'unsafe-inline' challenges.cloudflare.com static.cloudflareinsights.com`
+- `style-src 'self' 'unsafe-inline'`
+- `connect-src 'self' <supabase-url> cloudflareinsights.com`
+- `frame-src challenges.cloudflare.com`
+- Never add `unsafe-eval`
+
+## Security Headers (all in public/_headers)
+- X-Frame-Options: DENY
+- X-Content-Type-Options: nosniff
+- Referrer-Policy: strict-origin-when-cross-origin
+- HSTS: max-age=63072000; includeSubDomains; preload
+- Permissions-Policy: camera=(), geolocation=(), microphone=()

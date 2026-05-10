@@ -4,12 +4,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-XHVerse is the portfolio, blog, and tools site for Rujikorn Ngoensaard (XH / bossruji) — a Data Architect specializing in Azure, Databricks, Microsoft Fabric, and data governance. Built with Astro 6, deployed to Cloudflare Pages.
+XHVerse is the portfolio, blog, and tools site for Rujikorn Ngoensaard (XH / bossruji) — a Senior Data Engineer specializing in enterprise data platforms, Azure, Databricks, Microsoft Fabric, and platform governance. Built with Astro 6, deployed to Cloudflare Pages.
 
 - **Production**: https://xhverse.co
 - **Repo**: https://github.com/devruji/xhverse-site
-- **Current version**: v2.11.0
-- **Business model**: Consulting/advisory — site drives inbound leads via content + tools
+- **Current version**: v3.0.0
+- **Business model**: Consulting/advisory — site drives inbound leads via content + interactive tools (7 live)
 
 ## Commands
 
@@ -78,14 +78,19 @@ src/
 ├── layouts/
 │   ├── BaseLayout.astro    # SEO, CSP meta, structured data, OG tags
 │   └── AdminLayout.astro   # Admin panel layout with nav
-├── lib/                 # Business logic + tests (100% coverage)
+├── lib/                 # Business logic + tests (100% coverage, 422 tests)
 │   ├── admin/           # Admin utilities
+│   ├── architecture-roulette/   # 10-scenario decision game
 │   ├── blog/            # Blog merge logic (static + Supabase)
 │   ├── cv-requests/     # CV request submission + dedup
 │   ├── data-platform-maturity/  # Maturity tool scoring
+│   ├── data-stack-roast/        # Combinatorial stack roast engine
 │   ├── governance-scorecard/    # Governance tool scoring
+│   ├── lakehouse-cost-calculator/ # Databricks cost estimation
 │   ├── leads/           # Lead tracking
-│   └── render-markdown.ts       # Markdown → HTML
+│   ├── render-markdown.ts       # Markdown → HTML
+│   ├── spark-explained/         # Pipeline visualization logic
+│   └── sql-deathmatch/          # SQL challenge scoring
 ├── pages/
 │   ├── index.astro      # Homepage
 │   ├── about.astro      # About page
@@ -97,9 +102,14 @@ src/
 │   │   ├── index.astro  # Blog listing
 │   │   └── [slug].astro # Blog post (dynamic route)
 │   ├── tools/
-│   │   ├── index.astro  # Tools listing
+│   │   ├── index.astro  # Tools listing (7 tools)
+│   │   ├── architecture-roulette.astro
 │   │   ├── data-platform-maturity-checker.astro
-│   │   └── governance-scorecard.astro
+│   │   ├── data-stack-roast.astro
+│   │   ├── governance-scorecard.astro
+│   │   ├── lakehouse-cost-calculator.astro
+│   │   ├── spark-explained.astro
+│   │   └── sql-deathmatch.astro
 │   └── admin/
 │       ├── index.astro          # Dashboard
 │       ├── cv-requests.astro    # CV request management
@@ -119,8 +129,9 @@ tests/e2e/
 supabase/
 ├── functions/
 │   ├── send-cv/index.ts            # Sends CV PDF on approval (UPDATE webhook)
-│   └── notify-cv-request/index.ts  # Emails admin on new request (INSERT webhook)
-└── migrations/                     # 9 migrations (posts, benchmarks, cv_requests, leads)
+│   ├── notify-cv-request/index.ts  # Emails admin on new request (INSERT webhook)
+│   └── submit-cv-request/index.ts  # Handles CV request submission
+└── migrations/                     # 12 migrations (posts, benchmarks, cv_requests, leads, dedup, context_other)
 ```
 
 ### CSP Dual-Layer Architecture
@@ -144,17 +155,26 @@ To add a new external domain: update both layers + test with `bun run build && g
 Tools live at `/tools/` and follow a consistent pattern:
 ```
 src/lib/<tool-name>/
-├── questions.ts       # Questions/inputs + types
-├── questions.test.ts  # 100% coverage
-├── scoring.ts         # Scoring logic + output generation
-└── scoring.test.ts    # 100% coverage
+├── questions.ts or scenarios.ts or rounds.ts  # Input data + types
+├── scoring.ts or roast-engine.ts or calculator.ts  # Logic + output
+├── *.test.ts  # Co-located tests (100% coverage)
 
 src/pages/tools/<tool-slug>.astro  # Page with client-side <script>
 ```
 
-Tools are fully client-side (compute in browser), with optional Supabase for anonymous benchmarking. Each produces a copyable text brief suitable for stakeholder communication.
+Tools are fully client-side (compute in browser), with optional Supabase for anonymous benchmarking. Most produce a copyable text brief.
 
-Current tools: Data Platform Maturity Checker, Governance Readiness Scorecard.
+**Current tools (7):**
+
+| Tool | Type | Key Pattern |
+|------|------|-------------|
+| Data Platform Maturity Checker | Assessment (form → score) | 15 questions, 5 categories, tier + benchmark |
+| Governance Readiness Scorecard | Assessment (form → score) | 20 questions, blockers + action plan |
+| Architecture Decision Roulette | Game (round-based) | 10 scenarios, pick → reveal, agreement % |
+| Data Stack Roast | Generator (selection → text) | 6 dropdowns, combinatorial roast paragraphs |
+| SQL Deathmatch | Challenge (round-based) | 15 SQL pairs, pick winner, tier ranking |
+| Lakehouse Cost Calculator | Calculator (form → numbers) | Cluster config → USD estimate + optimizations |
+| Spark Explained | Visualizer (interactive) | Pipeline stages, partitions, animated SVG |
 
 ### Admin Panel Architecture
 

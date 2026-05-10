@@ -1,0 +1,27 @@
+---
+description: Code quality standards for all source files
+globs: ["src/**/*.ts", "src/**/*.astro", "src/**/*.js"]
+---
+
+## Type Safety
+- No `any` types — use explicit types on all public APIs
+- Export types alongside data for consumer convenience
+- Discriminated unions for state (e.g., `{ kind: "saved" } | { kind: "failed"; message: string }`)
+
+## Style
+- No comments unless the WHY is non-obvious
+- No unnecessary abstractions — 3 similar lines > premature DRY
+- Minimal diffs — don't refactor adjacent code
+- No features beyond what the task requires
+- Prefer editing existing files over creating new ones
+
+## Patterns Used in This Codebase
+- Graceful degradation: if Supabase not configured → skip silently, don't throw
+- Validation before action: validate submission → then insert (with DB constraint as backup)
+- Brief builders: every scoring function has a `buildXxxBrief()` that produces copyable text
+- Static content modules: typed exports in `src/data/`, imported by pages at build time
+- Tool pattern: `src/lib/<tool>/` (pure logic) + `src/pages/tools/<slug>.astro` (UI)
+
+## Verification
+- Run `bun run typecheck` before considering work done
+- If you touched src/lib/ or src/data/: also run `bun run coverage`

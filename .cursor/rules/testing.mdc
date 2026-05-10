@@ -1,0 +1,36 @@
+---
+description: Testing rules for data and lib modules
+globs: ["src/data/**", "src/lib/**"]
+---
+
+## Coverage Mandate
+- 100% on lines, functions, branches, statements — non-negotiable
+- Currently: 422 tests across 35 test files, all passing
+
+## File Structure
+- Co-locate tests as `*.test.ts` next to source
+- Example: `src/lib/sql-deathmatch/scoring.ts` → `src/lib/sql-deathmatch/scoring.test.ts`
+
+## Test Patterns
+- Mock external deps (Supabase) — never hit real services
+- Test error/fallback paths explicitly
+- Test boundary values for scoring (tier thresholds, 0%, 100%)
+- Test schema validation (unique IDs, valid structure, non-empty fields)
+- Test brief generation (contains expected sections, URL, score)
+
+## Commands
+- Full coverage: `bun run coverage`
+- Single file: `bunx vitest run src/lib/<module>/<file>.test.ts`
+- Watch mode: `bun run test:watch`
+
+## Supabase Mocking Pattern
+```typescript
+vi.mock("@supabase/supabase-js", () => ({ createClient: vi.fn() }));
+const mockClient = { from: vi.fn().mockReturnValue({ insert: vi.fn(), select: vi.fn() }) };
+```
+
+## Tool Test Categories
+1. **Schema tests** — unique IDs, valid options, non-empty text, correct structure
+2. **Scoring tests** — tier boundaries, edge cases (0 answers, all correct, partial)
+3. **Brief tests** — output contains score, tier/result, URL
+4. **Engine tests** — specific inputs produce expected outputs

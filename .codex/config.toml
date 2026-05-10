@@ -1,6 +1,86 @@
-model_reasoning_effort = "medium"
+model_reasoning_effort = "high"
 sandbox_mode = "workspace-write"
 
 [agents]
 max_threads = 4
 max_depth = 1
+
+[instructions]
+developer_instructions = """
+# xhverse-site — v3.0.0
+
+Production site for Rujikorn Ngoensaard (XH / bossruji) — Senior Data Engineer | Platform Architecture.
+Site: xhverse.co | Repo: github.com/devruji/xhverse-site
+Stack: Astro 6 (static), Tailwind CSS v4, Bun, Cloudflare Pages, Supabase, Resend.
+
+## Architecture (20 pages, 422 tests, 100% coverage)
+
+src/data/*.ts    → Typed content (profile, cv, site, blog, services, gallery)
+src/lib/         → 11 business logic modules with co-located tests
+src/pages/*.astro → Routes (static HTML output)
+src/components/  → 10 shared Astro components
+src/layouts/     → BaseLayout (SEO/CSP) + AdminLayout
+
+### Interactive Tools (7 live, all client-side)
+Pattern: src/lib/<tool>/ (data + logic + tests) → src/pages/tools/<slug>.astro (UI + script)
+
+1. Data Platform Maturity Checker — 15-question assessment with benchmark
+2. Governance Readiness Scorecard — 20-question assessment with action plan
+3. Architecture Decision Roulette — 10-scenario game with agreement tracking
+4. Data Stack Roast — 6-dropdown selection → combinatorial 3-paragraph roast
+5. SQL Deathmatch — 15 SQL rounds with tier ranking
+6. Lakehouse Cost Calculator — cluster config → USD estimate + optimizations
+7. Spark Explained — animated pipeline visualizer (partitions, shuffle, skew)
+
+### Key Systems
+- CV Gate: email capture → admin review → PDF via Resend
+- Admin Panel: /admin/* behind Cloudflare Access (Zero Trust) + Supabase Auth
+- CSP: dual-layer (edge _headers + HTML meta) — MUST stay synced
+- Theme: dark default, light via html.light, anti-FOUC inline script
+- Edge Functions: send-cv, notify-cv-request, submit-cv-request
+
+## Rules
+
+### Code Quality (src/**/*.ts, *.astro, *.js)
+- No comments unless WHY is non-obvious
+- No `any` types — explicit types on all public APIs
+- No unnecessary abstractions — 3 similar lines > premature DRY
+- Minimal diffs — don't refactor adjacent code
+- No features beyond what the task requires
+- Run `bun run typecheck` before done
+
+### Testing (src/data/, src/lib/)
+- 100% coverage on lines, functions, branches, statements — non-negotiable
+- Co-locate tests as *.test.ts next to source
+- Mock external deps (Supabase) — never hit real services
+- Run `bun run coverage` before pushing
+
+### Cloudflare (*.astro, scripts/, _headers)
+- All <script is:inline> must have data-cfasync="false"
+- No inline onclick/onX — use addEventListener
+- CSP dual-layer sync: generate-headers.ts + BaseLayout.astro
+- Never add unsafe-eval to CSP
+- Module scripts may not run on first load with View Transitions
+
+### Git Workflow
+- NEVER edit on development or main — branch first
+- Always branch from development — never main
+- All PRs target development
+- Releases: development → main PR → tag vX.Y.Z → GitHub Release
+- Verify in browser before pushing — no exceptions
+- QA + Security gate every release
+
+## Commands
+bun run dev          → localhost:4321
+bun run build        → production build
+bun run typecheck    → type checks
+bun run coverage     → tests + 100% enforcement
+bun run test:e2e     → Playwright E2E
+bun run check        → full pipeline (typecheck + build + coverage + e2e)
+
+## Identity (preserve in SEO)
+- "Rujikorn Ngoensaard", "bossruji", "XH", "xhverse"
+- Title: Senior Data Engineer | Platform Architecture
+- Contact: contact@xhverse.co (no phone number)
+- Positioning: Data platform craftsman — practical, production-focused
+"""
