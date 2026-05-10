@@ -41,8 +41,8 @@ export function buildCvDownloadUrl(pdfUrl: string, fileName = cvFileName) {
 }
 
 export const cvHighlights = [
-  "6+ years across enterprise data platforms — E-Commerce, Manufacturing, and Marketplace industries.",
-  "Azure, Databricks, Fabric, Spark, Terraform, Power BI — lakehouse design through to production CI/CD.",
-  "Delivered governance frameworks for orgs with 50+ data consumers — access control, lineage, and cataloging.",
-  "End-to-end ownership: architecture, data product delivery, ML pipelines, and platform operations.",
+  "5+ years in cloud data engineering — Retail, Real Estate, E-Commerce, Manufacturing, and Loyalty.",
+  "Azure, Databricks, Microsoft Fabric, Spark, Power BI — lakehouse architecture through to BI migration.",
+  "Led a 3-month migration: 200+ datasets, 100+ reports, 1,000+ users from Tableau to Fabric/Power BI.",
+  "Currently leading platform delivery and managing engineers at enterprise scale (Central Pattana, Data & AI).",
 ];
