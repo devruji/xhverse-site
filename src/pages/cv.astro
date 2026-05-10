@@ -321,7 +321,11 @@ const cvStructuredData = {
           return;
         }
 
-        const turnstileResponse = (document.querySelector('[name="cf-turnstile-response"]') as HTMLInputElement)?.value || "not-available";
+        const turnstileResponse = (document.querySelector('[name="cf-turnstile-response"]') as HTMLInputElement)?.value;
+        if (!turnstileResponse) {
+          showError("Please complete the verification challenge.");
+          return;
+        }
 
         const context: CvRequestContext | null =
           contextInput && cvRequestContexts.includes(contextInput as CvRequestContext)
