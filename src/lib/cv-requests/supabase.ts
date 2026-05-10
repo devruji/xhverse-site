@@ -10,6 +10,7 @@ type CvRequestsEnv = {
 
 export type CvRequestSaveState =
   | { kind: "saved" }
+  | { kind: "duplicate_pending" }
   | { kind: "rate_limited" }
   | { kind: "validation_error"; message: string }
   | { kind: "skipped"; reason: "not_configured" }
@@ -53,14 +54,22 @@ export async function submitCvRequest(
     return { kind: "validation_error", message: validationResult.error };
   }
 
+  const contextOther = submission.context === "other"
+    ? submission.contextOther!.trim()
+    : null;
+
   const { error } = await client.from("cv_download_requests").insert({
     email: submission.email.trim().toLowerCase(),
     name: submission.name?.trim() || null,
     context: submission.context,
+    context_other: contextOther,
     status: "pending",
   });
 
   if (error) {
+    if (error.code === "23505") {
+      return { kind: "duplicate_pending" };
+    }
     return { kind: "failed", message: error.message };
   }
 

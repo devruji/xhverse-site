@@ -100,6 +100,7 @@ describe("validateSubmission", () => {
     email: "user@company.com",
     name: "Test User",
     context: "engagement",
+    contextOther: null,
     honeypot: "",
   };
 
@@ -158,5 +159,32 @@ describe("validateSubmission", () => {
     expect(validateSubmission({ ...validSubmission, name: "" })).toEqual({
       valid: true,
     });
+  });
+
+  it("rejects context 'other' without a reason", () => {
+    expect(
+      validateSubmission({ ...validSubmission, context: "other", contextOther: null }),
+    ).toEqual({ valid: false, error: "Please provide a reason when selecting 'Other'." });
+    expect(
+      validateSubmission({ ...validSubmission, context: "other", contextOther: "  " }),
+    ).toEqual({ valid: false, error: "Please provide a reason when selecting 'Other'." });
+  });
+
+  it("rejects contextOther over 200 characters", () => {
+    expect(
+      validateSubmission({ ...validSubmission, context: "other", contextOther: "a".repeat(201) }),
+    ).toEqual({ valid: false, error: "Reason must be 200 characters or fewer." });
+  });
+
+  it("accepts context 'other' with a valid reason", () => {
+    expect(
+      validateSubmission({ ...validSubmission, context: "other", contextOther: "Recruiting for a startup" }),
+    ).toEqual({ valid: true });
+  });
+
+  it("accepts contextOther exactly 200 characters", () => {
+    expect(
+      validateSubmission({ ...validSubmission, context: "other", contextOther: "a".repeat(200) }),
+    ).toEqual({ valid: true });
   });
 });

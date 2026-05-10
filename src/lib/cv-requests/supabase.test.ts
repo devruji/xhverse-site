@@ -15,6 +15,7 @@ const validSubmission: CvRequestSubmission = {
   email: "user@company.com",
   name: "Test User",
   context: "engagement",
+  contextOther: null,
   honeypot: "",
 };
 
@@ -130,6 +131,7 @@ describe("submitCvRequest", () => {
       email: "user@company.com",
       name: "Test User",
       context: "engagement",
+      context_other: null,
       status: "pending",
     });
   });
@@ -162,10 +164,21 @@ describe("submitCvRequest", () => {
     );
   });
 
-  it("returns failed when insert errors", async () => {
+  it("returns duplicate_pending on unique constraint violation", async () => {
     const insert = vi
       .fn()
-      .mockResolvedValue({ error: { message: "permission denied" } });
+      .mockResolvedValue({ error: { code: "23505", message: "duplicate key value violates unique constraint" } });
+    const from = vi.fn().mockReturnValue({ insert });
+
+    const result = await submitCvRequest({ from } as never, validSubmission);
+
+    expect(result).toEqual({ kind: "duplicate_pending" });
+  });
+
+  it("returns failed when insert errors with non-duplicate error", async () => {
+    const insert = vi
+      .fn()
+      .mockResolvedValue({ error: { code: "42501", message: "permission denied" } });
     const from = vi.fn().mockReturnValue({ insert });
 
     const result = await submitCvRequest({ from } as never, validSubmission);
@@ -183,7 +196,23 @@ describe("submitCvRequest", () => {
     });
 
     expect(insert).toHaveBeenCalledWith(
-      expect.objectContaining({ context: null }),
+      expect.objectContaining({ context: null, context_other: null }),
     );
   });
+
+  it("passes context_other when context is other", async () => {
+    const insert = vi.fn().mockResolvedValue({ error: null });
+    const from = vi.fn().mockReturnValue({ insert });
+
+    await submitCvRequest({ from } as never, {
+      ...validSubmission,
+      context: "other",
+      contextOther: "  Recruiting for a startup  ",
+    });
+
+    expect(insert).toHaveBeenCalledWith(
+      expect.objectContaining({ context: "other", context_other: "Recruiting for a startup" }),
+    );
+  });
+
 });

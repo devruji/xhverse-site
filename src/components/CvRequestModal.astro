@@ -25,12 +25,12 @@ import { contextLabels, cvRequestContexts } from "../lib/cv-requests/types";
     </button>
 
     <div id="cv-modal-form-view">
-      <p class="text-[11px] uppercase tracking-[0.32em] text-zinc-500">Request CV</p>
+      <p class="text-[11px] uppercase tracking-[0.32em] text-zinc-500">CV Delivery</p>
       <h2 id="cv-modal-title" class="mt-3 text-xl font-semibold tracking-tight text-white">
-        Get a Copy
+        Get the CV in your inbox
       </h2>
       <p class="mt-2 text-sm leading-6 text-zinc-400">
-        Provide your email and I will review and share the full CV.
+        Handy if you are sharing with your team or want it on file. Delivered within minutes.
       </p>
 
       <form id="cv-request-form" class="mt-6 space-y-4" novalidate>
@@ -79,6 +79,20 @@ import { contextLabels, cvRequestContexts } from "../lib/cv-requests/types";
           </select>
         </div>
 
+        <div id="cv-context-other-wrap" class="hidden">
+          <label for="cv-context-other" class="block text-[11px] uppercase tracking-[0.22em] text-zinc-500">
+            Reason <span class="text-emerald-300">*</span>
+          </label>
+          <textarea
+            id="cv-context-other"
+            name="context_other"
+            rows="2"
+            maxlength="200"
+            class="mt-2 block w-full resize-none border border-white/10 bg-white/[0.03] px-3 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:border-emerald-300/50 focus:outline-none"
+            placeholder="Tell me why you'd like a copy..."
+          ></textarea>
+        </div>
+
         <div class="absolute -left-[9999px] opacity-0" aria-hidden="true">
           <label for="cv-website">Website</label>
           <input id="cv-website" name="website" type="text" tabindex="-1" autocomplete="off" />
@@ -91,8 +105,8 @@ import { contextLabels, cvRequestContexts } from "../lib/cv-requests/types";
           type="submit"
           class="mt-2 w-full bg-white px-5 py-3 text-sm font-semibold text-black transition hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          <span id="cv-submit-text">Submit Request</span>
-          <span id="cv-submit-loading" class="hidden">Submitting...</span>
+          <span id="cv-submit-text">Send to my email</span>
+          <span id="cv-submit-loading" class="hidden">Sending...</span>
         </button>
       </form>
     </div>

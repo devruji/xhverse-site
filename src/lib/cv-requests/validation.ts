@@ -90,5 +90,15 @@ export function validateSubmission(
     return { valid: false, error: "Name must be 100 characters or fewer." };
   }
 
+  if (submission.context === "other") {
+    const reason = submission.contextOther?.trim() ?? "";
+    if (!reason) {
+      return { valid: false, error: "Please provide a reason when selecting 'Other'." };
+    }
+    if (reason.length > 200) {
+      return { valid: false, error: "Reason must be 200 characters or fewer." };
+    }
+  }
+
   return { valid: true };
 }

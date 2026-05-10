@@ -5,15 +5,18 @@
 [![Bun](https://img.shields.io/badge/Bun-%23000000.svg?style=flat&logo=bun&logoColor=white)](https://bun.sh/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Welcome to the XHVerse Site repository! This is a modern static web application built with [Astro](https://astro.build/).
+Personal portfolio, blog, and interactive tools site for [Rujikorn Ngoensaard](https://xhverse.co) (XH / bossruji) — Data Architect specializing in Azure, Databricks, Microsoft Fabric, and data governance.
 
-## 🛠 Tech Stack
+## Tech Stack
 
-- **Framework:** [Astro](https://astro.build/)
-- **Styling:** [Tailwind CSS v4](https://tailwindcss.com/)
-- **Runtime:** [Bun](https://bun.sh/)
-- **Testing:** [Vitest](https://vitest.dev/) (Unit) & [Playwright](https://playwright.dev/) (E2E)
-- **Deployment:** [Cloudflare Pages](https://pages.cloudflare.com/)
+- **Framework:** [Astro 6](https://astro.build/) (static output)
+- **Styling:** [Tailwind CSS v4](https://tailwindcss.com/) via Vite plugin
+- **Runtime:** [Bun](https://bun.sh/) + Node 22.16.0
+- **Testing:** [Vitest](https://vitest.dev/) (100% coverage) & [Playwright](https://playwright.dev/) (E2E)
+- **Database:** [Supabase](https://supabase.com/) (build-time blog, client-side benchmarks, CV gate)
+- **Edge Functions:** Supabase Edge Functions (Deno) for email delivery
+- **Deployment:** [Cloudflare Pages](https://pages.cloudflare.com/) (Git integration)
+- **Admin:** Protected by [Cloudflare Access](https://www.cloudflare.com/products/zero-trust/) (Zero Trust, email OTP)
 
 ## Architecture
 
@@ -30,38 +33,42 @@ graph LR
     subgraph Cloudflare
         B -->|Git integration| D[Cloudflare Pages]
         D -->|serves| E["Static Site<br/>xhverse.co"]
+        F["Cloudflare Access"] -->|protects /admin/*| E
     end
 
     subgraph Supabase
-        F["PostgreSQL<br/>(posts, benchmarks)"]
-        G["Storage<br/>(CV PDF)"]
+        G["PostgreSQL<br/>(posts, benchmarks,<br/>cv_requests, leads)"]
+        H["Storage<br/>(CV PDF)"]
+        I["Edge Functions<br/>(send-cv)"]
     end
 
-    C -->|build-time fetch| F
-    E -->|client INSERT/SELECT| F
-    E -->|direct download| G
+    C -->|build-time fetch| G
+    E -->|client INSERT/SELECT| G
+    E -->|direct download| H
+    G -->|webhook on UPDATE| I
+    I -->|sends email via Resend| J[User Inbox]
 ```
 
-See [docs/architecture.md](docs/architecture.md) for detailed data flow and security model.
+See [docs/architecture.md](docs/architecture.md) for detailed data flow, security model, and page inventory.
 
 ## Features
 
-- Rapid frontend development and high performance.
-- Automated testing with Unit and E2E tools.
-- Continuous Integration (CI) via GitHub Actions.
-- Automated production and preview deployments via Cloudflare Pages Git integration.
-- Built and managed with Bun for maximum speed.
+- **Portfolio & Blog** — Static content with optional Supabase blog overlay
+- **Interactive Tools** — Data Platform Maturity Checker, Governance Readiness Scorecard
+- **Advisory Services** — Engagement types, process flow, conversion path
+- **CV Gate** — Email capture modal → admin approval → automated PDF delivery via Edge Function
+- **Admin Panel** — Dashboard, CV request management, lead tracking, tool submissions
+- **Dark/Light Theme** — CSS variable system with anti-FOUC, zero-JS theme swap
+- **100% Test Coverage** — Unit tests on all data/logic modules, E2E on all pages
 
 ## Getting Started
 
 ### Prerequisites
 
-- [Node.js](https://nodejs.org/) `22.12.0` or higher
-- [Bun](https://bun.sh/) (v1.0 or higher)
+- [Bun](https://bun.sh/) (v1.2+)
+- [Node.js](https://nodejs.org/) 22.16.0 (pinned in `.node-version`)
 
 ### Installation
-
-Clone the repository and install dependencies:
 
 ```sh
 git clone https://github.com/devruji/xhverse-site.git
@@ -69,85 +76,66 @@ cd xhverse-site
 bun install
 ```
 
-This repository pins the CI and Cloudflare Pages runtime with `/.node-version` to keep Astro-compatible Node behavior consistent across local development and deployment.
-
 ### Local Development
 
-Start the development server:
-
 ```sh
-bun run dev
+bun run dev          # http://localhost:4321
 ```
-
-The site will be available at `http://localhost:4321`.
 
 ### Testing
 
-Run unit tests with coverage:
-
 ```sh
-bun run coverage
-```
-
-Run type/content checks:
-
-```sh
-bun run typecheck
-```
-
-Run end-to-end tests:
-
-```sh
-bun run test:e2e
+bun run typecheck    # Astro type/content checks
+bun run coverage     # Unit tests + 100% coverage enforcement
+bun run test:e2e     # Playwright (chromium desktop + mobile)
+bun run check        # Full pipeline: typecheck + build + coverage + e2e
 ```
 
 ### Building for Production
 
-Build the production site locally:
-
 ```sh
-bun run build
+bun run build        # Output → ./dist/
 ```
 
-The built output will be inside the `./dist/` directory.
+### Edge Functions
+
+```sh
+bunx supabase functions deploy send-cv    # Deploy CV email function
+bunx supabase secrets set RESEND_API_KEY=re_xxxxx
+```
 
 ## Deployment
 
-This project uses GitHub Actions for CI only. Deployments should be handled by **Cloudflare Pages Git integration** so Cloudflare can build the site with the correct production or preview environment variables.
+Cloudflare Pages Git integration handles all deployments:
 
-Current branch flow:
+| Branch | Environment | URL |
+|--------|-------------|-----|
+| `main` | Production | https://xhverse.co |
+| `development` | Preview | Auto-generated preview URL |
+| `feat/*` | Preview | Auto-generated preview URL |
 
-- `feat/*` -> preview deployment on Cloudflare Pages
-- `development` -> preview deployment on Cloudflare Pages
-- `main` -> production deployment to `https://xhverse.co`
+Cloudflare Pages settings:
+- **Build command:** `bun run build`
+- **Output directory:** `dist`
+- **Node version:** Read from `.node-version`
 
-Recommended Cloudflare Pages settings:
+### Environment Variables
 
-- Production branch: `main`
-- Build command: `bun run build`
-- Build output directory: `dist`
-- Node.js version: `22.16.0` (or read from `/.node-version`)
+| Variable | Environment | Purpose |
+|----------|-------------|---------|
+| `SUPABASE_URL` | Build | Database URL |
+| `SUPABASE_SECRET_KEY` | Build (secret) | Service role key |
+| `PUBLIC_SUPABASE_URL` | Build + client | For CSP connect-src |
+| `PUBLIC_SITE_URL` | Production | Canonical URL override |
+| `PUBLIC_ALLOW_INDEXING` | Preview (optional) | Force indexing on preview |
 
-Recommended environment variables:
+### Branch Flow
 
-- Production:
-  - `PUBLIC_PRODUCTION_BRANCH=main`
-  - `PUBLIC_SITE_URL=https://xhverse.co`
-- Preview:
-  - `PUBLIC_PRODUCTION_BRANCH=main`
+```
+feat/* ──PR──→ development ──Release PR──→ main ──tag──→ GitHub Release
+```
 
-This setup matches the SEO behavior in the app:
-
-- Production builds emit canonical URLs for `https://xhverse.co`
-- Preview builds fall back to their preview URL and add `noindex, nofollow`
-
-Release note:
-
-- Production releases should be promoted from `development` to `main`, tagged on the exact merged `main` commit, and published as a GitHub Release for that same tag. The GitHub Releases page only shows Release objects, so verify the newest release appears as `Latest` after publishing.
-
-Important Cloudflare limitation:
-
-- If the current Pages project was created as a Direct Upload project, Cloudflare does not let you convert it to Git integration later. In that case, create a new Pages project connected to the GitHub repository and migrate the custom domain to that project.
+Both `development` and `main` are protected branches requiring PRs + passing CI.
 
 ## © License & Copyright
 

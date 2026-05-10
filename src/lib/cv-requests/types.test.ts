@@ -99,6 +99,7 @@ describe("CvRequestSubmission type", () => {
       email: "submit@example.com",
       name: "Submitter",
       context: "networking",
+      contextOther: null,
       honeypot: "",
     };
     expect(submission.email).toBe("submit@example.com");
