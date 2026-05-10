@@ -332,6 +332,11 @@ const cvStructuredData = {
             ? (contextInput as CvRequestContext)
             : null;
 
+        if (context === "other" && !contextOtherInput?.value.trim()) {
+          showError("Please provide a reason when selecting 'Other'.");
+          return;
+        }
+
         setLoading(true);
 
         try {
