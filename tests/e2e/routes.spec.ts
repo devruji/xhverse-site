@@ -40,7 +40,7 @@ test("cv page gates CV access via email capture modal", async ({ page }) => {
   await expect(
     page.getByRole("heading", { name: "Rujikorn Ngoensaard" }),
   ).toBeVisible();
-  const getCopyBtn = page.getByRole("button", { name: /Send me the PDF/i }).first();
+  const getCopyBtn = page.getByRole("button", { name: /Request CV/i }).first();
   await expect(getCopyBtn).toBeVisible();
   await getCopyBtn.click();
   const modal = page.locator("#cv-request-modal");

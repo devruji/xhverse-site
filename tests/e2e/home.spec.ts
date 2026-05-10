@@ -17,7 +17,7 @@ test("primary links are visible", async ({ page }) => {
   await expect(
     page.getByRole("link", { name: /Writing/i }).first(),
   ).toBeVisible();
-  await expect(page.getByRole("link", { name: /Request CV/i })).toBeVisible();
+  await expect(page.locator("#profile").getByRole("link", { name: /^CV$/i })).toBeVisible();
 });
 
 test("contact links are visible", async ({ page }) => {
