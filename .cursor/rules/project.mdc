@@ -1,29 +1,83 @@
 ---
-description: Project-wide rule for xhverse site
+description: Project-wide rule for xhverse site (v3.0.0)
 alwaysApply: true
 ---
 
-Follow the repository `AGENTS.md` as the primary source of truth.
+# xhverse-site v3.0.0
 
-For implementation work:
-- create or use a feature branch from `development` before editing unless the user explicitly chooses another base
-- prefer minimal, production-grade diffs
-- preserve existing behavior unless the task explicitly requires change
-- do not modify generated folders such as `coverage`, `dist`, `playwright-report`, `test-results`, or `.astro`
-- do not touch Supabase code or migrations unless the user explicitly asks
-- preserve the current portfolio positioning: data architecture, modern data platforms, governance, analytics architecture, and practical platform craftsmanship
-- preserve identity SEO signals for `Rujikorn Ngoensaard`, `bossruji`, `XH`, and `xhverse` when editing homepage, About, metadata, or structured data
-- for complex tasks, produce a plan first before editing
+Follow `AGENTS.md` and `CLAUDE.md` as primary sources of truth.
 
-For CI and release work:
-- keep `development` and `main` as protected long-lived branches
-- merge feature work into `development` first
-- promote production with a `development` to `main` release PR
-- after merging to `main`, tag the exact main commit with an annotated version tag
-- create or update the matching GitHub Release object and verify it appears as Latest
-- keep GitHub deployment reporting current for production releases
+## Identity & Positioning
+- Owner: Rujikorn Ngoensaard (XH / bossruji) — Senior Data Engineer | Platform Architecture
+- Positioning: Data platform craftsman — practical, production-focused
+- Tech: Azure, Databricks, Fabric, Spark, Power BI, Delta Lake, Unity Catalog
+- Contact: contact@xhverse.co (no phone number on site)
+- Preserve SEO: "Rujikorn Ngoensaard", "bossruji", "XH", "xhverse"
+- Current employer: Central Pattana (Oct 2024–Present) — named publicly
 
-For final responses:
-- keep reports concise
-- report only what was actually changed or verified
-- do not claim checks were run unless they were explicitly run or evidenced
+## Architecture
+- **20 pages** (Astro 6, static output only, no SSR)
+- **7 interactive tools** (all client-side compute, no external deps)
+- **11 lib modules** with 422 tests at 100% coverage
+- **Admin panel** behind Cloudflare Access (Zero Trust)
+- **CV** gated via email capture + admin review + Resend delivery
+- **CSP** dual-layer: `scripts/generate-headers.ts` + `BaseLayout.astro` meta tag
+
+### Data Flow
+```
+src/data/*.ts → src/lib/ → src/pages/*.astro → dist/ → Cloudflare CDN
+```
+
+### Tool Pattern
+```
+src/lib/<tool>/   (data + logic + tests)  ← backend-engineer
+src/pages/tools/<slug>.astro (UI + script) ← frontend-engineer
+```
+
+## Code Rules
+- No `any` types — explicit types on all public APIs
+- No comments unless WHY is non-obvious
+- No onclick/inline handlers (Cloudflare Rocket Loader)
+- `data-cfasync="false"` on all `<script is:inline>`
+- 100% test coverage on `src/data/` and `src/lib/`
+- No external runtime dependencies for tools
+- Minimal diffs — don't refactor adjacent code
+
+## Git Workflow
+- Branch from `development` — never `main`
+- **NEVER** edit on `development` or `main` — create branch first
+- All PRs target `development`
+- Release: `development` → `main` PR → tag `vX.Y.Z` → GitHub Release
+- Verify in browser (both themes, mobile) before pushing
+- QA + Security gate every release
+
+## Commands
+```bash
+bun run check        # Full pipeline (typecheck + build + coverage + e2e)
+bun run dev          # Dev server at localhost:4321
+bun run typecheck    # Type checks (0 errors required)
+bun run coverage     # Tests + 100% enforcement
+bun run test:e2e     # Playwright (20 tests, chromium + mobile)
+bun run build        # Production build (20 pages)
+```
+
+## Implementation Rules
+- Prefer minimal, production-grade diffs
+- Preserve existing behavior unless task explicitly requires change
+- Do not modify: `coverage/`, `dist/`, `playwright-report/`, `test-results/`, `.astro/`
+- Do not touch `supabase/` migrations unless explicitly asked
+- For complex tasks, produce a plan first
+- Show user in browser before pushing — no exceptions
+
+## Design System (dark-first)
+- Background: `bg-[var(--bg-page)]`
+- Text: white (headings), zinc-300/400 (body), zinc-500 (labels)
+- Accent: emerald-200/300 (CTAs, active, positive)
+- Cards: `border border-white/10 bg-white/[0.03] p-5`
+- Labels: `text-[10-12px] uppercase tracking-[0.22em]`
+- Container: `max-w-7xl px-5 sm:px-8 lg:px-10`
+
+## Reports
+- Keep concise
+- Report only what was actually changed or verified
+- Do not claim checks were run unless explicitly run
