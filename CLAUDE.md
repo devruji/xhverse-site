@@ -8,7 +8,7 @@ XHVerse is the portfolio, blog, and tools site for Rujikorn Ngoensaard (XH / bos
 
 - **Production**: https://xhverse.co
 - **Repo**: https://github.com/devruji/xhverse-site
-- **Current version**: v2.11.0
+- **Current version**: v2.12.0
 - **Business model**: Consulting/advisory — site drives inbound leads via content + tools
 
 ## Commands
@@ -37,6 +37,7 @@ Kill dev server: `lsof -ti :4321 | xargs kill -9 2>/dev/null`
 - **Bun** (package manager + script runner), Node 22.16.0 (pinned in `.node-version`)
 - **Cloudflare Pages** (Git integration auto-deploy from `main`)
 - **Supabase** (build-time blog overlay + runtime for CV requests, leads, tool benchmarks)
+- **Cloudflare Turnstile** (bot protection — Non-interactive mode on CV request form)
 - **Resend** (transactional email — CV delivery + admin notifications)
 
 ### Data Flow
@@ -52,76 +53,15 @@ dist/ (deployed to Cloudflare CDN)
 
 All content is defined in TypeScript modules. Supabase overlays blog posts at build time but the site builds without it.
 
-### Key Directories
-```
-src/
-├── components/          # Shared Astro components
-│   ├── About.astro
-│   ├── BlogPreview.astro
-│   ├── Contact.astro
-│   ├── CvRequestModal.astro
-│   ├── Footer.astro
-│   ├── GalleryPreview.astro
-│   ├── Header.astro
-│   ├── Hero.astro
-│   ├── Statement.astro
-│   └── ThemeToggle.astro
-├── data/                # Static content modules + tests
-│   ├── blog.ts          # Blog post definitions
-│   ├── cv.ts            # CV highlights + metadata
-│   ├── gallery.ts       # Gallery items
-│   ├── profile.ts       # Identity, social links
-│   ├── services.ts      # Service offerings
-│   ├── site.ts          # Site-wide config
-│   ├── seo.js           # SEO defaults
-│   └── supabase-config.ts  # Single Supabase config source
-├── layouts/
-│   ├── BaseLayout.astro    # SEO, CSP meta, structured data, OG tags
-│   └── AdminLayout.astro   # Admin panel layout with nav
-├── lib/                 # Business logic + tests (100% coverage)
-│   ├── admin/           # Admin utilities
-│   ├── blog/            # Blog merge logic (static + Supabase)
-│   ├── cv-requests/     # CV request submission + dedup
-│   ├── data-platform-maturity/  # Maturity tool scoring
-│   ├── governance-scorecard/    # Governance tool scoring
-│   ├── leads/           # Lead tracking
-│   └── render-markdown.ts       # Markdown → HTML
-├── pages/
-│   ├── index.astro      # Homepage
-│   ├── about.astro      # About page
-│   ├── cv.astro         # CV page (gated via email capture)
-│   ├── gallery.astro    # Photo gallery
-│   ├── services.astro   # Consulting services
-│   ├── 404.astro        # Custom 404
-│   ├── blog/
-│   │   ├── index.astro  # Blog listing
-│   │   └── [slug].astro # Blog post (dynamic route)
-│   ├── tools/
-│   │   ├── index.astro  # Tools listing
-│   │   ├── data-platform-maturity-checker.astro
-│   │   └── governance-scorecard.astro
-│   └── admin/
-│       ├── index.astro          # Dashboard
-│       ├── cv-requests.astro    # CV request management
-│       ├── leads.astro          # Lead tracking
-│       └── tools/maturity.astro # Maturity submissions
-└── styles/
-    └── global.css       # Theme variables, base styles
+### Key Patterns
 
-scripts/
-└── generate-headers.ts  # Generates public/_headers with CSP
+**Content → Pages**: `src/data/` exports typed arrays/objects, imported by `src/pages/*.astro` at build time. No CMS, no filesystem content collections.
 
-tests/e2e/
-├── data-platform-maturity.spec.ts
-├── home.spec.ts
-└── routes.spec.ts
+**Business logic (`src/lib/`)**: Pure functions with 100% test coverage. Each subdirectory is a domain: `blog/`, `cv-requests/`, `leads/`, `data-platform-maturity/`, `governance-scorecard/`. Tests co-located as `*.test.ts`.
 
-supabase/
-├── functions/
-│   ├── send-cv/index.ts            # Sends CV PDF on approval (UPDATE webhook)
-│   └── notify-cv-request/index.ts  # Emails admin on new request (INSERT webhook)
-└── migrations/                     # 9 migrations (posts, benchmarks, cv_requests, leads)
-```
+**Interactive tools** (`/tools/*`): Client-side compute (no server). Each tool has `questions.ts` + `scoring.ts` in `src/lib/<tool>/`, rendered by a page in `src/pages/tools/`.
+
+**Admin panel** (`/admin/*`): Protected by Cloudflare Access (Zero Trust, email OTP). Fetches data client-side from Supabase using anon key + RLS.
 
 ### CSP Dual-Layer Architecture
 
@@ -136,55 +76,40 @@ To add a new external domain: update both layers + test with `bun run build && g
 - Dark (default): CSS variables in `:root` in `src/styles/global.css`
 - Light: CSS variables in `html.light`
 - Anti-FOUC: Inline `<script is:inline data-cfasync="false">` reads localStorage before paint
+- Theme persistence across View Transitions: `astro:before-swap` event sets class on `newDocument`
 - Icon swap: `.theme-dark-only` / `.theme-light-only` CSS classes (no JS toggle)
-- Theme toggle: `src/components/ThemeToggle.astro` with `addEventListener` (never onclick)
-
-### Interactive Tools Architecture
-
-Tools live at `/tools/` and follow a consistent pattern:
-```
-src/lib/<tool-name>/
-├── questions.ts       # Questions/inputs + types
-├── questions.test.ts  # 100% coverage
-├── scoring.ts         # Scoring logic + output generation
-└── scoring.test.ts    # 100% coverage
-
-src/pages/tools/<tool-slug>.astro  # Page with client-side <script>
-```
-
-Tools are fully client-side (compute in browser), with optional Supabase for anonymous benchmarking. Each produces a copyable text brief suitable for stakeholder communication.
-
-Current tools: Data Platform Maturity Checker, Governance Readiness Scorecard.
-
-### Admin Panel Architecture
-
-Admin pages at `/admin/*` are protected by Cloudflare Access (Zero Trust, email OTP):
-- `src/pages/admin/index.astro` — Dashboard with stats
-- `src/pages/admin/cv-requests.astro` — CV download request management
-- `src/pages/admin/leads.astro` — Lead tracking
-- `src/pages/admin/tools/maturity.astro` — Maturity checker submissions
-- `src/layouts/AdminLayout.astro` — Admin-specific layout with nav
-
-Admin pages fetch data client-side from Supabase using the anon key + RLS policies.
 
 ### CV Download Gate
 
 ```
 User clicks "Request CV" → CvRequestModal opens
-→ Submits email → INSERT cv_download_requests (status: pending)
+→ Turnstile Non-interactive widget verifies human
+→ Submits email + token → submit-cv-request Edge Function
+→ Server verifies Turnstile token → INSERT cv_download_requests (status: pending)
 → notify-cv-request Edge Function → emails admin@xhverse.co
 → Admin approves at /admin/cv-requests → UPDATE status = approved
 → send-cv Edge Function → CV PDF emailed via Resend (with /services CTA)
 ```
 
 Dedup: Partial unique index on `(email) WHERE status = 'pending'` — allows re-requests after approval.
+Validation: "Other" context requires reason text (client + server enforced).
 
 Deploy edge functions:
 ```bash
+bunx supabase functions deploy submit-cv-request --no-verify-jwt
 bunx supabase functions deploy send-cv
 bunx supabase functions deploy notify-cv-request
 ```
-Secrets: `bunx supabase secrets set RESEND_API_KEY=re_xxxxx`
+Secrets: `bunx supabase secrets set RESEND_API_KEY=re_xxxxx TURNSTILE_SECRET_KEY=0x4AAA...`
+
+### Turnstile Integration
+
+- **Mode**: Non-interactive (shows checkbox widget, auto-solves for most users)
+- **Client**: Dynamic script loading (`document.createElement('script')`) to bypass Rocket Loader
+- **Render**: Explicit mode (`?render=explicit`) — widget renders on modal open, not page load
+- **Server**: `submit-cv-request` edge function verifies token via `challenges.cloudflare.com/turnstile/v0/siteverify`
+- **CSP**: `challenges.cloudflare.com` in `script-src` + `frame-src` (both layers)
+- **Rocket Loader**: Must be OFF in Cloudflare dashboard (rewrites Turnstile's own scripts)
 
 ## Branch & Release Flow
 
@@ -202,7 +127,6 @@ Secrets: `bunx supabase secrets set RESEND_API_KEY=re_xxxxx`
 git branch --show-current   # MUST NOT be development or main — branch first!
 git status --short          # Check for uncommitted changes
 git clean -fd --dry-run     # Check for untracked contamination from other sessions
-git clean -fd               # Remove if found — NEVER chase build errors from files you didn't create
 ```
 
 ### Making Changes
@@ -210,10 +134,7 @@ git clean -fd               # Remove if found — NEVER chase build errors from 
 1. Create feature branch from `development`
 2. Implement + run `bun run check` locally
 3. **Verify `git diff --stat` shows ONLY your intended changes**
-4. **Start dev server and show user** before pushing:
-   ```bash
-   lsof -ti :4321 | xargs kill -9 2>/dev/null; bun run dev
-   ```
+4. **Start dev server and show user** before pushing
 5. Wait for user approval in browser (both themes, mobile viewport)
 6. Once approved: commit, push, create PR to `development`
 7. **NEVER push without user seeing it in browser first**
@@ -226,11 +147,7 @@ Before `development` → `main`, run QA + Security in parallel:
 - `qa-expert` — 8-phase regression (pages, theme, SEO, headers, components)
 - `security-audit-expert` — 6-phase audit (secrets, CSP, OWASP, RLS, privacy, deps)
 
-Both must PASS. Either BLOCK → fix before releasing.
-
 ## Engineering Team (`.claude/agents/`)
-
-Subagents with isolated context windows, spawned automatically or on request.
 
 | Agent | Role | When to spawn |
 |-------|------|---------------|
@@ -240,17 +157,7 @@ Subagents with isolated context windows, spawned automatically or on request.
 | `backend-engineer` | Data layer, tests, types, Supabase | Data modules, coverage, type errors |
 | `platform-engineer` | Deploy, CI, CSP, Cloudflare | CI failures, header changes, infrastructure |
 
-### Delegation Pattern
-
-1. **Lead** plans the work, identifies concerns and owners
-2. **Frontend** handles visual implementation
-3. **Backend** handles data/logic/tests (100% coverage)
-4. **Platform** handles deploy/headers/CI
-5. **QA + Security** gate releases
-
 ## Rules (`.claude/rules/`)
-
-Auto-applied by file glob — read these before working on matching files:
 
 | Rule | Globs | Key constraint |
 |------|-------|----------------|
@@ -259,40 +166,20 @@ Auto-applied by file glob — read these before working on matching files:
 | `cloudflare` | `*.astro`, `scripts/**`, `_headers` | `data-cfasync="false"`, no onclick, CSP dual-layer |
 | `git-workflow` | All files | Branch from development, verify locally before push |
 
-## Available Skills (`.agents/skills/`)
-
-| Skill | When to use |
-|-------|-------------|
-| `xhverse-dev` | Auto-triggers for all work in this repo |
-| `astro-page-implementation` | Creating or editing Astro pages |
-| `content-to-page` | Turning content notes into page-ready sections |
-| `document-writer` | Technical docs, blog posts, ADRs |
-| `cloudflare-platform` | Cloudflare Pages/Workers/DNS config |
-| `supabase-backend` | Database, auth, storage work |
-| `qa-expert` | Pre-release regression gate |
-| `security-audit-expert` | Security audit (pre-release + on demand) |
-| `seo-metadata-check` | Quick single-page SEO review |
-| `ux-ui-auditor` | Visual + accessibility audit |
-
 ## Lessons Learned
 
-_Update this section when you hit a non-obvious issue._
-
-- **CLEAN WORKSPACE FIRST**: Other sessions/agents leave untracked files. If build fails on files you didn't touch — STOP. Run `git clean -fd`. Never reactively delete source files to fix cascading errors.
-- **ALWAYS show user locally before push**: Start dev server, let user check in browser. No exceptions. Skipping this has caused multiple hotfixes.
-- **ALL PRs target `development`**: Never target `main` directly. Release PRs (`development` → `main`) are a separate explicit step only during release flow.
-- **NEVER edit on development/main**: Always create a feature/fix branch first. Even for one-line fixes.
-- **Branch convention**: Always branch from `development`, never `main`. Agents default to `main` without explicit guidance.
+- **CLEAN WORKSPACE FIRST**: Other sessions/agents leave untracked files. If build fails on files you didn't touch — STOP. Run `git clean -fd`.
+- **ALWAYS show user locally before push**: Start dev server, let user check in browser. No exceptions.
 - **Cloudflare Rocket Loader**: Blocks ALL inline `onclick`/`onX` handlers and rewrites `<script>` type attributes. Fix: `<script is:inline data-cfasync="false">` with `addEventListener`.
-- **CSP must include `'unsafe-inline'`**: Both `script-src` and `style-src` need it for Astro inline scripts and Tailwind.
 - **Module scripts + View Transitions**: Astro `<script>` (non-inline) compiles to `type="module"` which may not execute on first load with `<ClientRouter />`. Use `is:inline data-cfasync="false"` for critical scripts.
 - **CSS `background` vs `background-color`**: Use `background-color: var(--bg-page)` for theme-reactive elements. The shorthand can cache initial values.
 - **Image lazy loading + Playwright**: LCP images must use `loading="eager"` + `fetchpriority="high"` or mobile E2E tests timeout.
-- **Preview noindex override**: Set `PUBLIC_ALLOW_INDEXING=true` in Cloudflare Pages preview env to share preview URLs.
-- **Theme icon swap**: `.theme-dark-only` / `.theme-light-only` CSS classes for dual-theme image variants.
-- **Always verify locally first**: Multiple production hotfixes came from not checking in browser. Never push without user approval.
+- **Turnstile + Rocket Loader**: Rocket Loader rewrites Turnstile's internal scripts. Must disable Rocket Loader globally OR load Turnstile dynamically via `document.createElement('script')`.
+- **Turnstile in hidden modals**: Auto-render mode skips `display:none` containers. Use explicit render (`?render=explicit`) and call `turnstile.render()` when the modal opens.
+- **Turnstile Managed mode + Trusted Types**: Chromium's Trusted Types policy inside the Turnstile iframe causes invalid tokens. Use Non-interactive mode instead.
+- **Turnstile site key format**: Starts with `0x4AAAAAA` (6+ A's). A missing character produces silent failures.
+- **Hotfixes to main bypass development**: When urgent fixes go directly to main, development diverges. Always re-sync development after hotfix series.
 - **Rebase conflicts can lose files**: After conflict resolution, always verify expected files are still present with `git ls-tree`.
-- **Protected branches**: Both `development` and `main` require PRs + passing CI. Cannot push directly.
 
 ## Key Constraints
 
@@ -303,3 +190,5 @@ _Update this section when you hit a non-obvious issue._
 - Keep `bun.lock` in sync — never bypass `--frozen-lockfile`
 - Supabase config lives in ONE place: `src/data/supabase-config.ts`
 - Site must build successfully without Supabase env vars (static fallback)
+- Cloudflare Rocket Loader must stay **OFF** (breaks Turnstile widget)
+- Turnstile site key is public (in client HTML); secret key is Supabase secret only
