@@ -23,6 +23,46 @@ const tools = [
     category: "Governance",
     status: "Live",
   },
+  {
+    slug: "architecture-roulette",
+    title: "Architecture Decision Roulette",
+    description:
+      "10 real-world data platform scenarios. Pick your approach, then see how a Senior Data Engineer would call it.",
+    category: "Architecture",
+    status: "Live",
+  },
+  {
+    slug: "data-stack-roast",
+    title: "Data Stack Roast",
+    description:
+      "Select your stack components and get a brutally honest 3-paragraph roast of your architecture choices.",
+    category: "Architecture",
+    status: "Live",
+  },
+  {
+    slug: "sql-deathmatch",
+    title: "SQL Deathmatch",
+    description:
+      "15 rounds of paired Spark SQL queries. Pick the winner, learn execution plan reasoning, and discover your tier.",
+    category: "SQL",
+    status: "Live",
+  },
+  {
+    slug: "lakehouse-cost-calculator",
+    title: "Lakehouse Cost Calculator",
+    description:
+      "Estimate monthly Databricks costs from your cluster config. See optimization suggestions with projected savings.",
+    category: "Cost",
+    status: "Live",
+  },
+  {
+    slug: "spark-explained",
+    title: "Spark Explained",
+    description:
+      "Animated pipeline visualizer showing how data flows through Spark stages — partitions, shuffles, skew, and spills.",
+    category: "Education",
+    status: "Live",
+  },
 ];
 ---
 
@@ -46,7 +86,7 @@ const tools = [
         Interactive tools
       </h1>
       <p class="mt-4 max-w-xl text-sm leading-7 text-zinc-400">
-        Practical, focused instruments for data platform teams. Each tool is designed to surface a specific signal — fast, anonymous, and useful without context.
+        7 free tools for data platform teams — assessments, challenges, calculators, and visualizers. Fast, anonymous, and useful without context.
       </p>
 
       <div class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
@@ -73,16 +113,6 @@ const tools = [
           </a>
         ))}
 
-        <!-- Coming soon placeholder -->
-        <div class="flex flex-col items-center justify-center rounded-2xl border border-dashed border-white/10 p-6 text-center">
-          <svg width="32" height="32" viewBox="0 0 20 20" fill="none" class="text-zinc-600">
-            <rect x="3" y="3" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
-            <rect x="11" y="3" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
-            <rect x="3" y="11" width="6" height="6" rx="1.5" stroke="currentColor" stroke-width="1.5"/>
-            <path d="M14 12v4M12 14h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" opacity="0.7"/>
-          </svg>
-          <p class="mt-3 text-sm text-zinc-600">More tools coming</p>
-        </div>
       </div>
     </div>
   </main>
