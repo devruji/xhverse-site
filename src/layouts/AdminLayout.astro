@@ -45,7 +45,101 @@ const navItems = [
     <title>{pageTitle}</title>
   </head>
   <body class="min-h-screen bg-[var(--bg-page)] font-sans text-[var(--text)]">
-    <section id="admin-login-section" class="flex min-h-screen items-center justify-center px-5">
+    <div id="admin-loading" class="flex min-h-screen flex-col items-center justify-center gap-5">
+      <svg
+        class="admin-mascot-bounce"
+        width="64"
+        height="80"
+        viewBox="0 0 16 20"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+        style="image-rendering: pixelated;"
+      >
+        <!-- Ears -->
+        <rect x="4" y="0" width="1" height="1" fill="#64748b"/>
+        <rect x="5" y="0" width="1" height="1" fill="#64748b"/>
+        <rect x="10" y="0" width="1" height="1" fill="#64748b"/>
+        <rect x="11" y="0" width="1" height="1" fill="#64748b"/>
+        <rect x="3" y="1" width="1" height="1" fill="#64748b"/>
+        <rect x="4" y="1" width="1" height="1" fill="#64748b"/>
+        <rect x="5" y="1" width="1" height="1" fill="#64748b"/>
+        <rect x="10" y="1" width="1" height="1" fill="#64748b"/>
+        <rect x="11" y="1" width="1" height="1" fill="#64748b"/>
+        <rect x="12" y="1" width="1" height="1" fill="#64748b"/>
+        <rect x="3" y="2" width="1" height="1" fill="#64748b"/>
+        <rect x="4" y="2" width="1" height="1" fill="#64748b"/>
+        <rect x="5" y="2" width="1" height="1" fill="#64748b"/>
+        <rect x="6" y="2" width="1" height="1" fill="#64748b"/>
+        <rect x="9" y="2" width="1" height="1" fill="#64748b"/>
+        <rect x="10" y="2" width="1" height="1" fill="#64748b"/>
+        <rect x="11" y="2" width="1" height="1" fill="#64748b"/>
+        <rect x="12" y="2" width="1" height="1" fill="#64748b"/>
+        <!-- Head top dark row -->
+        <rect x="3" y="3" width="1" height="1" fill="#64748b"/>
+        <rect x="4" y="3" width="1" height="1" fill="#64748b"/>
+        <rect x="11" y="3" width="1" height="1" fill="#64748b"/>
+        <rect x="12" y="3" width="1" height="1" fill="#64748b"/>
+        <!-- Face (light) -->
+        <rect x="5" y="3" width="6" height="1" fill="#e2e8f0"/>
+        <rect x="4" y="4" width="8" height="1" fill="#e2e8f0"/>
+        <rect x="3" y="5" width="1" height="1" fill="#64748b"/>
+        <rect x="12" y="5" width="1" height="1" fill="#64748b"/>
+        <rect x="4" y="5" width="8" height="1" fill="#e2e8f0"/>
+        <!-- Spikes left & right -->
+        <rect x="1" y="6" width="1" height="1" fill="#64748b"/>
+        <rect x="2" y="6" width="1" height="1" fill="#64748b"/>
+        <rect x="13" y="6" width="1" height="1" fill="#64748b"/>
+        <rect x="14" y="6" width="1" height="1" fill="#64748b"/>
+        <rect x="1" y="7" width="1" height="1" fill="#64748b"/>
+        <rect x="2" y="7" width="1" height="1" fill="#64748b"/>
+        <rect x="13" y="7" width="1" height="1" fill="#64748b"/>
+        <rect x="14" y="7" width="1" height="1" fill="#64748b"/>
+        <!-- Face middle rows -->
+        <rect x="3" y="6" width="1" height="1" fill="#64748b"/>
+        <rect x="12" y="6" width="1" height="1" fill="#64748b"/>
+        <rect x="4" y="6" width="8" height="1" fill="#e2e8f0"/>
+        <rect x="3" y="7" width="1" height="1" fill="#64748b"/>
+        <rect x="12" y="7" width="1" height="1" fill="#64748b"/>
+        <rect x="4" y="7" width="8" height="1" fill="#e2e8f0"/>
+        <!-- Eyes -->
+        <rect x="5" y="6" width="2" height="1" fill="#334155"/>
+        <rect x="9" y="6" width="2" height="1" fill="#334155"/>
+        <!-- Mouth -->
+        <rect x="6" y="8" width="4" height="1" fill="#94a3b8"/>
+        <!-- Lower face border -->
+        <rect x="3" y="8" width="1" height="1" fill="#64748b"/>
+        <rect x="4" y="8" width="2" height="1" fill="#e2e8f0"/>
+        <rect x="10" y="8" width="2" height="1" fill="#e2e8f0"/>
+        <rect x="12" y="8" width="1" height="1" fill="#64748b"/>
+        <rect x="3" y="9" width="10" height="1" fill="#64748b"/>
+        <!-- Body -->
+        <rect x="4" y="10" width="8" height="1" fill="#64748b"/>
+        <rect x="4" y="11" width="8" height="1" fill="#64748b"/>
+        <rect x="4" y="12" width="8" height="1" fill="#64748b"/>
+        <rect x="5" y="13" width="6" height="1" fill="#64748b"/>
+        <!-- Legs -->
+        <rect x="4" y="14" width="2" height="1" fill="#64748b"/>
+        <rect x="10" y="14" width="2" height="1" fill="#64748b"/>
+        <rect x="4" y="15" width="2" height="1" fill="#64748b"/>
+        <rect x="10" y="15" width="2" height="1" fill="#64748b"/>
+        <!-- Feet -->
+        <rect x="3" y="16" width="3" height="1" fill="#64748b"/>
+        <rect x="10" y="16" width="3" height="1" fill="#64748b"/>
+      </svg>
+      <p class="text-[10px] uppercase tracking-[0.28em] text-zinc-600">Loading</p>
+      <style>
+        .admin-mascot-bounce {
+          animation: mascotBounce 1s ease-in-out infinite;
+        }
+        @keyframes mascotBounce {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-8px); }
+        }
+      </style>
+    </div>
+
+    <section id="admin-login-section" class="hidden flex min-h-screen items-center justify-center px-5">
       <div class="w-full max-w-sm">
         <a href="/" class="group inline-block">
           <p class="text-[10px] uppercase tracking-[0.35em] text-zinc-500">xhverse.co</p>
@@ -165,6 +259,7 @@ const navItems = [
     <script>
       import { createAdminClient } from "../lib/admin/supabase";
 
+      const adminLoading = document.querySelector<HTMLElement>("#admin-loading");
       const loginSection = document.querySelector<HTMLElement>("#admin-login-section");
       const shell = document.querySelector<HTMLElement>("#admin-shell");
       const loginForm = document.querySelector<HTMLFormElement>("#admin-login-form");
@@ -180,7 +275,12 @@ const navItems = [
 
       const supabaseClient = createAdminClient(import.meta.env);
 
+      function hideLoading(): void {
+        if (adminLoading) adminLoading.classList.add("hidden");
+      }
+
       function showShell(email: string): void {
+        hideLoading();
         if (loginSection) loginSection.classList.add("hidden");
         if (shell) shell.classList.remove("hidden");
         if (userEmail) userEmail.textContent = email;
@@ -189,6 +289,7 @@ const navItems = [
       }
 
       function showLogin(): void {
+        hideLoading();
         if (loginSection) loginSection.classList.remove("hidden");
         if (shell) shell.classList.add("hidden");
       }
@@ -250,6 +351,7 @@ const navItems = [
 
       async function init(): Promise<void> {
         if (!supabaseClient) {
+          showLogin();
           showLoginError("Supabase not configured.");
           return;
         }
@@ -257,6 +359,8 @@ const navItems = [
         const { data } = await supabaseClient.auth.getSession();
         if (data?.session) {
           showShell(data.session.user.email ?? "admin");
+        } else {
+          showLogin();
         }
       }
 
