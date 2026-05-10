@@ -2,16 +2,12 @@
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Footer from "../components/Footer.astro";
 import CvRequestModal from "../components/CvRequestModal.astro";
-import {
-  cvHighlights,
-  resolveCvPdfUrl,
-} from "../data/cv";
+import { cvHighlights } from "../data/cv";
 import { profile } from "../data/profile";
 import { site } from "../data/site";
 
 const deploymentSite = (Astro.site ?? site.siteUrl).toString();
 const cvUrl = new URL("/cv", deploymentSite).toString();
-const pdfUrl = resolveCvPdfUrl();
 
 const cvStructuredData = {
   "@context": "https://schema.org",
@@ -58,14 +54,12 @@ const cvStructuredData = {
           <a href="/cv" aria-current="page" class="text-white">CV</a>
           <a href="/#contact" class="transition hover:text-white">Contact</a>
         </nav>
-        <a
-          href={pdfUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          class="border border-white/15 px-3 py-1.5 text-xs uppercase tracking-[0.18em] text-zinc-300 transition hover:border-emerald-300/70 hover:text-white md:hidden"
+        <button
+          type="button"
+          class="cv-request-open border border-white/15 px-3 py-1.5 text-xs uppercase tracking-[0.18em] text-zinc-300 transition hover:border-emerald-300/70 hover:text-white md:hidden"
         >
-          Open PDF
-        </a>
+          Get CV
+        </button>
       </header>
 
       <section class="grid gap-10 py-12 sm:py-16 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
@@ -80,20 +74,12 @@ const cvStructuredData = {
           <p class="mt-6 max-w-2xl text-base leading-8 text-zinc-300 sm:text-lg">
             Public CV for data platform architecture, governance, analytics engineering, and practical enterprise data work.
           </p>
-          <div class="mt-8 flex flex-col gap-3 sm:flex-row">
-            <a
-              href={pdfUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="inline-flex items-center justify-center bg-white px-5 py-3 text-sm font-semibold text-black transition hover:bg-emerald-100"
-            >
-              Open PDF
-            </a>
+          <div class="mt-8">
             <button
               type="button"
-              class="cv-request-open inline-flex items-center justify-center border border-white/15 px-5 py-3 text-sm font-medium text-white transition hover:border-emerald-300/70"
+              class="cv-request-open inline-flex items-center justify-center bg-white px-5 py-3 text-sm font-semibold text-black transition hover:bg-emerald-100"
             >
-              Send me a copy
+              Get the CV
             </button>
           </div>
         </div>
