@@ -196,6 +196,8 @@ const cvStructuredData = {
           reset: (widgetId: string) => void;
           remove: (widgetId: string) => void;
         };
+        __turnstileReady?: boolean;
+        onTurnstileLoad?: () => void;
       }
     }
 
@@ -230,9 +232,11 @@ const cvStructuredData = {
 
       function renderTurnstile() {
         const container = document.getElementById("cv-turnstile");
-        if (!container || !window.turnstile) return;
+        if (!container) return;
+        if (!window.turnstile || !window.__turnstileReady) return;
         if (turnstileWidgetId !== null) {
           window.turnstile.remove(turnstileWidgetId);
+          turnstileWidgetId = null;
         }
         const theme = document.documentElement.classList.contains("light") ? "light" : "dark";
         turnstileWidgetId = window.turnstile.render(container, {
@@ -375,5 +379,17 @@ const cvStructuredData = {
     initCvModal();
     document.addEventListener("astro:page-load", initCvModal);
   </script>
-  <script is:inline data-cfasync="false" src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
+  <script is:inline data-cfasync="false">
+    window.__turnstileReady = false;
+    window.onTurnstileLoad = function() {
+      window.__turnstileReady = true;
+      var container = document.getElementById("cv-turnstile");
+      var modal = document.getElementById("cv-request-modal");
+      if (container && modal && !modal.classList.contains("hidden") && container.childElementCount === 0) {
+        var theme = document.documentElement.classList.contains("light") ? "light" : "dark";
+        window.turnstile.render(container, { sitekey: "0x4AAAAADMcLyUUQWUEWNgW", theme: theme });
+      }
+    };
+  </script>
+  <script is:inline data-cfasync="false" src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit&onload=onTurnstileLoad" async defer></script>
 </BaseLayout>
