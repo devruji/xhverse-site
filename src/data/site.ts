@@ -2,7 +2,7 @@ export const site = {
   title: "xhverse",
   siteUrl: "https://xhverse.co",
   description:
-    "XHVERSE is the data architecture journal and portfolio of Rujikorn Ngoensaard, also known as XH or bossruji, focused on modern data platforms, governance, analytics architecture, and practical data strategy.",
+    "XHVERSE is the data engineering journal and portfolio of Rujikorn Ngoensaard (Senior Data Engineer / Data Architect), also known as XH or bossruji, focused on enterprise data platforms, lakehouse architecture, governance, and platform delivery.",
   email: "contact@xhverse.co",
   github: "https://github.com/devruji",
   medium: "https://medium.xhverse.co",

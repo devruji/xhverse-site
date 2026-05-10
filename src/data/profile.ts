@@ -10,12 +10,12 @@ export const profile = {
     "bossruji",
     "Rujikorn Ngoensaard",
   ],
-  title: "Data Engineer / Data Architect",
-  bio: "Focused on modern data platforms, analytics architecture, governance, and practical data strategy.",
+  title: "Senior Data Engineer | Platform Architecture",
+  bio: "Leading enterprise data platform delivery, lakehouse architecture, BI migration, and platform governance across Azure, Databricks, and Microsoft Fabric.",
   craftLine:
-    "A data platform craftsman: practical, detail-oriented, and focused on systems teams can operate with confidence.",
+    "A data platform craftsman: practical, production-focused, and built for teams that ship.",
   longBio:
-    "Rujikorn Ngoensaard, also known as XH or bossruji, is a Data Engineer / Data Architect working at the intersection of data platform engineering, analytics architecture, and business-aligned technology strategy. His work focuses on building and improving enterprise data ecosystems across Azure, Databricks, Microsoft Fabric, and related analytics stacks.",
+    "Rujikorn Ngoensaard, also known as XH or bossruji, is a Senior Data Engineer with 5+ years in cloud data engineering and enterprise platform delivery. Currently leading platform delivery, reporting migration, and governance standards at Central Pattana (Oct 2024–Present) across Azure, Databricks, and Microsoft Fabric environments. Experienced in managing engineers, coordinating vendors, and delivering at enterprise scale.",
   statement:
     "I care less about hype and more about building systems that are clear, maintainable, governed, and useful for the people who rely on them. This space is where I share thoughts, notes, and work around architecture, platform strategy, and the realities of building data foundations that can actually support the business.",
   avatar: "/images/xh-profile-960.png",
@@ -41,7 +41,7 @@ export const profile = {
     "Power BI",
   ],
   contactIntro:
-    "For data platform architecture, governance, analytics engineering, or thoughtful technical conversations, send a message and I’ll get back to you.",
+    "For platform architecture, governance design, reporting enablement, or advisory conversations, send a message and I’ll get back to you.",
 };
 
 export type Profile = typeof profile;
