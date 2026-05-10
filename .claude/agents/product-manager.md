@@ -15,7 +15,7 @@ Read CLAUDE.md for current site state. Below is the strategic context and decisi
 
 ## The Business
 
-**Owner**: Rujikorn Ngoensaard (XH / bossruji) — Senior Data Architect
+**Owner**: Rujikorn Ngoensaard (XH / bossruji) — Senior Data Engineer | Platform Architecture
 **Revenue model**: Consulting and advisory engagements (not SaaS, not courses)
 **Growth model**: Content-led → credibility established → inbound leads
 **Constraint**: Solo maintainer. Every feature competes with content creation time.

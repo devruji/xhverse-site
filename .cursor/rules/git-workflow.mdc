@@ -1,0 +1,38 @@
+---
+description: Git workflow and branching rules
+globs: ["**"]
+---
+
+## Branch Rules
+- Always branch from `development` — never from `main`
+- **NEVER** edit files while on `development` or `main` — create a feature/fix branch FIRST
+- Before any edit: `git branch --show-current` — if it's `development` or `main`, STOP and branch
+- Feature branches: PR to `development`
+- Releases: PR from `development` → `main`, then tag + GitHub Release
+- Never commit directly to `main` or `development`
+- Both branches are protected — direct push blocked, CI required
+
+## Before Starting Any Task
+```bash
+git branch --show-current   # Must NOT be development or main
+git status --short          # Check for uncommitted changes
+git clean -fd --dry-run     # Check for untracked contamination
+```
+
+## Before Pushing
+- Verify locally in browser (both themes, mobile viewport) — no exceptions
+- Run `bun run check` for full pipeline validation
+- Verify `git diff --stat` shows ONLY intended changes
+
+## Release Flow
+1. Feature branch → PR to development → CI passes → merge
+2. Release PR: development → main → CI passes → merge
+3. Tag exact main commit: `git tag vX.Y.Z origin/main`
+4. Push tag: `git push origin vX.Y.Z`
+5. Create GitHub Release (mark as Latest)
+6. Check latest tag FIRST: `git tag --sort=-v:refname | head -1`
+
+## Security Gate
+- QA + Security audit on every PR touching auth/RLS/edge functions/forms
+- Both must PASS before merge to main
+- Run agents in parallel for speed
