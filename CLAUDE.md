@@ -52,12 +52,14 @@ All content is defined in TypeScript modules. Supabase overlays blog posts at bu
 
 ### Key Directories
 - `src/data/` — Static content modules + tests (profile, blog, cv, gallery, services, site, seo)
-- `src/lib/` — Business logic + tests (blog/, data-platform-maturity/, governance-scorecard/, render-markdown)
-- `src/pages/` — Route pages (index, about, blog/, cv, gallery, services, tools/)
-- `src/components/` — Shared Astro components (Header, Footer, ThemeToggle)
-- `src/layouts/BaseLayout.astro` — SEO, CSP meta, structured data, OG tags
+- `src/lib/` — Business logic + tests (blog/, data-platform-maturity/, governance-scorecard/, cv-requests/, leads/, admin/, render-markdown)
+- `src/pages/` — Route pages (index, about, blog/, cv, gallery, services, tools/, admin/)
+- `src/components/` — Shared Astro components (Header, Footer, ThemeToggle, CvRequestModal)
+- `src/layouts/` — BaseLayout.astro (SEO, CSP, structured data), AdminLayout.astro (admin panel)
 - `scripts/generate-headers.ts` — Generates `public/_headers` with CSP (runs before astro build)
 - `tests/e2e/` — Playwright tests (chromium desktop + mobile)
+- `supabase/functions/` — Edge Functions (Deno runtime, deployed separately)
+- `supabase/migrations/` — Database migrations (RLS, tables, views)
 
 ### CSP Dual-Layer Architecture
 
@@ -92,6 +94,29 @@ Tools are fully client-side (compute in browser), with optional Supabase for ano
 
 Current tools: Data Platform Maturity Checker, Governance Readiness Scorecard.
 
+### Admin Panel Architecture
+
+Admin pages at `/admin/*` are protected by Cloudflare Access (Zero Trust, email OTP):
+- `src/pages/admin/index.astro` — Dashboard with stats
+- `src/pages/admin/cv-requests.astro` — CV download request management
+- `src/pages/admin/leads.astro` — Lead tracking
+- `src/pages/admin/tools/maturity.astro` — Maturity checker submissions
+- `src/layouts/AdminLayout.astro` — Admin-specific layout with nav
+
+Admin pages fetch data client-side from Supabase using the anon key + RLS policies.
+
+### CV Download Gate
+
+```
+User clicks "Get a Copy" → CvRequestModal opens
+→ Submits email → INSERT cv_download_requests (status: pending)
+→ Admin approves at /admin/cv-requests → UPDATE status = approved
+→ Supabase webhook → send-cv Edge Function → email via Resend
+```
+
+Deploy: `bunx supabase functions deploy send-cv`
+Secrets: `bunx supabase secrets set RESEND_API_KEY=re_xxxxx`
+
 ## Branch & Release Flow
 
 - `development` — integration branch; **base for ALL work**
@@ -102,14 +127,29 @@ Current tools: Data Platform Maturity Checker, Governance Readiness Scorecard.
 
 ## Development Workflow
 
+### Before Starting ANY Task
+
+```bash
+git branch --show-current   # MUST NOT be development or main — branch first!
+git status --short          # Check for uncommitted changes
+git clean -fd --dry-run     # Check for untracked contamination from other sessions
+git clean -fd               # Remove if found — NEVER chase build errors from files you didn't create
+```
+
+### Making Changes
+
 1. Create feature branch from `development`
 2. Implement + run `bun run check` locally
-3. **Start dev server and show user** before pushing:
+3. **Verify `git diff --stat` shows ONLY your intended changes**
+4. **Start dev server and show user** before pushing:
    ```bash
    lsof -ti :4321 | xargs kill -9 2>/dev/null; bun run dev
    ```
-4. Wait for user approval in browser (both themes, mobile viewport)
-5. Once approved: commit, push, create PR to `development`
+5. Wait for user approval in browser (both themes, mobile viewport)
+6. Once approved: commit, push, create PR to `development`
+7. **NEVER push without user seeing it in browser first**
+8. **NEVER create PRs targeting `main`** — always target `development`
+9. **NEVER edit files while on `development` or `main`** — create a branch FIRST
 
 ### Pre-Release Gate
 
@@ -169,6 +209,10 @@ Auto-applied by file glob — read these before working on matching files:
 
 _Update this section when you hit a non-obvious issue._
 
+- **CLEAN WORKSPACE FIRST**: Other sessions/agents leave untracked files. If build fails on files you didn't touch — STOP. Run `git clean -fd`. Never reactively delete source files to fix cascading errors.
+- **ALWAYS show user locally before push**: Start dev server, let user check in browser. No exceptions. Skipping this has caused multiple hotfixes.
+- **ALL PRs target `development`**: Never target `main` directly. Release PRs (`development` → `main`) are a separate explicit step only during release flow.
+- **NEVER edit on development/main**: Always create a feature/fix branch first. Even for one-line fixes.
 - **Branch convention**: Always branch from `development`, never `main`. Agents default to `main` without explicit guidance.
 - **Cloudflare Rocket Loader**: Blocks ALL inline `onclick`/`onX` handlers and rewrites `<script>` type attributes. Fix: `<script is:inline data-cfasync="false">` with `addEventListener`.
 - **CSP must include `'unsafe-inline'`**: Both `script-src` and `style-src` need it for Astro inline scripts and Tailwind.
