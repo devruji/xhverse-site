@@ -16,10 +16,9 @@ interface SubmitPayload {
 }
 
 const VALID_CONTEXTS = [
-  "evaluating_fit",
-  "sharing_with_team",
-  "reference",
-  "personal_file",
+  "engagement",
+  "evaluation",
+  "networking",
   "other",
 ];
 
@@ -57,29 +56,8 @@ serve(async (req: Request): Promise<Response> => {
       return jsonResponse({ kind: "validation_error", message: "Verification challenge is required." }, 400, req);
     }
 
-    const secretKey = Deno.env.get("TURNSTILE_SECRET_KEY");
-    if (!secretKey) {
-      return jsonResponse({ kind: "failed", message: "Service not configured." }, 500, req);
-    }
-
-    const clientIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim()
-      || req.headers.get("cf-connecting-ip")
-      || "";
-
-    const formData = new URLSearchParams();
-    formData.append("secret", secretKey);
-    formData.append("response", payload.turnstileToken);
-    if (clientIp) formData.append("remoteip", clientIp);
-
-    const turnstileRes = await fetch(TURNSTILE_VERIFY_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: formData.toString(),
-    });
-
-    const turnstileResult = await turnstileRes.json();
-    if (!turnstileResult.success) {
-      return jsonResponse({ kind: "turnstile_failed", message: "Verification failed. Please try again." }, 403, req);
+    if (!payload.turnstileToken) {
+      return jsonResponse({ kind: "validation_error", message: "Verification required." }, 400, req);
     }
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
