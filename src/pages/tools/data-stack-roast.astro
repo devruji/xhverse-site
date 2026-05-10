@@ -1,0 +1,198 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+import { stackCategories, stackOptions, categoryLabels } from "../../lib/data-stack-roast/stacks";
+---
+
+<BaseLayout
+  title="Data Stack Roast | XHVERSE"
+  description="Select your stack components and get a brutally honest 3-paragraph roast of your architecture choices."
+>
+  <div class="min-h-screen bg-[var(--bg-page)] font-sans text-[var(--text)]">
+    <Header current="/tools" />
+    <main class="mx-auto max-w-7xl px-5 py-6 sm:px-8 sm:py-8 lg:px-10">
+      <section class="py-10 sm:py-14">
+        <p class="text-[12px] uppercase tracking-[0.32em] text-emerald-200">Architecture tool</p>
+        <h1 class="mt-4 max-w-3xl text-[2.4rem] font-semibold leading-[0.98] tracking-tight text-white sm:text-[3.8rem]">
+          Data Stack Roast
+        </h1>
+        <p class="mt-6 max-w-2xl text-base leading-8 text-zinc-300 sm:text-lg">
+          Select your stack. Get roasted. Improve.
+        </p>
+      </section>
+
+      <section class="border-t border-white/10 py-10">
+        <form id="roast-form" class="space-y-5">
+          <div class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+            <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Your stack</p>
+            <h2 class="mt-3 text-2xl font-semibold tracking-tight text-white sm:text-3xl">Select one option per category.</h2>
+            <p class="mt-4 text-sm leading-7 text-zinc-400">Be honest — the roast is better when you are.</p>
+          </div>
+
+          <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {stackCategories.map((category) => (
+              <div class="border border-white/10 bg-white/[0.03] p-4">
+                <label class="block text-sm font-semibold text-white" for={`select-${category}`}>
+                  {categoryLabels[category]}
+                </label>
+                <select
+                  id={`select-${category}`}
+                  name={category}
+                  required
+                  class="mt-3 w-full border border-white/10 bg-black/30 px-3 py-2.5 text-sm text-zinc-300 outline-none transition focus:border-emerald-300/50"
+                >
+                  <option value="">Choose...</option>
+                  {stackOptions[category].map((opt) => (
+                    <option value={opt.id}>{opt.label}</option>
+                  ))}
+                </select>
+              </div>
+            ))}
+          </div>
+
+          <div class="flex flex-col gap-3 sm:flex-row">
+            <button
+              id="roast-button"
+              type="submit"
+              disabled
+              class="inline-flex items-center justify-center bg-white px-5 py-3 text-sm font-semibold text-black transition hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              Roast my stack
+            </button>
+            <button
+              id="reset-button"
+              type="button"
+              class="inline-flex items-center justify-center border border-white/15 px-5 py-3 text-sm font-medium text-white transition hover:border-emerald-300/70"
+            >
+              Reset
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <section id="result-panel" class="hidden border-t border-white/10 py-10" aria-live="polite">
+        <div class="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+          <div class="space-y-6">
+            <div class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+              <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">The roast</p>
+              <div id="roast-paragraphs" class="mt-5 space-y-4"></div>
+            </div>
+
+            <div class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+              <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Improvement path</p>
+              <ul id="improvement-list" class="mt-4 space-y-3"></ul>
+            </div>
+          </div>
+
+          <div class="space-y-6">
+            <div class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+              <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Brief</p>
+                  <h2 class="mt-2 text-xl font-semibold tracking-tight text-white">Copyable summary</h2>
+                </div>
+                <button
+                  id="copy-brief"
+                  type="button"
+                  class="inline-flex items-center justify-center border border-white/15 px-4 py-2 text-sm font-medium text-white transition hover:border-emerald-300/70"
+                >
+                  Copy brief
+                </button>
+              </div>
+              <textarea
+                id="brief-textarea"
+                readonly
+                class="mt-4 min-h-[20rem] w-full resize-y border border-white/10 bg-black/30 p-4 font-mono text-xs leading-6 text-zinc-300 outline-none"
+              ></textarea>
+              <p id="copy-status" class="mt-3 text-xs text-zinc-500"></p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <Footer />
+  </div>
+
+  <script>
+    import { stackCategories, type StackSelections } from "../../lib/data-stack-roast/stacks";
+    import { generateRoast, buildRoastBrief } from "../../lib/data-stack-roast/roast-engine";
+
+    const form = document.querySelector<HTMLFormElement>("#roast-form");
+    const roastButton = document.querySelector<HTMLButtonElement>("#roast-button");
+    const resetButton = document.querySelector<HTMLButtonElement>("#reset-button");
+    const copyButton = document.querySelector<HTMLButtonElement>("#copy-brief");
+    const resultPanel = document.querySelector<HTMLElement>("#result-panel");
+    const roastParagraphs = document.querySelector<HTMLElement>("#roast-paragraphs");
+    const improvementList = document.querySelector<HTMLElement>("#improvement-list");
+    const briefTextarea = document.querySelector<HTMLTextAreaElement>("#brief-textarea");
+    const copyStatus = document.querySelector<HTMLElement>("#copy-status");
+
+    const slotLabels = ["Architecture", "Operations", "Growth"];
+
+    function checkFormComplete(): void {
+      if (!form || !roastButton) return;
+      const formData = new FormData(form);
+      const allFilled = stackCategories.every((cat) => {
+        const val = formData.get(cat);
+        return val && val !== "";
+      });
+      roastButton.disabled = !allFilled;
+    }
+
+    stackCategories.forEach((cat) => {
+      const select = document.querySelector<HTMLSelectElement>(`#select-${cat}`);
+      select?.addEventListener("change", checkFormComplete);
+    });
+
+    form?.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const formData = new FormData(form);
+      const selections = Object.fromEntries(
+        stackCategories.map((cat) => [cat, formData.get(cat) as string]),
+      ) as StackSelections;
+
+      const result = generateRoast(selections);
+
+      if (roastParagraphs) {
+        roastParagraphs.innerHTML = result.roastParagraphs.map((text, i) => `
+          <div class="border border-white/10 bg-black/20 p-4">
+            <p class="text-[10px] uppercase tracking-wider text-zinc-500">${slotLabels[i]}</p>
+            <p class="mt-2 text-sm italic leading-7 text-zinc-300">${text}</p>
+          </div>
+        `).join("");
+      }
+
+      if (improvementList) {
+        improvementList.innerHTML = result.improvementPath.map((item) => `
+          <li class="border-l-2 border-emerald-300/40 pl-3 text-sm leading-7 text-zinc-300">${item}</li>
+        `).join("");
+      }
+
+      if (briefTextarea) briefTextarea.value = buildRoastBrief(result);
+
+      resultPanel?.classList.remove("hidden");
+      resultPanel?.scrollIntoView({ block: "start", behavior: "smooth" });
+    });
+
+    resetButton?.addEventListener("click", () => {
+      form?.reset();
+      resultPanel?.classList.add("hidden");
+      if (roastButton) roastButton.disabled = true;
+      if (briefTextarea) briefTextarea.value = "";
+      if (copyStatus) copyStatus.textContent = "";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    copyButton?.addEventListener("click", async () => {
+      if (!briefTextarea) return;
+      briefTextarea.select();
+      try {
+        await navigator.clipboard.writeText(briefTextarea.value);
+        if (copyStatus) copyStatus.textContent = "Brief copied.";
+      } catch {
+        if (copyStatus) copyStatus.textContent = "Select the brief text and copy it from your browser.";
+      }
+    });
+  </script>
+</BaseLayout>
