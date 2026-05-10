@@ -30,7 +30,7 @@ import { contextLabels, cvRequestContexts } from "../lib/cv-requests/types";
         Get the CV in your inbox
       </h2>
       <p class="mt-2 text-sm leading-6 text-zinc-400">
-        Handy if you are sharing with your team or want it on file. Delivered within minutes.
+        Submit your details and I will review and deliver the CV within 24 hours.
       </p>
 
       <form id="cv-request-form" class="mt-6 space-y-4" novalidate>
@@ -105,9 +105,12 @@ import { contextLabels, cvRequestContexts } from "../lib/cv-requests/types";
           type="submit"
           class="mt-2 w-full bg-white px-5 py-3 text-sm font-semibold text-black transition hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          <span id="cv-submit-text">Send to my email</span>
-          <span id="cv-submit-loading" class="hidden">Sending...</span>
+          <span id="cv-submit-text">Request CV</span>
+          <span id="cv-submit-loading" class="hidden">Submitting...</span>
         </button>
+        <p class="mt-3 text-center text-[11px] leading-5 text-zinc-500">
+          Your email is used only to deliver the CV. No marketing, no mailing list.
+        </p>
       </form>
     </div>
 
@@ -117,9 +120,9 @@ import { contextLabels, cvRequestContexts } from "../lib/cv-requests/types";
           <path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </div>
-      <h2 class="mt-4 text-xl font-semibold tracking-tight text-white">Request Received</h2>
-      <p class="mt-2 text-sm leading-6 text-zinc-400">
-        Thank you. I will review your request and share the CV to your email shortly.
+      <h2 id="cv-success-title" class="mt-4 text-xl font-semibold tracking-tight text-white">Request Received</h2>
+      <p id="cv-success-message" class="mt-2 text-sm leading-6 text-zinc-400">
+        Thank you. I will review your request and deliver the CV to your email within 24 hours.
       </p>
       <button
         id="cv-success-close"
