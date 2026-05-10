@@ -233,7 +233,10 @@ const cvStructuredData = {
       function renderTurnstile() {
         const container = document.getElementById("cv-turnstile");
         if (!container) return;
-        if (!window.turnstile || !window.__turnstileReady) return;
+        if (!window.turnstile || !window.__turnstileReady) {
+          setTimeout(renderTurnstile, 200);
+          return;
+        }
         if (turnstileWidgetId !== null) {
           window.turnstile.remove(turnstileWidgetId);
           turnstileWidgetId = null;
@@ -242,6 +245,7 @@ const cvStructuredData = {
         turnstileWidgetId = window.turnstile.render(container, {
           sitekey: "0x4AAAAADMcLyUUQWUEWNgW",
           theme,
+          size: "flexible",
         });
       }
 
@@ -387,7 +391,7 @@ const cvStructuredData = {
       var modal = document.getElementById("cv-request-modal");
       if (container && modal && !modal.classList.contains("hidden") && container.childElementCount === 0) {
         var theme = document.documentElement.classList.contains("light") ? "light" : "dark";
-        window.turnstile.render(container, { sitekey: "0x4AAAAADMcLyUUQWUEWNgW", theme: theme });
+        window.turnstile.render(container, { sitekey: "0x4AAAAADMcLyUUQWUEWNgW", theme: theme, size: "flexible" });
       }
     };
   </script>

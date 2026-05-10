@@ -98,14 +98,14 @@ import { contextLabels, cvRequestContexts } from "../lib/cv-requests/types";
           <input id="cv-website" name="website" type="text" tabindex="-1" autocomplete="off" />
         </div>
 
-        <div id="cv-turnstile" class="mt-2"></div>
-
         <div id="cv-form-error" class="hidden text-sm text-red-400" role="alert"></div>
+
+        <div id="cv-turnstile" class="mt-4 flex items-center justify-center overflow-hidden rounded"></div>
 
         <button
           id="cv-submit-btn"
           type="submit"
-          class="mt-2 w-full bg-white px-5 py-3 text-sm font-semibold text-black transition hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-50"
+          class="mt-4 w-full bg-white px-5 py-3 text-sm font-semibold text-black transition hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-50"
         >
           <span id="cv-submit-text">Request CV</span>
           <span id="cv-submit-loading" class="hidden">Submitting...</span>
