@@ -1,0 +1,314 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+---
+
+<BaseLayout
+  title="SQL Deathmatch | XHVERSE"
+  description="15 rounds of paired Spark SQL queries. Pick the winner, learn execution plan reasoning, and discover your tier."
+>
+  <div class="min-h-screen bg-[var(--bg-page)] font-sans text-[var(--text)]">
+    <Header current="/tools" />
+    <main class="mx-auto max-w-7xl px-5 py-6 sm:px-8 sm:py-8 lg:px-10">
+      <section class="py-10 sm:py-14">
+        <p class="text-[12px] uppercase tracking-[0.32em] text-emerald-200">SQL tool</p>
+        <h1 class="mt-4 max-w-3xl text-[2.4rem] font-semibold leading-[0.98] tracking-tight text-white sm:text-[3.8rem]">
+          SQL Deathmatch
+        </h1>
+        <p class="mt-6 max-w-2xl text-base leading-8 text-zinc-300 sm:text-lg">
+          15 rounds. Two queries. One winner. Pick wisely.
+        </p>
+      </section>
+
+      <section class="border-t border-white/10 py-10">
+        <div id="start-panel" class="border border-white/10 bg-white/[0.03] p-6 text-center sm:p-10">
+          <p class="text-sm text-zinc-400">Each round presents two SQL approaches to the same problem. Pick the one that performs better.</p>
+          <button
+            id="start-button"
+            type="button"
+            class="mt-5 inline-flex items-center justify-center bg-white px-6 py-3 text-sm font-semibold text-black transition hover:bg-emerald-100"
+          >
+            Start Deathmatch
+          </button>
+        </div>
+
+        <div id="game-panel" class="hidden space-y-6">
+          <div class="flex items-center justify-between border border-white/10 bg-white/[0.03] px-5 py-3">
+            <p id="progress-label" class="text-sm font-medium text-zinc-400">Round 1 / 15</p>
+            <div id="progress-dots" class="flex gap-1"></div>
+          </div>
+
+          <div class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+            <h2 id="round-title" class="text-xl font-semibold tracking-tight text-white"></h2>
+            <p id="round-context" class="mt-3 text-sm leading-7 text-zinc-300"></p>
+          </div>
+
+          <div id="queries-container" class="grid gap-4 lg:grid-cols-2">
+            <button id="query-a-btn" type="button" class="query-button group border border-white/10 bg-white/[0.03] p-4 text-left transition hover:border-emerald-300/50">
+              <p class="text-xs font-semibold uppercase tracking-wider text-zinc-500">Query A</p>
+              <p id="query-a-label" class="mt-2 text-sm font-medium text-white"></p>
+              <pre class="mt-3 overflow-x-auto rounded bg-black/40 p-3"><code id="query-a-sql" class="text-xs leading-6 text-emerald-300/80"></code></pre>
+            </button>
+            <button id="query-b-btn" type="button" class="query-button group border border-white/10 bg-white/[0.03] p-4 text-left transition hover:border-emerald-300/50">
+              <p class="text-xs font-semibold uppercase tracking-wider text-zinc-500">Query B</p>
+              <p id="query-b-label" class="mt-2 text-sm font-medium text-white"></p>
+              <pre class="mt-3 overflow-x-auto rounded bg-black/40 p-3"><code id="query-b-sql" class="text-xs leading-6 text-emerald-300/80"></code></pre>
+            </button>
+          </div>
+
+          <div id="reveal-panel" class="hidden border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+            <div id="reveal-header" class="flex items-center gap-3">
+              <span id="reveal-badge" class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wider"></span>
+              <span id="reveal-winner-label" class="text-sm text-zinc-400"></span>
+            </div>
+            <p id="reveal-explanation" class="mt-4 text-sm leading-7 text-zinc-300"></p>
+            <button
+              id="next-button"
+              type="button"
+              class="mt-6 inline-flex items-center justify-center border border-white/15 px-5 py-3 text-sm font-medium text-white transition hover:border-emerald-300/70"
+            >
+              Next Round →
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section id="result-panel" class="hidden border-t border-white/10 py-10" aria-live="polite">
+        <div class="grid gap-6 lg:grid-cols-[1fr_1fr]">
+          <div class="space-y-6">
+            <div class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+              <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Result</p>
+              <div class="mt-4 grid gap-4 sm:grid-cols-2">
+                <div class="border border-white/10 bg-black/20 p-5">
+                  <p class="text-sm text-zinc-500">Score</p>
+                  <p id="final-score" class="mt-2 text-5xl font-semibold tracking-tight text-white">0/15</p>
+                </div>
+                <div class="border border-white/10 bg-black/20 p-5">
+                  <p class="text-sm text-zinc-500">Tier</p>
+                  <p id="final-tier" class="mt-2 text-2xl font-semibold tracking-tight text-emerald-200"></p>
+                </div>
+              </div>
+            </div>
+
+            <div class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+              <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Common gaps</p>
+              <ul id="mistakes-list" class="mt-4 space-y-3"></ul>
+            </div>
+          </div>
+
+          <div class="space-y-6">
+            <div class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+              <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Brief</p>
+                  <h2 class="mt-2 text-xl font-semibold tracking-tight text-white">Copyable summary</h2>
+                </div>
+                <button
+                  id="copy-brief"
+                  type="button"
+                  class="inline-flex items-center justify-center border border-white/15 px-4 py-2 text-sm font-medium text-white transition hover:border-emerald-300/70"
+                >
+                  Copy brief
+                </button>
+              </div>
+              <textarea
+                id="brief-textarea"
+                readonly
+                class="mt-4 min-h-[10rem] w-full resize-y border border-white/10 bg-black/30 p-4 font-mono text-xs leading-6 text-zinc-300 outline-none"
+              ></textarea>
+              <p id="copy-status" class="mt-3 text-xs text-zinc-500"></p>
+            </div>
+
+            <button
+              id="reset-button"
+              type="button"
+              class="inline-flex items-center justify-center border border-white/15 px-5 py-3 text-sm font-medium text-white transition hover:border-emerald-300/70"
+            >
+              Try Again
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+    <Footer />
+  </div>
+
+  <script>
+    import { rounds } from "../../lib/sql-deathmatch/rounds";
+    import { calculateDeathmatchResult, buildDeathmatchBrief } from "../../lib/sql-deathmatch/scoring";
+
+    const startPanel = document.querySelector<HTMLElement>("#start-panel");
+    const gamePanel = document.querySelector<HTMLElement>("#game-panel");
+    const resultPanel = document.querySelector<HTMLElement>("#result-panel");
+    const startButton = document.querySelector<HTMLButtonElement>("#start-button");
+    const nextButton = document.querySelector<HTMLButtonElement>("#next-button");
+    const resetButton = document.querySelector<HTMLButtonElement>("#reset-button");
+    const copyButton = document.querySelector<HTMLButtonElement>("#copy-brief");
+    const progressLabel = document.querySelector<HTMLElement>("#progress-label");
+    const progressDots = document.querySelector<HTMLElement>("#progress-dots");
+    const roundTitle = document.querySelector<HTMLElement>("#round-title");
+    const roundContext = document.querySelector<HTMLElement>("#round-context");
+    const queryABtn = document.querySelector<HTMLButtonElement>("#query-a-btn");
+    const queryBBtn = document.querySelector<HTMLButtonElement>("#query-b-btn");
+    const queryALabel = document.querySelector<HTMLElement>("#query-a-label");
+    const queryBLabel = document.querySelector<HTMLElement>("#query-b-label");
+    const queryASql = document.querySelector<HTMLElement>("#query-a-sql");
+    const queryBSql = document.querySelector<HTMLElement>("#query-b-sql");
+    const revealPanel = document.querySelector<HTMLElement>("#reveal-panel");
+    const revealBadge = document.querySelector<HTMLElement>("#reveal-badge");
+    const revealWinnerLabel = document.querySelector<HTMLElement>("#reveal-winner-label");
+    const revealExplanation = document.querySelector<HTMLElement>("#reveal-explanation");
+    const briefTextarea = document.querySelector<HTMLTextAreaElement>("#brief-textarea");
+    const copyStatus = document.querySelector<HTMLElement>("#copy-status");
+    const finalScore = document.querySelector<HTMLElement>("#final-score");
+    const finalTier = document.querySelector<HTMLElement>("#final-tier");
+    const mistakesList = document.querySelector<HTMLElement>("#mistakes-list");
+
+    let currentIndex = 0;
+    let answers: Record<string, "a" | "b"> = {};
+
+    function renderProgressDots(): void {
+      if (!progressDots) return;
+      progressDots.innerHTML = Array.from({ length: 15 }, (_, i) => {
+        let cls = "h-2 w-2 rounded-full ";
+        if (i < currentIndex) {
+          const correct = answers[rounds[i].id] === rounds[i].winner;
+          cls += correct ? "bg-emerald-300" : "bg-rose-300";
+        } else if (i === currentIndex) {
+          cls += "bg-white";
+        } else {
+          cls += "bg-white/20";
+        }
+        return `<span class="${cls}"></span>`;
+      }).join("");
+    }
+
+    function renderRound(): void {
+      const round = rounds[currentIndex];
+      if (!round) return;
+
+      if (progressLabel) progressLabel.textContent = `Round ${currentIndex + 1} / 15`;
+      if (roundTitle) roundTitle.textContent = round.title;
+      if (roundContext) roundContext.textContent = round.context;
+      if (queryALabel) queryALabel.textContent = round.queryA.label;
+      if (queryBLabel) queryBLabel.textContent = round.queryB.label;
+      if (queryASql) queryASql.textContent = round.queryA.sql;
+      if (queryBSql) queryBSql.textContent = round.queryB.sql;
+
+      [queryABtn, queryBBtn].forEach((btn) => {
+        if (!btn) return;
+        btn.disabled = false;
+        btn.classList.remove("opacity-60", "cursor-default", "border-emerald-300/50", "border-rose-300/50");
+        btn.classList.add("hover:border-emerald-300/50");
+      });
+
+      revealPanel?.classList.add("hidden");
+      renderProgressDots();
+    }
+
+    function handlePick(pick: "a" | "b"): void {
+      const round = rounds[currentIndex];
+      answers[round.id] = pick;
+      const correct = pick === round.winner;
+
+      [queryABtn, queryBBtn].forEach((btn) => {
+        if (!btn) return;
+        btn.disabled = true;
+        btn.classList.remove("hover:border-emerald-300/50");
+        btn.classList.add("opacity-60", "cursor-default");
+      });
+
+      const pickedBtn = pick === "a" ? queryABtn : queryBBtn;
+      const winnerBtn = round.winner === "a" ? queryABtn : queryBBtn;
+
+      if (pickedBtn) {
+        pickedBtn.classList.remove("opacity-60");
+        pickedBtn.classList.add(correct ? "border-emerald-300/50" : "border-rose-300/50");
+      }
+      if (!correct && winnerBtn) {
+        winnerBtn.classList.remove("opacity-60");
+        winnerBtn.classList.add("border-emerald-300/50");
+      }
+
+      if (revealBadge) {
+        revealBadge.textContent = correct ? "Correct" : "Wrong";
+        revealBadge.className = correct
+          ? "inline-flex items-center rounded-full bg-emerald-300/15 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-emerald-200"
+          : "inline-flex items-center rounded-full bg-rose-300/15 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-rose-200";
+      }
+      if (revealWinnerLabel) {
+        revealWinnerLabel.textContent = `Winner: Query ${round.winner.toUpperCase()}`;
+      }
+      if (revealExplanation) revealExplanation.textContent = round.explanation;
+      if (nextButton) nextButton.textContent = currentIndex < 14 ? "Next Round →" : "See results";
+
+      revealPanel?.classList.remove("hidden");
+      renderProgressDots();
+    }
+
+    function showResults(): void {
+      gamePanel?.classList.add("hidden");
+      resultPanel?.classList.remove("hidden");
+
+      const result = calculateDeathmatchResult(rounds, answers);
+
+      if (finalScore) finalScore.textContent = `${result.correctCount}/${result.totalRounds}`;
+      if (finalTier) finalTier.textContent = result.tier;
+
+      if (mistakesList) {
+        if (result.commonMistakes.length === 0) {
+          mistakesList.innerHTML = `<li class="text-sm text-zinc-400">No gaps — perfect score!</li>`;
+        } else {
+          mistakesList.innerHTML = result.commonMistakes.map((m) => `
+            <li class="border-l-2 border-rose-300/40 pl-3 text-sm leading-7 text-zinc-300">${m}</li>
+          `).join("");
+        }
+      }
+
+      if (briefTextarea) briefTextarea.value = buildDeathmatchBrief(result);
+      resultPanel?.scrollIntoView({ block: "start", behavior: "smooth" });
+    }
+
+    queryABtn?.addEventListener("click", () => handlePick("a"));
+    queryBBtn?.addEventListener("click", () => handlePick("b"));
+
+    startButton?.addEventListener("click", () => {
+      currentIndex = 0;
+      answers = {};
+      startPanel?.classList.add("hidden");
+      gamePanel?.classList.remove("hidden");
+      resultPanel?.classList.add("hidden");
+      renderRound();
+    });
+
+    nextButton?.addEventListener("click", () => {
+      currentIndex++;
+      if (currentIndex >= 15) {
+        showResults();
+      } else {
+        renderRound();
+      }
+    });
+
+    resetButton?.addEventListener("click", () => {
+      startPanel?.classList.remove("hidden");
+      gamePanel?.classList.add("hidden");
+      resultPanel?.classList.add("hidden");
+      currentIndex = 0;
+      answers = {};
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    copyButton?.addEventListener("click", async () => {
+      if (!briefTextarea) return;
+      briefTextarea.select();
+      try {
+        await navigator.clipboard.writeText(briefTextarea.value);
+        if (copyStatus) copyStatus.textContent = "Brief copied.";
+      } catch {
+        if (copyStatus) copyStatus.textContent = "Select the brief text and copy it from your browser.";
+      }
+    });
+  </script>
+</BaseLayout>

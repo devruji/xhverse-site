@@ -1,0 +1,267 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+import { nodeTypes, nodeCategoryLabels, workloadTypeLabels, PRICING_LAST_UPDATED } from "../../lib/lakehouse-cost-calculator/pricing";
+import type { NodeCategory } from "../../lib/lakehouse-cost-calculator/pricing";
+---
+
+<BaseLayout
+  title="Lakehouse Cost Calculator | XHVERSE"
+  description="Estimate your Databricks monthly costs. See where you can save with optimization suggestions."
+>
+  <div class="min-h-screen bg-[var(--bg-page)] font-sans text-[var(--text)]">
+    <Header current="/tools" />
+    <main class="mx-auto max-w-7xl px-5 py-6 sm:px-8 sm:py-8 lg:px-10">
+      <section class="py-10 sm:py-14">
+        <p class="text-[12px] uppercase tracking-[0.32em] text-emerald-200">Cost tool</p>
+        <h1 class="mt-4 max-w-3xl text-[2.4rem] font-semibold leading-[0.98] tracking-tight text-white sm:text-[3.8rem]">
+          Lakehouse Cost Calculator
+        </h1>
+        <p class="mt-6 max-w-2xl text-base leading-8 text-zinc-300 sm:text-lg">
+          Estimate your Databricks monthly costs. See where you can save.
+        </p>
+      </section>
+
+      <section class="border-t border-white/10 py-10">
+        <form id="cost-form" class="space-y-5">
+          <div class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+            <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Cluster config</p>
+            <h2 class="mt-3 text-2xl font-semibold tracking-tight text-white sm:text-3xl">Configure your workload.</h2>
+          </div>
+
+          <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div class="border border-white/10 bg-white/[0.03] p-4">
+              <label class="block text-sm font-semibold text-white" for="node-type">Node type</label>
+              <select id="node-type" name="nodeTypeId" required class="mt-3 w-full border border-white/10 bg-black/30 px-3 py-2.5 text-sm text-zinc-300 outline-none transition focus:border-emerald-300/50">
+                {(Object.entries(nodeCategoryLabels) as [NodeCategory, string][]).map(([cat, label]) => (
+                  <optgroup label={label}>
+                    {nodeTypes.filter((n) => n.category === cat).map((node) => (
+                      <option value={node.id}>{node.name}</option>
+                    ))}
+                  </optgroup>
+                ))}
+              </select>
+            </div>
+
+            <div class="border border-white/10 bg-white/[0.03] p-4">
+              <label class="block text-sm font-semibold text-white" for="min-workers">Min workers</label>
+              <input id="min-workers" name="minWorkers" type="number" min="1" max="50" value="2" required class="mt-3 w-full border border-white/10 bg-black/30 px-3 py-2.5 text-sm text-zinc-300 outline-none transition focus:border-emerald-300/50" />
+            </div>
+
+            <div class="border border-white/10 bg-white/[0.03] p-4">
+              <label class="block text-sm font-semibold text-white" for="max-workers">Max workers</label>
+              <input id="max-workers" name="maxWorkers" type="number" min="1" max="100" value="8" required class="mt-3 w-full border border-white/10 bg-black/30 px-3 py-2.5 text-sm text-zinc-300 outline-none transition focus:border-emerald-300/50" />
+            </div>
+
+            <div class="border border-white/10 bg-white/[0.03] p-4">
+              <label class="block text-sm font-semibold text-white" for="hours-per-day">
+                Hours per day: <span id="hours-value" class="text-emerald-200">8</span>
+              </label>
+              <input id="hours-per-day" name="hoursPerDay" type="range" min="1" max="24" value="8" class="mt-3 w-full accent-emerald-300" />
+            </div>
+
+            <div class="border border-white/10 bg-white/[0.03] p-4">
+              <label class="block text-sm font-semibold text-white" for="days-per-month">Days per month</label>
+              <input id="days-per-month" name="daysPerMonth" type="number" min="1" max="31" value="22" required class="mt-3 w-full border border-white/10 bg-black/30 px-3 py-2.5 text-sm text-zinc-300 outline-none transition focus:border-emerald-300/50" />
+            </div>
+
+            <div class="border border-white/10 bg-white/[0.03] p-4">
+              <label class="block text-sm font-semibold text-white" for="jobs-count">Jobs count</label>
+              <input id="jobs-count" name="jobsCount" type="number" min="0" max="1000" value="50" required class="mt-3 w-full border border-white/10 bg-black/30 px-3 py-2.5 text-sm text-zinc-300 outline-none transition focus:border-emerald-300/50" />
+            </div>
+
+            <div class="border border-white/10 bg-white/[0.03] p-4">
+              <label class="block text-sm font-semibold text-white" for="spot-percentage">
+                Spot %: <span id="spot-value" class="text-emerald-200">30%</span>
+              </label>
+              <input id="spot-percentage" name="spotPercentage" type="range" min="0" max="100" value="30" class="mt-3 w-full accent-emerald-300" />
+            </div>
+
+            <div class="border border-white/10 bg-white/[0.03] p-4 sm:col-span-2 lg:col-span-2">
+              <p class="text-sm font-semibold text-white">Workload type</p>
+              <div class="mt-3 flex flex-wrap gap-3">
+                {(Object.entries(workloadTypeLabels) as [string, string][]).map(([type, label], i) => (
+                  <label class="cursor-pointer border border-white/10 bg-black/20 px-4 py-2 text-sm text-zinc-300 transition has-[:checked]:border-emerald-300/80 has-[:checked]:bg-emerald-300/10 has-[:checked]:text-white">
+                    <input type="radio" name="workloadType" value={type} class="sr-only" checked={i === 0} />
+                    {label}
+                  </label>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-3 sm:flex-row">
+            <button
+              type="submit"
+              class="inline-flex items-center justify-center bg-white px-5 py-3 text-sm font-semibold text-black transition hover:bg-emerald-100"
+            >
+              Calculate cost
+            </button>
+            <button
+              id="reset-button"
+              type="button"
+              class="inline-flex items-center justify-center border border-white/15 px-5 py-3 text-sm font-medium text-white transition hover:border-emerald-300/70"
+            >
+              Reset
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <section id="result-panel" class="hidden border-t border-white/10 py-10" aria-live="polite">
+        <div class="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+          <div class="space-y-6">
+            <div class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+              <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Cost estimate</p>
+              <div class="mt-4 grid gap-4 sm:grid-cols-3">
+                <div class="border border-white/10 bg-black/20 p-5">
+                  <p class="text-sm text-zinc-500">Current monthly</p>
+                  <p id="current-cost" class="mt-2 text-3xl font-semibold tracking-tight text-white">$0</p>
+                </div>
+                <div class="border border-white/10 bg-black/20 p-5">
+                  <p class="text-sm text-zinc-500">Optimized</p>
+                  <p id="optimized-cost" class="mt-2 text-3xl font-semibold tracking-tight text-emerald-200">$0</p>
+                </div>
+                <div class="border border-white/10 bg-black/20 p-5">
+                  <p class="text-sm text-zinc-500">Savings</p>
+                  <p id="savings-delta" class="mt-2 text-3xl font-semibold tracking-tight text-emerald-200">$0</p>
+                  <p id="savings-pct" class="mt-1 text-sm text-zinc-500"></p>
+                </div>
+              </div>
+            </div>
+
+            <div class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+              <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Optimizations</p>
+              <div id="optimizations-list" class="mt-4 space-y-3"></div>
+            </div>
+
+            <p class="text-xs text-zinc-600">Pricing last updated: {PRICING_LAST_UPDATED}</p>
+          </div>
+
+          <div class="space-y-6">
+            <div class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+              <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Brief</p>
+                  <h2 class="mt-2 text-xl font-semibold tracking-tight text-white">Copyable summary</h2>
+                </div>
+                <button
+                  id="copy-brief"
+                  type="button"
+                  class="inline-flex items-center justify-center border border-white/15 px-4 py-2 text-sm font-medium text-white transition hover:border-emerald-300/70"
+                >
+                  Copy brief
+                </button>
+              </div>
+              <textarea
+                id="brief-textarea"
+                readonly
+                class="mt-4 min-h-[16rem] w-full resize-y border border-white/10 bg-black/30 p-4 font-mono text-xs leading-6 text-zinc-300 outline-none"
+              ></textarea>
+              <p id="copy-status" class="mt-3 text-xs text-zinc-500"></p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <Footer />
+  </div>
+
+  <script>
+    import type { WorkloadType } from "../../lib/lakehouse-cost-calculator/pricing";
+    import { calculateResult, buildCostBrief, type ClusterConfig } from "../../lib/lakehouse-cost-calculator/calculator";
+    import { getOptimizations } from "../../lib/lakehouse-cost-calculator/optimizations";
+
+    const form = document.querySelector<HTMLFormElement>("#cost-form");
+    const resetButton = document.querySelector<HTMLButtonElement>("#reset-button");
+    const copyButton = document.querySelector<HTMLButtonElement>("#copy-brief");
+    const resultPanel = document.querySelector<HTMLElement>("#result-panel");
+    const briefTextarea = document.querySelector<HTMLTextAreaElement>("#brief-textarea");
+    const copyStatus = document.querySelector<HTMLElement>("#copy-status");
+    const hoursSlider = document.querySelector<HTMLInputElement>("#hours-per-day");
+    const hoursValue = document.querySelector<HTMLElement>("#hours-value");
+    const spotSlider = document.querySelector<HTMLInputElement>("#spot-percentage");
+    const spotValue = document.querySelector<HTMLElement>("#spot-value");
+
+    hoursSlider?.addEventListener("input", () => {
+      if (hoursValue) hoursValue.textContent = hoursSlider.value;
+    });
+
+    spotSlider?.addEventListener("input", () => {
+      if (spotValue) spotValue.textContent = `${spotSlider.value}%`;
+    });
+
+    function formatCurrency(value: number): string {
+      return `$${value.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`;
+    }
+
+    form?.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const formData = new FormData(form);
+
+      const config: ClusterConfig = {
+        nodeTypeId: formData.get("nodeTypeId") as string,
+        minWorkers: Number(formData.get("minWorkers")),
+        maxWorkers: Number(formData.get("maxWorkers")),
+        hoursPerDay: Number(formData.get("hoursPerDay")),
+        daysPerMonth: Number(formData.get("daysPerMonth")),
+        jobsCount: Number(formData.get("jobsCount")),
+        spotPercentage: Number(formData.get("spotPercentage")),
+        workloadType: formData.get("workloadType") as WorkloadType,
+      };
+
+      const result = calculateResult(config);
+      const optimizations = getOptimizations(config);
+
+      const currentCostEl = document.querySelector<HTMLElement>("#current-cost");
+      const optimizedCostEl = document.querySelector<HTMLElement>("#optimized-cost");
+      const savingsDeltaEl = document.querySelector<HTMLElement>("#savings-delta");
+      const savingsPctEl = document.querySelector<HTMLElement>("#savings-pct");
+      const optimizationsList = document.querySelector<HTMLElement>("#optimizations-list");
+
+      if (currentCostEl) currentCostEl.textContent = formatCurrency(result.currentCost.totalMonthly);
+      if (optimizedCostEl) optimizedCostEl.textContent = formatCurrency(result.optimizedCost.totalMonthly);
+      if (savingsDeltaEl) savingsDeltaEl.textContent = formatCurrency(result.monthlyDelta);
+      if (savingsPctEl) savingsPctEl.textContent = `${result.savingsPercentage.toFixed(1)}% reduction`;
+
+      if (optimizationsList) {
+        optimizationsList.innerHTML = optimizations.map((opt) => `
+          <div class="border ${opt.applicable ? "border-emerald-300/30 bg-emerald-300/5" : "border-white/10 bg-black/20 opacity-50"} p-4">
+            <div class="flex items-center justify-between gap-3">
+              <span class="text-sm font-semibold ${opt.applicable ? "text-white" : "text-zinc-400"}">${opt.title}</span>
+              <span class="text-xs ${opt.applicable ? "text-emerald-200" : "text-zinc-600"}">~${opt.projectedSavingsPercent}%</span>
+            </div>
+            <p class="mt-2 text-xs leading-6 text-zinc-400">${opt.description}</p>
+          </div>
+        `).join("");
+      }
+
+      if (briefTextarea) briefTextarea.value = buildCostBrief(config, result);
+
+      resultPanel?.classList.remove("hidden");
+      resultPanel?.scrollIntoView({ block: "start", behavior: "smooth" });
+    });
+
+    resetButton?.addEventListener("click", () => {
+      form?.reset();
+      resultPanel?.classList.add("hidden");
+      if (briefTextarea) briefTextarea.value = "";
+      if (copyStatus) copyStatus.textContent = "";
+      if (hoursValue) hoursValue.textContent = "8";
+      if (spotValue) spotValue.textContent = "30%";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    copyButton?.addEventListener("click", async () => {
+      if (!briefTextarea) return;
+      briefTextarea.select();
+      try {
+        await navigator.clipboard.writeText(briefTextarea.value);
+        if (copyStatus) copyStatus.textContent = "Brief copied.";
+      } catch {
+        if (copyStatus) copyStatus.textContent = "Select the brief text and copy it from your browser.";
+      }
+    });
+  </script>
+</BaseLayout>

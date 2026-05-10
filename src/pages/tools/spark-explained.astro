@@ -1,0 +1,265 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+import { transformations, transformationTypes } from "../../lib/spark-explained/transformations";
+import { presetPipelines } from "../../lib/spark-explained/pipeline";
+---
+
+<BaseLayout
+  title="Spark Explained | XHVERSE"
+  description="Animated pipeline visualizer showing how data flows through Spark stages — partitions, shuffles, skew, and spills."
+>
+  <div class="min-h-screen bg-[var(--bg-page)] font-sans text-[var(--text)]">
+    <Header current="/tools" />
+    <main class="mx-auto max-w-7xl px-5 py-6 sm:px-8 sm:py-8 lg:px-10">
+      <section class="py-10 sm:py-14">
+        <p class="text-[12px] uppercase tracking-[0.32em] text-emerald-200">Education tool</p>
+        <h1 class="mt-4 max-w-3xl text-[2.4rem] font-semibold leading-[0.98] tracking-tight text-white sm:text-[3.8rem]">
+          Spark Explained
+        </h1>
+        <p class="mt-6 max-w-2xl text-base leading-8 text-zinc-300 sm:text-lg">
+          See how data flows through Spark stages. Understand shuffles, skew, and spills.
+        </p>
+      </section>
+
+      <section class="border-t border-white/10 py-10">
+        <div class="space-y-6">
+          <div class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+            <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Presets</p>
+            <div id="preset-buttons" class="mt-4 flex flex-wrap gap-3">
+              {presetPipelines.map((preset) => (
+                <button
+                  type="button"
+                  data-preset={preset.id}
+                  class="preset-btn border border-white/10 bg-black/20 px-4 py-2 text-sm text-zinc-300 transition hover:border-emerald-300/50 hover:text-white"
+                >
+                  {preset.name}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+            <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Build your own</p>
+            <div id="transform-buttons" class="mt-4 flex flex-wrap gap-2">
+              {transformationTypes.map((t) => (
+                <button
+                  type="button"
+                  data-transform={t}
+                  class="transform-btn border border-white/10 bg-black/20 px-3 py-1.5 text-xs text-zinc-400 transition hover:border-emerald-300/50 hover:text-white"
+                >
+                  {transformations[t].label}
+                </button>
+              ))}
+            </div>
+            <div class="mt-4 flex gap-3">
+              <button
+                id="play-button"
+                type="button"
+                disabled
+                class="inline-flex items-center justify-center border border-white/15 px-4 py-2 text-sm font-medium text-white transition hover:border-emerald-300/70 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Play
+              </button>
+              <button
+                id="reset-button"
+                type="button"
+                class="inline-flex items-center justify-center border border-white/15 px-4 py-2 text-sm font-medium text-white transition hover:border-emerald-300/70"
+              >
+                Reset
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="pipeline-section" class="hidden border-t border-white/10 py-10" aria-live="polite">
+        <div class="space-y-6">
+          <div class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+            <div class="flex items-center justify-between gap-4">
+              <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Pipeline stages</p>
+              <div id="stats-bar" class="flex gap-4 text-xs text-zinc-500"></div>
+            </div>
+            <div id="pipeline-viz" class="mt-6 flex gap-2 overflow-x-auto pb-4 sm:gap-4"></div>
+          </div>
+
+          <div class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+            <div class="flex items-center gap-4">
+              <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Legend</p>
+            </div>
+            <div class="mt-4 flex flex-wrap gap-4 text-xs text-zinc-400">
+              <span class="flex items-center gap-2"><span class="inline-block h-3 w-3 rounded-sm bg-emerald-400"></span> Normal</span>
+              <span class="flex items-center gap-2"><span class="inline-block h-3 w-3 rounded-sm bg-amber-400"></span> Skewed (&gt;1.5x)</span>
+              <span class="flex items-center gap-2"><span class="inline-block h-3 w-3 rounded-sm bg-rose-400"></span> Spill to disk</span>
+              <span class="flex items-center gap-2"><span class="inline-block h-3 w-1 border-l border-dashed border-zinc-500"></span> Shuffle boundary</span>
+            </div>
+          </div>
+
+          <div id="annotation-panel" class="hidden border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+            <p id="annotation-title" class="text-sm font-semibold text-white"></p>
+            <p id="annotation-body" class="mt-2 text-sm leading-7 text-zinc-400"></p>
+          </div>
+        </div>
+      </section>
+    </main>
+    <Footer />
+  </div>
+
+  <script>
+    import { transformations, type TransformationType } from "../../lib/spark-explained/transformations";
+    import { buildPipeline, presetPipelines, SKEW_THRESHOLD, type PipelineState } from "../../lib/spark-explained/pipeline";
+    import { getAnnotation } from "../../lib/spark-explained/annotations";
+
+    const pipelineSection = document.querySelector<HTMLElement>("#pipeline-section");
+    const pipelineViz = document.querySelector<HTMLElement>("#pipeline-viz");
+    const statsBar = document.querySelector<HTMLElement>("#stats-bar");
+    const annotationPanel = document.querySelector<HTMLElement>("#annotation-panel");
+    const annotationTitle = document.querySelector<HTMLElement>("#annotation-title");
+    const annotationBody = document.querySelector<HTMLElement>("#annotation-body");
+    const playButton = document.querySelector<HTMLButtonElement>("#play-button");
+    const resetButton = document.querySelector<HTMLButtonElement>("#reset-button");
+
+    let currentChain: TransformationType[] = [];
+    let currentState: PipelineState | null = null;
+    let playInterval: ReturnType<typeof setInterval> | null = null;
+    let highlightedIndex = -1;
+
+    function getPartitionColor(skewFactor: number, spillToDisk: boolean): string {
+      if (spillToDisk) return "bg-rose-400";
+      if (skewFactor >= 1.5) return "bg-amber-400";
+      return "bg-emerald-400";
+    }
+
+    function renderPipeline(state: PipelineState): void {
+      if (!pipelineViz || !statsBar) return;
+
+      pipelineSection?.classList.remove("hidden");
+
+      statsBar.innerHTML = [
+        `<span>Stages: ${state.stages.length}</span>`,
+        `<span>Shuffles: <span class="text-amber-300">${state.totalShuffles}</span></span>`,
+        `<span>Spills: <span class="text-rose-300">${state.totalSpills}</span></span>`,
+        state.hasSkew ? `<span class="text-amber-300">Skew detected</span>` : "",
+      ].filter(Boolean).join("");
+
+      const maxRowCount = Math.max(
+        ...state.stages.flatMap((s) => s.partitions.map((p) => p.rowCount)),
+        1,
+      );
+
+      pipelineViz.innerHTML = state.stages.map((stage, stageIdx) => {
+        const isHighlighted = stageIdx === highlightedIndex;
+        const partitionHtml = stage.partitions.map((p) => {
+          const height = Math.max(4, Math.round((p.rowCount / maxRowCount) * 60));
+          const color = getPartitionColor(p.skewFactor, p.spillToDisk);
+          return `<div class="${color} w-full rounded-sm transition-all duration-300" style="height: ${height}px;"></div>`;
+        }).join("");
+
+        const shuffleIndicator = stage.shuffleOccurred && stageIdx > 0
+          ? `<div class="absolute -left-2 top-0 h-full border-l border-dashed border-zinc-500 sm:-left-3"></div>`
+          : "";
+
+        const borderClass = isHighlighted ? "border-emerald-300/50" : "border-white/10";
+
+        return `
+          <div class="stage-column relative flex min-w-[60px] flex-1 cursor-pointer flex-col items-center gap-1 border ${borderClass} bg-black/20 p-2 transition sm:min-w-[80px] sm:p-3" data-stage="${stageIdx}">
+            ${shuffleIndicator}
+            <div class="flex w-full flex-col gap-1">
+              ${partitionHtml}
+            </div>
+            <p class="mt-2 text-center text-[10px] leading-tight text-zinc-500">${transformations[stage.transformation].label}</p>
+          </div>
+        `;
+      }).join("");
+
+      pipelineViz.querySelectorAll<HTMLElement>(".stage-column").forEach((col) => {
+        col.addEventListener("click", () => {
+          const idx = Number(col.dataset.stage);
+          showAnnotation(idx);
+        });
+      });
+
+      if (playButton) playButton.disabled = state.stages.length === 0;
+    }
+
+    function showAnnotation(stageIdx: number): void {
+      if (!currentState || stageIdx < 0 || stageIdx >= currentState.stages.length) return;
+
+      highlightedIndex = stageIdx;
+      const stage = currentState.stages[stageIdx];
+      const hasSkew = stage.partitions.some((p) => p.skewFactor >= SKEW_THRESHOLD);
+      const hasSpill = stage.partitions.some((p) => p.spillToDisk);
+      const annotation = getAnnotation(stage.transformation, hasSkew, hasSpill);
+
+      if (annotationTitle) annotationTitle.textContent = annotation.title;
+      if (annotationBody) annotationBody.textContent = annotation.body;
+      annotationPanel?.classList.remove("hidden");
+
+      renderPipeline(currentState);
+    }
+
+    function runPipeline(chain: TransformationType[]): void {
+      stopPlay();
+      currentChain = chain;
+      currentState = buildPipeline(chain);
+      highlightedIndex = -1;
+      annotationPanel?.classList.add("hidden");
+      renderPipeline(currentState);
+    }
+
+    function stopPlay(): void {
+      if (playInterval) {
+        clearInterval(playInterval);
+        playInterval = null;
+      }
+    }
+
+    document.querySelectorAll<HTMLButtonElement>(".preset-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const presetId = btn.dataset.preset;
+        const preset = presetPipelines.find((p) => p.id === presetId);
+        if (preset) runPipeline(preset.transformations);
+      });
+    });
+
+    document.querySelectorAll<HTMLButtonElement>(".transform-btn").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const t = btn.dataset.transform as TransformationType;
+        currentChain = [...currentChain, t];
+        currentState = buildPipeline(currentChain);
+        highlightedIndex = -1;
+        annotationPanel?.classList.add("hidden");
+        renderPipeline(currentState);
+      });
+    });
+
+    playButton?.addEventListener("click", () => {
+      if (!currentState || currentState.stages.length === 0) return;
+
+      stopPlay();
+      highlightedIndex = -1;
+      let idx = 0;
+
+      playInterval = setInterval(() => {
+        if (!currentState || idx >= currentState.stages.length) {
+          stopPlay();
+          return;
+        }
+        showAnnotation(idx);
+        idx++;
+      }, 1000);
+    });
+
+    resetButton?.addEventListener("click", () => {
+      stopPlay();
+      currentChain = [];
+      currentState = null;
+      highlightedIndex = -1;
+      pipelineSection?.classList.add("hidden");
+      annotationPanel?.classList.add("hidden");
+      if (pipelineViz) pipelineViz.innerHTML = "";
+      if (playButton) playButton.disabled = true;
+    });
+  </script>
+</BaseLayout>

@@ -1,0 +1,283 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+---
+
+<BaseLayout
+  title="Architecture Decision Roulette | XHVERSE"
+  description="10 real-world data platform scenarios. Pick your approach, then see how a Senior Data Engineer would call it."
+>
+  <div class="min-h-screen bg-[var(--bg-page)] font-sans text-[var(--text)]">
+    <Header current="/tools" />
+    <main class="mx-auto max-w-7xl px-5 py-6 sm:px-8 sm:py-8 lg:px-10">
+      <section class="py-10 sm:py-14">
+        <p class="text-[12px] uppercase tracking-[0.32em] text-emerald-200">Architecture tool</p>
+        <h1 class="mt-4 max-w-3xl text-[2.4rem] font-semibold leading-[0.98] tracking-tight text-white sm:text-[3.8rem]">
+          Architecture Decision Roulette
+        </h1>
+        <p class="mt-6 max-w-2xl text-base leading-8 text-zinc-300 sm:text-lg">
+          10 real-world scenarios. Pick your approach, then see how XH would call it.
+        </p>
+      </section>
+
+      <section class="border-t border-white/10 py-10">
+        <div id="start-panel" class="border border-white/10 bg-white/[0.03] p-6 text-center sm:p-10">
+          <p class="text-sm text-zinc-400">Ready to test your architecture instincts?</p>
+          <button
+            id="start-button"
+            type="button"
+            class="mt-5 inline-flex items-center justify-center bg-white px-6 py-3 text-sm font-semibold text-black transition hover:bg-emerald-100"
+          >
+            Deal me a scenario
+          </button>
+        </div>
+
+        <div id="game-panel" class="hidden space-y-6">
+          <div class="flex items-center justify-between border border-white/10 bg-white/[0.03] px-5 py-3">
+            <p id="progress-label" class="text-sm font-medium text-zinc-400">Scenario 1 / 10</p>
+            <div id="progress-dots" class="flex gap-1.5"></div>
+          </div>
+
+          <div class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+            <h2 id="scenario-title" class="text-xl font-semibold tracking-tight text-white sm:text-2xl"></h2>
+            <p id="scenario-situation" class="mt-4 text-sm leading-7 text-zinc-300"></p>
+          </div>
+
+          <div id="options-container" class="grid gap-3"></div>
+
+          <div id="reveal-panel" class="hidden border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+            <div id="reveal-header" class="flex items-center gap-3">
+              <span id="reveal-badge" class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wider"></span>
+              <span id="reveal-pick-label" class="text-sm text-zinc-400"></span>
+            </div>
+            <p id="reveal-reasoning" class="mt-4 text-sm leading-7 text-zinc-300"></p>
+            <button
+              id="next-button"
+              type="button"
+              class="mt-6 inline-flex items-center justify-center border border-white/15 px-5 py-3 text-sm font-medium text-white transition hover:border-emerald-300/70"
+            >
+              Next scenario →
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section id="result-panel" class="hidden border-t border-white/10 py-10" aria-live="polite">
+        <div class="grid gap-6 lg:grid-cols-[1fr_1fr]">
+          <div class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+            <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Result</p>
+            <div class="mt-4 border border-white/10 bg-black/20 p-5">
+              <p class="text-sm text-zinc-500">Agreement rate</p>
+              <p id="agreement-score" class="mt-2 text-5xl font-semibold tracking-tight text-white">0%</p>
+            </div>
+            <p id="agreement-summary" class="mt-4 text-sm leading-7 text-zinc-400"></p>
+          </div>
+
+          <div class="space-y-6">
+            <div class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+              <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Brief</p>
+                  <h2 class="mt-2 text-xl font-semibold tracking-tight text-white">Copyable summary</h2>
+                </div>
+                <button
+                  id="copy-brief"
+                  type="button"
+                  class="inline-flex items-center justify-center border border-white/15 px-4 py-2 text-sm font-medium text-white transition hover:border-emerald-300/70"
+                >
+                  Copy brief
+                </button>
+              </div>
+              <textarea
+                id="brief-textarea"
+                readonly
+                class="mt-4 min-h-[10rem] w-full resize-y border border-white/10 bg-black/30 p-4 font-mono text-xs leading-6 text-zinc-300 outline-none"
+              ></textarea>
+              <p id="copy-status" class="mt-3 text-xs text-zinc-500"></p>
+            </div>
+
+            <button
+              id="reset-button"
+              type="button"
+              class="inline-flex items-center justify-center border border-white/15 px-5 py-3 text-sm font-medium text-white transition hover:border-emerald-300/70"
+            >
+              Play again
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+    <Footer />
+  </div>
+
+  <script>
+    import { scenarios, type Scenario } from "../../lib/architecture-roulette/scenarios";
+    import { calculateRouletteResult, buildRouletteBrief } from "../../lib/architecture-roulette/scoring";
+
+    const startPanel = document.querySelector<HTMLElement>("#start-panel");
+    const gamePanel = document.querySelector<HTMLElement>("#game-panel");
+    const resultPanel = document.querySelector<HTMLElement>("#result-panel");
+    const startButton = document.querySelector<HTMLButtonElement>("#start-button");
+    const nextButton = document.querySelector<HTMLButtonElement>("#next-button");
+    const resetButton = document.querySelector<HTMLButtonElement>("#reset-button");
+    const copyButton = document.querySelector<HTMLButtonElement>("#copy-brief");
+    const progressLabel = document.querySelector<HTMLElement>("#progress-label");
+    const progressDots = document.querySelector<HTMLElement>("#progress-dots");
+    const scenarioTitle = document.querySelector<HTMLElement>("#scenario-title");
+    const scenarioSituation = document.querySelector<HTMLElement>("#scenario-situation");
+    const optionsContainer = document.querySelector<HTMLElement>("#options-container");
+    const revealPanel = document.querySelector<HTMLElement>("#reveal-panel");
+    const revealBadge = document.querySelector<HTMLElement>("#reveal-badge");
+    const revealPickLabel = document.querySelector<HTMLElement>("#reveal-pick-label");
+    const revealReasoning = document.querySelector<HTMLElement>("#reveal-reasoning");
+    const briefTextarea = document.querySelector<HTMLTextAreaElement>("#brief-textarea");
+    const copyStatus = document.querySelector<HTMLElement>("#copy-status");
+    const agreementScore = document.querySelector<HTMLElement>("#agreement-score");
+    const agreementSummary = document.querySelector<HTMLElement>("#agreement-summary");
+
+    let shuffled: Scenario[] = [];
+    let currentIndex = 0;
+    let answers: Record<string, "a" | "b" | "c"> = {};
+
+    function fisherYatesShuffle<T>(arr: T[]): T[] {
+      const a = [...arr];
+      for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function renderProgressDots(): void {
+      if (!progressDots) return;
+      progressDots.innerHTML = Array.from({ length: 10 }, (_, i) => {
+        let cls = "h-2 w-2 rounded-full ";
+        if (i < currentIndex) {
+          const agreed = answers[shuffled[i].id] === shuffled[i].xhRecommendation;
+          cls += agreed ? "bg-emerald-300" : "bg-amber-300";
+        } else if (i === currentIndex) {
+          cls += "bg-white";
+        } else {
+          cls += "bg-white/20";
+        }
+        return `<span class="${cls}"></span>`;
+      }).join("");
+    }
+
+    function renderScenario(): void {
+      const scenario = shuffled[currentIndex];
+      if (!scenario) return;
+
+      if (progressLabel) progressLabel.textContent = `Scenario ${currentIndex + 1} / 10`;
+      if (scenarioTitle) scenarioTitle.textContent = scenario.title;
+      if (scenarioSituation) scenarioSituation.textContent = scenario.situation;
+
+      if (optionsContainer) {
+        optionsContainer.innerHTML = scenario.options.map((opt) => `
+          <button
+            type="button"
+            data-option="${opt.id}"
+            class="option-button border border-white/10 bg-white/[0.03] p-4 text-left transition hover:border-emerald-300/50"
+          >
+            <span class="block text-sm font-semibold text-white">${opt.id.toUpperCase()}. ${opt.label}</span>
+            <span class="mt-2 block text-xs leading-6 text-zinc-500">Tradeoff: ${opt.tradeoff}</span>
+          </button>
+        `).join("");
+
+        optionsContainer.querySelectorAll<HTMLButtonElement>(".option-button").forEach((btn) => {
+          btn.addEventListener("click", () => handleOptionPick(btn.dataset.option as "a" | "b" | "c"));
+        });
+      }
+
+      revealPanel?.classList.add("hidden");
+      renderProgressDots();
+    }
+
+    function handleOptionPick(pick: "a" | "b" | "c"): void {
+      const scenario = shuffled[currentIndex];
+      answers[scenario.id] = pick;
+
+      optionsContainer?.querySelectorAll<HTMLButtonElement>(".option-button").forEach((btn) => {
+        btn.disabled = true;
+        btn.classList.remove("hover:border-emerald-300/50");
+        btn.classList.add("opacity-60", "cursor-default");
+        if (btn.dataset.option === pick) {
+          btn.classList.remove("opacity-60");
+          btn.classList.add("border-white/30");
+        }
+      });
+
+      const agreed = pick === scenario.xhRecommendation;
+      if (revealBadge) {
+        revealBadge.textContent = agreed ? "Agreed" : "Different call";
+        revealBadge.className = agreed
+          ? "inline-flex items-center rounded-full bg-emerald-300/15 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-emerald-200"
+          : "inline-flex items-center rounded-full bg-amber-300/15 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-amber-200";
+      }
+      if (revealPickLabel) {
+        const xhOpt = scenario.options.find((o) => o.id === scenario.xhRecommendation);
+        revealPickLabel.textContent = `XH's pick: ${scenario.xhRecommendation.toUpperCase()}. ${xhOpt?.label ?? ""}`;
+      }
+      if (revealReasoning) revealReasoning.textContent = scenario.reasoning;
+      if (nextButton) nextButton.textContent = currentIndex < 9 ? "Next scenario →" : "See results";
+
+      revealPanel?.classList.remove("hidden");
+      renderProgressDots();
+    }
+
+    function showResults(): void {
+      gamePanel?.classList.add("hidden");
+      resultPanel?.classList.remove("hidden");
+
+      const result = calculateRouletteResult(shuffled, answers);
+
+      if (agreementScore) agreementScore.textContent = `${result.agreementPercentage}%`;
+      if (agreementSummary) {
+        agreementSummary.textContent = `You and XH aligned on ${result.agreements} out of ${result.answered} architecture decisions.`;
+      }
+      if (briefTextarea) briefTextarea.value = buildRouletteBrief(result);
+
+      resultPanel?.scrollIntoView({ block: "start", behavior: "smooth" });
+    }
+
+    startButton?.addEventListener("click", () => {
+      shuffled = fisherYatesShuffle(scenarios).slice(0, 10);
+      currentIndex = 0;
+      answers = {};
+      startPanel?.classList.add("hidden");
+      gamePanel?.classList.remove("hidden");
+      resultPanel?.classList.add("hidden");
+      renderScenario();
+    });
+
+    nextButton?.addEventListener("click", () => {
+      currentIndex++;
+      if (currentIndex >= 10) {
+        showResults();
+      } else {
+        renderScenario();
+      }
+    });
+
+    resetButton?.addEventListener("click", () => {
+      startPanel?.classList.remove("hidden");
+      gamePanel?.classList.add("hidden");
+      resultPanel?.classList.add("hidden");
+      currentIndex = 0;
+      answers = {};
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    copyButton?.addEventListener("click", async () => {
+      if (!briefTextarea) return;
+      briefTextarea.select();
+      try {
+        await navigator.clipboard.writeText(briefTextarea.value);
+        if (copyStatus) copyStatus.textContent = "Brief copied.";
+      } catch {
+        if (copyStatus) copyStatus.textContent = "Select the brief text and copy it from your browser.";
+      }
+    });
+  </script>
+</BaseLayout>
