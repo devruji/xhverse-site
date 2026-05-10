@@ -36,6 +36,7 @@ Kill dev server: `lsof -ti :4321 | xargs kill -9 2>/dev/null`
 - **Bun** (package manager + script runner), Node 22.16.0 (pinned in `.node-version`)
 - **Cloudflare Pages** (Git integration auto-deploy from `main`)
 - **Supabase** (build-time only — blog posts + tool benchmarks, with static fallback)
+- **Supabase Edge Functions** (`supabase/functions/`) — for async workflows (e.g., send-cv email delivery)
 
 ### Data Flow
 ```
@@ -52,12 +53,14 @@ All content is defined in TypeScript modules. Supabase overlays blog posts at bu
 
 ### Key Directories
 - `src/data/` — Static content modules + tests (profile, blog, cv, gallery, services, site, seo)
-- `src/lib/` — Business logic + tests (blog/, data-platform-maturity/, governance-scorecard/, render-markdown)
-- `src/pages/` — Route pages (index, about, blog/, cv, gallery, services, tools/)
-- `src/components/` — Shared Astro components (Header, Footer, ThemeToggle)
-- `src/layouts/BaseLayout.astro` — SEO, CSP meta, structured data, OG tags
+- `src/lib/` — Business logic + tests (blog/, data-platform-maturity/, governance-scorecard/, cv-requests/, leads/, admin/, render-markdown)
+- `src/pages/` — Route pages (index, about, blog/, cv, gallery, services, tools/, admin/)
+- `src/components/` — Shared Astro components (Header, Footer, ThemeToggle, CvRequestModal)
+- `src/layouts/` — BaseLayout.astro (SEO, CSP, structured data), AdminLayout.astro (admin panel)
 - `scripts/generate-headers.ts` — Generates `public/_headers` with CSP (runs before astro build)
 - `tests/e2e/` — Playwright tests (chromium desktop + mobile)
+- `supabase/functions/` — Edge Functions (Deno runtime, deployed separately via `bunx supabase functions deploy`)
+- `supabase/migrations/` — Database migrations (RLS, tables, views)
 
 ### CSP Dual-Layer Architecture
 
@@ -92,6 +95,25 @@ Tools are fully client-side (compute in browser), with optional Supabase for ano
 
 Current tools: Data Platform Maturity Checker, Governance Readiness Scorecard.
 
+### Admin Panel Architecture
+
+Admin pages live at `/admin/*` and are protected by Cloudflare Access (Zero Trust, email OTP):
+- `src/pages/admin/index.astro` — Dashboard with stats
+- `src/pages/admin/cv-requests.astro` — CV download request management
+- `src/pages/admin/leads.astro` — Lead tracking
+- `src/pages/admin/tools/maturity.astro` — Maturity checker submissions
+- `src/layouts/AdminLayout.astro` — Admin-specific layout with nav
+
+Admin pages fetch data client-side from Supabase using the anon key + RLS policies.
+
+### CV Download Gate
+
+The CV page uses a gated download flow:
+1. User clicks "Get a Copy" → `CvRequestModal.astro` opens
+2. User submits email → saved to `cv_download_requests` table (status: pending)
+3. Admin approves in `/admin/cv-requests` → status updated to "approved"
+4. Supabase webhook triggers `send-cv` Edge Function → sends email with PDF link via Resend
+
 ## Branch & Release Flow
 
 - `development` — integration branch; **base for ALL work**
@@ -102,14 +124,27 @@ Current tools: Data Platform Maturity Checker, Governance Readiness Scorecard.
 
 ## Development Workflow
 
+### Before Starting ANY Task
+
+```bash
+git status --short          # Check for uncommitted changes
+git clean -fd --dry-run     # Check for untracked contamination from other sessions
+git clean -fd               # Remove if found — NEVER chase build errors from files you didn't create
+```
+
+### Making Changes
+
 1. Create feature branch from `development`
 2. Implement + run `bun run check` locally
-3. **Start dev server and show user** before pushing:
+3. **Verify `git diff --stat` shows ONLY your intended changes**
+4. **Start dev server and show user** before pushing:
    ```bash
    lsof -ti :4321 | xargs kill -9 2>/dev/null; bun run dev
    ```
-4. Wait for user approval in browser (both themes, mobile viewport)
-5. Once approved: commit, push, create PR to `development`
+5. Wait for user approval in browser (both themes, mobile viewport)
+6. Once approved: commit, push, create PR to `development`
+7. **NEVER push without user seeing it in browser first**
+8. **NEVER create PRs targeting `main`** — always target `development`
 
 ### Pre-Release Gate
 
@@ -169,6 +204,9 @@ Auto-applied by file glob — read these before working on matching files:
 
 _Update this section when you hit a non-obvious issue._
 
+- **CLEAN WORKSPACE FIRST**: Other sessions/agents leave untracked files. If build fails on files you didn't touch — STOP. Run `git clean -fd`. Never reactively delete source files to fix cascading errors.
+- **ALWAYS show user locally before push**: Start dev server, let user check in browser. No exceptions. Skipping this has caused multiple hotfixes.
+- **ALL PRs target `development`**: Never target `main` directly. Release PRs (`development` → `main`) are a separate explicit step only during release flow.
 - **Branch convention**: Always branch from `development`, never `main`. Agents default to `main` without explicit guidance.
 - **Cloudflare Rocket Loader**: Blocks ALL inline `onclick`/`onX` handlers and rewrites `<script>` type attributes. Fix: `<script is:inline data-cfasync="false">` with `addEventListener`.
 - **CSP must include `'unsafe-inline'`**: Both `script-src` and `style-src` need it for Astro inline scripts and Tailwind.
