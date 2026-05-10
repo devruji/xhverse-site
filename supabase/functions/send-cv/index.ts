@@ -27,8 +27,12 @@ const CV_PDF_URL =
 
 const RESEND_API_URL = "https://api.resend.com/emails";
 
+function escapeHtml(text: string): string {
+  return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
 function buildEmailHtml(name: string | null): string {
-  const greeting = name ? `Hi ${name},` : "Hi there,";
+  const greeting = name ? `Hi ${escapeHtml(name)},` : "Hi there,";
   return `
 <!DOCTYPE html>
 <html>
@@ -91,9 +95,12 @@ serve(async (req: Request): Promise<Response> => {
     }
 
     const pdfBuffer = await pdfResponse.arrayBuffer();
-    const pdfBase64 = btoa(
-      String.fromCharCode(...new Uint8Array(pdfBuffer)),
-    );
+    const bytes = new Uint8Array(pdfBuffer);
+    let binary = "";
+    for (let i = 0; i < bytes.length; i++) {
+      binary += String.fromCharCode(bytes[i]);
+    }
+    const pdfBase64 = btoa(binary);
 
     const emailResponse = await fetch(RESEND_API_URL, {
       method: "POST",
@@ -115,21 +122,35 @@ serve(async (req: Request): Promise<Response> => {
       }),
     });
 
+    const supabaseUrl = Deno.env.get("SUPABASE_URL");
+    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+
     if (!emailResponse.ok) {
+      if (supabaseUrl && supabaseKey) {
+        const supabase = createClient(supabaseUrl, supabaseKey);
+        await supabase
+          .from("cv_download_requests")
+          .update({ delivery_status: "failed" })
+          .eq("id", payload.record.id);
+      }
       return new Response(
         JSON.stringify({ error: "Failed to send email" }),
         { status: 500, headers: { "Content-Type": "application/json" } },
       );
     }
 
-    const supabaseUrl = Deno.env.get("SUPABASE_URL");
-    const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+    const emailResult = await emailResponse.json();
+    const resendMessageId: string | null = emailResult?.id ?? null;
 
     if (supabaseUrl && supabaseKey) {
       const supabase = createClient(supabaseUrl, supabaseKey);
       await supabase
         .from("cv_download_requests")
-        .update({ sent_at: new Date().toISOString() })
+        .update({
+          sent_at: new Date().toISOString(),
+          resend_message_id: resendMessageId,
+          delivery_status: "delivered",
+        })
         .eq("id", payload.record.id);
     }
 
