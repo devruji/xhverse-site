@@ -1,10 +1,9 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Footer from "../components/Footer.astro";
+import CvRequestModal from "../components/CvRequestModal.astro";
 import {
-  buildCvDownloadUrl,
   cvHighlights,
-  cvStorage,
   resolveCvPdfUrl,
 } from "../data/cv";
 import { profile } from "../data/profile";
@@ -13,7 +12,6 @@ import { site } from "../data/site";
 const deploymentSite = (Astro.site ?? site.siteUrl).toString();
 const cvUrl = new URL("/cv", deploymentSite).toString();
 const pdfUrl = resolveCvPdfUrl();
-const downloadUrl = buildCvDownloadUrl(pdfUrl);
 
 const cvStructuredData = {
   "@context": "https://schema.org",
@@ -60,13 +58,12 @@ const cvStructuredData = {
           <a href="/cv" aria-current="page" class="text-white">CV</a>
           <a href="/#contact" class="transition hover:text-white">Contact</a>
         </nav>
-        <a
-          href={downloadUrl}
-          download={cvStorage.fileName}
-          class="border border-white/15 px-3 py-1.5 text-xs uppercase tracking-[0.18em] text-zinc-300 transition hover:border-emerald-300/70 hover:text-white md:hidden"
+        <button
+          type="button"
+          class="cv-request-open border border-white/15 px-3 py-1.5 text-xs uppercase tracking-[0.18em] text-zinc-300 transition hover:border-emerald-300/70 hover:text-white md:hidden"
         >
-          Download
-        </a>
+          Get a Copy
+        </button>
       </header>
 
       <section class="grid gap-10 py-12 sm:py-16 lg:grid-cols-[0.95fr_1.05fr] lg:items-start">
@@ -90,13 +87,12 @@ const cvStructuredData = {
             >
               View CV
             </a>
-            <a
-              href={downloadUrl}
-              download={cvStorage.fileName}
-              class="inline-flex items-center justify-center border border-white/15 px-5 py-3 text-sm font-medium text-white transition hover:border-emerald-300/70"
+            <button
+              type="button"
+              class="cv-request-open inline-flex items-center justify-center border border-white/15 px-5 py-3 text-sm font-medium text-white transition hover:border-emerald-300/70"
             >
-              Download PDF
-            </a>
+              Get a Copy
+            </button>
           </div>
         </div>
 
@@ -162,5 +158,138 @@ const cvStructuredData = {
 
     </main>
     <Footer />
+    <CvRequestModal />
   </div>
+
+  <script>
+    import {
+      createCvRequestsPublicClient,
+      submitCvRequest,
+    } from "../lib/cv-requests/supabase";
+    import { validateEmail } from "../lib/cv-requests/validation";
+    import { cvRequestContexts, type CvRequestContext } from "../lib/cv-requests/types";
+
+    function initCvModal() {
+      const modal = document.getElementById("cv-request-modal");
+      const panel = document.getElementById("cv-modal-panel");
+      const form = document.getElementById("cv-request-form") as HTMLFormElement | null;
+      const formView = document.getElementById("cv-modal-form-view");
+      const successView = document.getElementById("cv-modal-success-view");
+      const errorEl = document.getElementById("cv-form-error");
+      const submitBtn = document.getElementById("cv-submit-btn") as HTMLButtonElement | null;
+      const submitText = document.getElementById("cv-submit-text");
+      const submitLoading = document.getElementById("cv-submit-loading");
+      const closeBtn = document.getElementById("cv-modal-close");
+      const successCloseBtn = document.getElementById("cv-success-close");
+
+      if (!modal || !panel || !form || !formView || !successView || !errorEl || !submitBtn || !submitText || !submitLoading || !closeBtn || !successCloseBtn) return;
+
+      const openButtons = document.querySelectorAll(".cv-request-open");
+
+      function openModal() {
+        modal!.classList.remove("hidden");
+        modal!.classList.add("flex");
+        formView!.classList.remove("hidden");
+        successView!.classList.add("hidden");
+        errorEl!.classList.add("hidden");
+        errorEl!.textContent = "";
+        form!.reset();
+      }
+
+      function closeModal() {
+        modal!.classList.add("hidden");
+        modal!.classList.remove("flex");
+      }
+
+      function showError(message: string) {
+        errorEl!.textContent = message;
+        errorEl!.classList.remove("hidden");
+      }
+
+      function setLoading(loading: boolean) {
+        submitBtn!.disabled = loading;
+        submitText!.classList.toggle("hidden", loading);
+        submitLoading!.classList.toggle("hidden", !loading);
+      }
+
+      openButtons.forEach((btn) => {
+        btn.addEventListener("click", openModal);
+      });
+
+      closeBtn.addEventListener("click", closeModal);
+      successCloseBtn.addEventListener("click", closeModal);
+
+      modal.addEventListener("click", (e) => {
+        if (e.target === modal) closeModal();
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape" && !modal.classList.contains("hidden")) {
+          closeModal();
+        }
+      });
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        errorEl.classList.add("hidden");
+
+        const emailInput = (document.getElementById("cv-email") as HTMLInputElement).value;
+        const nameInput = (document.getElementById("cv-name") as HTMLInputElement).value;
+        const contextInput = (document.getElementById("cv-context") as HTMLSelectElement).value;
+        const honeypotInput = (document.getElementById("cv-website") as HTMLInputElement).value;
+
+        const emailCheck = validateEmail(emailInput);
+        if (!emailCheck.valid) {
+          showError(emailCheck.error);
+          return;
+        }
+
+        const context: CvRequestContext | null =
+          contextInput && cvRequestContexts.includes(contextInput as CvRequestContext)
+            ? (contextInput as CvRequestContext)
+            : null;
+
+        setLoading(true);
+
+        try {
+          const client = createCvRequestsPublicClient({
+            PUBLIC_SUPABASE_URL: import.meta.env.PUBLIC_SUPABASE_URL,
+            PUBLIC_SUPABASE_PUBLISHABLE_KEY: import.meta.env.PUBLIC_SUPABASE_PUBLISHABLE_KEY,
+            PUBLIC_SUPABASE_ANON_KEY: import.meta.env.PUBLIC_SUPABASE_ANON_KEY,
+          });
+
+          const result = await submitCvRequest(client, {
+            email: emailInput,
+            name: nameInput || null,
+            context,
+            honeypot: honeypotInput,
+          });
+
+          switch (result.kind) {
+            case "saved":
+              formView!.classList.add("hidden");
+              successView!.classList.remove("hidden");
+              break;
+            case "validation_error":
+              showError(result.message);
+              break;
+            case "skipped":
+              formView!.classList.add("hidden");
+              successView!.classList.remove("hidden");
+              break;
+            case "failed":
+              showError("Something went wrong. Please try again later.");
+              break;
+          }
+        } catch {
+          showError("Something went wrong. Please try again later.");
+        } finally {
+          setLoading(false);
+        }
+      });
+    }
+
+    initCvModal();
+    document.addEventListener("astro:page-load", initCvModal);
+  </script>
 </BaseLayout>
