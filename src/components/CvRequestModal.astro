@@ -1,0 +1,119 @@
+---
+import { contextLabels, cvRequestContexts } from "../lib/cv-requests/types";
+---
+
+<div
+  id="cv-request-modal"
+  class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 backdrop-blur-sm"
+  aria-modal="true"
+  role="dialog"
+  aria-labelledby="cv-modal-title"
+>
+  <div
+    id="cv-modal-panel"
+    class="relative mx-4 w-full max-w-md border border-white/10 bg-[var(--bg-page)] p-6 shadow-2xl sm:p-8"
+  >
+    <button
+      id="cv-modal-close"
+      type="button"
+      class="absolute right-4 top-4 text-zinc-500 transition hover:text-white"
+      aria-label="Close modal"
+    >
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M5 5l10 10M15 5L5 15" stroke-linecap="round"/>
+      </svg>
+    </button>
+
+    <div id="cv-modal-form-view">
+      <p class="text-[11px] uppercase tracking-[0.32em] text-zinc-500">Request CV</p>
+      <h2 id="cv-modal-title" class="mt-3 text-xl font-semibold tracking-tight text-white">
+        Get a Copy
+      </h2>
+      <p class="mt-2 text-sm leading-6 text-zinc-400">
+        Provide your email and I will review and share the full CV.
+      </p>
+
+      <form id="cv-request-form" class="mt-6 space-y-4" novalidate>
+        <div>
+          <label for="cv-email" class="block text-[11px] uppercase tracking-[0.22em] text-zinc-500">
+            Email <span class="text-emerald-300">*</span>
+          </label>
+          <input
+            id="cv-email"
+            name="email"
+            type="email"
+            required
+            autocomplete="email"
+            class="mt-2 block w-full border border-white/10 bg-white/[0.03] px-3 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:border-emerald-300/50 focus:outline-none"
+            placeholder="you@company.com"
+          />
+        </div>
+
+        <div>
+          <label for="cv-name" class="block text-[11px] uppercase tracking-[0.22em] text-zinc-500">
+            Name <span class="text-zinc-600">(optional)</span>
+          </label>
+          <input
+            id="cv-name"
+            name="name"
+            type="text"
+            autocomplete="name"
+            class="mt-2 block w-full border border-white/10 bg-white/[0.03] px-3 py-2.5 text-sm text-white placeholder:text-zinc-600 focus:border-emerald-300/50 focus:outline-none"
+            placeholder="Your name"
+          />
+        </div>
+
+        <div>
+          <label for="cv-context" class="block text-[11px] uppercase tracking-[0.22em] text-zinc-500">
+            Context <span class="text-zinc-600">(optional)</span>
+          </label>
+          <select
+            id="cv-context"
+            name="context"
+            class="mt-2 block w-full border border-white/10 bg-white/[0.03] px-3 py-2.5 text-sm text-white focus:border-emerald-300/50 focus:outline-none"
+          >
+            <option value="">Select a reason...</option>
+            {cvRequestContexts.map((ctx) => (
+              <option value={ctx}>{contextLabels[ctx]}</option>
+            ))}
+          </select>
+        </div>
+
+        <div class="absolute -left-[9999px] opacity-0" aria-hidden="true">
+          <label for="cv-website">Website</label>
+          <input id="cv-website" name="website" type="text" tabindex="-1" autocomplete="off" />
+        </div>
+
+        <div id="cv-form-error" class="hidden text-sm text-red-400" role="alert"></div>
+
+        <button
+          id="cv-submit-btn"
+          type="submit"
+          class="mt-2 w-full bg-white px-5 py-3 text-sm font-semibold text-black transition hover:bg-emerald-100 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          <span id="cv-submit-text">Submit Request</span>
+          <span id="cv-submit-loading" class="hidden">Submitting...</span>
+        </button>
+      </form>
+    </div>
+
+    <div id="cv-modal-success-view" class="hidden text-center">
+      <div class="mx-auto flex size-14 items-center justify-center rounded-full border border-emerald-300/25 bg-emerald-300/10">
+        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-emerald-300">
+          <path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <h2 class="mt-4 text-xl font-semibold tracking-tight text-white">Request Received</h2>
+      <p class="mt-2 text-sm leading-6 text-zinc-400">
+        Thank you. I will review your request and share the CV to your email shortly.
+      </p>
+      <button
+        id="cv-success-close"
+        type="button"
+        class="mt-6 w-full border border-white/15 px-5 py-3 text-sm font-medium text-white transition hover:border-emerald-300/70"
+      >
+        Close
+      </button>
+    </div>
+  </div>
+</div>

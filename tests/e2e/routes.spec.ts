@@ -37,7 +37,7 @@ test("gallery page renders images", async ({ page }) => {
   await expect(page.locator("img").first()).toBeVisible();
 });
 
-test("cv page exposes a viewable and downloadable PDF", async ({ page }) => {
+test("cv page exposes a viewable PDF and gated copy request", async ({ page }) => {
   await page.goto("/cv");
   await expect(page).toHaveTitle(/Rujikorn Ngoensaard CV/i);
   await expect(
@@ -47,12 +47,14 @@ test("cv page exposes a viewable and downloadable PDF", async ({ page }) => {
     "href",
     cvPdfUrl,
   );
-  await expect(
-    page.getByRole("link", { name: /^Download PDF$/i }),
-  ).toHaveAttribute(
-    "href",
-    `${cvPdfUrl}?download=Rujikorn-Ngoensaard-CV.pdf`,
-  );
+  const getCopyBtn = page.getByRole("button", { name: /Get a Copy/i }).first();
+  await expect(getCopyBtn).toBeVisible();
+  await getCopyBtn.click();
+  const modal = page.locator("#cv-request-modal");
+  await expect(modal).toBeVisible();
+  await expect(modal.getByRole("heading", { name: "Get a Copy" })).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(modal).toBeHidden();
 });
 
 test("homepage sets SEO and referrer metadata", async ({ page }) => {
