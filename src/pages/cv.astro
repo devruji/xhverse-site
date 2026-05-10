@@ -228,6 +228,7 @@ const cvStructuredData = {
 
       let turnstileWidgetId: string | null = null;
       let turnstileScriptLoaded = false;
+      let turnstileRendering = false;
 
       function loadTurnstileScript() {
         if (turnstileScriptLoaded) return;
@@ -244,22 +245,32 @@ const cvStructuredData = {
 
       function renderTurnstile() {
         const container = document.getElementById("cv-turnstile");
-        if (!container) return;
+        if (!container || turnstileRendering) return;
         loadTurnstileScript();
         if (!window.turnstile) {
           setTimeout(renderTurnstile, 300);
           return;
         }
-        if (turnstileWidgetId !== null) {
-          window.turnstile.remove(turnstileWidgetId);
-          turnstileWidgetId = null;
-        }
+        if (container.childElementCount > 0) return;
+        turnstileRendering = true;
         const theme = document.documentElement.classList.contains("light") ? "light" : "dark";
         turnstileWidgetId = window.turnstile.render(container, {
           sitekey: "0x4AAAAADMcLyUUQWUEWNgW",
           theme,
           size: "flexible",
         });
+        turnstileRendering = false;
+      }
+
+      function resetTurnstile() {
+        const container = document.getElementById("cv-turnstile");
+        if (turnstileWidgetId !== null && window.turnstile) {
+          window.turnstile.reset(turnstileWidgetId);
+        } else if (container) {
+          container.innerHTML = "";
+          turnstileWidgetId = null;
+          renderTurnstile();
+        }
       }
 
       function openModal() {
@@ -376,7 +387,7 @@ const cvStructuredData = {
               break;
             case "turnstile_failed":
               showError("Verification failed. Please try again.");
-              renderTurnstile();
+              resetTurnstile();
               break;
             case "validation_error":
               showError(result.message);
