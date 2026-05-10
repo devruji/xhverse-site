@@ -27,8 +27,12 @@ const CV_PDF_URL =
 
 const RESEND_API_URL = "https://api.resend.com/emails";
 
+function escapeHtml(text: string): string {
+  return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
 function buildEmailHtml(name: string | null): string {
-  const greeting = name ? `Hi ${name},` : "Hi there,";
+  const greeting = name ? `Hi ${escapeHtml(name)},` : "Hi there,";
   return `
 <!DOCTYPE html>
 <html>

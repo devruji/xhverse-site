@@ -30,12 +30,12 @@ create table if not exists public.cv_email_blocklist (
 alter table public.cv_download_requests enable row level security;
 alter table public.cv_email_blocklist enable row level security;
 
--- Public: anyone can insert a request (anon key)
+-- Public: anyone can insert a request (anon key, restricted to pending state only)
 create policy "anon_insert_cv_requests"
   on public.cv_download_requests
   for insert
   to anon
-  with check (true);
+  with check (status = 'pending' AND delivery_status = 'pending');
 
 -- Anon: no read access (admin reads via authenticated role)
 
