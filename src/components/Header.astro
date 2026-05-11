@@ -96,11 +96,13 @@ const { current, links = defaultLinks } = Astro.props;
 </nav>
 
 <script is:inline data-cfasync="false">
-  (function () {
+  function initNavDrawer() {
     var toggle = document.getElementById("nav-menu-toggle");
     var drawer = document.getElementById("nav-drawer");
     var backdrop = document.getElementById("nav-drawer-backdrop");
     var close = document.getElementById("nav-drawer-close");
+
+    if (!toggle || !drawer) return;
 
     function open() {
       drawer.classList.remove("translate-x-full");
@@ -116,7 +118,7 @@ const { current, links = defaultLinks } = Astro.props;
       document.body.style.overflow = "";
     }
 
-    if (toggle) toggle.addEventListener("click", open);
+    toggle.addEventListener("click", open);
     if (close) close.addEventListener("click", shut);
     if (backdrop) backdrop.addEventListener("click", shut);
 
@@ -124,7 +126,10 @@ const { current, links = defaultLinks } = Astro.props;
       if (e.key === "Escape" && !drawer.classList.contains("translate-x-full")) shut();
     });
 
-    var links = drawer ? drawer.querySelectorAll(".nav-drawer-link") : [];
+    var links = drawer.querySelectorAll(".nav-drawer-link");
     links.forEach(function (l) { l.addEventListener("click", shut); });
-  })();
+  }
+
+  initNavDrawer();
+  document.addEventListener("astro:page-load", initNavDrawer);
 </script>
