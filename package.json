@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.2",
-    "@supabase/supabase-js": "^2.105.1",
+    "@supabase/supabase-js": "^2.105.4",
     "@tailwindcss/vite": "^4.2.4",
     "astro": "^6.1.10",
     "marked": "^18.0.2",
