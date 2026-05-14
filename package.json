@@ -34,7 +34,7 @@
     "@vitest/coverage-v8": "^4.1.5",
     "supabase": "^2.98.2",
     "typescript": "^6.0.3",
-    "vitest": "^4.1.5",
+    "vitest": "^4.1.6",
     "wrangler": "^4.90.0"
   },
   "overrides": {
