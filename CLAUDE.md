@@ -211,7 +211,7 @@ Secrets: `bunx supabase secrets set RESEND_API_KEY=re_xxxxx`
 - `development` — integration branch; **base for ALL work**
 - `main` — production only; receives merges from `development`
 - Feature branches → PR to `development` → CI passes → merge
-- Release: PR `development` → `main` → tag `vX.Y.Z` → GitHub Release
+- Release: PR `development` → `main` → annotated tag `vX.Y.Z` with a useful message → GitHub Release
 - Both branches are protected — direct push blocked, CI required
 
 ## Development Workflow
@@ -248,17 +248,20 @@ Before `development` → `main`, run QA + Security in parallel:
 
 Both must PASS. Either BLOCK → fix before releasing.
 
-## Engineering Team (`.claude/agents/`)
+## Engineering Team (`.codex/agents/`)
 
-Subagents with isolated context windows, spawned automatically or on request.
+Repo-local sub-agent definitions live in `.codex/agents/*.toml`. Use them for explicit delegation or parallel agent work when the current Codex runtime allows sub-agents and the user has asked for delegation.
 
-| Agent | Role | When to spawn |
-|-------|------|---------------|
-| `product-manager` | Feature strategy, roadmap, competitive research | "What should we build?", feature evaluation |
-| `engineering-lead` | Architect, coordinator, code review | Planning, multi-concern tasks, architecture decisions |
-| `frontend-engineer` | UI, Astro pages, styling, themes, a11y | Visual work, responsive fixes, new pages |
-| `backend-engineer` | Data layer, tests, types, Supabase | Data modules, coverage, type errors |
-| `platform-engineer` | Deploy, CI, CSP, Cloudflare | CI failures, header changes, infrastructure |
+| Agent | Role | When to use |
+|-------|------|-------------|
+| `engineering-lead` | Architecture, coordination, code review | Multi-concern tasks, architecture decisions, release planning |
+| `site-planner` | Read-heavy implementation planning | File-level plans, owner split, risks, verification scope |
+| `astro-builder` | Production Astro implementation | Page/component changes that need direct Astro execution |
+| `frontend-engineer` | UI, Astro pages, styling, themes, a11y | Visual work, responsive fixes, interactive tool UIs |
+| `backend-engineer` | Data layer, tests, types, Supabase | `src/data/`, `src/lib/`, coverage, type errors |
+| `platform-engineer` | Deploy, CI, CSP, Cloudflare | CI failures, headers, build pipeline, edge/platform work |
+| `product-manager` | Product strategy, roadmap, content direction | Feature evaluation, prioritization, business rationale |
+| `qa-reviewer` | Read-only QA and release readiness | Regression review, a11y, security, release gate findings |
 
 ### Delegation Pattern
 
@@ -268,7 +271,7 @@ Subagents with isolated context windows, spawned automatically or on request.
 4. **Platform** handles deploy/headers/CI
 5. **QA + Security** gate releases
 
-## Rules (`.claude/rules/`)
+## Rules (`.cursor/rules/`)
 
 Auto-applied by file glob — read these before working on matching files:
 
@@ -284,6 +287,7 @@ Auto-applied by file glob — read these before working on matching files:
 | Skill | When to use |
 |-------|-------------|
 | `xhverse-dev` | Auto-triggers for all work in this repo |
+| `astro-site-init` | Updating CLAUDE.md / agent onboarding for this Astro site |
 | `astro-page-implementation` | Creating or editing Astro pages |
 | `content-to-page` | Turning content notes into page-ready sections |
 | `document-writer` | Technical docs, blog posts, ADRs |
@@ -293,6 +297,23 @@ Auto-applied by file glob — read these before working on matching files:
 | `security-audit-expert` | Security audit (pre-release + on demand) |
 | `seo-metadata-check` | Quick single-page SEO review |
 | `ux-ui-auditor` | Visual + accessibility audit |
+
+Skill frontmatter must stay valid YAML. Use `description: >-` for long descriptions that contain colons, quotes, or branch names.
+
+## Codex Config
+
+`.codex/config.toml` is runtime configuration only:
+
+```toml
+model_reasoning_effort = "high"
+sandbox_mode = "workspace-write"
+
+[agents]
+max_threads = 4
+max_depth = 1
+```
+
+Do not add `[instructions]` or `developer_instructions` tables. Newer Codex config parsing treats that shape as invalid and blocks skill reload. Keep repo guidance in `AGENTS.md`, `CLAUDE.md`, `.cursor/rules/`, `.agents/skills/`, and `.codex/agents/`.
 
 ## Lessons Learned
 
@@ -313,6 +334,9 @@ _Update this section when you hit a non-obvious issue._
 - **Always verify locally first**: Multiple production hotfixes came from not checking in browser. Never push without user approval.
 - **Rebase conflicts can lose files**: After conflict resolution, always verify expected files are still present with `git ls-tree`.
 - **Protected branches**: Both `development` and `main` require PRs + passing CI. Cannot push directly.
+- **Codex config schema**: `.codex/config.toml` must not contain `[instructions]` / `developer_instructions`; that causes `invalid type: map, expected a string` during skill reload.
+- **Skill YAML descriptions**: A single-line frontmatter description containing `context:` or similar colon text can break skill loading. Use folded YAML blocks for long descriptions and validate all `SKILL.md` frontmatter after edits.
+- **Instruction-surface sync**: When workflow or agent rules change, update `AGENTS.md`, `CLAUDE.md`, `.cursor/rules/`, `.agents/skills/`, and `.codex/agents/` together so future sessions do not inherit stale rules.
 
 ## Key Constraints
 

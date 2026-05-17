@@ -47,7 +47,7 @@ No external dependencies. No runtime. Pure TypeScript compute in the browser.
 | Final QA | qa-reviewer |
 
 ## Release Flow
-feature branch → PR to development → CI → merge → release PR (dev→main) → tag → GitHub Release
+feature branch → PR to development → CI → merge → release PR (dev→main) → annotated tag → GitHub Release
 
 QA + Security gates mandatory before every release to main.
 

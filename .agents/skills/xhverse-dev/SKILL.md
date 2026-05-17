@@ -12,7 +12,7 @@ This skill provides the full context for working productively in xhverse-site �
 - **Framework**: Astro 6, static output
 - **Styling**: Tailwind CSS v4 via `@tailwindcss/vite` plugin
 - **Runtime**: Bun (package manager + scripts), Node 22.16.0 (pinned in `.node-version`)
-- **Data**: Static TypeScript modules in `src/data/` with optional Supabase overlay for blog posts at build time
+- **Data**: Static TypeScript modules in `src/data/` with optional Supabase overlay for blog posts at build time and selected runtime submissions
 - **Deploy**: Cloudflare Pages via Git integration (no manual deploys)
 
 ## Commands
@@ -59,8 +59,22 @@ Single test file: `bunx vitest run src/data/blog.test.ts`
 - When adding logic to `src/data/` or `src/lib/`, you must add matching tests that maintain 100% coverage
 
 ### Tools Page
-- `/tools/data-platform-maturity-checker`: Interactive assessment with scoring in `src/lib/data-platform-maturity/`
-- Stores anonymous benchmark data via Supabase
+- `/tools/data-platform-maturity-checker`: Assessment with benchmark persistence
+- `/tools/governance-scorecard`: Assessment with blockers and action plan
+- `/tools/architecture-roulette`: Decision game with agreement tracking
+- `/tools/data-stack-roast`: Dropdown generator
+- `/tools/sql-deathmatch`: SQL challenge game
+- `/tools/lakehouse-cost-calculator`: Cost estimator
+- `/tools/spark-explained`: Pipeline visualizer
+
+## Agent Surfaces
+
+- `AGENTS.md`: compact repo contract
+- `CLAUDE.md`: full onboarding and implementation guide
+- `.cursor/rules/*.mdc`: Cursor rule surfaces
+- `.agents/skills/*/SKILL.md`: Codex skills; keep YAML frontmatter valid
+- `.codex/agents/*.toml`: repo-local sub-agent role cards
+- `.codex/config.toml`: runtime config only; never add `[instructions]` or `developer_instructions`
 
 ## Constraints
 
@@ -70,6 +84,7 @@ Single test file: `bunx vitest run src/data/blog.test.ts`
 - Keep `.node-version`, CI workflow, and Cloudflare Pages runtime aligned
 - Keep `bun.lock` in sync — never bypass `--frozen-lockfile`
 - CSP headers enforced in production via `<meta>` in BaseLayout — update if adding external resources
+- For long skill descriptions, use YAML folded blocks (`description: >-`) so colons do not break skill loading
 - Prefer minimal diffs; avoid unrelated refactors
 - Dark, minimal, professional design language
 

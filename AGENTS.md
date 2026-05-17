@@ -61,13 +61,23 @@ src/pages/tools/<slug>.astro → Page with <script> block
 - **CSP**: Dual-layer (edge `_headers` + HTML meta tag) — must stay synced
 - **Theme**: Dark default, light via `html.light`. Anti-FOUC inline script.
 
+## Agent Knowledge Surfaces
+
+- **AGENTS.md**: Compact operating contract for all agents
+- **CLAUDE.md**: Full repo onboarding and implementation guide
+- **.cursor/rules/*.mdc**: Cursor rule surfaces for project, git, testing, Cloudflare, and code quality
+- **.agents/skills/*/SKILL.md**: Repo skills; frontmatter must be valid YAML
+- **.codex/agents/*.toml**: Repo-local sub-agent role definitions
+- **.codex/config.toml**: Codex runtime config only. Do not add `[instructions]` or `developer_instructions` tables here; put repo guidance in AGENTS.md, CLAUDE.md, skills, or rules.
+
 ## Branch & Release Rules
 
 1. **NEVER edit on `development` or `main`** — create a feature branch first
 2. **ALWAYS branch from `development`** — never from `main`
 3. **ALL PRs target `development`** — release PRs are `development` → `main`
-4. **ALWAYS show user in browser before push** — no exceptions
-5. **QA + Security gate every release** — both must PASS
+4. **ALWAYS create an annotated release tag with a useful message after `main` promotion**
+5. **ALWAYS show user in browser before push** — no exceptions
+6. **QA + Security gate every release** — both must PASS
 
 ## Non-Negotiable Constraints
 
@@ -84,10 +94,13 @@ src/pages/tools/<slug>.astro → Page with <script> block
 | Agent | Owns | Key Rules |
 |-------|------|-----------|
 | **engineering-lead** | Architecture, coordination, code review | Plans first, delegates to specialists |
-| **backend-engineer** | `src/data/`, `src/lib/`, tests, types, Supabase | 100% coverage, no `any`, mock externals |
+| **site-planner** | Read-heavy planning, file-level implementation scopes | No edits; define owners, risks, and checks |
+| **astro-builder** | Production Astro page/component implementation | Follow existing page patterns and visual system |
 | **frontend-engineer** | Pages, components, layouts, styling, a11y | addEventListener only, mobile-first, both themes |
+| **backend-engineer** | `src/data/`, `src/lib/`, tests, types, Supabase | 100% coverage, no `any`, mock externals |
 | **platform-engineer** | CI, CSP, headers, Cloudflare, build pipeline | Dual-layer CSP sync, `generate-headers.ts` |
 | **product-manager** | Feature strategy, roadmap, UX decisions | Business case for every recommendation |
+| **qa-reviewer** | Read-only regression, a11y, security, release readiness | Findings first; verify with real commands |
 
 ## Content & Identity
 
@@ -105,3 +118,5 @@ src/pages/tools/<slug>.astro → Page with <script> block
 - `bun run check` passes (typecheck + build + coverage + e2e)
 - User has verified in browser (both themes, mobile viewport)
 - Final summary includes: changed files, risks, verification status
+
+For docs, rule, skill, or Codex-config-only changes, validate the relevant Markdown/YAML/TOML surfaces and state clearly that app runtime tests were not run.
