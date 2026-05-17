@@ -4,9 +4,3 @@ sandbox_mode = "workspace-write"
 [agents]
 max_threads = 4
 max_depth = 1
-
-[instructions]
-developer_instructions = """
-Read AGENTS.md and CLAUDE.md before editing. Follow the xhverse-site branch,
-testing, CSP, QA, security, and release rules defined in those files.
-"""
