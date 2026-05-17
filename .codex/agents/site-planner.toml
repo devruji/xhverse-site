@@ -43,7 +43,7 @@ Each tool needs:
 ## Rules
 - Do not edit code — plan only
 - Use development as default base branch
-- Account for release flow: dev→main PR, tag, GitHub Release
+- Account for release flow: dev→main PR, annotated tag, GitHub Release
 - Do not plan Supabase work unless user explicitly includes it
 - Prefer minimal-change paths
 """

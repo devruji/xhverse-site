@@ -34,6 +34,14 @@ src/lib/<tool>/   (data + logic + tests)  ← backend-engineer
 src/pages/tools/<slug>.astro (UI + script) ← frontend-engineer
 ```
 
+## Agent Instruction Surfaces
+- `AGENTS.md` is the compact operating contract.
+- `CLAUDE.md` is the full repo onboarding guide.
+- `.cursor/rules/*.mdc` are Cursor-specific rules.
+- `.agents/skills/*/SKILL.md` are Codex skills; frontmatter must be valid YAML.
+- `.codex/agents/*.toml` are repo-local sub-agent role cards.
+- `.codex/config.toml` is runtime config only. Do not add `[instructions]` or `developer_instructions` tables; that shape breaks Codex skill reload.
+
 ## Code Rules
 - No `any` types — explicit types on all public APIs
 - No comments unless WHY is non-obvious
@@ -47,7 +55,7 @@ src/pages/tools/<slug>.astro (UI + script) ← frontend-engineer
 - Branch from `development` — never `main`
 - **NEVER** edit on `development` or `main` — create branch first
 - All PRs target `development`
-- Release: `development` → `main` PR → tag `vX.Y.Z` → GitHub Release
+- Release: `development` → `main` PR → annotated tag `vX.Y.Z` with a useful message → GitHub Release
 - Verify in browser (both themes, mobile) before pushing
 - QA + Security gate every release
 

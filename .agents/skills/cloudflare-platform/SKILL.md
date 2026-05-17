@@ -1,6 +1,15 @@
 ---
 name: cloudflare-platform
-description: Guide for working with the full Cloudflare platform — Pages, Workers, R2, D1, KV, DNS, and edge configuration. Use this skill whenever the user mentions Cloudflare in any context: deploying to Pages, configuring _headers or _redirects, setting up Workers or Functions, managing R2 buckets, D1 databases, KV namespaces, DNS records, custom domains, or environment variables. Also trigger when discussing CDN caching, edge logic, security headers for Cloudflare-hosted sites, or debugging Cloudflare-specific deployment issues. If the user mentions "deploy", "production", "preview URL", or "edge" in the context of this project, use this skill.
+description: >-
+  Guide for working with the full Cloudflare platform — Pages, Workers, R2,
+  D1, KV, DNS, and edge configuration. Use this skill whenever the user
+  mentions Cloudflare in any context: deploying to Pages, configuring _headers
+  or _redirects, setting up Workers or Functions, managing R2 buckets, D1
+  databases, KV namespaces, DNS records, custom domains, or environment
+  variables. Also trigger when discussing CDN caching, edge logic, security
+  headers for Cloudflare-hosted sites, or debugging Cloudflare-specific
+  deployment issues. If the user mentions "deploy", "production", "preview
+  URL", or "edge" in the context of this project, use this skill.
 ---
 
 # Cloudflare Platform Guide
