@@ -45,6 +45,15 @@ To add a domain: update BOTH layers → `bun run build && grep "domain" dist/_he
 - Node version: 22.16.0 (pinned in .node-version)
 - Admin routes: /admin/* behind Cloudflare Access (Zero Trust, email OTP)
 
+## Repo MCP & Connector Policy
+
+- Own `.codex/config.toml` runtime changes with engineering-lead review.
+- Keep Cloudflare repo-scoped because it supports Pages, Access, Turnstile, security headers, and deploy checks.
+- Keep Supabase available only for explicit backend/data/RLS/storage/auth/admin work.
+- Do not add Notion to this repo.
+- Store only env var names in git, never bearer tokens or service-role keys.
+- Validate with TOML parsing, `codex mcp list` inside and outside the repo, and a secret scan after MCP/config changes.
+
 ## Supabase Edge Functions (Deno runtime)
 - send-cv/index.ts — triggered on UPDATE (status→approved), sends CV PDF via Resend
 - notify-cv-request/index.ts — triggered on INSERT, emails admin about new request

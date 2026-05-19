@@ -155,12 +155,12 @@ Repo-local sub-agent definitions live in `.codex/agents/*.toml`. Use them for ex
 
 | Agent | Role | When to use |
 |-------|------|-------------|
-| `engineering-lead` | Architecture, coordination, code review | Multi-concern tasks, architecture decisions, release planning |
+| `engineering-lead` | Architecture, coordination, code review | Multi-concern tasks, architecture decisions, release planning, agent-surface governance |
 | `site-planner` | Read-heavy implementation planning | File-level plans, owner split, risks, verification scope |
 | `astro-builder` | Production Astro implementation | Page/component changes that need direct Astro execution |
 | `frontend-engineer` | UI, Astro pages, styling, themes, a11y | Visual work, responsive fixes, interactive tool UIs |
 | `backend-engineer` | Data layer, tests, types, Supabase | `src/data/`, `src/lib/`, coverage, type errors |
-| `platform-engineer` | Deploy, CI, CSP, Cloudflare | CI failures, headers, build pipeline, edge/platform work |
+| `platform-engineer` | Deploy, CI, CSP, Cloudflare | CI failures, headers, build pipeline, edge/platform work, repo MCP config |
 | `product-manager` | Product strategy, roadmap, content direction | Feature evaluation, prioritization, business rationale |
 | `qa-reviewer` | Read-only QA and release readiness | Regression review, a11y, security, release gate findings |
 
@@ -180,6 +180,7 @@ Repo-local sub-agent definitions live in `.codex/agents/*.toml`. Use them for ex
 | `testing` | `src/data/**`, `src/lib/**` | 100% coverage on all 4 metrics, mock externals |
 | `cloudflare` | `*.astro`, `scripts/**`, `_headers` | `data-cfasync="false"`, no onclick, CSP dual-layer |
 | `git-workflow` | All files | Branch from development, verify locally before push |
+| `agent-surfaces` | Agent/rule/config files | Keep skills, rules, memory notes, and repo MCP config synchronized |
 
 ## Available Skills (`.agents/skills/`)
 
@@ -192,6 +193,7 @@ Repo-local sub-agent definitions live in `.codex/agents/*.toml`. Use them for ex
 | `document-writer` | Technical docs, blog posts, ADRs |
 | `cloudflare-platform` | Cloudflare Pages/Workers/DNS config |
 | `supabase-backend` | Database, auth, storage work |
+| `agent-surface-maintenance` | Skills, rules, memory notes, Codex config, and repo-scoped MCP upkeep |
 | `qa-expert` | Pre-release regression gate |
 | `security-audit-expert` | Security audit (pre-release + on demand) |
 | `seo-metadata-check` | Quick single-page SEO review |
@@ -210,9 +212,25 @@ sandbox_mode = "workspace-write"
 [agents]
 max_threads = 4
 max_depth = 1
+
+[plugins."cloudflare@openai-curated"]
+enabled = true
+
+[plugins."supabase@openai-curated"]
+enabled = true
+
+[mcp_servers.cloudflare-api]
+url = "https://mcp.cloudflare.com/mcp"
+bearer_token_env_var = "CLOUDFLARE_API_TOKEN"
 ```
 
 Do not add `[instructions]` or `developer_instructions` tables. Newer Codex config parsing treats that shape as invalid and blocks skill reload. Keep repo guidance in `AGENTS.md`, `CLAUDE.md`, `.cursor/rules/`, `.agents/skills/`, and `.codex/agents/`.
+
+Repo MCP policy:
+- Keep Cloudflare repo-scoped because it supports Pages, Access, Turnstile, security headers, and deployment checks.
+- Keep Supabase available for explicit backend/data/RLS/storage/auth/admin work.
+- Do not add Notion here; xhverse does not use it.
+- Store only env var names in git, never token values.
 
 ## Lessons Learned
 
@@ -232,6 +250,7 @@ Do not add `[instructions]` or `developer_instructions` tables. Newer Codex conf
 - **Codex config schema**: `.codex/config.toml` must not contain `[instructions]` / `developer_instructions`; that causes `invalid type: map, expected a string` during skill reload.
 - **Skill YAML descriptions**: A single-line frontmatter description containing `context:` or similar colon text can break skill loading. Use folded YAML blocks for long descriptions and validate all `SKILL.md` frontmatter after edits.
 - **Instruction-surface sync**: When workflow or agent rules change, update `AGENTS.md`, `CLAUDE.md`, `.cursor/rules/`, `.agents/skills/`, and `.codex/agents/` together so future sessions do not inherit stale rules.
+- **Repo-scoped MCP curation**: Prefer a small project-relevant set. Cloudflare is default for xhverse; Supabase is task-scoped; Notion stays out of this repo.
 
 ## Key Constraints
 

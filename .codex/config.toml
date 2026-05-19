@@ -10,6 +10,9 @@ max_depth = 1
 [plugins."cloudflare@openai-curated"]
 enabled = true
 
+[plugins."supabase@openai-curated"]
+enabled = true
+
 [mcp_servers.cloudflare-api]
 url = "https://mcp.cloudflare.com/mcp"
 bearer_token_env_var = "CLOUDFLARE_API_TOKEN"

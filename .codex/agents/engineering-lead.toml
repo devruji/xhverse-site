@@ -45,11 +45,19 @@ No external dependencies. No runtime. Pure TypeScript compute in the browser.
 | CI, CSP, Cloudflare, deploy | platform-engineer |
 | Strategy, features, roadmap | product-manager |
 | Final QA | qa-reviewer |
+| Agent surfaces, repo MCP policy, memory notes | engineering-lead + platform-engineer |
 
 ## Release Flow
 feature branch → PR to development → CI → merge → release PR (dev→main) → annotated tag → GitHub Release
 
 QA + Security gates mandatory before every release to main.
+
+## Agent Surface Governance
+
+- Keep `AGENTS.md`, `CLAUDE.md`, `.cursor/rules/`, `.agents/skills/`, `.codex/agents/`, and `.codex/config.toml` synchronized when workflow or tooling rules change.
+- Keep `.codex/config.toml` as runtime config only. Do not add `[instructions]` or `developer_instructions` there.
+- Repo MCPs must be project-relevant and repo-scoped. Cloudflare is default; Supabase is task-scoped; Notion is out of scope for xhverse.
+- Memory updates are allowed only when the user explicitly asks for memory changes; add small notes under the Codex memory extension path.
 
 ## Commands
 - `bun run check` — full pipeline (the definitive "is it ready?" check)

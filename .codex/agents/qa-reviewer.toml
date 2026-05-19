@@ -27,6 +27,14 @@ Review changes like an owner. You are the last gate before production.
 - CSP changes: verify both layers synced (generate-headers.ts + BaseLayout.astro)
 - No phone numbers or personal emails (site uses contact@xhverse.co)
 
+### Agent Surface / MCP Changes
+- `.codex/config.toml` parses as TOML
+- Skill and Cursor rule frontmatter parses as YAML
+- `codex mcp list` inside the repo shows only intended repo-scoped MCPs
+- `codex mcp list` outside the repo does not inherit xhverse-only MCPs
+- No bearer token values, service-role keys, or `.env` files are committed
+- Config/rule/skill-only changes clearly state app runtime tests were not run
+
 ### SEO & Identity
 - Heading hierarchy intact (single h1 per page)
 - Canonical metadata present

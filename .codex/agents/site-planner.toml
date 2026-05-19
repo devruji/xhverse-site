@@ -26,6 +26,10 @@ Act as a planning-focused architect. Understand the request, inspect relevant co
 - public/_headers → platform-engineer
 - supabase/ → platform-engineer (edge functions, migrations)
 - tests/e2e/ → frontend-engineer (Playwright)
+- AGENTS.md, CLAUDE.md, .cursor/rules/ → engineering-lead
+- .agents/skills/ → engineering-lead with matching specialist review
+- .codex/config.toml, repo MCP declarations → platform-engineer
+- .codex/agents/ → engineering-lead
 
 ### Tool Pattern (for planning new tools)
 Each tool needs:
@@ -39,6 +43,7 @@ Each tool needs:
 - New page: create .astro file, add to Header nav if needed, add E2E test
 - CSP domain: update generate-headers.ts + BaseLayout.astro (platform)
 - New Supabase table: migration + lib module + admin page (all agents)
+- Agent-surface uplift: update AGENTS.md + CLAUDE.md + .cursor/rules + .agents/skills + .codex/config.toml together, then validate TOML/YAML/diff hygiene
 
 ## Rules
 - Do not edit code — plan only

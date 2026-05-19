@@ -65,10 +65,12 @@ src/pages/tools/<slug>.astro → Page with <script> block
 
 - **AGENTS.md**: Compact operating contract for all agents
 - **CLAUDE.md**: Full repo onboarding and implementation guide
-- **.cursor/rules/*.mdc**: Cursor rule surfaces for project, git, testing, Cloudflare, and code quality
+- **.cursor/rules/*.mdc**: Cursor rule surfaces for project, git, testing, Cloudflare, code quality, and agent-surface maintenance
 - **.agents/skills/*/SKILL.md**: Repo skills; frontmatter must be valid YAML
 - **.codex/agents/*.toml**: Repo-local sub-agent role definitions
 - **.codex/config.toml**: Codex runtime config only. Do not add `[instructions]` or `developer_instructions` tables here; put repo guidance in AGENTS.md, CLAUDE.md, skills, or rules.
+- **Memory updates**: Only when explicitly requested. Add small notes under `/Users/bossruji/.codex/memories/extensions/ad_hoc/notes/`; do not edit generated memory files directly.
+- **Repo-scoped MCPs**: Declare only project-relevant MCPs/connectors in `.codex/config.toml`. Store env var names, never token values. Do not add Notion for this repo.
 
 ## Branch & Release Rules
 
@@ -93,14 +95,21 @@ src/pages/tools/<slug>.astro → Page with <script> block
 
 | Agent | Owns | Key Rules |
 |-------|------|-----------|
-| **engineering-lead** | Architecture, coordination, code review | Plans first, delegates to specialists |
+| **engineering-lead** | Architecture, coordination, code review, agent-surface governance | Plans first, delegates to specialists |
 | **site-planner** | Read-heavy planning, file-level implementation scopes | No edits; define owners, risks, and checks |
 | **astro-builder** | Production Astro page/component implementation | Follow existing page patterns and visual system |
 | **frontend-engineer** | Pages, components, layouts, styling, a11y | addEventListener only, mobile-first, both themes |
 | **backend-engineer** | `src/data/`, `src/lib/`, tests, types, Supabase | 100% coverage, no `any`, mock externals |
-| **platform-engineer** | CI, CSP, headers, Cloudflare, build pipeline | Dual-layer CSP sync, `generate-headers.ts` |
+| **platform-engineer** | CI, CSP, headers, Cloudflare, build pipeline, repo MCP config | Dual-layer CSP sync, `generate-headers.ts`, no secrets in config |
 | **product-manager** | Feature strategy, roadmap, UX decisions | Business case for every recommendation |
 | **qa-reviewer** | Read-only regression, a11y, security, release readiness | Findings first; verify with real commands |
+
+## Repo-Scoped MCP Policy
+
+- **Cloudflare**: Default repo MCP because xhverse runs on Cloudflare Pages and uses Access, Turnstile, security headers, and deployment checks.
+- **Supabase**: Allowed only for explicit backend/data/RLS/storage/auth/admin work.
+- **Notion**: Not used by xhverse; keep it out of repo config.
+- **Secrets**: Never commit bearer tokens, service-role keys, or `.env` files. Use env var references only.
 
 ## Content & Identity
 
