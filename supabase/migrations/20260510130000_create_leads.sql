@@ -28,6 +28,7 @@ create policy "leads_authenticated_all"
 
 revoke all on table public.leads from anon, authenticated;
 grant select, insert, update, delete on table public.leads to authenticated;
+grant select, insert, update, delete on table public.leads to service_role;
 
 comment on table public.leads is
   'Unified leads from CV requests, maturity tool, governance tool, and contact form. Managed by authenticated admin users only.';

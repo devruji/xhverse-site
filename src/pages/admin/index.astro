@@ -10,7 +10,7 @@ import AdminLayout from "../../layouts/AdminLayout.astro";
     </p>
   </div>
 
-  <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+  <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
     <div class="border border-white/10 bg-white/[0.03] p-4">
       <p class="text-[11px] uppercase tracking-[0.22em] text-zinc-500">CV Requests</p>
       <p id="stat-cv" class="mt-2 text-2xl font-semibold text-white">-</p>
@@ -22,6 +22,10 @@ import AdminLayout from "../../layouts/AdminLayout.astro";
     <div class="border border-white/10 bg-white/[0.03] p-4">
       <p class="text-[11px] uppercase tracking-[0.22em] text-zinc-500">Leads</p>
       <p id="stat-leads" class="mt-2 text-2xl font-semibold text-white">-</p>
+    </div>
+    <div class="border border-white/10 bg-white/[0.03] p-4">
+      <p class="text-[11px] uppercase tracking-[0.22em] text-zinc-500">SCD Lab Joins</p>
+      <p id="stat-scd-joins" class="mt-2 text-2xl font-semibold text-emerald-200">-</p>
     </div>
     <div class="border border-white/10 bg-white/[0.03] p-4">
       <p class="text-[11px] uppercase tracking-[0.22em] text-zinc-500">Blog Posts</p>
@@ -46,16 +50,18 @@ import AdminLayout from "../../layouts/AdminLayout.astro";
     async function loadDashboard(): Promise<void> {
       if (!client) return;
 
-      const [cvResult, maturityResult, leadsResult, postsResult] = await Promise.all([
+      const [cvResult, maturityResult, leadsResult, scdResult, postsResult] = await Promise.all([
         client.from("cv_download_requests").select("id, status, email, requested_at", { count: "exact", head: false }),
         client.from("data_platform_maturity_submissions").select("id, contact_email, created_at", { count: "exact", head: false }),
         client.from("leads").select("id", { count: "exact", head: true }),
+        client.from("scd_design_lab_progress").select("session_id, email, joined_at, last_seen_at, progress_status", { count: "exact", head: false }),
         client.from("posts").select("id", { count: "exact", head: true }),
       ]);
 
       const statCv = document.querySelector("#stat-cv");
       const statMaturity = document.querySelector("#stat-maturity");
       const statLeads = document.querySelector("#stat-leads");
+      const statScdJoins = document.querySelector("#stat-scd-joins");
       const statPosts = document.querySelector("#stat-posts");
       const alertStrip = document.querySelector("#alert-strip");
       const alertCount = document.querySelector("#alert-pending-count");
@@ -63,6 +69,7 @@ import AdminLayout from "../../layouts/AdminLayout.astro";
       if (statCv) statCv.textContent = String(cvResult.count ?? cvResult.data?.length ?? 0);
       if (statMaturity) statMaturity.textContent = String(maturityResult.count ?? maturityResult.data?.length ?? 0);
       if (statLeads) statLeads.textContent = String(leadsResult.count ?? 0);
+      if (statScdJoins) statScdJoins.textContent = String((scdResult.data ?? []).filter((r: { email: string | null }) => r.email).length);
       if (statPosts) statPosts.textContent = String(postsResult.count ?? 0);
 
       const pendingCount = (cvResult.data ?? []).filter(
@@ -86,6 +93,11 @@ import AdminLayout from "../../layouts/AdminLayout.astro";
           .filter((r: { contact_email: string | null }) => r.contact_email)
           .map((r: { contact_email: string | null; created_at: string }) => ({
             type: "Maturity Submission", email: r.contact_email as string, date: r.created_at,
+          })),
+        ...(scdResult.data ?? [])
+          .filter((r: { email: string | null }) => r.email)
+          .map((r: { email: string | null; joined_at: string | null; last_seen_at: string }) => ({
+            type: "SCD Lab Join", email: r.email as string, date: r.joined_at ?? r.last_seen_at,
           })),
       ];
 

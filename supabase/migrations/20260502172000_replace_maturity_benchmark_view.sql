@@ -52,6 +52,7 @@ create policy "data_platform_maturity_benchmark_select"
 
 revoke all on table public.data_platform_maturity_benchmark from anon, authenticated;
 grant select on table public.data_platform_maturity_benchmark to anon, authenticated;
+grant select, insert, update, delete on table public.data_platform_maturity_benchmark to service_role;
 
 create schema if not exists private;
 

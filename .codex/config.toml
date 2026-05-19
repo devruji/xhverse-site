@@ -4,3 +4,18 @@ sandbox_mode = "workspace-write"
 [agents]
 max_threads = 4
 max_depth = 1
+
+[plugins."notion@openai-curated"]
+enabled = true
+
+[plugins."supabase@openai-curated"]
+enabled = true
+
+[apps.asdk_app_69c18c28f1188191bf5b8445c4ab0a2e.tools.notion_notion-update-page]
+approval_mode = "approve"
+
+[apps.asdk_app_69d3e5ee6a708191baa733f7b8931995.tools.supabase_apply_migration]
+approval_mode = "approve"
+
+[apps.asdk_app_69d3e5ee6a708191baa733f7b8931995.tools.supabase_execute_sql]
+approval_mode = "approve"
