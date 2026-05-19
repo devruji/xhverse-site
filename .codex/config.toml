@@ -5,15 +5,16 @@ sandbox_mode = "workspace-write"
 max_threads = 4
 max_depth = 1
 
-[plugins."notion@openai-curated"]
+# xhverse uses Cloudflare for Pages, Access, Turnstile, security headers, and deploy checks.
+# Keep Cloudflare enabled here so it is available only when working in this repo.
+[plugins."cloudflare@openai-curated"]
 enabled = true
 
-[plugins."supabase@openai-curated"]
-enabled = true
+[mcp_servers.cloudflare-api]
+url = "https://mcp.cloudflare.com/mcp"
+bearer_token_env_var = "CLOUDFLARE_API_TOKEN"
 
-[apps.asdk_app_69c18c28f1188191bf5b8445c4ab0a2e.tools.notion_notion-update-page]
-approval_mode = "approve"
-
+# Supabase is repo-scoped because xhverse owns public forms, admin data, and migrations.
 [apps.asdk_app_69d3e5ee6a708191baa733f7b8931995.tools.supabase_apply_migration]
 approval_mode = "approve"
 
