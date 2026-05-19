@@ -75,6 +75,7 @@ Single test file: `bunx vitest run src/data/blog.test.ts`
 - `.agents/skills/*/SKILL.md`: Codex skills; keep YAML frontmatter valid
 - `.codex/agents/*.toml`: repo-local sub-agent role cards
 - `.codex/config.toml`: runtime config only; never add `[instructions]` or `developer_instructions`
+- `.agents/skills/agent-surface-maintenance/SKILL.md`: use for skills, rules, memory notes, Codex config, and repo-scoped MCP upkeep
 
 ## Constraints
 
