@@ -8,7 +8,7 @@ globs: ["**"]
 - **NEVER** edit files while on `development` or `main` — create a feature/fix branch FIRST
 - Before any edit: `git branch --show-current` — if it's `development` or `main`, STOP and branch
 - Feature branches: PR to `development`
-- Releases: PR from `development` → `main`, then tag + GitHub Release
+- Releases: PR from `development` → `main`, then annotated tag + GitHub Release
 - Never commit directly to `main` or `development`
 - Both branches are protected — direct push blocked, CI required
 
@@ -27,7 +27,7 @@ git clean -fd --dry-run     # Check for untracked contamination
 ## Release Flow
 1. Feature branch → PR to development → CI passes → merge
 2. Release PR: development → main → CI passes → merge
-3. Tag exact main commit: `git tag vX.Y.Z origin/main`
+3. Tag exact main commit with an annotated, useful message: `git tag -a vX.Y.Z -m "vX.Y.Z: concise release summary" origin/main`
 4. Push tag: `git push origin vX.Y.Z`
 5. Create GitHub Release (mark as Latest)
 6. Check latest tag FIRST: `git tag --sort=-v:refname | head -1`

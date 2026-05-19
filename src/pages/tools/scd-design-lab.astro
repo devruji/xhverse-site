@@ -1,0 +1,877 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+import { scdScenarios, scdStrategies, strategyLabels } from "../../lib/scd-design-lab/scenarios";
+
+const scdTypeGuide = [
+  {
+    type: "Type 0",
+    name: "Retain original",
+    behavior: "Keep the first value and ignore later changes.",
+    useWhen: "The attribute is immutable or should not change analytically.",
+    avoidWhen: "The business expects corrected or current values.",
+    example: "Original signup channel, first acquisition source.",
+  },
+  {
+    type: "Type 1",
+    name: "Overwrite",
+    behavior: "Update the row in place and keep only the latest value.",
+    useWhen: "The change is a correction or only current state matters.",
+    avoidWhen: "Historical reports must reflect the value at transaction time.",
+    example: "Correcting a misspelled email or customer name.",
+  },
+  {
+    type: "Type 2",
+    name: "Add history row",
+    behavior: "Expire the old row and insert a new current row with effective dates.",
+    useWhen: "Facts need point-in-time joins to historical dimension state.",
+    avoidWhen: "The attribute changes too often or history adds no value.",
+    example: "Customer tier, store region, account ownership.",
+  },
+  {
+    type: "Type 3",
+    name: "Previous value",
+    behavior: "Store the current value and one previous value on the same row.",
+    useWhen: "The business only compares current vs immediately previous value.",
+    avoidWhen: "More than one historical transition must be reconstructed.",
+    example: "Current product category plus previous product category.",
+  },
+  {
+    type: "Type 6",
+    name: "Hybrid",
+    behavior: "Combine Type 1, Type 2, and Type 3 patterns in one dimension.",
+    useWhen: "Teams need both point-in-time history and current-state rollups.",
+    avoidWhen: "The model does not have strong ownership and test coverage.",
+    example: "Membership plan history plus latest plan on every version.",
+  },
+];
+---
+
+<BaseLayout
+  title="SCD Design Lab | XHVERSE"
+  description="Practice Slowly Changing Dimension design with realistic customer, product, and membership change scenarios."
+>
+  <div class="scd-lab-root min-h-screen bg-[var(--bg-page)] font-sans text-[var(--text)]">
+    <Header current="/tools" />
+    <main class="mx-auto max-w-7xl px-5 py-6 sm:px-8 sm:py-8 lg:px-10">
+      <section class="grid gap-8 py-10 sm:py-14 lg:grid-cols-[1fr_0.75fr] lg:items-end">
+        <div>
+          <p class="text-[12px] uppercase tracking-[0.32em] text-emerald-200">Data modeling tool</p>
+          <h1 class="mt-4 max-w-4xl text-[2.45rem] font-semibold leading-[0.98] tracking-tight text-white sm:text-[4rem]">
+            SCD Design Lab
+          </h1>
+          <p class="mt-6 max-w-2xl text-base leading-8 text-zinc-300 sm:text-lg">
+            Practice how customer, product, and membership changes should land in a dimension table. Choose a
+            strategy, inspect the rows, and see how the reporting answer changes.
+          </p>
+        </div>
+        <aside class="scd-practice-note p-5 text-sm leading-7">
+          <p class="scd-practice-note-label text-[11px] uppercase tracking-[0.24em]">Practice lab</p>
+          <p class="mt-3">
+            Work through realistic dimension changes and compare how each SCD strategy changes the table and the
+            reporting answer. Joining the lab is optional.
+          </p>
+        </aside>
+      </section>
+
+      <section class="grid gap-6 border-t border-white/10 py-8 lg:grid-cols-[0.85fr_1.12fr_0.88fr]">
+        <aside class="space-y-6">
+          <section class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+            <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Mode</p>
+            <div class="scd-mode-control mt-4 p-2">
+              <div id="mode-selector" class="scd-mode-selector grid gap-2" aria-label="Lab mode" aria-describedby="mode-help">
+                <button type="button" data-mode="guided" aria-pressed="true" class="mode-button scd-mode-button scd-mode-active min-h-11 border px-3 py-2 font-semibold uppercase transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70">
+                  Guided
+                </button>
+                <button type="button" data-mode="challenge" aria-pressed="false" class="mode-button scd-mode-button scd-mode-inactive min-h-11 border px-3 py-2 font-semibold uppercase transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70">
+                  Challenge
+                </button>
+                <button type="button" data-mode="sandbox" aria-pressed="false" class="mode-button scd-mode-button scd-mode-inactive min-h-11 border px-3 py-2 font-semibold uppercase transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70">
+                  Sandbox
+                </button>
+              </div>
+              <p id="mode-help" class="scd-mode-help mt-2 border-t px-2 pb-1 pt-3 text-xs leading-6">
+                Hints stay visible and every answer explains the tradeoff.
+              </p>
+            </div>
+          </section>
+
+          <section class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+            <div class="flex items-center justify-between gap-4">
+              <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Scenario</p>
+              <span id="progress-count" class="text-xs text-zinc-500">1 / {scdScenarios.length}</span>
+            </div>
+            <div id="scenario-list" class="mt-5 grid gap-2">
+              {scdScenarios.map((scenario, index) => (
+                <button
+                  type="button"
+                  data-scenario-id={scenario.id}
+                  class:list={[
+                    "scenario-button min-h-11 border px-3 py-2 text-left text-sm transition",
+                    index === 0
+                      ? "border-emerald-300/70 bg-emerald-300/10 text-white"
+                      : "border-white/10 bg-black/20 text-zinc-400 hover:border-emerald-300/50 hover:text-white",
+                  ]}
+                >
+                  <span class="block text-[10px] uppercase tracking-[0.16em] text-zinc-500">{scenario.entity}</span>
+                  <span class="mt-1 block font-medium">{scenario.title}</span>
+                </button>
+              ))}
+            </div>
+          </section>
+
+          <section class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+            <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Progress</p>
+            <div class="mt-4 grid grid-cols-5 gap-1" id="progress-dots" aria-label="Scenario progress"></div>
+            <p id="progress-help" class="mt-4 text-sm leading-7 text-zinc-400">Answer each scenario to build your SCD design score.</p>
+          </section>
+        </aside>
+
+        <section class="space-y-6">
+          <article class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+            <div class="flex flex-wrap items-center gap-2">
+              <span id="entity-badge" class="border border-cyan-300/30 bg-cyan-300/8 px-2 py-1 text-[10px] uppercase tracking-[0.16em] text-cyan-100"></span>
+              <span id="change-date" class="border border-white/10 bg-black/20 px-2 py-1 text-[10px] uppercase tracking-[0.16em] text-zinc-400"></span>
+            </div>
+            <h2 id="scenario-title" class="mt-4 text-2xl font-semibold tracking-tight text-white"></h2>
+            <p id="scenario-summary" class="mt-3 text-sm leading-7 text-zinc-300"></p>
+            <div class="mt-5 border border-white/10 bg-black/20 p-4">
+              <p class="text-[11px] uppercase tracking-[0.22em] text-zinc-500">Business question</p>
+              <p id="business-question" class="mt-2 text-sm leading-7 text-emerald-100"></p>
+            </div>
+          </article>
+
+          <section class="grid gap-6">
+            <div class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+              <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Before</p>
+              <div id="before-table" class="mt-4 overflow-x-auto"></div>
+            </div>
+            <div class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+              <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">After preview</p>
+              <p id="preview-explanation" class="mt-3 text-sm leading-7 text-zinc-400"></p>
+              <div id="after-table" class="mt-4 overflow-x-auto"></div>
+            </div>
+          </section>
+
+          <section class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+            <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Reporting impact</p>
+            <h3 id="impact-title" class="mt-3 text-lg font-semibold tracking-tight text-white"></h3>
+            <p id="impact-help" class="mt-2 text-sm leading-7 text-zinc-400"></p>
+            <div id="fact-impact" class="mt-4 grid gap-3 sm:grid-cols-2"></div>
+          </section>
+
+          <section id="feedback-panel" class="hidden border border-white/10 bg-white/[0.03] p-5 sm:p-6" aria-live="polite">
+            <div class="flex flex-wrap items-center gap-3">
+              <span id="verdict-badge" class="border px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em]"></span>
+              <span id="recommended-label" class="text-sm text-zinc-400"></span>
+            </div>
+            <p id="verdict-explanation" class="mt-4 text-sm leading-7 text-zinc-300"></p>
+            <p id="verdict-risk" class="mt-3 border-l border-amber-300/50 pl-3 text-sm leading-7 text-amber-100"></p>
+          </section>
+        </section>
+
+        <aside class="space-y-6 lg:sticky lg:top-6 lg:self-start">
+          <form id="decision-form" class="isolate border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+            <fieldset class="relative z-0 min-w-0">
+              <legend class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Decision</legend>
+              <p id="hint-text" class="mt-3 text-sm leading-7 text-zinc-400"></p>
+              <div class="mt-5 grid gap-2">
+                {scdStrategies.map((strategy) => (
+                  <label class="block min-h-11 cursor-pointer border border-white/10 bg-black/20 p-3 transition has-[:checked]:border-emerald-300/80 has-[:checked]:bg-emerald-300/10">
+                    <input class="peer sr-only" type="radio" name="strategy" value={strategy} />
+                    <span class="block text-sm font-semibold text-white">{strategyLabels[strategy]}</span>
+                    <span class="mt-1 block text-xs leading-5 text-zinc-500 peer-checked:text-zinc-300">
+                      {strategy === "type_1" && "Overwrite and keep only the latest value."}
+                      {strategy === "type_2" && "Expire the old row and insert a new current row."}
+                      {strategy === "type_3" && "Keep current value plus one previous value."}
+                      {strategy === "type_6" && "Blend Type 2 history with current-value reporting."}
+                      {strategy === "ignore" && "Reject or keep the original row unchanged."}
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+
+            <p id="decision-error" class="mt-4 hidden text-sm text-rose-200">Choose a strategy before submitting.</p>
+
+            <div class="relative z-50 mt-5 grid gap-3">
+              <button id="submit-decision" type="submit" class="min-h-11 bg-white px-5 py-3 text-sm font-semibold text-black transition hover:bg-emerald-100">
+                Submit decision
+              </button>
+              <button id="next-scenario" type="button" class="hidden min-h-11 border border-white/15 px-5 py-3 text-sm font-medium text-white transition hover:border-emerald-300/70">
+                Next scenario
+              </button>
+              <button id="reset-lab" type="button" class="min-h-11 border border-white/15 px-5 py-3 text-sm font-medium text-zinc-300 transition hover:border-emerald-300/70 hover:text-white">
+                Reset lab
+              </button>
+            </div>
+          </form>
+
+          <section id="result-panel" class="hidden border border-emerald-300/25 bg-emerald-300/8 p-5 sm:p-6" aria-live="polite">
+            <p class="text-[12px] uppercase tracking-[0.32em] text-emerald-200">Lab result</p>
+            <p id="final-score" class="mt-4 text-4xl font-semibold tracking-tight text-white"></p>
+            <p id="final-tier" class="mt-2 text-lg font-semibold text-emerald-100"></p>
+            <textarea id="brief-textarea" readonly class="mt-5 min-h-[10rem] w-full resize-y border border-white/10 bg-black/30 p-4 font-mono text-xs leading-6 text-zinc-300 outline-none"></textarea>
+            <button id="copy-brief" type="button" class="mt-3 min-h-11 w-full border border-white/15 px-4 py-2 text-sm font-medium text-white transition hover:border-emerald-300/70">
+              Copy brief
+            </button>
+            <p id="copy-status" class="mt-3 text-xs text-zinc-500"></p>
+          </section>
+
+          <form id="join-form" class="hidden border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+            <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Join the lab</p>
+            <p class="mt-3 text-sm leading-7 text-zinc-400">
+              Save your design signal so XH can see who is practicing the lab. This is optional.
+            </p>
+            <div class="mt-4 grid gap-3">
+              <label class="block">
+                <span class="text-sm font-medium text-zinc-200">Email</span>
+                <input id="join-email" type="email" autocomplete="email" required class="mt-2 w-full border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-emerald-300/70" placeholder="you@example.com" />
+              </label>
+              <label class="block">
+                <span class="text-sm font-medium text-zinc-200">Name</span>
+                <input id="join-name" type="text" autocomplete="name" class="mt-2 w-full border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-emerald-300/70" placeholder="Optional" />
+              </label>
+              <label class="block">
+                <span class="text-sm font-medium text-zinc-200">Company / role</span>
+                <input id="join-context" type="text" class="mt-2 w-full border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-emerald-300/70" placeholder="Optional" />
+              </label>
+              <label class="flex items-start gap-3 text-sm leading-6 text-zinc-300">
+                <input id="join-consent" type="checkbox" class="mt-1 accent-emerald-300" required />
+                <span>I consent to storing this lab join record for admin follow-up.</span>
+              </label>
+            </div>
+            <button type="submit" class="mt-4 min-h-11 w-full bg-white px-5 py-3 text-sm font-semibold text-black transition hover:bg-emerald-100">
+              Save my lab result
+            </button>
+            <p id="join-status" class="mt-3 text-xs leading-6 text-zinc-500"></p>
+          </form>
+        </aside>
+      </section>
+
+      <section id="scd-type-guide" class="border-t border-white/10 py-10 sm:py-14">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Knowledge guide</p>
+            <h2 class="mt-3 text-3xl font-semibold tracking-tight text-white">What each SCD type means.</h2>
+          </div>
+          <p class="max-w-2xl text-sm leading-7 text-zinc-400">
+            Use this as the quick reference while practicing. The type is only correct when it matches the business-time question.
+          </p>
+        </div>
+
+        <div class="mt-8 grid gap-4 lg:grid-cols-5">
+          {scdTypeGuide.map((item) => (
+            <article class="border border-white/10 bg-white/[0.03] p-5">
+              <p class="text-[11px] uppercase tracking-[0.2em] text-emerald-200">{item.type}</p>
+              <h3 class="mt-3 text-lg font-semibold tracking-tight text-white">{item.name}</h3>
+              <p class="mt-3 text-sm leading-7 text-zinc-300">{item.behavior}</p>
+              <dl class="mt-4 space-y-3 text-sm leading-6">
+                <div>
+                  <dt class="text-[10px] uppercase tracking-[0.16em] text-zinc-500">Use when</dt>
+                  <dd class="mt-1 text-zinc-300">{item.useWhen}</dd>
+                </div>
+                <div>
+                  <dt class="text-[10px] uppercase tracking-[0.16em] text-zinc-500">Avoid when</dt>
+                  <dd class="mt-1 text-zinc-400">{item.avoidWhen}</dd>
+                </div>
+                <div>
+                  <dt class="text-[10px] uppercase tracking-[0.16em] text-zinc-500">Example</dt>
+                  <dd class="mt-1 text-emerald-100">{item.example}</dd>
+                </div>
+              </dl>
+            </article>
+          ))}
+        </div>
+      </section>
+    </main>
+    <Footer />
+  </div>
+
+      <style is:global>
+        .scd-record-row {
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          background-color: rgba(0, 0, 0, 0.18);
+        }
+
+        .scd-row-inserted {
+          border-left: 3px solid rgba(110, 231, 183, 0.9);
+          background-color: rgba(16, 185, 129, 0.09);
+        }
+
+        .scd-row-expired {
+          border-left: 3px solid rgba(252, 211, 77, 0.9);
+          background-color: rgba(245, 158, 11, 0.1);
+        }
+
+        .scd-row-updated {
+          border-left: 3px solid rgba(103, 232, 249, 0.9);
+          background-color: rgba(6, 182, 212, 0.09);
+        }
+
+        .scd-row-unchanged {
+          border-left: 3px solid rgba(148, 163, 184, 0.35);
+        }
+
+        .scd-record-field {
+          min-width: 0;
+          display: flex;
+          align-items: baseline;
+          justify-content: space-between;
+          gap: 1rem;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+          padding: 0.7rem 0;
+        }
+
+        .scd-record-label {
+          flex: 0 0 auto;
+          min-width: 0;
+          max-width: 48%;
+          white-space: nowrap;
+        }
+
+        .scd-record-value {
+          flex: 1 1 auto;
+          min-width: 0;
+          overflow-wrap: break-word;
+          text-align: right;
+          word-break: normal;
+        }
+
+        .scd-record-mono {
+          overflow-wrap: normal;
+          white-space: nowrap;
+        }
+
+        html.light .scd-record-row {
+          border-color: rgba(15, 23, 42, 0.1);
+          background-color: rgba(15, 23, 42, 0.025);
+        }
+
+        html.light .scd-row-inserted {
+          border-left-color: rgba(5, 150, 105, 0.85);
+          background-color: rgba(5, 150, 105, 0.08);
+        }
+
+        html.light .scd-row-expired {
+          border-left-color: rgba(217, 119, 6, 0.85);
+          background-color: rgba(217, 119, 6, 0.09);
+        }
+
+        html.light .scd-row-updated {
+          border-left-color: rgba(14, 116, 144, 0.85);
+          background-color: rgba(14, 116, 144, 0.08);
+        }
+
+        html.light .scd-row-unchanged {
+          border-left-color: rgba(15, 23, 42, 0.18);
+        }
+
+        html.light .scd-record-field {
+          border-color: rgba(15, 23, 42, 0.08);
+        }
+
+        .scd-practice-note {
+          border: 1px solid rgba(103, 232, 249, 0.2);
+          background-color: rgba(34, 211, 238, 0.08);
+          color: #ecfeff;
+        }
+
+        .scd-practice-note-label {
+          color: rgba(165, 243, 252, 0.82);
+        }
+
+        html.light .scd-practice-note {
+          border-color: rgba(14, 116, 144, 0.28);
+          background-color: rgba(8, 145, 178, 0.06);
+          color: #164e63;
+        }
+
+        html.light .scd-practice-note-label {
+          color: #0e7490;
+        }
+
+        .scd-mode-control {
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          background-color: rgba(0, 0, 0, 0.16);
+        }
+
+        .scd-mode-selector {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .scd-mode-button {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          min-width: 0;
+          overflow: hidden;
+          padding-inline: 0.5rem;
+          text-align: center;
+          font-size: 0.625rem;
+          line-height: 1.1;
+          letter-spacing: 0.06em;
+          white-space: nowrap;
+        }
+
+        .scd-mode-active {
+          border-color: rgba(110, 231, 183, 0.7);
+          background-color: rgba(110, 231, 183, 0.12);
+          color: #d1fae5;
+          box-shadow: inset 0 0 0 1px rgba(110, 231, 183, 0.16);
+        }
+
+        .scd-mode-inactive {
+          border-color: rgba(255, 255, 255, 0.1);
+          background-color: rgba(0, 0, 0, 0.2);
+          color: #9ca3af;
+        }
+
+        .scd-mode-inactive:hover {
+          border-color: rgba(110, 231, 183, 0.5);
+          color: #f9fafb;
+        }
+
+        .scd-mode-help {
+          border-color: rgba(255, 255, 255, 0.1);
+          color: #9ca3af;
+        }
+
+        html.light .scd-mode-control {
+          border-color: rgba(15, 23, 42, 0.1);
+          background-color: rgba(15, 23, 42, 0.025);
+        }
+
+        html.light .scd-mode-active {
+          border-color: rgba(5, 150, 105, 0.65);
+          background-color: #d1fae5;
+          color: #064e3b;
+          box-shadow: inset 0 0 0 1px rgba(5, 150, 105, 0.2);
+        }
+
+        html.light .scd-mode-inactive {
+          border-color: rgba(15, 23, 42, 0.1);
+          background-color: rgba(15, 23, 42, 0.03);
+          color: #4b5563;
+        }
+
+        html.light .scd-mode-inactive:hover {
+          border-color: rgba(5, 150, 105, 0.45);
+          color: #111827;
+        }
+
+        html.light .scd-mode-help {
+          border-color: rgba(15, 23, 42, 0.1);
+          color: #4b5563;
+        }
+
+        html.light .scd-lab-root .text-emerald-100 {
+          color: #064e3b;
+        }
+
+        html.light .scd-lab-root .text-cyan-50,
+        html.light .scd-lab-root .text-cyan-100 {
+          color: #155e75;
+        }
+
+        html.light .scd-lab-root .text-amber-100 {
+          color: #92400e;
+        }
+
+        html.light .scd-lab-root .text-rose-100,
+        html.light .scd-lab-root .text-rose-200 {
+          color: #9f1239;
+        }
+
+        html.light .scd-lab-root .bg-emerald-300\/8 {
+          background-color: rgba(5, 150, 105, 0.08);
+        }
+
+        html.light .scd-lab-root .bg-cyan-300\/8 {
+          background-color: rgba(14, 116, 144, 0.07);
+        }
+
+        html.light .scd-lab-root .bg-amber-300\/8 {
+          background-color: rgba(217, 119, 6, 0.09);
+        }
+
+        html.light .scd-lab-root .bg-rose-300\/10 {
+          background-color: rgba(225, 29, 72, 0.08);
+        }
+      </style>
+
+      <script>
+    import {
+      buildLabBrief,
+      buildStrategyPreview,
+      calculateLabResult,
+      evaluateDesign,
+      type DesignEvaluation,
+      type PreviewRow,
+    } from "../../lib/scd-design-lab/engine";
+    import {
+      scdScenarios,
+      strategyLabels,
+      type DimensionRow,
+      type ScdScenario,
+      type ScdStrategy,
+    } from "../../lib/scd-design-lab/scenarios";
+    import {
+      buildJoinPayload,
+      buildTrackingEvent,
+      createScdDesignLabClient,
+      getOrCreateLabIdentity,
+      submitScdDesignLabJoin,
+      trackScdDesignLabEvent,
+      type LabIdentity,
+    } from "../../lib/scd-design-lab/tracking";
+
+    type LabMode = "guided" | "challenge" | "sandbox";
+
+    const client = createScdDesignLabClient(import.meta.env);
+    const identity: LabIdentity | null = typeof localStorage === "undefined"
+      ? null
+      : getOrCreateLabIdentity(localStorage);
+    const doNotTrack = navigator.doNotTrack;
+
+    const modeButtons = Array.from(document.querySelectorAll<HTMLButtonElement>(".mode-button"));
+    const scenarioButtons = Array.from(document.querySelectorAll<HTMLButtonElement>(".scenario-button"));
+    const decisionForm = document.querySelector<HTMLFormElement>("#decision-form");
+    const feedbackPanel = document.querySelector<HTMLElement>("#feedback-panel");
+    const resultPanel = document.querySelector<HTMLElement>("#result-panel");
+    const joinForm = document.querySelector<HTMLFormElement>("#join-form");
+    const strategyInputs = Array.from(document.querySelectorAll<HTMLInputElement>('input[name="strategy"]'));
+
+    let mode: LabMode = "guided";
+    let currentIndex = 0;
+    let selectedStrategy: ScdStrategy = "type_2";
+    let answers: Record<string, ScdStrategy> = {};
+    let latestEvaluation: DesignEvaluation | null = null;
+
+    function escapeHtml(text: string): string {
+      const div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function formatCurrency(amount: number): string {
+      return new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(amount);
+    }
+
+    function scenario(): ScdScenario {
+      return scdScenarios[currentIndex];
+    }
+
+    function track(eventType: Parameters<typeof buildTrackingEvent>[1]["eventType"], progressPercent: number, resultKey: string | null = null): void {
+      if (!identity) return;
+      const current = scenario();
+      const payload = buildTrackingEvent(identity, {
+        eventType,
+        stepId: current.id,
+        stepIndex: currentIndex + 1,
+        totalSteps: scdScenarios.length,
+        progressPercent,
+        resultKey,
+        payload: {
+          scenario: current.id,
+          strategy: selectedStrategy,
+          mode,
+        },
+      });
+      void trackScdDesignLabEvent(client, payload, doNotTrack);
+    }
+
+    function rowStateClass(row: PreviewRow | DimensionRow): string {
+      if (!("state" in row)) return "scd-row-unchanged";
+      if (row.state === "inserted") return "scd-row-inserted";
+      if (row.state === "expired") return "scd-row-expired";
+      if (row.state === "updated") return "scd-row-updated";
+      return "scd-row-unchanged";
+    }
+
+    function rowStateLabel(row: PreviewRow | DimensionRow): string {
+      if (!("state" in row)) return row.isCurrent ? "Current row" : "Historical row";
+      if (row.state === "inserted") return "New current row";
+      if (row.state === "expired") return "Expired row";
+      if (row.state === "updated") return "Updated row";
+      return row.isCurrent ? "Current row" : "Unchanged row";
+    }
+
+    function renderRows(rows: Array<DimensionRow | PreviewRow>, current: ScdScenario): string {
+      const extraColumns = new Set<string>();
+      rows.forEach((row) => {
+        Object.keys(row.values)
+          .filter((key) => !current.columns.some((column) => column.key === key))
+          .forEach((key) => extraColumns.add(key));
+      });
+      const valueColumns = [
+        ...current.columns.map((column) => ({ key: column.key, label: column.label })),
+        ...Array.from(extraColumns).map((key) => ({ key, label: key.replaceAll("_", " ") })),
+      ];
+      const headers = ["SK", current.naturalKeyLabel, ...valueColumns.map((column) => column.label), "valid_from", "valid_to", "current"];
+
+      return `
+        <div class="grid gap-3" role="table" aria-label="${escapeHtml(current.title)} dimension records">
+          <div class="sr-only" role="row">
+            ${headers.map((header) => `<span role="columnheader">${escapeHtml(header)}</span>`).join("")}
+          </div>
+          ${rows.map((row) => {
+            const fields = [
+              { label: "SK", value: row.sk, mono: true },
+              { label: current.naturalKeyLabel, value: row.naturalKey, mono: true },
+              ...valueColumns.map((column) => ({
+                label: column.label,
+                value: row.values[column.key] ?? "-",
+                mono: false,
+              })),
+              { label: "valid_from", value: row.validFrom, mono: true },
+              { label: "valid_to", value: row.validTo, mono: true },
+              { label: "current", value: row.isCurrent ? "true" : "false", mono: false },
+            ];
+
+            return `
+              <article class="scd-record-row ${rowStateClass(row)} p-4" role="row">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                  <p class="text-[10px] font-semibold uppercase tracking-[0.16em] text-zinc-500">${escapeHtml(rowStateLabel(row))}</p>
+                  <p class="font-mono text-xs text-zinc-500">${escapeHtml(row.naturalKey)}</p>
+                </div>
+                <dl class="mt-3">
+                  ${fields.map((field) => `
+                    <div class="scd-record-field">
+                      <dt class="scd-record-label text-[10px] uppercase tracking-[0.08em] text-zinc-500">${escapeHtml(field.label)}</dt>
+                      <dd class="scd-record-value ${field.mono ? "scd-record-mono font-mono" : ""} text-sm font-semibold leading-5 text-zinc-200">${escapeHtml(field.value)}</dd>
+                    </div>
+                  `).join("")}
+                </dl>
+              </article>
+            `;
+          }).join("")}
+        </div>
+      `;
+    }
+
+    function renderProgress(): void {
+      const progressDots = document.querySelector<HTMLElement>("#progress-dots");
+      if (!progressDots) return;
+      progressDots.innerHTML = scdScenarios.map((item, index) => {
+        const answered = answers[item.id];
+        const active = index === currentIndex;
+        const tone = answered
+          ? evaluateDesign(item, answered).verdict === "good_fit"
+            ? "bg-emerald-300"
+            : "bg-amber-300"
+          : active
+            ? "bg-white"
+            : "bg-white/20";
+        return `<span class="h-2 ${tone}" aria-hidden="true"></span>`;
+      }).join("");
+    }
+
+    function renderScenario(): void {
+      const current = scenario();
+      const preview = buildStrategyPreview(current, selectedStrategy);
+      latestEvaluation = answers[current.id] ? evaluateDesign(current, answers[current.id]) : null;
+
+      document.querySelector("#progress-count")!.textContent = `${currentIndex + 1} / ${scdScenarios.length}`;
+      document.querySelector("#entity-badge")!.textContent = current.entity;
+      document.querySelector("#change-date")!.textContent = `Change date ${current.changeDate}`;
+      document.querySelector("#scenario-title")!.textContent = current.title;
+      document.querySelector("#scenario-summary")!.textContent = current.summary;
+      document.querySelector("#business-question")!.textContent = current.businessQuestion;
+      document.querySelector("#hint-text")!.textContent = mode === "challenge"
+        ? "Hints are hidden. Choose the SCD strategy that best answers the business question."
+        : `${current.changedColumn} changes to ${current.incomingValue}. Ask whether history, current state, or a previous-value shortcut is required.`;
+      document.querySelector("#before-table")!.innerHTML = renderRows(current.beforeRows, current);
+      document.querySelector("#preview-explanation")!.textContent = preview.explanation;
+      document.querySelector("#after-table")!.innerHTML = renderRows(preview.rows, current);
+      document.querySelector("#impact-title")!.textContent = `Transaction amount grouped by ${current.changedColumn.replaceAll("_", " ")}`;
+      document.querySelector("#impact-help")!.textContent =
+        "Shows how existing fact rows roll up after this SCD decision.";
+      document.querySelector("#fact-impact")!.innerHTML = preview.factImpact.map((impact) => `
+        <div class="border border-white/10 bg-black/20 p-4">
+          <p class="text-[11px] uppercase tracking-[0.16em] text-zinc-500">${escapeHtml(current.changedColumn)}</p>
+          <p class="mt-2 text-lg font-semibold text-white">${escapeHtml(impact.label)}</p>
+          <p class="mt-1 font-mono text-sm text-emerald-200">${formatCurrency(impact.amount)}</p>
+        </div>
+      `).join("");
+
+      scenarioButtons.forEach((button, index) => {
+        const active = index === currentIndex;
+        button.classList.toggle("border-emerald-300/70", active);
+        button.classList.toggle("bg-emerald-300/10", active);
+        button.classList.toggle("text-white", active);
+        button.classList.toggle("border-white/10", !active);
+        button.classList.toggle("bg-black/20", !active);
+        button.classList.toggle("text-zinc-400", !active);
+      });
+
+      strategyInputs.forEach((input) => {
+        input.checked = input.value === selectedStrategy;
+        input.disabled = Boolean(answers[current.id]) && mode !== "sandbox";
+      });
+
+      const answered = Boolean(answers[current.id]);
+      document.querySelector("#submit-decision")?.classList.toggle("hidden", answered && mode !== "sandbox");
+      document.querySelector("#next-scenario")?.classList.toggle("hidden", !answered || currentIndex === scdScenarios.length - 1);
+      renderFeedback();
+      renderProgress();
+    }
+
+    function renderFeedback(): void {
+      const current = scenario();
+      const answeredStrategy = answers[current.id];
+      if (!feedbackPanel || !answeredStrategy) {
+        feedbackPanel?.classList.add("hidden");
+        return;
+      }
+      const evaluation = evaluateDesign(current, answeredStrategy);
+      latestEvaluation = evaluation;
+      const badge = document.querySelector<HTMLElement>("#verdict-badge");
+      const badgeClass = evaluation.verdict === "good_fit"
+        ? "border-emerald-300/40 bg-emerald-300/10 text-emerald-100"
+        : evaluation.verdict === "partial_fit"
+          ? "border-amber-300/40 bg-amber-300/10 text-amber-100"
+          : "border-rose-300/40 bg-rose-300/10 text-rose-100";
+      if (badge) {
+        badge.className = `border px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] ${badgeClass}`;
+        badge.textContent = evaluation.verdictLabel;
+      }
+      document.querySelector("#recommended-label")!.textContent = `Recommended: ${strategyLabels[evaluation.recommendedStrategy]}`;
+      document.querySelector("#verdict-explanation")!.textContent = evaluation.explanation;
+      document.querySelector("#verdict-risk")!.textContent = evaluation.risk;
+      feedbackPanel.classList.remove("hidden");
+    }
+
+    function setMode(nextMode: LabMode): void {
+      mode = nextMode;
+      modeButtons.forEach((button) => {
+        const active = button.dataset.mode === nextMode;
+        button.setAttribute("aria-pressed", String(active));
+        button.className = active
+          ? "mode-button scd-mode-button scd-mode-active min-h-11 border px-3 py-2 font-semibold uppercase transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70"
+          : "mode-button scd-mode-button scd-mode-inactive min-h-11 border px-3 py-2 font-semibold uppercase transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70";
+      });
+      document.querySelector("#mode-help")!.textContent = nextMode === "guided"
+        ? "Hints stay visible and every answer explains the tradeoff."
+        : nextMode === "challenge"
+          ? "Hints are reduced. Score yourself on the strategy choice."
+          : "Preview table behavior freely before locking in an answer.";
+      renderScenario();
+    }
+
+    function renderFinalResult(): void {
+      const result = calculateLabResult(answers);
+      if (!resultPanel || result.completedScenarios < scdScenarios.length) return;
+      const brief = buildLabBrief(result);
+      resultPanel.classList.remove("hidden");
+      joinForm?.classList.remove("hidden");
+      document.querySelector("#final-score")!.textContent = `${result.averageScore}/100`;
+      document.querySelector("#final-tier")!.textContent = result.tier;
+      const textarea = document.querySelector<HTMLTextAreaElement>("#brief-textarea");
+      if (textarea) textarea.value = brief;
+      track("completed", 100, result.tier);
+    }
+
+    modeButtons.forEach((button) => {
+      button.addEventListener("click", () => setMode(button.dataset.mode as LabMode));
+    });
+
+    scenarioButtons.forEach((button, index) => {
+      button.addEventListener("click", () => {
+        currentIndex = index;
+        selectedStrategy = answers[scenario().id] ?? "type_2";
+        renderScenario();
+      });
+    });
+
+    strategyInputs.forEach((input) => {
+      input.addEventListener("change", () => {
+        selectedStrategy = input.value as ScdStrategy;
+        document.querySelector("#decision-error")?.classList.add("hidden");
+        renderScenario();
+        track("design_selected", Math.round((currentIndex / scdScenarios.length) * 100));
+      });
+    });
+
+    decisionForm?.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const selected = strategyInputs.find((input) => input.checked);
+      if (!selected) {
+        document.querySelector("#decision-error")?.classList.remove("hidden");
+        return;
+      }
+      selectedStrategy = selected.value as ScdStrategy;
+      const current = scenario();
+      answers = { ...answers, [current.id]: selectedStrategy };
+      const evaluation = evaluateDesign(current, selectedStrategy);
+      latestEvaluation = evaluation;
+      const progress = Math.round(((currentIndex + 1) / scdScenarios.length) * 100);
+      track("step_completed", progress, evaluation.verdict);
+      track("result_generated", progress, evaluation.verdict);
+      renderScenario();
+      renderFinalResult();
+    });
+
+    document.querySelector("#next-scenario")?.addEventListener("click", () => {
+      currentIndex = Math.min(currentIndex + 1, scdScenarios.length - 1);
+      selectedStrategy = answers[scenario().id] ?? "type_2";
+      renderScenario();
+    });
+
+    document.querySelector("#reset-lab")?.addEventListener("click", () => {
+      answers = {};
+      currentIndex = 0;
+      selectedStrategy = "type_2";
+      resultPanel?.classList.add("hidden");
+      joinForm?.classList.add("hidden");
+      feedbackPanel?.classList.add("hidden");
+      renderScenario();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    document.querySelector("#copy-brief")?.addEventListener("click", async () => {
+      const textarea = document.querySelector<HTMLTextAreaElement>("#brief-textarea");
+      if (!textarea) return;
+      textarea.select();
+      try {
+        await navigator.clipboard.writeText(textarea.value);
+        document.querySelector("#copy-status")!.textContent = "Brief copied.";
+      } catch {
+        document.querySelector("#copy-status")!.textContent = "Select the brief text and copy it from your browser.";
+      }
+    });
+
+    joinForm?.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (!identity || !latestEvaluation) return;
+      const email = document.querySelector<HTMLInputElement>("#join-email")?.value ?? "";
+      const name = document.querySelector<HTMLInputElement>("#join-name")?.value ?? "";
+      const context = document.querySelector<HTMLInputElement>("#join-context")?.value ?? "";
+      const consent = document.querySelector<HTMLInputElement>("#join-consent")?.checked ?? false;
+      const status = document.querySelector<HTMLElement>("#join-status");
+      const payload = buildJoinPayload(identity, {
+        email,
+        name,
+        company: context,
+        role: "",
+        consentGiven: consent,
+        selectedStrategy,
+        score: calculateLabResult(answers).averageScore,
+      });
+      const state = await submitScdDesignLabJoin(client, payload);
+      if (state.kind === "saved") {
+        status!.textContent = "Saved. Your lab join is visible in the admin progress view.";
+        track("joined", 100, "joined");
+      } else if (state.kind === "skipped") {
+        status!.textContent = "Saving is not configured in this environment. The lab result still works locally.";
+      } else {
+        status!.textContent = state.message;
+      }
+    });
+
+    track("lab_opened", 0);
+    track("lab_started", 0);
+    renderScenario();
+  </script>
+</BaseLayout>

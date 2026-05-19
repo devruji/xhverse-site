@@ -9,7 +9,10 @@ create table if not exists public.cv_download_requests (
   approved_at timestamptz,
   sent_at timestamptz,
   notes text,
-  ip_hash text
+  ip_hash text,
+  resend_message_id text,
+  delivery_status text not null default 'pending'
+    check (delivery_status in ('pending', 'sending', 'delivered', 'failed'))
 );
 
 create index if not exists idx_cv_requests_email_date
@@ -61,3 +64,12 @@ create policy "admin_manage_blocklist"
   to authenticated
   using (true)
   with check (true);
+
+revoke all on table public.cv_download_requests from anon, authenticated;
+grant insert on table public.cv_download_requests to anon;
+grant select, insert, update, delete on table public.cv_download_requests to authenticated;
+grant select, insert, update, delete on table public.cv_download_requests to service_role;
+
+revoke all on table public.cv_email_blocklist from anon, authenticated;
+grant select, insert, update, delete on table public.cv_email_blocklist to authenticated;
+grant select, insert, update, delete on table public.cv_email_blocklist to service_role;

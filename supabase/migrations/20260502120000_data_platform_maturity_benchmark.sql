@@ -140,6 +140,8 @@ create policy "data_platform_maturity_anon_insert"
 
 revoke all on table public.data_platform_maturity_submissions from anon, authenticated;
 grant insert on table public.data_platform_maturity_submissions to anon;
+grant select on table public.data_platform_maturity_submissions to authenticated;
+grant select, insert, update, delete on table public.data_platform_maturity_submissions to service_role;
 
 drop view if exists public.data_platform_maturity_benchmark;
 create view public.data_platform_maturity_benchmark as
@@ -163,6 +165,7 @@ from public.data_platform_maturity_submissions;
 
 revoke all on table public.data_platform_maturity_benchmark from anon, authenticated;
 grant select on table public.data_platform_maturity_benchmark to anon, authenticated;
+grant select, insert, update, delete on table public.data_platform_maturity_benchmark to service_role;
 
 comment on table public.data_platform_maturity_submissions is
   'Anonymous Data Platform Maturity assessment submissions. Public visitors can insert only; raw reads are not exposed.';

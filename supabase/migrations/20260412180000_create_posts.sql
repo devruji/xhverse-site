@@ -28,6 +28,10 @@ create policy "posts_select_published"
   to anon, authenticated
   using (status = 'published' and published_at is not null);
 
+revoke all on table public.posts from anon, authenticated;
+grant select on table public.posts to anon, authenticated;
+grant select, insert, update, delete on table public.posts to service_role;
+
 -- Writes: use the Supabase dashboard, service role, or add authenticated policies later.
 
 comment on table public.posts is 'Site blog posts; Astro build reads published rows via Supabase API.';

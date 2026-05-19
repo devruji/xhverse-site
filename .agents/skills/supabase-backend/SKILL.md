@@ -5,26 +5,35 @@ description: Guide for working with Supabase as a full backend — database, aut
 
 # Supabase Backend Guide
 
-This project uses Supabase for database (blog posts, maturity benchmarks), storage (CV PDF), and client-side data submission. This skill covers the full Supabase platform.
+This project uses Supabase for build-time blog content, selected runtime submissions, admin data access, CV PDF storage, and Edge Functions for CV email delivery. Use this skill only when the task explicitly involves Supabase/backend data work or the changed files already touch Supabase integrations.
 
 ## Current Usage in xhverse
 
 ### Database Tables
 - `posts` — blog posts with slug, title, body_markdown, tags, reading_time, medium_url, published_at, status
-- Maturity benchmark tables — anonymous assessment submissions and aggregate stats
+- `data_platform_maturity_submissions` — anonymous maturity assessment submissions and aggregate stats
+- `cv_download_requests` — CV gate requests, approval status, and send lifecycle
+- `leads` — advisory/contact lead tracking for the admin panel
 
 ### Storage
 - `documents` bucket → `cv/rujikorn-ngoensaard-cv.pdf` (public read)
 
 ### Client Access Patterns
 - **Build time**: `SUPABASE_URL` + `SUPABASE_SECRET_KEY` (service role) for fetching published posts
-- **Client side**: `PUBLIC_SUPABASE_URL` + `PUBLIC_SUPABASE_PUBLISHABLE_KEY` (anon key) for maturity tool submissions
+- **Client side**: `PUBLIC_SUPABASE_URL` + `PUBLIC_SUPABASE_PUBLISHABLE_KEY` (anon key) for maturity submissions, CV requests, leads, and admin reads/updates gated by RLS and Cloudflare Access
+- **Edge Functions**: Supabase service role + `RESEND_API_KEY` for CV request notifications and PDF delivery
 
 ### Security Model
 - All tables have RLS enabled
-- Anonymous users: insert-only on benchmark tables, no raw reads
+- Anonymous users: insert-only on public submissions and constrained reads where explicitly allowed by RLS
+- Admin pages are protected by Cloudflare Access before client-side Supabase calls
 - Service role (build time): full read access to published posts
 - Public storage: read-only on `documents` bucket
+
+### Edge Functions
+- `submit-cv-request` — handles public CV request submission
+- `notify-cv-request` — emails the admin when a new CV request is created
+- `send-cv` — sends the CV PDF after an admin approves a request
 
 ## Database
 
@@ -71,8 +80,13 @@ const { data, error } = await supabase
 
 // Insert anonymous submission (client side, anon key)
 const { error } = await supabase
-  .from("benchmark_submissions")
+  .from("data_platform_maturity_submissions")
   .insert({ scores: payload, submitted_at: new Date().toISOString() });
+
+// Insert public CV request (client side, anon key)
+const { error: requestError } = await supabase
+  .from("cv_download_requests")
+  .insert({ email, status: "pending" });
 ```
 
 ### RLS Policy Patterns
