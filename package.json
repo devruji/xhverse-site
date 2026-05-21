@@ -31,7 +31,7 @@
     "@playwright/test": "^1.60.0",
     "@types/node": "^25.9.0",
     "@types/sanitize-html": "^2.16.1",
-    "@vitest/coverage-v8": "^4.1.6",
+    "@vitest/coverage-v8": "^4.1.7",
     "supabase": "^2.100.0",
     "typescript": "^6.0.3",
     "vitest": "^4.1.6",
