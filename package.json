@@ -35,7 +35,7 @@
     "supabase": "^2.100.0",
     "typescript": "^6.0.3",
     "vitest": "^4.1.6",
-    "wrangler": "^4.92.0"
+    "wrangler": "^4.93.0"
   },
   "overrides": {
     "devalue": "^5.8.1",
