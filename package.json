@@ -29,7 +29,7 @@
   "devDependencies": {
     "@astrojs/check": "^0.9.9",
     "@playwright/test": "^1.60.0",
-    "@types/node": "^25.9.0",
+    "@types/node": "^25.9.1",
     "@types/sanitize-html": "^2.16.1",
     "@vitest/coverage-v8": "^4.1.6",
     "supabase": "^2.100.0",
