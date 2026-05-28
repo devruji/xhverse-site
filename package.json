@@ -21,7 +21,7 @@
     "@astrojs/sitemap": "^3.7.2",
     "@supabase/supabase-js": "^2.106.0",
     "@tailwindcss/vite": "^4.3.0",
-    "astro": "^6.3.5",
+    "astro": "^6.3.8",
     "marked": "^18.0.4",
     "sanitize-html": "^2.17.4",
     "tailwindcss": "^4.3.0"
