@@ -82,6 +82,13 @@ src/pages/tools/<slug>.astro → Page with <script> block
 - **Edit discipline**: One tool edits a file at a time. If Cursor is implementing, Codex stays review/QA-only unless explicitly asked to patch findings.
 - **Chat hygiene**: If the Cursor chat gets long or confused, start a new Cursor conversation and point it at the current handoff file and branch state.
 
+## Engineering Skill Defaults
+
+- **debug-mantra**: Use for bug reports, failing checks, regressions, stack traces, or broken behavior before proposing a fix.
+- **scrutinize**: Use as the default review lens for plans, PRs, diffs, architecture choices, and code-change sanity checks.
+- **post-mortem**: Use after a bug fix has a reliable repro, known root cause, implemented fix, and validation evidence, especially when a writeup or RCA is requested.
+- These defaults apply to both Codex and Cursor when the relevant skill is available. Codex-authored Cursor handoffs should name the expected skill lens when debugging, review, or post-fix writeup work is in scope.
+
 ## Branch & Release Rules
 
 1. **NEVER edit on `development` or `main`** — create a feature branch first

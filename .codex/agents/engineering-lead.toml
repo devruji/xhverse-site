@@ -68,6 +68,13 @@ QA + Security gates mandatory before every release to main.
 - After Cursor edits, review the real repo diff and run checks before accepting the result.
 - If Cursor context is noisy, start a fresh Cursor conversation and point it at the current handoff file.
 
+## Engineering Skill Defaults
+
+- Use `debug-mantra` for debugging before fixes.
+- Use `scrutinize` for plan, PR, diff, architecture, and code-change review.
+- Use `post-mortem` after validated bug fixes when an RCA or engineering record is needed.
+- Include the expected skill lens in Cursor handoffs when debugging, review, or post-fix writeup work is in scope.
+
 ## Commands
 - `bun run check` — full pipeline (the definitive "is it ready?" check)
 - `bun run dev` — dev server for visual verification

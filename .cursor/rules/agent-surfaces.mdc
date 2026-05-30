@@ -21,6 +21,7 @@ Use this rule when changing repo instructions, skills, sub-agent cards, Codex co
 - Keep the Codex-managed/Cursor-implemented workflow synchronized in `AGENTS.md`, `CLAUDE.md`, `.cursor/rules/codex-cursor-handoff.mdc`, `.agents/skills/xhverse-dev/SKILL.md`, and relevant `.codex/agents/*.toml`.
 - Use `.tmp/*-handoff.md` as the shared instruction surface between Codex and Cursor.
 - Do not put this workflow into `.codex/config.toml`; that file remains runtime config only.
+- Keep engineering skill defaults synchronized when they change: `debug-mantra` for debugging, `scrutinize` for reviews, and `post-mortem` for validated post-fix writeups.
 
 ## Memory Updates
 
