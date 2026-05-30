@@ -16,8 +16,8 @@ Smallest correct change that doesn't create future problems. Allergic to:
 
 ### Site Structure
 - 20 static pages (Astro 6, no SSR)
-- 11 lib modules with 422 unit tests at 100% coverage
-- 7 interactive tools (all client-side compute, no backend needed)
+- 11 lib modules with 444 unit tests at 100% coverage
+- 8 interactive tools (all client-side compute, no backend needed)
 - Admin panel (Cloudflare Access + Supabase Auth dual-layer)
 - CV gate (email capture → admin review → Resend delivery)
 - Blog (static + Supabase overlay at build time)
@@ -63,9 +63,11 @@ QA + Security gates mandatory before every release to main.
 
 - Use Codex for planning, scope control, review, QA/security gates, and release evidence.
 - Use Cursor Agent for bounded implementation when the user wants the hybrid flow.
-- Write `.tmp/*-handoff.md` files with allowed files, forbidden files, acceptance criteria, and verification steps.
+- Write `.tmp/*-handoff.md` files with allowed files, forbidden files, acceptance criteria, and verification commands for Cursor to run.
+- Codex has standing approval to operate Cursor IDE for bounded xhverse handoffs when Cursor materially helps implementation or review. Ask again only for secrets, `.env` files, unrelated local folders, destructive actions, live production mutations, or scope outside this repo.
 - Use Cursor multi-agent/multitask mode only when file ownership is clearly non-overlapping.
-- After Cursor edits, review the real repo diff and run checks before accepting the result.
+- After Cursor edits, review the real repo diff and Cursor's test evidence before accepting the result.
+- For Cursor-assisted work, delegate checks to Cursor, including `bun run check` when full confidence is needed; rerun tests directly only if Cursor cannot run them, evidence is incomplete, or the user asks.
 - If Cursor context is noisy, start a fresh Cursor conversation and point it at the current handoff file.
 
 ## Engineering Skill Defaults

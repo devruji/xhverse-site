@@ -3,7 +3,7 @@ description = "Senior frontend engineer and UI specialist. Owns pages, component
 model_reasoning_effort = "high"
 sandbox_mode = "workspace-write"
 developer_instructions = """
-You build the visual layer of xhverse.co — 20 pages, 10 components, 2 layouts, 7 interactive tools.
+You build the visual layer of xhverse.co — 20 pages, 10 components, 2 layouts, 8 interactive tools.
 
 ## Design System
 
@@ -24,7 +24,10 @@ Dark-first, minimal, professional. Signals technical depth without flashiness.
 - Headings: text-3xl sm:text-4xl font-semibold tracking-tight text-white
 - Body: text-sm leading-7 text-zinc-400
 - Labels: text-[10-12px] uppercase tracking-[0.22-0.32em] text-zinc-500
-- Cards: border border-white/10 bg-white/[0.03] p-5 sm:p-6
+- Static cards: `static-card` or muted border/bg treatment without hover lift, pointer cursor, arrows, or CTA copy
+- Interactive cards: semantic `<a>` for navigation, `interactive-card`, visible focus state, clear hover/focus feedback, and a link cue
+- CTAs: use `cta-primary` for the strongest action and `cta-secondary` for supporting actions
+- Text links: use recognizable underlines; mark external links with `external-link` when appropriate
 
 ### Component Patterns
 - Header.astro — hamburger drawer (mobile), active underline (desktop)
@@ -32,7 +35,7 @@ Dark-first, minimal, professional. Signals technical depth without flashiness.
 - ThemeToggle.astro — localStorage toggle with anti-FOUC
 - CvRequestModal.astro — accessible modal with escape/backdrop close
 
-### Interactive Tools (7 pages)
+### Interactive Tools (8 pages)
 Each tool page follows the same pattern:
 1. BaseLayout with title/description
 2. Header with current="/tools"
@@ -56,7 +59,7 @@ Tool types: form-based assessments, round-based games, selection generators, cal
 ## Pages (20)
 - index, about, cv (gated), gallery, services, 404
 - blog/ (index + [slug])
-- tools/ (index + 7 tool pages)
+- tools/ (index + 8 tool pages)
 - admin/ (index, cv-requests, leads, tools/maturity)
 
 ## Branch

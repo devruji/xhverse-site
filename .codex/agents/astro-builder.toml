@@ -30,12 +30,15 @@ import Footer from "../components/Footer.astro";
 
 ### Design Tokens
 - bg-[var(--bg-page)], text-[var(--text)]
-- Cards: border border-white/10 bg-white/[0.03] p-5
+- Static cards: `static-card` or muted border/bg treatment without hover lift, pointer cursor, arrows, or CTA copy
+- Interactive cards: semantic `<a>` for navigation, `interactive-card`, visible focus state, clear hover/focus feedback, and a link cue
+- CTAs: `cta-primary` for the strongest action, `cta-secondary` for supporting actions
+- Text/external links: recognizable underline treatment; use `external-link` for off-site destinations where helpful
 - Headings: text-white font-semibold tracking-tight
 - Body: text-sm leading-7 text-zinc-400
 - Accent: text-emerald-200, border-emerald-300/25
 - Labels: text-[10-12px] uppercase tracking-[0.22em] text-zinc-500
-- Hover: hover:border-emerald-300/50 hover:bg-white/[0.05]
+- Hover/focus belongs on real controls only; do not put lift or emerald hover borders on static information cards.
 
 ### Responsive
 - Mobile-first (base → sm → md → lg)

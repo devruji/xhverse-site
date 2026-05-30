@@ -32,7 +32,7 @@ import { presetPipelines } from "../../lib/spark-explained/pipeline";
                 <button
                   type="button"
                   data-preset={preset.id}
-                  class="preset-btn border border-white/10 bg-black/20 px-4 py-2 text-sm text-zinc-300 transition hover:border-emerald-300/50 hover:text-white"
+                  class="preset-btn cta-secondary px-4 py-2 text-sm"
                 >
                   {preset.name}
                 </button>
@@ -47,7 +47,7 @@ import { presetPipelines } from "../../lib/spark-explained/pipeline";
                 <button
                   type="button"
                   data-transform={t}
-                  class="transform-btn border border-white/10 bg-black/20 px-3 py-1.5 text-xs text-zinc-400 transition hover:border-emerald-300/50 hover:text-white"
+                  class="transform-btn cta-secondary px-3 py-1.5 text-xs"
                 >
                   {transformations[t].label}
                 </button>
@@ -58,14 +58,14 @@ import { presetPipelines } from "../../lib/spark-explained/pipeline";
                 id="play-button"
                 type="button"
                 disabled
-                class="inline-flex items-center justify-center border border-white/15 px-4 py-2 text-sm font-medium text-white transition hover:border-emerald-300/70 disabled:cursor-not-allowed disabled:opacity-40"
+                class="cta-secondary px-4 py-2 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 Play
               </button>
               <button
                 id="reset-button"
                 type="button"
-                class="inline-flex items-center justify-center border border-white/15 px-4 py-2 text-sm font-medium text-white transition hover:border-emerald-300/70"
+                class="cta-secondary px-4 py-2"
               >
                 Reset
               </button>
@@ -163,17 +163,17 @@ import { presetPipelines } from "../../lib/spark-explained/pipeline";
         const borderClass = isHighlighted ? "border-emerald-300/50" : "border-white/10";
 
         return `
-          <div class="stage-column relative flex min-w-[60px] flex-1 cursor-pointer flex-col items-center gap-1 border ${borderClass} bg-black/20 p-2 transition sm:min-w-[80px] sm:p-3" data-stage="${stageIdx}">
+          <button type="button" class="stage-column relative flex min-w-[60px] flex-1 flex-col items-center gap-1 border ${borderClass} bg-black/20 p-2 text-left transition hover:border-emerald-300/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70 sm:min-w-[80px] sm:p-3" data-stage="${stageIdx}">
             ${shuffleIndicator}
             <div class="flex w-full flex-col gap-1">
               ${partitionHtml}
             </div>
             <p class="mt-2 text-center text-[10px] leading-tight text-zinc-500">${transformations[stage.transformation].label}</p>
-          </div>
+          </button>
         `;
       }).join("");
 
-      pipelineViz.querySelectorAll<HTMLElement>(".stage-column").forEach((col) => {
+      pipelineViz.querySelectorAll<HTMLButtonElement>(".stage-column").forEach((col) => {
         col.addEventListener("click", () => {
           const idx = Number(col.dataset.stage);
           showAnnotation(idx);

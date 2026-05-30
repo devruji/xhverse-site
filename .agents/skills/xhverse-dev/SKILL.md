@@ -59,6 +59,7 @@ Single test file: `bunx vitest run src/data/blog.test.ts`
 - When adding logic to `src/data/` or `src/lib/`, you must add matching tests that maintain 100% coverage
 
 ### Tools Page
+- `/tools/scd-design-lab`: SCD modeling practice lab
 - `/tools/data-platform-maturity-checker`: Assessment with benchmark persistence
 - `/tools/governance-scorecard`: Assessment with blockers and action plan
 - `/tools/architecture-roulette`: Decision game with agreement tracking
@@ -81,10 +82,12 @@ Single test file: `bunx vitest run src/data/blog.test.ts`
 
 - Codex is accountable for planning, review, QA, security gates, and release evidence.
 - Cursor can implement bounded changes from a Codex-authored `.tmp/*-handoff.md` file.
-- Handoff files must list allowed files, forbidden files, acceptance criteria, and verification steps.
-- Codex may operate Cursor IDE through Computer Use only after explicit user approval to submit the handoff to Cursor Agent.
+- Handoff files must list allowed files, forbidden files, acceptance criteria, and verification commands for Cursor to run.
+- Codex has standing approval to operate Cursor IDE through Computer Use for bounded xhverse handoffs when Cursor materially helps implementation or review.
+- Ask again only for secrets, `.env` files, unrelated local folders, destructive actions, live production mutations, or scope outside this repo.
 - Use Cursor multi-agent/multitask mode only for non-overlapping file ownership.
-- After Cursor edits, review the actual `git diff` before accepting any summary, then run the relevant checks.
+- After Cursor edits, review the actual `git diff` and Cursor's test evidence before accepting any summary.
+- For Cursor-assisted work, ask Cursor to run the relevant checks, including `bun run check` when full confidence is needed; Codex reruns tests directly only if Cursor cannot run them, evidence is incomplete, or the user asks.
 - If Cursor chat context gets noisy, open a fresh Cursor conversation and point it at the current handoff file.
 
 ## Engineering Skill Defaults

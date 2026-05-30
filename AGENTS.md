@@ -8,8 +8,8 @@ This file provides shared context for all Claude Code agents working in this rep
 - **Role**: Senior Data Engineer | Platform Architecture
 - **Version**: v3.0.0
 - **Stack**: Astro 6 (static only), Tailwind CSS v4, Bun, Cloudflare Pages, Supabase, Resend
-- **Pages**: 20 (homepage, about, cv, gallery, services, blog, 7 tools, admin panel)
-- **Tests**: 422 unit tests at 100% coverage + 20 E2E tests
+- **Pages**: 20 (homepage, about, cv, gallery, services, blog, 8 tools, admin panel)
+- **Tests**: 444 unit tests at 100% coverage + 20 E2E tests
 
 ## Commands
 
@@ -36,7 +36,7 @@ src/layouts/      → BaseLayout (SEO/CSP) + AdminLayout (admin panel)
 dist/             → Deployed to Cloudflare CDN
 ```
 
-### Interactive Tools (7 live)
+### Interactive Tools (8 live)
 
 All tools are fully client-side. Each follows:
 ```
@@ -46,6 +46,7 @@ src/pages/tools/<slug>.astro → Page with <script> block
 
 | Tool | Type |
 |------|------|
+| SCD Design Lab | Education (dimension modeling practice) |
 | Data Platform Maturity Checker | Assessment (form → score + benchmark) |
 | Governance Readiness Scorecard | Assessment (form → score + action plan) |
 | Architecture Decision Roulette | Game (10 scenarios, agreement tracking) |
@@ -75,10 +76,10 @@ src/pages/tools/<slug>.astro → Page with <script> block
 ## Codex + Cursor Flow
 
 - **Default split**: Codex owns planning, scope control, review, QA, security gate, and release evidence. Cursor owns bounded implementation when explicitly used.
-- **Handoff surface**: Use repo files, usually `.tmp/*-handoff.md`, as the shared instruction channel. Include allowed files, forbidden files, acceptance criteria, and verification plan.
-- **Cursor Agent use**: Codex may operate Cursor IDE through Computer Use and submit the handoff to Cursor Agent only after explicit user approval, because repo content can be sent to Cursor.
+- **Handoff surface**: Use repo files, usually `.tmp/*-handoff.md`, as the shared instruction channel. Include allowed files, forbidden files, acceptance criteria, and verification commands for Cursor to run.
+- **Cursor Agent use**: The user has granted standing approval for Codex to operate Cursor IDE through Computer Use and submit bounded xhverse handoffs to Cursor Agent when it materially helps implementation. Ask again only if the handoff includes secrets, `.env` files, unrelated local folders, destructive actions, live production mutations, or scope outside this repo.
 - **Mode choice**: Use Cursor normal agent for one focused implementation. Use Cursor multi-agent/multitask mode only when the work can be split into non-overlapping file ownership.
-- **Review gate**: After Cursor edits, Codex must inspect `git status`, `git diff`, run the relevant checks, and verify UI behavior when user-facing.
+- **Review gate**: After Cursor edits, Codex must inspect `git status`, `git diff`, and Cursor's test evidence. For Cursor-assisted work, ask Cursor to run the relevant checks, including `bun run check` when full confidence is needed; Codex reruns tests directly only if Cursor cannot run them, evidence is incomplete, or the user asks.
 - **Edit discipline**: One tool edits a file at a time. If Cursor is implementing, Codex stays review/QA-only unless explicitly asked to patch findings.
 - **Chat hygiene**: If the Cursor chat gets long or confused, start a new Cursor conversation and point it at the current handoff file and branch state.
 

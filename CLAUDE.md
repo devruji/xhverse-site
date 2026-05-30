@@ -132,7 +132,7 @@ git clean -fd --dry-run     # Check for untracked contamination from other sessi
 ### Making Changes
 
 1. Create feature branch from `development`
-2. Implement + run `bun run check` locally
+2. Implement + verify; for Cursor-assisted work, have Cursor run `bun run check` and report the output
 3. **Verify `git diff --stat` shows ONLY your intended changes**
 4. **Start dev server and show user** before pushing
 5. Wait for user approval in browser (both themes, mobile viewport)
@@ -147,13 +147,14 @@ Use this flow when the user wants Codex to manage planning, review, QA, security
 
 1. Codex checks branch and dirty state, then creates or reuses a feature branch from `development`.
 2. Codex writes a scoped handoff file under `.tmp/`, usually `.tmp/<task>-handoff.md`.
-3. The handoff must include allowed files, forbidden files, acceptance criteria, risk notes, and Codex verification steps.
+3. The handoff must include allowed files, forbidden files, acceptance criteria, risk notes, and verification commands for Cursor to run.
 4. Cursor implements from that handoff. Prefer one focused Cursor Agent for one focused change.
 5. Use Cursor multi-agent or multitask mode only when file ownership is non-overlapping and the handoff assigns each workstream clearly.
-6. Codex may operate Cursor IDE with Computer Use only after explicit user approval, because submitting to Cursor Agent can transmit repo content to Cursor.
+6. The user has granted standing approval for Codex to operate Cursor IDE with Computer Use and submit bounded xhverse handoffs to Cursor Agent when it materially helps implementation. Ask again only for secrets, `.env` files, unrelated local folders, destructive actions, live production mutations, or scope outside this repo.
 7. After Cursor finishes, Codex inspects `git status`, `git diff`, and the actual changed files before trusting any Cursor summary.
-8. Codex runs the narrowest sufficient checks for the change, plus browser or Playwright verification for user-facing UI.
-9. If Cursor chat context becomes noisy, open a fresh Cursor conversation and point it to the current handoff file, branch, and allowed file list.
+8. Cursor runs the narrowest sufficient checks for the change, including `bun run check` when full confidence is needed, and captures the output in its response.
+9. Codex reviews Cursor's test evidence plus `git status`, `git diff`, and the actual changed files before trusting any Cursor summary. Codex reruns tests directly only if Cursor cannot run them, evidence is incomplete, or the user asks.
+10. If Cursor chat context becomes noisy, open a fresh Cursor conversation and point it to the current handoff file, branch, and allowed file list.
 
 For this split, Codex remains the accountable gate. Cursor implementation is not done until Codex review and verification pass.
 
@@ -278,7 +279,7 @@ Repo MCP policy:
 - **Skill YAML descriptions**: A single-line frontmatter description containing `context:` or similar colon text can break skill loading. Use folded YAML blocks for long descriptions and validate all `SKILL.md` frontmatter after edits.
 - **Instruction-surface sync**: When workflow or agent rules change, update `AGENTS.md`, `CLAUDE.md`, `.cursor/rules/`, `.agents/skills/`, and `.codex/agents/` together so future sessions do not inherit stale rules.
 - **Repo-scoped MCP curation**: Prefer a small project-relevant set. Cloudflare is default for xhverse; Supabase is task-scoped; Notion stays out of this repo.
-- **Codex + Cursor split**: For hybrid work, Codex owns planning, review, QA/security gates, and evidence. Cursor implements from `.tmp/*-handoff.md`. Codex can operate Cursor IDE with explicit user approval, then must review the real diff before accepting the change.
+- **Codex + Cursor split**: For hybrid work, Codex owns planning, review, QA/security gates, and evidence. Cursor implements from `.tmp/*-handoff.md`. Codex has standing approval to operate Cursor IDE for bounded xhverse handoffs, then must review the real diff before accepting the change.
 - **Engineering skill defaults**: Use `debug-mantra` for debugging, `scrutinize` for plan/PR/diff review, and `post-mortem` only after a reproduced, root-caused, validated fix. Apply the same lens in Cursor handoffs when relevant.
 
 ## Key Constraints

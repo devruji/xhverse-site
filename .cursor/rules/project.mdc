@@ -17,8 +17,8 @@ Follow `AGENTS.md` and `CLAUDE.md` as primary sources of truth.
 
 ## Architecture
 - **20 pages** (Astro 6, static output only, no SSR)
-- **7 interactive tools** (all client-side compute, no external deps)
-- **11 lib modules** with 422 tests at 100% coverage
+- **8 interactive tools** (all client-side compute, no external deps)
+- **11 lib modules** with 444 tests at 100% coverage
 - **Admin panel** behind Cloudflare Access (Zero Trust)
 - **CV** gated via email capture + admin review + Resend delivery
 - **CSP** dual-layer: `scripts/generate-headers.ts` + `BaseLayout.astro` meta tag
@@ -56,6 +56,7 @@ src/pages/tools/<slug>.astro (UI + script) ← frontend-engineer
 - Use `scrutinize` for plan review, PR review, diff review, architecture/design sanity checks, and second-opinion review.
 - Use `post-mortem` only after there is a reliable repro, known root cause, implemented fix, and validation evidence.
 - When Codex hands work to Cursor, follow the skill lens named in the `.tmp/*-handoff.md`.
+- For Codex-managed Cursor work, Cursor runs the requested verification commands, including `bun run check` when full confidence is needed; Codex reviews Cursor's output and reruns tests only if evidence is incomplete or the user asks.
 
 ## Git Workflow
 - Branch from `development` — never `main`
@@ -87,7 +88,10 @@ bun run build        # Production build (20 pages)
 - Background: `bg-[var(--bg-page)]`
 - Text: white (headings), zinc-300/400 (body), zinc-500 (labels)
 - Accent: emerald-200/300 (CTAs, active, positive)
-- Cards: `border border-white/10 bg-white/[0.03] p-5`
+- Static cards: `static-card` or muted border/bg treatment with no hover lift, pointer cursor, or CTA arrow
+- Interactive cards: semantic `<a>`/`<button>` with `interactive-card`, visible focus state, hover/focus feedback, and link cue
+- CTAs: `cta-primary` for primary actions, `cta-secondary` for supporting actions
+- Text links: recognizable underline treatment; mark external links with `external-link` where appropriate
 - Labels: `text-[10-12px] uppercase tracking-[0.22em]`
 - Container: `max-w-7xl px-5 sm:px-8 lg:px-10`
 

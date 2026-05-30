@@ -20,7 +20,7 @@ const visiblePosts = posts.slice(0, limit);
     </div>
     <div class="grid grid--blog">
       {visiblePosts.map((post) => (
-        <article class="card card--blog">
+        <article class="card card--blog static-card">
           <h3>{post.title}</h3>
           <p class="muted">{post.date}</p>
           <p>{post.excerpt}</p>
@@ -29,4 +29,3 @@ const visiblePosts = posts.slice(0, limit);
     </div>
   </div>
 </section>
-

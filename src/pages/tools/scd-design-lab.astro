@@ -196,13 +196,13 @@ const scdTypeGuide = [
             <p id="decision-error" class="mt-4 hidden text-sm text-rose-200">Choose a strategy before submitting.</p>
 
             <div class="relative z-50 mt-5 grid gap-3">
-              <button id="submit-decision" type="submit" class="min-h-11 bg-white px-5 py-3 text-sm font-semibold text-black transition hover:bg-emerald-100">
+              <button id="submit-decision" type="submit" class="cta-primary min-h-11">
                 Submit decision
               </button>
-              <button id="next-scenario" type="button" class="hidden min-h-11 border border-white/15 px-5 py-3 text-sm font-medium text-white transition hover:border-emerald-300/70">
+              <button id="next-scenario" type="button" class="cta-secondary hidden min-h-11">
                 Next scenario
               </button>
-              <button id="reset-lab" type="button" class="min-h-11 border border-white/15 px-5 py-3 text-sm font-medium text-zinc-300 transition hover:border-emerald-300/70 hover:text-white">
+              <button id="reset-lab" type="button" class="cta-secondary min-h-11 text-zinc-300">
                 Reset lab
               </button>
             </div>
@@ -213,7 +213,7 @@ const scdTypeGuide = [
             <p id="final-score" class="mt-4 text-4xl font-semibold tracking-tight text-white"></p>
             <p id="final-tier" class="mt-2 text-lg font-semibold text-emerald-100"></p>
             <textarea id="brief-textarea" readonly class="mt-5 min-h-[10rem] w-full resize-y border border-white/10 bg-black/30 p-4 font-mono text-xs leading-6 text-zinc-300 outline-none"></textarea>
-            <button id="copy-brief" type="button" class="mt-3 min-h-11 w-full border border-white/15 px-4 py-2 text-sm font-medium text-white transition hover:border-emerald-300/70">
+            <button id="copy-brief" type="button" class="cta-secondary mt-3 min-h-11 w-full px-4 py-2">
               Copy brief
             </button>
             <p id="copy-status" class="mt-3 text-xs text-zinc-500"></p>
@@ -242,7 +242,7 @@ const scdTypeGuide = [
                 <span>I consent to storing this lab join record for admin follow-up.</span>
               </label>
             </div>
-            <button type="submit" class="mt-4 min-h-11 w-full bg-white px-5 py-3 text-sm font-semibold text-black transition hover:bg-emerald-100">
+            <button type="submit" class="cta-primary mt-4 min-h-11 w-full">
               Save my lab result
             </button>
             <p id="join-status" class="mt-3 text-xs leading-6 text-zinc-500"></p>

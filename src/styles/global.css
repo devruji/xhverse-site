@@ -87,6 +87,43 @@ html.light .border-emerald-300\/25 { border-color: rgba(5, 150, 105, 0.35); }
 html.light .bg-emerald-300\/8 { background-color: rgba(5, 150, 105, 0.08); }
 html.light .border-emerald-300\/80 { border-color: rgba(5, 150, 105, 0.6); }
 html.light .bg-emerald-300\/10 { background-color: rgba(5, 150, 105, 0.08); }
+html.light .interactive-card:hover,
+html.light .interactive-card:focus-visible {
+  box-shadow: 0 24px 50px rgba(15, 23, 42, 0.08);
+}
+html.light .interactive-card {
+  background: var(--bg-card);
+  border-color: rgba(15, 23, 42, 0.12);
+}
+html.light .interactive-card .link-cue {
+  color: #047857;
+}
+html.light .interactive-card:hover .link-cue,
+html.light .interactive-card:focus-visible .link-cue,
+html.light .interactive-card:focus-within .link-cue {
+  color: #059669;
+}
+html.light .cta-primary {
+  background: var(--text-heading);
+  color: #ffffff;
+  box-shadow: 0 16px 35px rgba(15, 23, 42, 0.12);
+}
+html.light .cta-primary:hover,
+html.light .cta-primary:focus-visible {
+  background: #064e3b;
+  color: #ffffff;
+}
+html.light .cta-secondary {
+  background: rgba(15, 23, 42, 0.02);
+  border-color: rgba(15, 23, 42, 0.16);
+  color: var(--text-heading);
+}
+html.light .cta-secondary:hover,
+html.light .cta-secondary:focus-visible {
+  background: rgba(5, 150, 105, 0.08);
+  border-color: rgba(5, 150, 105, 0.5);
+  color: var(--text-heading);
+}
 
 .theme-dark-only { display: block; }
 .theme-light-only { display: none; }
@@ -125,12 +162,19 @@ html.light button.bg-white { background-color: var(--text-heading); color: #ffff
 html.light button.bg-white:hover { background-color: #064e3b; }
 html.light .bg-white.text-black { background-color: var(--text-heading); color: #ffffff; }
 html.light .section--muted { background: #f1f5f9; border-color: var(--border-subtle); }
-html.light .card:hover { box-shadow: 0 24px 50px rgba(15, 23, 42, 0.08); }
-html.light .gallery-item:hover { box-shadow: 0 20px 40px rgba(15, 23, 42, 0.07); }
 html.light .article-body pre { background-color: #f3f4f6; }
 html.light .article-body blockquote { border-left-color: rgba(0, 0, 0, 0.15); }
 
-/* Let Tailwind/preflight manage default link styles. */
+/* Let Tailwind/preflight manage default link styles, then layer project affordances. */
+
+:where(a[href], button:not(:disabled), [role="button"]):not([aria-disabled="true"]) {
+  cursor: pointer;
+}
+
+:where(a[href], button, input, select, textarea, [tabindex]:not([tabindex="-1"])):focus-visible {
+  outline: 2px solid rgba(110, 231, 183, 0.9);
+  outline-offset: 4px;
+}
 
 .page {
   min-height: 100vh;
@@ -214,6 +258,10 @@ p {
   position: relative;
   font-size: 0.9rem;
   color: var(--muted);
+  text-decoration: underline;
+  text-decoration-color: rgba(110, 231, 183, 0.45);
+  text-underline-offset: 0.28em;
+  transition: color 0.18s ease-out, text-decoration-color 0.18s ease-out;
 }
 
 .link-underlined::after {
@@ -225,6 +273,36 @@ p {
   height: 1px;
   background: linear-gradient(90deg, var(--accent), transparent);
   opacity: 0.7;
+}
+
+.link-underlined:hover,
+.link-underlined:focus-visible {
+  color: var(--text-heading);
+  text-decoration-color: rgba(110, 231, 183, 0.9);
+}
+
+.text-link {
+  color: var(--text);
+  font-weight: 500;
+  text-decoration: underline;
+  text-decoration-color: rgba(110, 231, 183, 0.45);
+  text-underline-offset: 0.28em;
+  transition: color 0.18s ease-out, text-decoration-color 0.18s ease-out;
+}
+
+.text-link:hover,
+.text-link:focus-visible {
+  color: var(--text-heading);
+  text-decoration-color: rgba(110, 231, 183, 0.9);
+}
+
+.external-link::after {
+  content: "↗";
+  display: inline-block;
+  margin-left: 0.3em;
+  font-size: 0.82em;
+  line-height: 1;
+  transform: translateY(-0.08em);
 }
 
 .button {
@@ -242,8 +320,67 @@ p {
   cursor: pointer;
 }
 
-.button:hover {
+.button:hover,
+.button:focus-visible {
   filter: brightness(1.05);
+}
+
+.cta-primary,
+.cta-secondary {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  border-radius: 0;
+  padding: 0.7rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 650;
+  line-height: 1.2;
+  text-decoration: none;
+  transition:
+    background-color 0.18s ease-out,
+    border-color 0.18s ease-out,
+    color 0.18s ease-out,
+    box-shadow 0.18s ease-out,
+    transform 0.18s ease-out;
+}
+
+.cta-primary {
+  border: 1px solid transparent;
+  background: #ffffff;
+  color: #020617;
+  box-shadow: 0 16px 35px rgba(0, 0, 0, 0.28);
+}
+
+.cta-primary:hover,
+.cta-primary:focus-visible {
+  background: #d1fae5;
+  transform: translateY(-1px);
+}
+
+.cta-secondary {
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--text-heading);
+}
+
+.cta-secondary:hover,
+.cta-secondary:focus-visible {
+  border-color: rgba(110, 231, 183, 0.7);
+  background: rgba(110, 231, 183, 0.08);
+  color: var(--text-heading);
+  transform: translateY(-1px);
+}
+
+.cta-primary:active,
+.cta-secondary:active {
+  transform: translateY(0);
+}
+
+.cta-primary.hidden,
+.cta-secondary.hidden {
+  display: none;
 }
 
 .site-header {
@@ -394,6 +531,44 @@ p {
   background: var(--bg-card);
   border: 1px solid var(--border-subtle);
   box-shadow: var(--shadow-soft);
+}
+
+.static-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-subtle);
+}
+
+.interactive-card {
+  position: relative;
+  background: var(--bg-card);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  text-decoration: none;
+  transition:
+    background-color 0.18s ease-out,
+    border-color 0.18s ease-out,
+    box-shadow 0.18s ease-out,
+    transform 0.18s ease-out;
+}
+
+.interactive-card:hover,
+.interactive-card:focus-visible,
+.interactive-card:focus-within {
+  border-color: var(--border-interactive);
+  background: rgba(255, 255, 255, 0.055);
+  box-shadow: 0 22px 42px rgba(0, 0, 0, 0.34);
+  transform: translateY(-2px);
+}
+
+.interactive-card .link-cue {
+  color: #a7f3d0;
+  transition: color 0.18s ease-out, transform 0.18s ease-out;
+}
+
+.interactive-card:hover .link-cue,
+.interactive-card:focus-visible .link-cue,
+.interactive-card:focus-within .link-cue {
+  color: #d1fae5;
+  transform: translateX(3px);
 }
 
 .card--blog p {
@@ -559,25 +734,6 @@ p {
   animation: slide-in-right 0.8s ease-out 0.2s both;
 }
 
-.card {
-  transition: transform 0.2s ease-out, box-shadow 0.2s ease-out, border-color 0.2s ease-out;
-}
-
-.card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 24px 50px rgba(15, 23, 42, 0.8);
-  border-color: rgba(148, 163, 184, 0.4);
-}
-
-.gallery-item {
-  transition: transform 0.25s ease-out, box-shadow 0.25s ease-out;
-}
-
-.gallery-item:hover {
-  transform: scale(1.02);
-  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.7);
-}
-
 .button {
   transition: filter 0.15s ease-out, transform 0.15s ease-out;
 }
@@ -681,14 +837,16 @@ html.light .hero-spotlight::before {
     transform: scaleX(1);
   }
 
-  .card,
-  .gallery-item,
+  .interactive-card,
+  .cta-primary,
+  .cta-secondary,
   .button {
     transition: none;
   }
 
-  .card:hover,
-  .gallery-item:hover {
+  .interactive-card:hover,
+  .cta-primary:hover,
+  .cta-secondary:hover {
     transform: none;
   }
 
@@ -738,4 +896,3 @@ html.light .hero-spotlight::before {
     align-items: flex-start;
   }
 }
-
