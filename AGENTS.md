@@ -72,6 +72,16 @@ src/pages/tools/<slug>.astro → Page with <script> block
 - **Memory updates**: Only when explicitly requested. Add small notes under `/Users/bossruji/.codex/memories/extensions/ad_hoc/notes/`; do not edit generated memory files directly.
 - **Repo-scoped MCPs**: Declare only project-relevant MCPs/connectors in `.codex/config.toml`. Store env var names, never token values. Do not add Notion for this repo.
 
+## Codex + Cursor Flow
+
+- **Default split**: Codex owns planning, scope control, review, QA, security gate, and release evidence. Cursor owns bounded implementation when explicitly used.
+- **Handoff surface**: Use repo files, usually `.tmp/*-handoff.md`, as the shared instruction channel. Include allowed files, forbidden files, acceptance criteria, and verification plan.
+- **Cursor Agent use**: Codex may operate Cursor IDE through Computer Use and submit the handoff to Cursor Agent only after explicit user approval, because repo content can be sent to Cursor.
+- **Mode choice**: Use Cursor normal agent for one focused implementation. Use Cursor multi-agent/multitask mode only when the work can be split into non-overlapping file ownership.
+- **Review gate**: After Cursor edits, Codex must inspect `git status`, `git diff`, run the relevant checks, and verify UI behavior when user-facing.
+- **Edit discipline**: One tool edits a file at a time. If Cursor is implementing, Codex stays review/QA-only unless explicitly asked to patch findings.
+- **Chat hygiene**: If the Cursor chat gets long or confused, start a new Cursor conversation and point it at the current handoff file and branch state.
+
 ## Branch & Release Rules
 
 1. **NEVER edit on `development` or `main`** — create a feature branch first

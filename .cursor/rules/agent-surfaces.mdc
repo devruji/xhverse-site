@@ -16,6 +16,12 @@ Use this rule when changing repo instructions, skills, sub-agent cards, Codex co
 - `.codex/agents/*.toml`: repo-local sub-agent role cards.
 - `.codex/config.toml`: runtime config only; no `[instructions]` or `developer_instructions`.
 
+## Codex + Cursor Surface Sync
+
+- Keep the Codex-managed/Cursor-implemented workflow synchronized in `AGENTS.md`, `CLAUDE.md`, `.cursor/rules/codex-cursor-handoff.mdc`, `.agents/skills/xhverse-dev/SKILL.md`, and relevant `.codex/agents/*.toml`.
+- Use `.tmp/*-handoff.md` as the shared instruction surface between Codex and Cursor.
+- Do not put this workflow into `.codex/config.toml`; that file remains runtime config only.
+
 ## Memory Updates
 
 - Update memory only when the user explicitly asks for memory changes.
@@ -35,5 +41,6 @@ Use this rule when changing repo instructions, skills, sub-agent cards, Codex co
 
 - Parse TOML after `.codex/config.toml` edits.
 - Validate skill frontmatter YAML after `SKILL.md` edits.
+- Validate Cursor rule frontmatter after `.cursor/rules/*.mdc` edits.
 - Run `git diff --check`.
 - For config/rule/skill-only changes, state that app runtime tests were not run.

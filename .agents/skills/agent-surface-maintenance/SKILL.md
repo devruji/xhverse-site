@@ -23,7 +23,8 @@ Keep future sessions aligned without turning runtime config into documentation.
    - `.codex/config.toml`: runtime config only, including repo-scoped MCP/plugin declarations.
    - Memory: add a small note under the Codex memory extension path only when the user explicitly asks to update memory.
 4. For MCP changes, prefer the smallest repo-scoped set that directly supports xhverse work. Do not add Notion here. Do not store bearer tokens in git.
-5. Validate changed Markdown, TOML, and skill YAML before sign-off. Run app tests only when application behavior changes.
+5. For Codex + Cursor workflow changes, keep `AGENTS.md`, `CLAUDE.md`, `.cursor/rules/codex-cursor-handoff.mdc`, `.agents/skills/xhverse-dev/SKILL.md`, and relevant `.codex/agents/*.toml` aligned.
+6. Validate changed Markdown, Cursor rule frontmatter, TOML, and skill YAML before sign-off. Run app tests only when application behavior changes.
 
 ## MCP Policy
 
@@ -31,3 +32,11 @@ Keep future sessions aligned without turning runtime config into documentation.
 - Supabase belongs only when the task touches backend data, migrations, RLS, storage, auth, or admin data flows.
 - Browser and GitHub capabilities can remain general tooling; do not duplicate them in repo MCP config unless a concrete workflow needs it.
 - Avoid speculative MCP installs. A broken or slow MCP should be removed rather than carried as session startup tax.
+
+## Codex + Cursor Handoff Policy
+
+- Codex owns scope, planning, review, QA, security gates, and release evidence.
+- Cursor implements only from bounded handoffs or explicit user direction.
+- Use `.tmp/*-handoff.md` files to avoid copy-paste handoffs.
+- Computer Use can operate Cursor IDE only after explicit user approval to submit the handoff to Cursor Agent.
+- Cursor multi-agent/multitask mode is allowed only for clearly separated file ownership.
