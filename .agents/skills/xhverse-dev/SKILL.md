@@ -77,6 +77,16 @@ Single test file: `bunx vitest run src/data/blog.test.ts`
 - `.codex/config.toml`: runtime config only; never add `[instructions]` or `developer_instructions`
 - `.agents/skills/agent-surface-maintenance/SKILL.md`: use for skills, rules, memory notes, Codex config, and repo-scoped MCP upkeep
 
+## Codex + Cursor Workflow
+
+- Codex is accountable for planning, review, QA, security gates, and release evidence.
+- Cursor can implement bounded changes from a Codex-authored `.tmp/*-handoff.md` file.
+- Handoff files must list allowed files, forbidden files, acceptance criteria, and verification steps.
+- Codex may operate Cursor IDE through Computer Use only after explicit user approval to submit the handoff to Cursor Agent.
+- Use Cursor multi-agent/multitask mode only for non-overlapping file ownership.
+- After Cursor edits, review the actual `git diff` before accepting any summary, then run the relevant checks.
+- If Cursor chat context gets noisy, open a fresh Cursor conversation and point it at the current handoff file.
+
 ## Constraints
 
 - Do not modify generated folders: `coverage/`, `dist/`, `playwright-report/`, `test-results/`, `.astro/`

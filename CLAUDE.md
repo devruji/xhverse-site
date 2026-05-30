@@ -8,7 +8,7 @@ XHVerse is the portfolio, blog, and tools site for Rujikorn Ngoensaard (XH / bos
 
 - **Production**: https://xhverse.co
 - **Repo**: https://github.com/devruji/xhverse-site
-- **Current version**: v2.12.0
+- **Current version**: v3.0.0
 - **Business model**: Consulting/advisory — site drives inbound leads via content + tools
 
 ## Commands
@@ -141,6 +141,22 @@ git clean -fd --dry-run     # Check for untracked contamination from other sessi
 8. **NEVER create PRs targeting `main`** — always target `development`
 9. **NEVER edit files while on `development` or `main`** — create a branch FIRST
 
+### Codex + Cursor Handoff Workflow
+
+Use this flow when the user wants Codex to manage planning, review, QA, security, or release gates while Cursor performs implementation.
+
+1. Codex checks branch and dirty state, then creates or reuses a feature branch from `development`.
+2. Codex writes a scoped handoff file under `.tmp/`, usually `.tmp/<task>-handoff.md`.
+3. The handoff must include allowed files, forbidden files, acceptance criteria, risk notes, and Codex verification steps.
+4. Cursor implements from that handoff. Prefer one focused Cursor Agent for one focused change.
+5. Use Cursor multi-agent or multitask mode only when file ownership is non-overlapping and the handoff assigns each workstream clearly.
+6. Codex may operate Cursor IDE with Computer Use only after explicit user approval, because submitting to Cursor Agent can transmit repo content to Cursor.
+7. After Cursor finishes, Codex inspects `git status`, `git diff`, and the actual changed files before trusting any Cursor summary.
+8. Codex runs the narrowest sufficient checks for the change, plus browser or Playwright verification for user-facing UI.
+9. If Cursor chat context becomes noisy, open a fresh Cursor conversation and point it to the current handoff file, branch, and allowed file list.
+
+For this split, Codex remains the accountable gate. Cursor implementation is not done until Codex review and verification pass.
+
 ### Pre-Release Gate
 
 Before `development` → `main`, run QA + Security in parallel:
@@ -181,6 +197,7 @@ Repo-local sub-agent definitions live in `.codex/agents/*.toml`. Use them for ex
 | `cloudflare` | `*.astro`, `scripts/**`, `_headers` | `data-cfasync="false"`, no onclick, CSP dual-layer |
 | `git-workflow` | All files | Branch from development, verify locally before push |
 | `agent-surfaces` | Agent/rule/config files | Keep skills, rules, memory notes, and repo MCP config synchronized |
+| `codex-cursor-handoff` | All files | Codex plans/reviews/gates, Cursor implements bounded handoffs |
 
 ## Available Skills (`.agents/skills/`)
 
@@ -251,6 +268,7 @@ Repo MCP policy:
 - **Skill YAML descriptions**: A single-line frontmatter description containing `context:` or similar colon text can break skill loading. Use folded YAML blocks for long descriptions and validate all `SKILL.md` frontmatter after edits.
 - **Instruction-surface sync**: When workflow or agent rules change, update `AGENTS.md`, `CLAUDE.md`, `.cursor/rules/`, `.agents/skills/`, and `.codex/agents/` together so future sessions do not inherit stale rules.
 - **Repo-scoped MCP curation**: Prefer a small project-relevant set. Cloudflare is default for xhverse; Supabase is task-scoped; Notion stays out of this repo.
+- **Codex + Cursor split**: For hybrid work, Codex owns planning, review, QA/security gates, and evidence. Cursor implements from `.tmp/*-handoff.md`. Codex can operate Cursor IDE with explicit user approval, then must review the real diff before accepting the change.
 
 ## Key Constraints
 

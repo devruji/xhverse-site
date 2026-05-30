@@ -1,0 +1,57 @@
+---
+description: Codex-managed planning, Cursor implementation, and Codex review gate
+globs: ["**"]
+---
+
+## Ownership Split
+
+- Codex owns planning, scope control, review, QA, security gates, release discipline, and evidence.
+- Cursor owns implementation only when explicitly asked or when Codex has created a bounded handoff.
+- Do not treat a Cursor Agent summary as proof. The repo diff and verification commands are the source of truth.
+
+## Handoff Files
+
+- Use `.tmp/<task>-handoff.md` for Codex-to-Cursor work.
+- Include:
+  - branch and base branch
+  - goal
+  - allowed files
+  - forbidden files
+  - acceptance criteria
+  - implementation constraints
+  - review and verification plan
+- Cursor must stay inside the allowed files unless it stops and explains why more scope is required.
+
+## Cursor Agent Mode
+
+- Use one Cursor Agent for a focused file or component cleanup.
+- Use Cursor multi-agent or multitask mode only when each workstream has non-overlapping file ownership.
+- If multiple Cursor agents are used, assign each agent a bounded task, allowed file list, and expected output.
+- If the chat context gets long, open a fresh Cursor conversation and point it at the current handoff file.
+
+## Computer Use Safety
+
+- Codex may operate Cursor IDE with Computer Use only after the user explicitly approves submitting the handoff to Cursor Agent.
+- Reason: sending a prompt to Cursor Agent can transmit repo content to Cursor.
+- Do not ask Cursor Agent to read secrets, `.env` files, credentials, private keys, or unrelated local folders.
+
+## Review Gate
+
+After Cursor edits:
+
+- Run `git status --short --branch`.
+- Inspect `git diff --stat`.
+- Inspect diffs for all changed files, not only files Cursor reports.
+- Verify no generated folders changed unless explicitly intended.
+- Run the relevant checks:
+  - docs/rules/skills/config only: Markdown/frontmatter/TOML validation plus `git diff --check`
+  - source changes: `bun run typecheck`
+  - `src/lib/**` or `src/data/**`: `bun run coverage`
+  - user-facing UI: build plus browser or Playwright verification
+- Report only checks that actually ran.
+
+## Edit Discipline
+
+- One tool edits a file at a time.
+- If Cursor is implementing, Codex stays read-only until review unless the user explicitly asks Codex to patch a finding.
+- Preserve unrelated user changes. Never clean, revert, or overwrite another agent's work without explicit approval.

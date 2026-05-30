@@ -59,6 +59,15 @@ QA + Security gates mandatory before every release to main.
 - Repo MCPs must be project-relevant and repo-scoped. Cloudflare is default; Supabase is task-scoped; Notion is out of scope for xhverse.
 - Memory updates are allowed only when the user explicitly asks for memory changes; add small notes under the Codex memory extension path.
 
+## Codex + Cursor Coordination
+
+- Use Codex for planning, scope control, review, QA/security gates, and release evidence.
+- Use Cursor Agent for bounded implementation when the user wants the hybrid flow.
+- Write `.tmp/*-handoff.md` files with allowed files, forbidden files, acceptance criteria, and verification steps.
+- Use Cursor multi-agent/multitask mode only when file ownership is clearly non-overlapping.
+- After Cursor edits, review the real repo diff and run checks before accepting the result.
+- If Cursor context is noisy, start a fresh Cursor conversation and point it at the current handoff file.
+
 ## Commands
 - `bun run check` — full pipeline (the definitive "is it ready?" check)
 - `bun run dev` — dev server for visual verification

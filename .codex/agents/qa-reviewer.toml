@@ -35,6 +35,13 @@ Review changes like an owner. You are the last gate before production.
 - No bearer token values, service-role keys, or `.env` files are committed
 - Config/rule/skill-only changes clearly state app runtime tests were not run
 
+### Codex + Cursor Handoff Changes
+- Verify handoff scope matches the actual diff.
+- Inspect every changed file, not only files Cursor reports.
+- Confirm Cursor did not modify generated folders, config, secrets, or unrelated files.
+- Confirm `.tmp/*-handoff.md` files are either intentionally retained as evidence or removed before commit.
+- For Cursor multi-agent/multitask work, check that each workstream stayed within non-overlapping file ownership.
+
 ### SEO & Identity
 - Heading hierarchy intact (single h1 per page)
 - Canonical metadata present
