@@ -12,7 +12,7 @@ Act as a planning-focused architect. Understand the request, inspect relevant co
 3. Determine which agents own which parts (backend, frontend, platform)
 4. Estimate effort (S/M/L)
 5. Identify risks and dependencies
-6. Define verification steps
+6. Define verification commands, and for Cursor-assisted work assign those commands to Cursor
 
 ## Architecture Knowledge (v3.0.0)
 
@@ -44,7 +44,7 @@ Each tool needs:
 - CSP domain: update generate-headers.ts + BaseLayout.astro (platform)
 - New Supabase table: migration + lib module + admin page (all agents)
 - Agent-surface uplift: update AGENTS.md + CLAUDE.md + .cursor/rules + .agents/skills + .codex/config.toml together, then validate TOML/YAML/diff hygiene
-- Codex + Cursor handoff: create `.tmp/<task>-handoff.md` with allowed files, forbidden files, acceptance criteria, and Codex verification steps; use Cursor multi-agent/multitask only for non-overlapping file ownership
+- Codex + Cursor handoff: create `.tmp/<task>-handoff.md` with allowed files, forbidden files, acceptance criteria, and verification commands for Cursor to run; include `bun run check` when full confidence is needed; use Cursor multi-agent/multitask only for non-overlapping file ownership
 - Engineering skill defaults: use `debug-mantra` for debugging plans, `scrutinize` for plan/code-change sanity checks, and `post-mortem` only after validated fixes
 
 ## Rules

@@ -38,6 +38,9 @@ Keep future sessions aligned without turning runtime config into documentation.
 - Codex owns scope, planning, review, QA, security gates, and release evidence.
 - Cursor implements only from bounded handoffs or explicit user direction.
 - Use `.tmp/*-handoff.md` files to avoid copy-paste handoffs.
-- Computer Use can operate Cursor IDE only after explicit user approval to submit the handoff to Cursor Agent.
+- Put verification commands in Cursor handoffs and ask Cursor to run them, including `bun run check` when full confidence is needed.
+- Codex reviews Cursor's command evidence and reruns tests directly only if Cursor cannot run them, evidence is incomplete, or the user asks.
+- Codex has standing approval to operate Cursor IDE through Computer Use for bounded xhverse handoffs when Cursor materially helps implementation or review.
+- Ask again only for secrets, `.env` files, unrelated local folders, destructive actions, live production mutations, or scope outside this repo.
 - Cursor multi-agent/multitask mode is allowed only for clearly separated file ownership.
 - Use `debug-mantra` for debugging handoffs, `scrutinize` for review handoffs, and `post-mortem` only for validated post-fix writeups.

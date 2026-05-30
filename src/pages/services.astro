@@ -69,7 +69,7 @@ const servicesStructuredData = {
           </p>
           <p class="mt-3 text-xs text-zinc-500">Available for advisory engagements alongside full-time enterprise delivery.</p>
           <div class="hero-entrance-delayed-2 mt-6">
-            <a href="#contact" class="inline-flex items-center justify-center bg-white px-5 py-2.5 text-sm font-semibold text-black transition hover:bg-emerald-100">
+            <a href="#contact" class="cta-primary">
               Start a conversation
             </a>
           </div>
@@ -89,7 +89,7 @@ const servicesStructuredData = {
         </div>
         <div class="stagger-children animate-on-scroll grid gap-4 lg:grid-cols-3">
           {engagementTypes.map((engagement) => (
-            <article class="flex min-h-[28rem] flex-col border border-white/10 bg-white/[0.03] p-5 transition hover:border-emerald-300/50 sm:p-6">
+            <article class="static-card flex min-h-[28rem] flex-col p-5 sm:p-6">
               <div class="flex items-start justify-between gap-4">
                 <h3 class="text-xl font-semibold tracking-tight text-white">{engagement.title}</h3>
                 <span class="shrink-0 text-right text-[11px] uppercase tracking-[0.16em] text-zinc-500">
@@ -183,7 +183,7 @@ const servicesStructuredData = {
             </p>
           </div>
           <div class="grid gap-3 sm:grid-cols-2">
-            <a href={`mailto:${profile.email}?subject=Advisory%20Inquiry`} class="group flex items-start gap-4 border border-white/10 bg-white/[0.03] p-5 transition hover:border-emerald-300/50 hover:bg-white/[0.05]">
+            <a href={`mailto:${profile.email}?subject=Advisory%20Inquiry`} class="interactive-card group flex items-start gap-4 p-5">
               <img src="/images/icon_email.svg" alt="" width="28" height="28" class="mt-0.5 brightness-[0.4] invert transition group-hover:brightness-[0.6] group-hover:invert" />
               <div>
                 <p class="text-[11px] uppercase tracking-[0.22em] text-zinc-500">Email</p>
@@ -191,7 +191,7 @@ const servicesStructuredData = {
                 <p class="mt-1 text-xs text-zinc-500">Describe your platform context</p>
               </div>
             </a>
-            <a href={site.linkedin} target="_blank" rel="noopener noreferrer" class="group flex items-start gap-4 border border-white/10 bg-white/[0.03] p-5 transition hover:border-emerald-300/50 hover:bg-white/[0.05]">
+            <a href={site.linkedin} target="_blank" rel="noopener noreferrer" class="interactive-card group flex items-start gap-4 p-5">
               <img src="/images/icon_linkedin.svg" alt="" width="28" height="28" class="mt-0.5 brightness-[0.4] invert transition group-hover:brightness-[0.6] group-hover:invert" />
               <div>
                 <p class="text-[11px] uppercase tracking-[0.22em] text-zinc-500">LinkedIn</p>

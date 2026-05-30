@@ -7,7 +7,7 @@ globs: ["**"]
 
 - Codex owns planning, scope control, review, QA, security gates, release discipline, and evidence.
 - Cursor owns implementation only when explicitly asked or when Codex has created a bounded handoff.
-- Do not treat a Cursor Agent summary as proof. The repo diff and verification commands are the source of truth.
+- Do not treat a Cursor Agent summary as proof. The repo diff and Cursor's verification command output are the source of truth.
 
 ## Handoff Files
 
@@ -19,7 +19,7 @@ globs: ["**"]
   - forbidden files
   - acceptance criteria
   - implementation constraints
-  - review and verification plan
+  - review plan and verification commands Cursor must run
 - Cursor must stay inside the allowed files unless it stops and explains why more scope is required.
 
 ## Cursor Agent Mode
@@ -38,8 +38,9 @@ globs: ["**"]
 
 ## Computer Use Safety
 
-- Codex may operate Cursor IDE with Computer Use only after the user explicitly approves submitting the handoff to Cursor Agent.
-- Reason: sending a prompt to Cursor Agent can transmit repo content to Cursor.
+- Codex has standing approval to operate Cursor IDE with Computer Use for bounded xhverse handoffs when Cursor materially helps implementation or review.
+- Ask again only for secrets, `.env` files, unrelated local folders, destructive actions, live production mutations, or scope outside this repo.
+- Reason: sending a prompt to Cursor Agent can transmit repo content to Cursor, and this approval is intentionally limited to xhverse-scoped handoffs.
 - Do not ask Cursor Agent to read secrets, `.env` files, credentials, private keys, or unrelated local folders.
 
 ## Review Gate
@@ -50,12 +51,14 @@ After Cursor edits:
 - Inspect `git diff --stat`.
 - Inspect diffs for all changed files, not only files Cursor reports.
 - Verify no generated folders changed unless explicitly intended.
-- Run the relevant checks:
+- Ask Cursor to run the relevant checks and report the exact command output:
   - docs/rules/skills/config only: Markdown/frontmatter/TOML validation plus `git diff --check`
   - source changes: `bun run typecheck`
   - `src/lib/**` or `src/data/**`: `bun run coverage`
   - user-facing UI: build plus browser or Playwright verification
-- Report only checks that actually ran.
+- Use `bun run check` when full confidence is needed or the handoff asks for the full gate.
+- Codex reruns tests directly only if Cursor cannot run them, evidence is incomplete, or the user asks.
+- Report only checks that actually ran and who ran them.
 
 ## Edit Discipline
 

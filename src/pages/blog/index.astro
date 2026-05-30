@@ -50,35 +50,46 @@ const deploymentSite = (Astro.site ?? site.siteUrl).toString();
       </h1>
       <p class="mt-4 max-w-xl text-sm leading-7 text-zinc-400">
         Full articles are published here on xhverse.co. When a piece is also on
-        <a href={site.medium} target="_blank" rel="noreferrer" class="text-zinc-300 underline underline-offset-2 transition hover:text-white">Medium</a>, a
+        <a href={site.medium} target="_blank" rel="noreferrer" class="text-link external-link">Medium</a>, a
         second link is shown for readers who prefer that surface.
       </p>
 
       <div class="stagger-children animate-on-scroll mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {sortedPosts.map((post) => (
-          <article class="group relative flex flex-col rounded-2xl border border-white/10 bg-white/[0.03] p-5 transition hover:border-emerald-300/50 hover:bg-white/[0.05] sm:p-6">
-            <div class="mb-3 flex items-center gap-2 text-xs text-zinc-500">
-              <time>{post.date}</time>
-              <span>·</span>
-              <span>{post.readingTime}</span>
-            </div>
-            <h2 class="text-lg font-semibold leading-snug text-white">
-              <a href={`/blog/${post.slug}`} class="after:absolute after:inset-0">
+          <article class="relative">
+            <a
+              href={`/blog/${post.slug}`}
+              aria-label={`Read article: ${post.title}`}
+              class="interactive-card group flex min-h-full flex-col rounded-2xl p-5 sm:p-6"
+            >
+              <div class="mb-3 flex items-center gap-2 text-xs text-zinc-500">
+                <time>{post.date}</time>
+                <span>·</span>
+                <span>{post.readingTime}</span>
+              </div>
+              <h2 class="text-lg font-semibold leading-snug text-white">
                 {post.title}
+              </h2>
+              <p class="mt-2 flex-1 text-sm leading-relaxed text-zinc-400">{post.excerpt}</p>
+              <div class="mt-4 flex flex-wrap gap-2">
+                {post.tags.map((tag) => (
+                  <span class="rounded-full border border-white/10 px-2.5 py-0.5 text-[11px] text-zinc-500">{tag}</span>
+                ))}
+              </div>
+              <div class="mt-4 flex items-center gap-3 pr-24 text-sm">
+                <span class="link-cue font-medium">Read article →</span>
+              </div>
+            </a>
+            {post.mediumUrl ? (
+              <a
+                href={post.mediumUrl}
+                target="_blank"
+                rel="noreferrer"
+                class="text-link external-link absolute bottom-5 left-[8.5rem] z-10 text-sm text-zinc-500 sm:bottom-6"
+              >
+                Medium
               </a>
-            </h2>
-            <p class="mt-2 flex-1 text-sm leading-relaxed text-zinc-400">{post.excerpt}</p>
-            <div class="mt-4 flex flex-wrap gap-2">
-              {post.tags.map((tag) => (
-                <span class="rounded-full border border-white/10 px-2.5 py-0.5 text-[11px] text-zinc-500">{tag}</span>
-              ))}
-            </div>
-            <div class="mt-4 flex items-center gap-3 text-sm">
-              <span class="font-medium text-emerald-300 transition group-hover:text-emerald-200">Read article →</span>
-              {post.mediumUrl ? (
-                <a href={post.mediumUrl} target="_blank" rel="noreferrer" class="relative z-10 text-zinc-500 transition hover:text-white">Medium ↗</a>
-              ) : null}
-            </div>
+            ) : null}
           </article>
         ))}
       </div>

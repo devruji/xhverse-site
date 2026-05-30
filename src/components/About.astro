@@ -34,12 +34,12 @@ const strengths = [
       architecture can support delivery without becoming detached from execution.
     </p>
     <div class="about-actions">
-      <a href={site.linkedin} target="_blank" rel="noopener noreferrer" class="link-underlined">LinkedIn profile</a>
-      <a href={site.medium} target="_blank" rel="noopener noreferrer" class="link-underlined">Medium writing</a>
+      <a href={site.linkedin} target="_blank" rel="noopener noreferrer" class="link-underlined external-link">LinkedIn profile</a>
+      <a href={site.medium} target="_blank" rel="noopener noreferrer" class="link-underlined external-link">Medium writing</a>
     </div>
     <div class="grid grid--blog about-grid">
       {strengths.map((item) => (
-        <article class="card card--blog">
+        <article class="card card--blog static-card">
           <h2>{item.title}</h2>
           <p class="muted">{item.description}</p>
         </article>
