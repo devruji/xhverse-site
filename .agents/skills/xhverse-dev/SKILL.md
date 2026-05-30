@@ -87,6 +87,13 @@ Single test file: `bunx vitest run src/data/blog.test.ts`
 - After Cursor edits, review the actual `git diff` before accepting any summary, then run the relevant checks.
 - If Cursor chat context gets noisy, open a fresh Cursor conversation and point it at the current handoff file.
 
+## Engineering Skill Defaults
+
+- Use `debug-mantra` for bugs, failing checks, regressions, stack traces, and broken behavior before proposing a fix.
+- Use `scrutinize` for plan review, PR review, diff review, architecture/design sanity checks, and second-opinion review.
+- Use `post-mortem` after a bug fix only when the repro, root cause, fix, and validation are known.
+- For Cursor handoffs, name the expected skill lens in `.tmp/*-handoff.md` whenever debugging, review, or post-fix writeup work is in scope.
+
 ## Constraints
 
 - Do not modify generated folders: `coverage/`, `dist/`, `playwright-report/`, `test-results/`, `.astro/`

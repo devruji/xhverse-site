@@ -14,6 +14,7 @@ globs: ["src/**/*.ts", "src/**/*.astro", "src/**/*.js"]
 - Minimal diffs — don't refactor adjacent code
 - No features beyond what the task requires
 - Prefer editing existing files over creating new ones
+- For debugging, use `debug-mantra`; for review or sanity checks, use `scrutinize`; for post-fix RCAs, use `post-mortem` only after validation evidence exists.
 
 ## Patterns Used in This Codebase
 - Graceful degradation: if Supabase not configured → skip silently, don't throw

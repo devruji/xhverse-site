@@ -157,6 +157,16 @@ Use this flow when the user wants Codex to manage planning, review, QA, security
 
 For this split, Codex remains the accountable gate. Cursor implementation is not done until Codex review and verification pass.
 
+### Engineering Skill Defaults
+
+Use these engineering skills whenever their trigger fits, for both Codex work and Cursor handoffs:
+
+- `debug-mantra` — bug reports, failing checks, regressions, stack traces, or broken behavior. Reproduce first, trace the fail path, falsify the hypothesis, then cross-reference evidence before fixing.
+- `scrutinize` — plan review, PR review, diff review, architecture/design sanity checks, or second-opinion review. Question whether the intent is right, look for simpler paths, and trace the actual code path before accepting the change.
+- `post-mortem` — post-fix engineering record after there is a reliable repro, known root cause, implemented fix, and validation evidence. Do not draft an RCA from guesses.
+
+When Codex writes a `.tmp/*-handoff.md` for Cursor, include the expected skill lens if the task is debugging, review, or post-fix writeup work.
+
 ### Pre-Release Gate
 
 Before `development` → `main`, run QA + Security in parallel:
@@ -269,6 +279,7 @@ Repo MCP policy:
 - **Instruction-surface sync**: When workflow or agent rules change, update `AGENTS.md`, `CLAUDE.md`, `.cursor/rules/`, `.agents/skills/`, and `.codex/agents/` together so future sessions do not inherit stale rules.
 - **Repo-scoped MCP curation**: Prefer a small project-relevant set. Cloudflare is default for xhverse; Supabase is task-scoped; Notion stays out of this repo.
 - **Codex + Cursor split**: For hybrid work, Codex owns planning, review, QA/security gates, and evidence. Cursor implements from `.tmp/*-handoff.md`. Codex can operate Cursor IDE with explicit user approval, then must review the real diff before accepting the change.
+- **Engineering skill defaults**: Use `debug-mantra` for debugging, `scrutinize` for plan/PR/diff review, and `post-mortem` only after a reproduced, root-caused, validated fix. Apply the same lens in Cursor handoffs when relevant.
 
 ## Key Constraints
 

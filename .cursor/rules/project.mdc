@@ -51,6 +51,12 @@ src/pages/tools/<slug>.astro (UI + script) ← frontend-engineer
 - No external runtime dependencies for tools
 - Minimal diffs — don't refactor adjacent code
 
+## Engineering Skill Defaults
+- Use `debug-mantra` for bug reports, failing checks, regressions, stack traces, or broken behavior before proposing fixes.
+- Use `scrutinize` for plan review, PR review, diff review, architecture/design sanity checks, and second-opinion review.
+- Use `post-mortem` only after there is a reliable repro, known root cause, implemented fix, and validation evidence.
+- When Codex hands work to Cursor, follow the skill lens named in the `.tmp/*-handoff.md`.
+
 ## Git Workflow
 - Branch from `development` — never `main`
 - **NEVER** edit on `development` or `main` — create branch first

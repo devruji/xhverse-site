@@ -45,6 +45,7 @@ Each tool needs:
 - New Supabase table: migration + lib module + admin page (all agents)
 - Agent-surface uplift: update AGENTS.md + CLAUDE.md + .cursor/rules + .agents/skills + .codex/config.toml together, then validate TOML/YAML/diff hygiene
 - Codex + Cursor handoff: create `.tmp/<task>-handoff.md` with allowed files, forbidden files, acceptance criteria, and Codex verification steps; use Cursor multi-agent/multitask only for non-overlapping file ownership
+- Engineering skill defaults: use `debug-mantra` for debugging plans, `scrutinize` for plan/code-change sanity checks, and `post-mortem` only after validated fixes
 
 ## Rules
 - Do not edit code — plan only

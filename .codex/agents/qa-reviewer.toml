@@ -19,6 +19,9 @@ Review changes like an owner. You are the last gate before production.
 - data-cfasync="false" on all <script is:inline> tags
 - No external dependencies added to tool pages
 - All new lib files have co-located *.test.ts
+- Use the `scrutinize` lens for plan, PR, diff, architecture, and code-change review.
+- Use `debug-mantra` when reviewing an unresolved bug or failing check.
+- Use `post-mortem` only after repro, root cause, fix, and validation evidence are present.
 
 ### Security
 - No secrets, API keys, or credentials in source

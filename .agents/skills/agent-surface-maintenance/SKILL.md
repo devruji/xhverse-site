@@ -23,7 +23,7 @@ Keep future sessions aligned without turning runtime config into documentation.
    - `.codex/config.toml`: runtime config only, including repo-scoped MCP/plugin declarations.
    - Memory: add a small note under the Codex memory extension path only when the user explicitly asks to update memory.
 4. For MCP changes, prefer the smallest repo-scoped set that directly supports xhverse work. Do not add Notion here. Do not store bearer tokens in git.
-5. For Codex + Cursor workflow changes, keep `AGENTS.md`, `CLAUDE.md`, `.cursor/rules/codex-cursor-handoff.mdc`, `.agents/skills/xhverse-dev/SKILL.md`, and relevant `.codex/agents/*.toml` aligned.
+5. For Codex + Cursor workflow or engineering skill default changes, keep `AGENTS.md`, `CLAUDE.md`, `.cursor/rules/codex-cursor-handoff.mdc`, `.cursor/rules/project.mdc`, `.agents/skills/xhverse-dev/SKILL.md`, and relevant `.codex/agents/*.toml` aligned.
 6. Validate changed Markdown, Cursor rule frontmatter, TOML, and skill YAML before sign-off. Run app tests only when application behavior changes.
 
 ## MCP Policy
@@ -40,3 +40,4 @@ Keep future sessions aligned without turning runtime config into documentation.
 - Use `.tmp/*-handoff.md` files to avoid copy-paste handoffs.
 - Computer Use can operate Cursor IDE only after explicit user approval to submit the handoff to Cursor Agent.
 - Cursor multi-agent/multitask mode is allowed only for clearly separated file ownership.
+- Use `debug-mantra` for debugging handoffs, `scrutinize` for review handoffs, and `post-mortem` only for validated post-fix writeups.

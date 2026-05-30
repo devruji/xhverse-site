@@ -29,6 +29,13 @@ globs: ["**"]
 - If multiple Cursor agents are used, assign each agent a bounded task, allowed file list, and expected output.
 - If the chat context gets long, open a fresh Cursor conversation and point it at the current handoff file.
 
+## Engineering Skill Lenses
+
+- Use `debug-mantra` for debugging handoffs before proposing a fix.
+- Use `scrutinize` for review handoffs, plan checks, PR checks, and diff sanity checks.
+- Use `post-mortem` only after a bug has a reliable repro, confirmed cause, implemented fix, and validation evidence.
+- If the handoff names one of these skills, treat that lens as part of the acceptance criteria.
+
 ## Computer Use Safety
 
 - Codex may operate Cursor IDE with Computer Use only after the user explicitly approves submitting the handoff to Cursor Agent.
