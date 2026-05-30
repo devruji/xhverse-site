@@ -1,4 +1,8 @@
 ---
+const btnBase =
+  'fixed bottom-6 right-6 z-[9999] flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border shadow-xl transition hover:scale-110 hover:border-emerald-400 active:scale-95';
+const btnDark = 'border-zinc-700 bg-zinc-900 text-zinc-200';
+const btnLight = 'border-zinc-300 bg-white text-zinc-700';
 ---
 
 <button
@@ -6,7 +10,7 @@
   type="button"
   aria-label="Toggle theme"
   data-astro-transition-persist="theme-toggle"
-  class="fixed bottom-6 right-6 z-[9999] flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border border-zinc-700 bg-zinc-900 text-zinc-200 shadow-xl transition hover:scale-110 hover:border-emerald-400 active:scale-95"
+  class={`${btnBase} ${btnDark}`}
 >
   <svg id="theme-icon-sun" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
     <circle cx="12" cy="12" r="5"></circle>
@@ -17,7 +21,7 @@
   </svg>
 </button>
 
-<script is:inline data-cfasync="false">
+<script is:inline data-cfasync="false" define:vars={{ btnBase, btnDark, btnLight }}>
 (function(){
   var toggle = document.getElementById('theme-toggle');
   if (!toggle || toggle._init) return;
@@ -30,11 +34,7 @@
     var isLight = document.documentElement.classList.contains('light');
     if (sun) sun.classList.toggle('hidden', isLight);
     if (moon) moon.classList.toggle('hidden', !isLight);
-    if (isLight) {
-      toggle.className = 'fixed bottom-6 right-6 z-[9999] flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border border-zinc-300 bg-white text-zinc-700 shadow-xl transition hover:scale-110 hover:border-emerald-400 active:scale-95';
-    } else {
-      toggle.className = 'fixed bottom-6 right-6 z-[9999] flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border border-zinc-700 bg-zinc-900 text-zinc-200 shadow-xl transition hover:scale-110 hover:border-emerald-400 active:scale-95';
-    }
+    toggle.className = btnBase + ' ' + (isLight ? btnLight : btnDark);
   }
 
   apply();

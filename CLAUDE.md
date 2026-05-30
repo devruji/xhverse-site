@@ -8,7 +8,7 @@ XHVerse is the portfolio, blog, and tools site for Rujikorn Ngoensaard (XH / bos
 
 - **Production**: https://xhverse.co
 - **Repo**: https://github.com/devruji/xhverse-site
-- **Current version**: v2.12.0
+- **Current version**: v3.0.0
 - **Business model**: Consulting/advisory — site drives inbound leads via content + tools
 
 ## Commands
@@ -132,7 +132,7 @@ git clean -fd --dry-run     # Check for untracked contamination from other sessi
 ### Making Changes
 
 1. Create feature branch from `development`
-2. Implement + run `bun run check` locally
+2. Implement + verify; for Cursor-assisted work, have Cursor run `bun run check` and report the output
 3. **Verify `git diff --stat` shows ONLY your intended changes**
 4. **Start dev server and show user** before pushing
 5. Wait for user approval in browser (both themes, mobile viewport)
@@ -140,6 +140,33 @@ git clean -fd --dry-run     # Check for untracked contamination from other sessi
 7. **NEVER push without user seeing it in browser first**
 8. **NEVER create PRs targeting `main`** — always target `development`
 9. **NEVER edit files while on `development` or `main`** — create a branch FIRST
+
+### Codex + Cursor Handoff Workflow
+
+Use this flow when the user wants Codex to manage planning, review, QA, security, or release gates while Cursor performs implementation.
+
+1. Codex checks branch and dirty state, then creates or reuses a feature branch from `development`.
+2. Codex writes a scoped handoff file under `.tmp/`, usually `.tmp/<task>-handoff.md`.
+3. The handoff must include allowed files, forbidden files, acceptance criteria, risk notes, and verification commands for Cursor to run.
+4. Cursor implements from that handoff. Prefer one focused Cursor Agent for one focused change.
+5. Use Cursor multi-agent or multitask mode only when file ownership is non-overlapping and the handoff assigns each workstream clearly.
+6. The user has granted standing approval for Codex to operate Cursor IDE with Computer Use and submit bounded xhverse handoffs to Cursor Agent when it materially helps implementation. Ask again only for secrets, `.env` files, unrelated local folders, destructive actions, live production mutations, or scope outside this repo.
+7. After Cursor finishes, Codex inspects `git status`, `git diff`, and the actual changed files before trusting any Cursor summary.
+8. Cursor runs the narrowest sufficient checks for the change, including `bun run check` when full confidence is needed, and captures the output in its response.
+9. Codex reviews Cursor's test evidence plus `git status`, `git diff`, and the actual changed files before trusting any Cursor summary. Codex reruns tests directly only if Cursor cannot run them, evidence is incomplete, or the user asks.
+10. If Cursor chat context becomes noisy, open a fresh Cursor conversation and point it to the current handoff file, branch, and allowed file list.
+
+For this split, Codex remains the accountable gate. Cursor implementation is not done until Codex review and verification pass.
+
+### Engineering Skill Defaults
+
+Use these engineering skills whenever their trigger fits, for both Codex work and Cursor handoffs:
+
+- `debug-mantra` — bug reports, failing checks, regressions, stack traces, or broken behavior. Reproduce first, trace the fail path, falsify the hypothesis, then cross-reference evidence before fixing.
+- `scrutinize` — plan review, PR review, diff review, architecture/design sanity checks, or second-opinion review. Question whether the intent is right, look for simpler paths, and trace the actual code path before accepting the change.
+- `post-mortem` — post-fix engineering record after there is a reliable repro, known root cause, implemented fix, and validation evidence. Do not draft an RCA from guesses.
+
+When Codex writes a `.tmp/*-handoff.md` for Cursor, include the expected skill lens if the task is debugging, review, or post-fix writeup work.
 
 ### Pre-Release Gate
 
@@ -155,12 +182,12 @@ Repo-local sub-agent definitions live in `.codex/agents/*.toml`. Use them for ex
 
 | Agent | Role | When to use |
 |-------|------|-------------|
-| `engineering-lead` | Architecture, coordination, code review | Multi-concern tasks, architecture decisions, release planning |
+| `engineering-lead` | Architecture, coordination, code review | Multi-concern tasks, architecture decisions, release planning, agent-surface governance |
 | `site-planner` | Read-heavy implementation planning | File-level plans, owner split, risks, verification scope |
 | `astro-builder` | Production Astro implementation | Page/component changes that need direct Astro execution |
 | `frontend-engineer` | UI, Astro pages, styling, themes, a11y | Visual work, responsive fixes, interactive tool UIs |
 | `backend-engineer` | Data layer, tests, types, Supabase | `src/data/`, `src/lib/`, coverage, type errors |
-| `platform-engineer` | Deploy, CI, CSP, Cloudflare | CI failures, headers, build pipeline, edge/platform work |
+| `platform-engineer` | Deploy, CI, CSP, Cloudflare | CI failures, headers, build pipeline, edge/platform work, repo MCP config |
 | `product-manager` | Product strategy, roadmap, content direction | Feature evaluation, prioritization, business rationale |
 | `qa-reviewer` | Read-only QA and release readiness | Regression review, a11y, security, release gate findings |
 
@@ -180,6 +207,8 @@ Repo-local sub-agent definitions live in `.codex/agents/*.toml`. Use them for ex
 | `testing` | `src/data/**`, `src/lib/**` | 100% coverage on all 4 metrics, mock externals |
 | `cloudflare` | `*.astro`, `scripts/**`, `_headers` | `data-cfasync="false"`, no onclick, CSP dual-layer |
 | `git-workflow` | All files | Branch from development, verify locally before push |
+| `agent-surfaces` | Agent/rule/config files | Keep skills, rules, memory notes, and repo MCP config synchronized |
+| `codex-cursor-handoff` | All files | Codex plans/reviews/gates, Cursor implements bounded handoffs |
 
 ## Available Skills (`.agents/skills/`)
 
@@ -192,6 +221,7 @@ Repo-local sub-agent definitions live in `.codex/agents/*.toml`. Use them for ex
 | `document-writer` | Technical docs, blog posts, ADRs |
 | `cloudflare-platform` | Cloudflare Pages/Workers/DNS config |
 | `supabase-backend` | Database, auth, storage work |
+| `agent-surface-maintenance` | Skills, rules, memory notes, Codex config, and repo-scoped MCP upkeep |
 | `qa-expert` | Pre-release regression gate |
 | `security-audit-expert` | Security audit (pre-release + on demand) |
 | `seo-metadata-check` | Quick single-page SEO review |
@@ -210,9 +240,25 @@ sandbox_mode = "workspace-write"
 [agents]
 max_threads = 4
 max_depth = 1
+
+[plugins."cloudflare@openai-curated"]
+enabled = true
+
+[plugins."supabase@openai-curated"]
+enabled = true
+
+[mcp_servers.cloudflare-api]
+url = "https://mcp.cloudflare.com/mcp"
+bearer_token_env_var = "CLOUDFLARE_API_TOKEN"
 ```
 
 Do not add `[instructions]` or `developer_instructions` tables. Newer Codex config parsing treats that shape as invalid and blocks skill reload. Keep repo guidance in `AGENTS.md`, `CLAUDE.md`, `.cursor/rules/`, `.agents/skills/`, and `.codex/agents/`.
+
+Repo MCP policy:
+- Keep Cloudflare repo-scoped because it supports Pages, Access, Turnstile, security headers, and deployment checks.
+- Keep Supabase available for explicit backend/data/RLS/storage/auth/admin work.
+- Do not add Notion here; xhverse does not use it.
+- Store only env var names in git, never token values.
 
 ## Lessons Learned
 
@@ -232,6 +278,9 @@ Do not add `[instructions]` or `developer_instructions` tables. Newer Codex conf
 - **Codex config schema**: `.codex/config.toml` must not contain `[instructions]` / `developer_instructions`; that causes `invalid type: map, expected a string` during skill reload.
 - **Skill YAML descriptions**: A single-line frontmatter description containing `context:` or similar colon text can break skill loading. Use folded YAML blocks for long descriptions and validate all `SKILL.md` frontmatter after edits.
 - **Instruction-surface sync**: When workflow or agent rules change, update `AGENTS.md`, `CLAUDE.md`, `.cursor/rules/`, `.agents/skills/`, and `.codex/agents/` together so future sessions do not inherit stale rules.
+- **Repo-scoped MCP curation**: Prefer a small project-relevant set. Cloudflare is default for xhverse; Supabase is task-scoped; Notion stays out of this repo.
+- **Codex + Cursor split**: For hybrid work, Codex owns planning, review, QA/security gates, and evidence. Cursor implements from `.tmp/*-handoff.md`. Codex has standing approval to operate Cursor IDE for bounded xhverse handoffs, then must review the real diff before accepting the change.
+- **Engineering skill defaults**: Use `debug-mantra` for debugging, `scrutinize` for plan/PR/diff review, and `post-mortem` only after a reproduced, root-caused, validated fix. Apply the same lens in Cursor handoffs when relevant.
 
 ## Key Constraints
 

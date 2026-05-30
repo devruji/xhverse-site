@@ -35,8 +35,10 @@ The site uses a dark, minimal, professional aesthetic. Any changes must respect 
 ### Interactive States
 - Hover transitions: `0.18s ease-out` (fast, subtle)
 - Nav underline: width 0 → 100% animation
-- Cards: border-color shift to emerald on hover
-- Buttons: brightness filter on hover (not color swap)
+- Clickable cards: semantic links/buttons, pointer affordance, visible focus, subtle lift, border/background change, and optional arrow movement
+- Static cards: no hover lift, no pointer cursor, no CTA arrow, and more muted border/background
+- Buttons: use shared CTA variants and keep hover/focus feedback clear but restrained
+- Text links: recognizable underline treatment; distinguish external links where appropriate
 
 ### Layout Patterns
 - Tailwind CSS v4 utilities + custom CSS in `global.css`
@@ -109,6 +111,9 @@ Evaluate in this order. Each category has specific signals to check against the 
 **What to check:**
 - Focus states are visible (keyboard navigation)
 - Hover states provide feedback without being distracting
+- Clickable cards are distinguishable from static cards before hover
+- Static information cards do not react like controls
+- Text links are recognizable without relying on color alone
 - Loading states exist for async operations (maturity tool submission)
 - Error states are clear and helpful
 - Success states confirm completed actions

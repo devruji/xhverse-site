@@ -101,7 +101,7 @@ const tools = [
         {tools.map((tool) => (
           <a
             href={`/tools/${tool.slug}`}
-            class="group relative flex flex-col rounded-2xl border border-white/10 bg-white/[0.03] p-6 transition hover:border-emerald-300/50 hover:bg-white/[0.05]"
+            class="interactive-card group relative flex flex-col rounded-2xl p-6"
           >
             <div class="mb-3 flex items-center justify-between">
               <span class="rounded-full border border-emerald-300/25 bg-emerald-300/8 px-2.5 py-0.5 text-[10px] uppercase tracking-wider text-emerald-200">
@@ -114,7 +114,7 @@ const tools = [
             </h2>
             <p class="mt-2 flex-1 text-sm leading-relaxed text-zinc-400">{tool.description}</p>
             <div class="mt-5">
-              <span class="text-sm font-medium text-emerald-300 transition group-hover:text-emerald-200">
+              <span class="link-cue text-sm font-medium">
                 Open tool →
               </span>
             </div>

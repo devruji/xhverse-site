@@ -1,0 +1,67 @@
+---
+description: Codex-managed planning, Cursor implementation, and Codex review gate
+globs: ["**"]
+---
+
+## Ownership Split
+
+- Codex owns planning, scope control, review, QA, security gates, release discipline, and evidence.
+- Cursor owns implementation only when explicitly asked or when Codex has created a bounded handoff.
+- Do not treat a Cursor Agent summary as proof. The repo diff and Cursor's verification command output are the source of truth.
+
+## Handoff Files
+
+- Use `.tmp/<task>-handoff.md` for Codex-to-Cursor work.
+- Include:
+  - branch and base branch
+  - goal
+  - allowed files
+  - forbidden files
+  - acceptance criteria
+  - implementation constraints
+  - review plan and verification commands Cursor must run
+- Cursor must stay inside the allowed files unless it stops and explains why more scope is required.
+
+## Cursor Agent Mode
+
+- Use one Cursor Agent for a focused file or component cleanup.
+- Use Cursor multi-agent or multitask mode only when each workstream has non-overlapping file ownership.
+- If multiple Cursor agents are used, assign each agent a bounded task, allowed file list, and expected output.
+- If the chat context gets long, open a fresh Cursor conversation and point it at the current handoff file.
+
+## Engineering Skill Lenses
+
+- Use `debug-mantra` for debugging handoffs before proposing a fix.
+- Use `scrutinize` for review handoffs, plan checks, PR checks, and diff sanity checks.
+- Use `post-mortem` only after a bug has a reliable repro, confirmed cause, implemented fix, and validation evidence.
+- If the handoff names one of these skills, treat that lens as part of the acceptance criteria.
+
+## Computer Use Safety
+
+- Codex has standing approval to operate Cursor IDE with Computer Use for bounded xhverse handoffs when Cursor materially helps implementation or review.
+- Ask again only for secrets, `.env` files, unrelated local folders, destructive actions, live production mutations, or scope outside this repo.
+- Reason: sending a prompt to Cursor Agent can transmit repo content to Cursor, and this approval is intentionally limited to xhverse-scoped handoffs.
+- Do not ask Cursor Agent to read secrets, `.env` files, credentials, private keys, or unrelated local folders.
+
+## Review Gate
+
+After Cursor edits:
+
+- Run `git status --short --branch`.
+- Inspect `git diff --stat`.
+- Inspect diffs for all changed files, not only files Cursor reports.
+- Verify no generated folders changed unless explicitly intended.
+- Ask Cursor to run the relevant checks and report the exact command output:
+  - docs/rules/skills/config only: Markdown/frontmatter/TOML validation plus `git diff --check`
+  - source changes: `bun run typecheck`
+  - `src/lib/**` or `src/data/**`: `bun run coverage`
+  - user-facing UI: build plus browser or Playwright verification
+- Use `bun run check` when full confidence is needed or the handoff asks for the full gate.
+- Codex reruns tests directly only if Cursor cannot run them, evidence is incomplete, or the user asks.
+- Report only checks that actually ran and who ran them.
+
+## Edit Discipline
+
+- One tool edits a file at a time.
+- If Cursor is implementing, Codex stays read-only until review unless the user explicitly asks Codex to patch a finding.
+- Preserve unrelated user changes. Never clean, revert, or overwrite another agent's work without explicit approval.

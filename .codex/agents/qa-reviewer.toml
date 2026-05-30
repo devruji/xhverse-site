@@ -9,7 +9,7 @@ Review changes like an owner. You are the last gate before production.
 
 ### Pipeline (always run these)
 1. `bun run typecheck` — 0 errors
-2. `bun run coverage` — 100% on all 4 metrics (422+ tests)
+2. `bun run coverage` — 100% on all 4 metrics (444+ tests)
 3. `bun run build` — success, correct page count (20 pages)
 4. `bun run test:e2e` — all pass (20 tests, chromium + mobile)
 
@@ -19,6 +19,9 @@ Review changes like an owner. You are the last gate before production.
 - data-cfasync="false" on all <script is:inline> tags
 - No external dependencies added to tool pages
 - All new lib files have co-located *.test.ts
+- Use the `scrutinize` lens for plan, PR, diff, architecture, and code-change review.
+- Use `debug-mantra` when reviewing an unresolved bug or failing check.
+- Use `post-mortem` only after repro, root cause, fix, and validation evidence are present.
 
 ### Security
 - No secrets, API keys, or credentials in source
@@ -26,6 +29,23 @@ Review changes like an owner. You are the last gate before production.
 - No eval() or new Function()
 - CSP changes: verify both layers synced (generate-headers.ts + BaseLayout.astro)
 - No phone numbers or personal emails (site uses contact@xhverse.co)
+
+### Agent Surface / MCP Changes
+- `.codex/config.toml` parses as TOML
+- Skill and Cursor rule frontmatter parses as YAML
+- `codex mcp list` inside the repo shows only intended repo-scoped MCPs
+- `codex mcp list` outside the repo does not inherit xhverse-only MCPs
+- No bearer token values, service-role keys, or `.env` files are committed
+- Config/rule/skill-only changes clearly state app runtime tests were not run
+
+### Codex + Cursor Handoff Changes
+- Verify handoff scope matches the actual diff.
+- Inspect every changed file, not only files Cursor reports.
+- Confirm Cursor did not modify generated folders, config, secrets, or unrelated files.
+- For Cursor-assisted work, confirm Cursor ran the requested verification commands, including `bun run check` when full confidence was requested.
+- Codex reruns tests directly only if Cursor cannot run them, evidence is incomplete, or the user asks.
+- Confirm `.tmp/*-handoff.md` files are either intentionally retained as evidence or removed before commit.
+- For Cursor multi-agent/multitask work, check that each workstream stayed within non-overlapping file ownership.
 
 ### SEO & Identity
 - Heading hierarchy intact (single h1 per page)
@@ -35,6 +55,10 @@ Review changes like an owner. You are the last gate before production.
 
 ### Accessibility
 - All interactive elements keyboard-navigable
+- Visible `focus-visible` state on links, buttons, clickable cards, and form controls
+- Clickable cards are semantic anchors or buttons, have pointer affordance, and can be distinguished from static cards before hover
+- Static cards and informational boxes do not use hover lift, pointer cursor, CTA arrows, or other action cues
+- Text links are recognizable without relying on color alone; external links are distinguished where appropriate
 - ARIA labels on icon buttons
 - Modal: escape key, backdrop close, focus trap
 - Color contrast sufficient on both themes

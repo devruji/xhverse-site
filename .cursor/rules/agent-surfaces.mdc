@@ -1,0 +1,48 @@
+---
+description: Agent surface, memory, and repo-scoped MCP maintenance
+globs: ["AGENTS.md", "CLAUDE.md", ".agents/**", ".codex/**", ".cursor/rules/**"]
+---
+
+## Scope
+
+Use this rule when changing repo instructions, skills, sub-agent cards, Codex config, MCP declarations, or memory handoff notes.
+
+## Source Placement
+
+- `AGENTS.md`: compact operating contract.
+- `CLAUDE.md`: full onboarding, lessons learned, and longer workflow explanations.
+- `.cursor/rules/*.mdc`: Cursor/editor rules with valid YAML frontmatter.
+- `.agents/skills/*/SKILL.md`: task workflows; frontmatter must be valid YAML.
+- `.codex/agents/*.toml`: repo-local sub-agent role cards.
+- `.codex/config.toml`: runtime config only; no `[instructions]` or `developer_instructions`.
+
+## Codex + Cursor Surface Sync
+
+- Keep the Codex-managed/Cursor-implemented workflow synchronized in `AGENTS.md`, `CLAUDE.md`, `.cursor/rules/codex-cursor-handoff.mdc`, `.agents/skills/xhverse-dev/SKILL.md`, and relevant `.codex/agents/*.toml`.
+- Use `.tmp/*-handoff.md` as the shared instruction surface between Codex and Cursor.
+- Codex has standing approval to operate Cursor IDE for bounded xhverse handoffs when Cursor materially helps; ask again only for secrets, unrelated local folders, destructive actions, live production mutations, or scope outside this repo.
+- Do not put this workflow into `.codex/config.toml`; that file remains runtime config only.
+- Keep engineering skill defaults synchronized when they change: `debug-mantra` for debugging, `scrutinize` for reviews, and `post-mortem` for validated post-fix writeups.
+
+## Memory Updates
+
+- Update memory only when the user explicitly asks for memory changes.
+- Add a small note under `/Users/bossruji/.codex/memories/extensions/ad_hoc/notes/`.
+- Do not edit the generated memory registry directly.
+
+## Repo-Scoped MCP Rules
+
+- Keep xhverse MCPs repo-scoped in `.codex/config.toml`.
+- Store only environment variable names, never bearer token values.
+- Cloudflare is the default MCP for this repo.
+- Supabase tooling is allowed for explicit backend/data/RLS work.
+- Do not add Notion for xhverse.
+- Remove MCPs that are slow, broken, unused, or not clearly tied to this project.
+
+## Validation
+
+- Parse TOML after `.codex/config.toml` edits.
+- Validate skill frontmatter YAML after `SKILL.md` edits.
+- Validate Cursor rule frontmatter after `.cursor/rules/*.mdc` edits.
+- Run `git diff --check`.
+- For config/rule/skill-only changes, state that app runtime tests were not run.

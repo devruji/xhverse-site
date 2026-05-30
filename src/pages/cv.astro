@@ -56,7 +56,7 @@ const cvStructuredData = {
         </nav>
         <button
           type="button"
-          class="cv-request-open border border-white/15 px-3 py-1.5 text-xs uppercase tracking-[0.18em] text-zinc-300 transition hover:border-emerald-300/70 hover:text-white md:hidden"
+          class="cta-secondary cv-request-open px-3 py-1.5 text-xs uppercase tracking-[0.18em] md:hidden"
         >
           Request CV
         </button>
@@ -77,7 +77,7 @@ const cvStructuredData = {
           <div class="mt-8">
             <button
               type="button"
-              class="cv-request-open inline-flex items-center justify-center bg-white px-5 py-3 text-sm font-semibold text-black transition hover:bg-emerald-100"
+              class="cta-primary cv-request-open"
             >
               Request CV
             </button>
@@ -85,7 +85,7 @@ const cvStructuredData = {
           </div>
         </div>
 
-        <aside class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+        <aside class="static-card p-5 sm:p-6">
           <div class="flex items-start justify-between gap-4">
             <div>
               <p class="text-[11px] uppercase tracking-[0.24em] text-zinc-500">Document</p>
@@ -142,19 +142,19 @@ const cvStructuredData = {
             </p>
           </div>
           <div class="grid gap-3 sm:grid-cols-2">
-            <article class="border border-white/10 bg-white/[0.03] p-5">
+            <article class="static-card p-5">
               <p class="text-sm font-medium text-white">Platform experience</p>
               <p class="mt-2 text-sm leading-7 text-zinc-400">Azure, Databricks, Fabric, Spark, Power BI — with specific project context.</p>
             </article>
-            <article class="border border-white/10 bg-white/[0.03] p-5">
+            <article class="static-card p-5">
               <p class="text-sm font-medium text-white">Architecture depth</p>
               <p class="mt-2 text-sm leading-7 text-zinc-400">Lakehouse design, governance models, data product delivery patterns.</p>
             </article>
-            <article class="border border-white/10 bg-white/[0.03] p-5">
+            <article class="static-card p-5">
               <p class="text-sm font-medium text-white">Industry context</p>
               <p class="mt-2 text-sm leading-7 text-zinc-400">Retail, Real Estate, E-Commerce, Manufacturing, and Loyalty — enterprise-scale work.</p>
             </article>
-            <article class="border border-white/10 bg-white/[0.03] p-5">
+            <article class="static-card p-5">
               <p class="text-sm font-medium text-white">Certifications and education</p>
               <p class="mt-2 text-sm leading-7 text-zinc-400">Relevant credentials and continuous learning background.</p>
             </article>
@@ -172,7 +172,7 @@ const cvStructuredData = {
           </div>
           <div class="grid gap-3">
             {cvHighlights.map((item) => (
-              <article class="border border-white/10 bg-white/[0.03] p-5">
+              <article class="static-card p-5">
                 <p class="text-sm leading-7 text-zinc-300">{item}</p>
               </article>
             ))}

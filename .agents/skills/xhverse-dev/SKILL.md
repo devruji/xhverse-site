@@ -59,6 +59,7 @@ Single test file: `bunx vitest run src/data/blog.test.ts`
 - When adding logic to `src/data/` or `src/lib/`, you must add matching tests that maintain 100% coverage
 
 ### Tools Page
+- `/tools/scd-design-lab`: SCD modeling practice lab
 - `/tools/data-platform-maturity-checker`: Assessment with benchmark persistence
 - `/tools/governance-scorecard`: Assessment with blockers and action plan
 - `/tools/architecture-roulette`: Decision game with agreement tracking
@@ -75,6 +76,26 @@ Single test file: `bunx vitest run src/data/blog.test.ts`
 - `.agents/skills/*/SKILL.md`: Codex skills; keep YAML frontmatter valid
 - `.codex/agents/*.toml`: repo-local sub-agent role cards
 - `.codex/config.toml`: runtime config only; never add `[instructions]` or `developer_instructions`
+- `.agents/skills/agent-surface-maintenance/SKILL.md`: use for skills, rules, memory notes, Codex config, and repo-scoped MCP upkeep
+
+## Codex + Cursor Workflow
+
+- Codex is accountable for planning, review, QA, security gates, and release evidence.
+- Cursor can implement bounded changes from a Codex-authored `.tmp/*-handoff.md` file.
+- Handoff files must list allowed files, forbidden files, acceptance criteria, and verification commands for Cursor to run.
+- Codex has standing approval to operate Cursor IDE through Computer Use for bounded xhverse handoffs when Cursor materially helps implementation or review.
+- Ask again only for secrets, `.env` files, unrelated local folders, destructive actions, live production mutations, or scope outside this repo.
+- Use Cursor multi-agent/multitask mode only for non-overlapping file ownership.
+- After Cursor edits, review the actual `git diff` and Cursor's test evidence before accepting any summary.
+- For Cursor-assisted work, ask Cursor to run the relevant checks, including `bun run check` when full confidence is needed; Codex reruns tests directly only if Cursor cannot run them, evidence is incomplete, or the user asks.
+- If Cursor chat context gets noisy, open a fresh Cursor conversation and point it at the current handoff file.
+
+## Engineering Skill Defaults
+
+- Use `debug-mantra` for bugs, failing checks, regressions, stack traces, and broken behavior before proposing a fix.
+- Use `scrutinize` for plan review, PR review, diff review, architecture/design sanity checks, and second-opinion review.
+- Use `post-mortem` after a bug fix only when the repro, root cause, fix, and validation are known.
+- For Cursor handoffs, name the expected skill lens in `.tmp/*-handoff.md` whenever debugging, review, or post-fix writeup work is in scope.
 
 ## Constraints
 
