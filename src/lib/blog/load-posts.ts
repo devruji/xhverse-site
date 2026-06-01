@@ -7,6 +7,8 @@ import {
 } from "./interpret-merge";
 
 const SELECT_COLUMNS =
+  "slug,title,excerpt,body_markdown,tags,reading_time,medium_url,published_at,updated_at,cover_image_path,cover_image_alt,seo_title,seo_description";
+const LEGACY_SELECT_COLUMNS =
   "slug,title,excerpt,body_markdown,tags,reading_time,medium_url,published_at";
 
 export function readSupabaseBuildCredentials(env: {
@@ -44,12 +46,24 @@ export async function loadPublishedPostsForBuild(
     );
     return sortPostsByDateDesc(staticFallback);
   }
-  const { data, error } = await client
-    .from("posts")
-    .select(SELECT_COLUMNS)
-    .eq("status", "published")
-    .not("published_at", "is", null)
-    .order("published_at", { ascending: false });
+  const nowIso = new Date().toISOString();
+  const queryPublishedPosts = (columns: string) =>
+    client
+      .from("posts")
+      .select(columns)
+      .eq("status", "published")
+      .not("published_at", "is", null)
+      .lte("published_at", nowIso)
+      .order("published_at", { ascending: false });
+
+  let { data, error } = await queryPublishedPosts(SELECT_COLUMNS);
+  if (isMissingEnhancedColumnError(error)) {
+    console.warn(
+      "[blog] Supabase posts metadata columns missing; retrying legacy post columns.",
+    );
+    ({ data, error } = await queryPublishedPosts(LEGACY_SELECT_COLUMNS));
+  }
+
   const interpretation = interpretSupabasePostsResponse(data, error);
 
   if (interpretation.kind === "use_fallback") {
@@ -70,4 +84,15 @@ export async function loadPublishedPostsForBuild(
 
   const merged = mergePostsWithStaticFallback(interpretation, staticFallback);
   return sortPostsByDateDesc(merged);
+}
+
+function isMissingEnhancedColumnError(error: { message?: string } | null): boolean {
+  const message = error?.message?.toLowerCase() ?? "";
+  return (
+    message.includes("cover_image_path") ||
+    message.includes("cover_image_alt") ||
+    message.includes("seo_title") ||
+    message.includes("seo_description") ||
+    message.includes("updated_at")
+  );
 }

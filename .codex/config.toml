@@ -17,6 +17,11 @@ enabled = true
 url = "https://mcp.cloudflare.com/mcp"
 bearer_token_env_var = "CLOUDFLARE_API_TOKEN"
 
+# Supabase is scoped to the xhverse project so agents cannot enumerate other account projects.
+[mcp_servers.supabase]
+url = "https://mcp.supabase.com/mcp?project_ref=jxfpnfliioqbhzznaphd"
+bearer_token_env_var = "SUPABASE_ACCESS_TOKEN"
+
 # Supabase is repo-scoped because xhverse owns public forms, admin data, and migrations.
 [apps.asdk_app_69d3e5ee6a708191baa733f7b8931995.tools.supabase_apply_migration]
 approval_mode = "approve"

@@ -60,24 +60,35 @@ const deploymentSite = (Astro.site ?? site.siteUrl).toString();
             <a
               href={`/blog/${post.slug}`}
               aria-label={`Read article: ${post.title}`}
-              class="interactive-card group flex min-h-full flex-col rounded-2xl p-5 sm:p-6"
+              class="interactive-card group flex min-h-full flex-col overflow-hidden rounded-2xl p-0"
             >
-              <div class="mb-3 flex items-center gap-2 text-xs text-zinc-500">
-                <time>{post.date}</time>
-                <span>·</span>
-                <span>{post.readingTime}</span>
-              </div>
-              <h2 class="text-lg font-semibold leading-snug text-white">
-                {post.title}
-              </h2>
-              <p class="mt-2 flex-1 text-sm leading-relaxed text-zinc-400">{post.excerpt}</p>
-              <div class="mt-4 flex flex-wrap gap-2">
-                {post.tags.map((tag) => (
-                  <span class="rounded-full border border-white/10 px-2.5 py-0.5 text-[11px] text-zinc-500">{tag}</span>
-                ))}
-              </div>
-              <div class="mt-4 flex items-center gap-3 pr-24 text-sm">
-                <span class="link-cue font-medium">Read article →</span>
+              {post.coverImageUrl ? (
+                <img
+                  src={post.coverImageUrl}
+                  alt={post.coverImageAlt ?? ""}
+                  loading="lazy"
+                  decoding="async"
+                  class="aspect-[16/9] w-full border-b border-white/10 object-cover"
+                />
+              ) : null}
+              <div class="flex flex-1 flex-col p-5 sm:p-6">
+                <div class="mb-3 flex items-center gap-2 text-xs text-zinc-500">
+                  <time>{post.date}</time>
+                  <span>·</span>
+                  <span>{post.readingTime}</span>
+                </div>
+                <h2 class="text-lg font-semibold leading-snug text-white">
+                  {post.title}
+                </h2>
+                <p class="mt-2 flex-1 text-sm leading-relaxed text-zinc-400">{post.excerpt}</p>
+                <div class="mt-4 flex flex-wrap gap-2">
+                  {post.tags.map((tag) => (
+                    <span class="rounded-full border border-white/10 px-2.5 py-0.5 text-[11px] text-zinc-500">{tag}</span>
+                  ))}
+                </div>
+                <div class="mt-4 flex items-center gap-3 pr-24 text-sm">
+                  <span class="link-cue font-medium">Read article →</span>
+                </div>
               </div>
             </a>
             {post.mediumUrl ? (
