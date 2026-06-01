@@ -1,0 +1,187 @@
+---
+import AdminLayout from "../../../layouts/AdminLayout.astro";
+---
+
+<AdminLayout title="Blog Writer" activePage="blog">
+  <div class="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+    <div>
+      <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Publishing</p>
+      <h1 class="mt-3 text-3xl font-semibold tracking-tight text-white">Blog Writer</h1>
+      <p class="mt-3 max-w-2xl text-sm leading-6 text-zinc-400">
+        Draft, publish, and tune xhverse articles from one focused workspace.
+      </p>
+    </div>
+    <a href="/admin/blog/new/" class="inline-flex min-h-11 items-center justify-center border border-emerald-300/50 bg-emerald-300/10 px-4 py-2 text-xs font-semibold uppercase tracking-[0.18em] text-emerald-200 transition hover:border-emerald-300/80 hover:text-white">
+      New post
+    </a>
+  </div>
+
+  <div class="mt-8 grid gap-3 sm:grid-cols-[1fr_auto]">
+    <label class="block">
+      <span class="block text-[11px] uppercase tracking-[0.22em] text-zinc-500">Search</span>
+      <input id="blog-search" type="search" class="mt-2 min-h-11 w-full border border-white/15 bg-black/30 px-4 text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-emerald-300/70" placeholder="Title, slug, or tag" />
+    </label>
+    <div>
+      <span class="block text-[11px] uppercase tracking-[0.22em] text-zinc-500">Status</span>
+      <div id="blog-status-filter" class="mt-2 flex min-h-11 gap-2">
+        <button data-status="all" type="button" aria-pressed="true" class="border border-emerald-300/50 bg-emerald-300/10 px-3 text-[10px] uppercase tracking-[0.15em] text-emerald-200 transition">All</button>
+        <button data-status="draft" type="button" aria-pressed="false" class="border border-white/15 px-3 text-[10px] uppercase tracking-[0.15em] text-zinc-400 transition hover:border-white/30 hover:text-zinc-200">Draft</button>
+        <button data-status="published" type="button" aria-pressed="false" class="border border-white/15 px-3 text-[10px] uppercase tracking-[0.15em] text-zinc-400 transition hover:border-white/30 hover:text-zinc-200">Published</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-6 overflow-x-auto border border-white/10">
+    <table class="w-full min-w-[760px] border-collapse text-sm">
+      <thead>
+        <tr class="border-b border-white/10 text-left text-[11px] uppercase tracking-[0.22em] text-zinc-500">
+          <th class="px-4 py-3">Post</th>
+          <th class="px-4 py-3">Status</th>
+          <th class="px-4 py-3">Published</th>
+          <th class="px-4 py-3">Updated</th>
+          <th class="px-4 py-3 text-right">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="blog-posts-body"></tbody>
+    </table>
+    <p id="blog-posts-loading" class="py-12 text-center text-sm text-zinc-500">Loading posts...</p>
+    <p id="blog-posts-empty" class="hidden py-12 text-center text-sm text-zinc-500">No posts match this view.</p>
+  </div>
+
+  <script>
+    import { createAdminClient } from "../../../lib/admin/supabase";
+    import {
+      filterAdminPosts,
+      formatTagsForInput,
+      interpretAdminPostsResponse,
+      mapSupabasePostError,
+      type AdminPostRow,
+      type PostStatus,
+    } from "../../../lib/blog/admin-posts";
+
+    type StatusFilter = PostStatus | "all";
+
+    const client = createAdminClient(import.meta.env);
+    const tableBody = document.querySelector<HTMLElement>("#blog-posts-body");
+    const loading = document.querySelector<HTMLElement>("#blog-posts-loading");
+    const empty = document.querySelector<HTMLElement>("#blog-posts-empty");
+    const search = document.querySelector<HTMLInputElement>("#blog-search");
+    const filter = document.querySelector<HTMLElement>("#blog-status-filter");
+
+    let posts: AdminPostRow[] = [];
+    let statusFilter: StatusFilter = "all";
+
+    function escapeHtml(text: string): string {
+      const div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function formatDate(value: string | null): string {
+      if (!value) return "Not scheduled";
+      return new Date(value).toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      });
+    }
+
+    function statusBadge(status: PostStatus): string {
+      const classes =
+        status === "published"
+          ? "border-emerald-300/25 bg-emerald-300/8 text-emerald-200"
+          : "border-amber-300/25 bg-amber-300/8 text-amber-200";
+      return `<span class="inline-block border px-2 py-0.5 text-[10px] uppercase tracking-[0.15em] ${classes}">${status}</span>`;
+    }
+
+    function renderPosts(): void {
+      if (!tableBody) return;
+      const visible = filterAdminPosts(posts, {
+        status: statusFilter,
+        query: search?.value ?? "",
+      });
+      if (loading) loading.classList.add("hidden");
+      if (visible.length === 0) {
+        tableBody.innerHTML = "";
+        if (empty) empty.classList.remove("hidden");
+        return;
+      }
+      if (empty) empty.classList.add("hidden");
+      tableBody.innerHTML = visible
+        .map((post) => `
+          <tr class="border-b border-white/5 align-top hover:bg-white/[0.02]">
+            <td class="px-4 py-4">
+              <p class="font-semibold text-white">${escapeHtml(post.title)}</p>
+              <p class="mt-1 text-xs text-zinc-500">/${escapeHtml(post.slug)}</p>
+              <p class="mt-2 max-w-xl text-sm leading-6 text-zinc-400">${escapeHtml(post.excerpt)}</p>
+              <p class="mt-2 text-xs text-zinc-500">${escapeHtml(formatTagsForInput(post.tags))}</p>
+            </td>
+            <td class="px-4 py-4">${statusBadge(post.status)}</td>
+            <td class="px-4 py-4 text-zinc-400">${formatDate(post.published_at)}</td>
+            <td class="px-4 py-4 text-zinc-500">${formatDate(post.updated_at)}</td>
+            <td class="px-4 py-4 text-right">
+              <a href="/admin/blog/edit/?id=${encodeURIComponent(post.id)}" class="inline-flex min-h-10 items-center border border-white/15 px-3 text-[10px] uppercase tracking-[0.15em] text-zinc-300 transition hover:border-emerald-300/70 hover:text-white">Edit</a>
+            </td>
+          </tr>
+        `)
+        .join("");
+    }
+
+    async function loadPosts(): Promise<void> {
+      if (!client) {
+        if (loading) loading.classList.add("hidden");
+        if (empty) {
+          empty.textContent = "Supabase is not configured.";
+          empty.classList.remove("hidden");
+        }
+        return;
+      }
+
+      const { data, error } = await client
+        .from("posts")
+        .select("*")
+        .order("updated_at", { ascending: false });
+      const result = interpretAdminPostsResponse(data, error);
+
+      if (result.kind === "failed") {
+        if (loading) loading.classList.add("hidden");
+        if (empty) {
+          empty.textContent = `Error: ${result.message}`;
+          empty.classList.remove("hidden");
+        }
+        return;
+      }
+
+      posts = result.data;
+      renderPosts();
+    }
+
+    function setActiveStatus(button: HTMLElement): void {
+      filter?.querySelectorAll("button").forEach((item) => {
+        item.className = "border border-white/15 px-3 text-[10px] uppercase tracking-[0.15em] text-zinc-400 transition hover:border-white/30 hover:text-zinc-200";
+        item.setAttribute("aria-pressed", "false");
+      });
+      button.className = "border border-emerald-300/50 bg-emerald-300/10 px-3 text-[10px] uppercase tracking-[0.15em] text-emerald-200 transition";
+      button.setAttribute("aria-pressed", "true");
+    }
+
+    search?.addEventListener("input", renderPosts);
+    filter?.querySelectorAll<HTMLButtonElement>("button[data-status]").forEach((button) => {
+      button.addEventListener("click", () => {
+        statusFilter = (button.dataset.status ?? "all") as StatusFilter;
+        setActiveStatus(button);
+        renderPosts();
+      });
+    });
+
+    window.addEventListener("admin:authenticated", () => {
+      loadPosts().catch((error: unknown) => {
+        if (empty) {
+          const message = error instanceof Error ? error.message : mapSupabasePostError({ message: "Failed to load posts." });
+          empty.textContent = `Error: ${message}`;
+          empty.classList.remove("hidden");
+        }
+      });
+    });
+  </script>
+</AdminLayout>

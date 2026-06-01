@@ -5,7 +5,14 @@ import Footer from "../../components/Footer.astro";
 import { posts as staticFallback } from "../../data/blog";
 import { site } from "../../data/site";
 import { profile } from "../../data/profile";
-import { renderMarkdownToHtml } from "../../lib/render-markdown";
+import {
+  extractTableOfContents,
+  renderMarkdownToHtml,
+} from "../../lib/render-markdown";
+import {
+  getAdjacentPosts,
+  getRelatedPostsByTags,
+} from "../../lib/blog/post-row";
 import {
   createSupabaseClientForBuild,
   loadPublishedPostsForBuild,
@@ -19,24 +26,31 @@ export async function getStaticPaths() {
   const allPosts = await loadPublishedPostsForBuild(client, staticFallback);
   return allPosts.map((post) => ({
     params: { slug: post.slug },
-    props: { post },
+    props: { post, allPosts },
   }));
 }
 
-const { post } = Astro.props;
+const { post, allPosts } = Astro.props;
 const deploymentSite = (Astro.site ?? site.siteUrl).toString();
 const canonicalUrl = new URL(`/blog/${post.slug}`, deploymentSite).toString();
 const html = renderMarkdownToHtml(post.bodyMarkdown);
+const toc = extractTableOfContents(post.bodyMarkdown);
+const adjacent = getAdjacentPosts(allPosts, post.slug);
+const relatedPosts = getRelatedPostsByTags(allPosts, post.slug, 3);
+const metaTitle = post.seoTitle ?? post.title;
+const metaDescription = post.seoDescription ?? post.excerpt;
+const articleImage = new URL(post.coverImageUrl ?? site.ogImage, deploymentSite).toString();
+const relatedToolCtas = post.relatedToolCtas ?? [];
 
 const articleStructuredData = {
   "@context": "https://schema.org",
   "@type": "BlogPosting",
   "@id": canonicalUrl,
   headline: post.title,
-  description: post.excerpt,
+  description: metaDescription,
   url: canonicalUrl,
   datePublished: post.date,
-  dateModified: post.date,
+  dateModified: post.updatedAt ?? post.date,
   keywords: post.tags.join(", "),
   wordCount: post.bodyMarkdown.split(/\s+/).length,
   inLanguage: "en",
@@ -53,14 +67,14 @@ const articleStructuredData = {
     name: profile.fullName,
     image: new URL(profile.avatar, deploymentSite).toString(),
   },
-  image: new URL(site.ogImage, deploymentSite).toString(),
+  image: articleImage,
   ...(post.mediumUrl ? { sameAs: post.mediumUrl } : {}),
 };
 ---
 
 <BaseLayout
-  title={post.title}
-  description={post.excerpt}
+  title={metaTitle}
+  description={metaDescription}
   type="article"
   structuredData={articleStructuredData}
 >
@@ -69,39 +83,134 @@ const articleStructuredData = {
   <Header current="/blog" />
   <main>
     <div class="mx-auto max-w-7xl px-5 py-14 sm:px-8 sm:py-20 lg:px-10">
-      <a href="/blog" class="inline-flex items-center gap-1.5 text-xs text-zinc-500 transition hover:text-white">
+      <a href="/blog" class="inline-flex min-h-10 items-center gap-1.5 text-xs text-zinc-500 transition hover:text-white">
         ← Writing hub
       </a>
 
-      <h1 class="mt-6 text-3xl font-semibold tracking-tight text-white sm:text-4xl lg:text-[2.75rem]">
-        {post.title}
-      </h1>
+      <div class="mt-8 grid gap-10 lg:grid-cols-[minmax(0,44rem)_minmax(15rem,1fr)] lg:items-start">
+        <article>
+          <header>
+            <h1 class="max-w-3xl text-3xl font-semibold text-white sm:text-4xl lg:text-[2.75rem]">
+              {post.title}
+            </h1>
 
-      <div class="mt-4 flex flex-wrap items-center gap-3 text-sm text-zinc-500">
-        <time>{post.date}</time>
-        <span>·</span>
-        <span>{post.readingTime}</span>
-        {post.tags.length > 0 && (
-          <>
-            <span>·</span>
-            <div class="flex gap-2">
-              {post.tags.map((tag) => (
-                <span class="rounded-full border border-white/10 px-2.5 py-0.5 text-[11px]">{tag}</span>
-              ))}
+            <p class="mt-5 max-w-2xl text-base leading-8 text-zinc-400">{post.excerpt}</p>
+
+            <div class="mt-5 flex flex-wrap items-center gap-3 text-sm text-zinc-500">
+              <time>{post.date}</time>
+              <span>·</span>
+              <span>{post.readingTime}</span>
+              {post.updatedAt && post.updatedAt !== post.date ? (
+                <>
+                  <span>·</span>
+                  <span>Updated {post.updatedAt}</span>
+                </>
+              ) : null}
             </div>
-          </>
-        )}
+
+            {post.tags.length > 0 && (
+              <div class="mt-5 flex flex-wrap gap-2">
+                {post.tags.map((tag) => (
+                  <span class="rounded-full border border-white/10 px-2.5 py-1 text-[11px] text-zinc-500">{tag}</span>
+                ))}
+              </div>
+            )}
+
+            {post.mediumUrl && (
+              <p class="mt-5">
+                <a href={post.mediumUrl} target="_blank" rel="noreferrer" class="inline-flex min-h-10 items-center text-sm text-zinc-500 underline underline-offset-2 transition hover:text-white">
+                  Also on Medium ↗
+                </a>
+              </p>
+            )}
+
+            {post.coverImageUrl ? (
+              <figure class="mt-8">
+                <img
+                  src={post.coverImageUrl}
+                  alt={post.coverImageAlt ?? ""}
+                  loading="eager"
+                  decoding="async"
+                  class="aspect-[16/9] w-full border border-white/10 object-cover"
+                />
+                {post.coverImageAlt ? (
+                  <figcaption class="mt-2 text-xs leading-5 text-zinc-500">{post.coverImageAlt}</figcaption>
+                ) : null}
+              </figure>
+            ) : null}
+          </header>
+
+          <article class="article-body article-body--reader" set:html={html} />
+
+          <nav class="mt-12 grid gap-3 border-t border-white/10 pt-6 sm:grid-cols-2" aria-label="Adjacent articles">
+            {adjacent.prev ? (
+              <a href={`/blog/${adjacent.prev.slug}`} class="interactive-card block rounded-xl p-4">
+                <span class="text-[11px] uppercase tracking-[0.18em] text-zinc-500">Previous</span>
+                <span class="mt-2 block text-sm font-semibold text-white">{adjacent.prev.title}</span>
+              </a>
+            ) : <span></span>}
+            {adjacent.next ? (
+              <a href={`/blog/${adjacent.next.slug}`} class="interactive-card block rounded-xl p-4 sm:text-right">
+                <span class="text-[11px] uppercase tracking-[0.18em] text-zinc-500">Next</span>
+                <span class="mt-2 block text-sm font-semibold text-white">{adjacent.next.title}</span>
+              </a>
+            ) : null}
+          </nav>
+        </article>
+
+        <aside class="lg:sticky lg:top-24">
+          {toc.length > 0 ? (
+            <nav class="border border-white/10 bg-white/[0.03] p-5" aria-label="Table of contents">
+              <p class="text-[11px] uppercase tracking-[0.22em] text-zinc-500">In this article</p>
+              <ol class="mt-4 space-y-2">
+                {toc.map((entry) => (
+                  <li class={entry.level === 3 ? "pl-4" : ""}>
+                    <a href={`#${entry.id}`} class="block min-h-8 text-sm leading-6 text-zinc-400 transition hover:text-white">
+                      {entry.text}
+                    </a>
+                  </li>
+                ))}
+              </ol>
+            </nav>
+          ) : null}
+
+          {relatedPosts.length > 0 ? (
+            <section class="mt-5 border border-white/10 bg-white/[0.03] p-5">
+              <p class="text-[11px] uppercase tracking-[0.22em] text-zinc-500">Related</p>
+              <div class="mt-4 space-y-3">
+                {relatedPosts.map((related) => (
+                  <a href={`/blog/${related.slug}`} class="block text-sm leading-6 text-zinc-400 transition hover:text-white">
+                    {related.title}
+                  </a>
+                ))}
+              </div>
+            </section>
+          ) : null}
+
+          {relatedToolCtas.length > 0 ? (
+            <section class="mt-5 border border-emerald-300/25 bg-emerald-300/8 p-5" aria-labelledby="practice-next-heading">
+              <p class="text-[11px] uppercase tracking-[0.22em] text-emerald-200">Practice this next</p>
+              <h2 id="practice-next-heading" class="mt-2 text-base font-semibold text-white">
+                Try the related tools
+              </h2>
+              <div class="mt-4 grid gap-2">
+                {relatedToolCtas.map((tool) => (
+                  <a
+                    href={tool.href}
+                    class:list={[
+                      "w-full justify-between focus-visible:ring-2 focus-visible:ring-emerald-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-page)]",
+                      tool.variant === "primary" ? "cta-primary" : "cta-secondary",
+                    ]}
+                  >
+                    <span>{tool.label}</span>
+                    <span aria-hidden="true">→</span>
+                  </a>
+                ))}
+              </div>
+            </section>
+          ) : null}
+        </aside>
       </div>
-
-      {post.mediumUrl && (
-        <p class="mt-3">
-          <a href={post.mediumUrl} target="_blank" rel="noreferrer" class="text-sm text-zinc-500 underline underline-offset-2 transition hover:text-white">
-            Also on Medium ↗
-          </a>
-        </p>
-      )}
-
-      <article class="article-body" set:html={html} />
     </div>
   </main>
   <Footer />

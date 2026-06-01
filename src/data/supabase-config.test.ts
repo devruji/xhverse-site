@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
+  BLOG_COVERS_BUCKET,
   DEFAULT_SUPABASE_PROJECT_URL,
+  blogCoverPublicUrl,
   resolveSupabaseOrigin,
 } from "./supabase-config";
 
@@ -35,6 +37,23 @@ describe("resolveSupabaseOrigin", () => {
     ).toBe("https://abc123.supabase.co");
   });
 
+  it("uses SUPABASE_URL when PUBLIC_SUPABASE_URL is not set", () => {
+    expect(
+      resolveSupabaseOrigin({
+        SUPABASE_URL: "https://private.supabase.co/rest/v1",
+      }),
+    ).toBe("https://private.supabase.co");
+  });
+
+  it("prefers PUBLIC_SUPABASE_URL over SUPABASE_URL", () => {
+    expect(
+      resolveSupabaseOrigin({
+        PUBLIC_SUPABASE_URL: "https://public.supabase.co",
+        SUPABASE_URL: "https://private.supabase.co",
+      }),
+    ).toBe("https://public.supabase.co");
+  });
+
   it("extracts origin without path", () => {
     expect(
       resolveSupabaseOrigin({
@@ -47,5 +66,18 @@ describe("resolveSupabaseOrigin", () => {
     expect(
       resolveSupabaseOrigin({ PUBLIC_SUPABASE_URL: "not-a-url" }),
     ).toBe(DEFAULT_SUPABASE_PROJECT_URL);
+  });
+});
+
+describe("blogCoverPublicUrl", () => {
+  it("builds a public Storage URL for blog covers", () => {
+    expect(BLOG_COVERS_BUCKET).toBe("blog-covers");
+    expect(
+      blogCoverPublicUrl("/posts/demo/id.webp", {
+        PUBLIC_SUPABASE_URL: "https://abc.supabase.co/rest/v1",
+      }),
+    ).toBe(
+      "https://abc.supabase.co/storage/v1/object/public/blog-covers/posts/demo/id.webp",
+    );
   });
 });

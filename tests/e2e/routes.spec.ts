@@ -26,6 +26,29 @@ test("blog article page renders markdown body", async ({ page }) => {
   await expect(page).toHaveURL(/\/blog\/[^/]+\/?$/);
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   await expect(page.locator(".article-body")).toBeVisible();
+  await expect(page.getByRole("navigation", { name: "Table of contents" })).toBeVisible();
+  await expect(page.locator(".article-body :is(h2, h3)[id]").first()).toBeVisible();
+});
+
+test("blog article mobile layout has no horizontal overflow", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/blog");
+  await page.locator("article a").first().click();
+  await expect(page.locator(".article-body")).toBeVisible();
+  const hasHorizontalOverflow = await page.evaluate(
+    () => document.documentElement.scrollWidth > document.documentElement.clientWidth,
+  );
+  expect(hasHorizontalOverflow).toBe(false);
+});
+
+test("admin blog routes load the protected shell", async ({ page }) => {
+  await page.goto("/admin/blog/");
+  await expect(page).toHaveTitle(/Blog Writer \| Admin \| XHVERSE/);
+  await expect(page.getByRole("heading", { name: "Sign in" })).toBeVisible();
+
+  await page.goto("/admin/blog/new/");
+  await expect(page).toHaveTitle(/New Post \| Admin \| XHVERSE/);
+  await expect(page.getByRole("heading", { name: "Sign in" })).toBeVisible();
 });
 
 test("gallery page renders images", async ({ page }) => {
