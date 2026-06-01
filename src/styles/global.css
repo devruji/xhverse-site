@@ -383,6 +383,39 @@ p {
   display: none;
 }
 
+.hero-cta-row .cta-primary,
+.hero-cta-row .cta-secondary {
+  white-space: nowrap;
+}
+
+.contact-icon {
+  flex: 0 0 auto;
+  opacity: 0.78;
+}
+
+.interactive-card:hover .contact-icon,
+.interactive-card:focus-visible .contact-icon,
+.interactive-card:focus-within .contact-icon {
+  opacity: 0.9;
+}
+
+html.light .contact-icon,
+html.light .interactive-card:hover .contact-icon,
+html.light .interactive-card:focus-visible .contact-icon,
+html.light .interactive-card:focus-within .contact-icon {
+  filter: none;
+}
+
+html.light .contact-icon {
+  opacity: 0.5;
+}
+
+html.light .interactive-card:hover .contact-icon,
+html.light .interactive-card:focus-visible .contact-icon,
+html.light .interactive-card:focus-within .contact-icon {
+  opacity: 0.68;
+}
+
 .site-header {
   position: sticky;
   top: 0;
@@ -894,5 +927,15 @@ html.light .hero-spotlight::before {
   .footer-inner {
     flex-direction: column;
     align-items: flex-start;
+  }
+}
+
+@media (max-width: 639px) {
+  .hero-cta-row .cta-primary,
+  .hero-cta-row .cta-secondary {
+    min-height: 3rem;
+    padding-inline: 0.5rem;
+    font-size: 0.6875rem;
+    line-height: 1;
   }
 }
