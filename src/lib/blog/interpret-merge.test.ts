@@ -43,7 +43,7 @@ describe("mergePostsWithStaticFallback", () => {
     expect(out).not.toBe(posts);
   });
 
-  it("maps remote rows when interpretation is remote", () => {
+  it("merges remote rows with static-only posts", () => {
     const row = {
       slug: "remote-only",
       title: "Remote",
@@ -58,9 +58,68 @@ describe("mergePostsWithStaticFallback", () => {
       { kind: "use_remote", rows: [row] },
       posts,
     );
-    expect(out).toHaveLength(1);
-    expect(out[0].slug).toBe("remote-only");
-    expect(out[0].bodyMarkdown).toContain("Hi");
+    expect(out.some((post) => post.slug === "remote-only")).toBe(true);
+    expect(out.some((post) => post.slug === "big-table-vs-star-schema")).toBe(
+      true,
+    );
+    expect(out.find((post) => post.slug === "remote-only")?.bodyMarkdown).toContain(
+      "Hi",
+    );
+  });
+
+  it("keeps static content canonical for repo-authored posts", () => {
+    const staticPost = posts.find(
+      (post) => post.slug === "big-table-vs-star-schema",
+    );
+    const row = {
+      slug: "big-table-vs-star-schema",
+      title: "Remote title",
+      excerpt: "Remote excerpt.",
+      body_markdown: "## Remote body",
+      tags: ["remote"] as string[],
+      reading_time: "2 min read",
+      medium_url: null as string | null,
+      published_at: "2026-06-02T00:00:00.000Z",
+    };
+    const out = mergePostsWithStaticFallback(
+      { kind: "use_remote", rows: [row] },
+      posts,
+    );
+    const merged = out.find((post) => post.slug === "big-table-vs-star-schema");
+    expect(merged?.title).toBe(staticPost?.title);
+    expect(merged?.bodyMarkdown).toBe(staticPost?.bodyMarkdown);
+    expect(merged?.bodyMarkdown).toContain("## References");
+    expect(merged?.updatedAt).toBe("2026-06-02");
+    expect(merged?.relatedToolCtas).toEqual(staticPost?.relatedToolCtas);
+  });
+
+  it("prefers remote updatedAt and remote CTAs when provided for repo-authored posts", () => {
+    const row = {
+      slug: "big-table-vs-star-schema",
+      title: "Remote title",
+      excerpt: "Remote excerpt.",
+      body_markdown: "## Remote body",
+      tags: ["remote"] as string[],
+      reading_time: "2 min read",
+      updated_at: "2026-06-03T00:00:00.000Z",
+      related_tool_ctas: [{ slug: "architecture-roulette", variant: "secondary" }],
+      medium_url: null as string | null,
+      published_at: "2026-06-03T00:00:00.000Z",
+    };
+    const out = mergePostsWithStaticFallback(
+      { kind: "use_remote", rows: [row] },
+      posts,
+    );
+    const merged = out.find((post) => post.slug === "big-table-vs-star-schema");
+    expect(merged?.updatedAt).toBe("2026-06-03");
+    expect(merged?.relatedToolCtas).toEqual([
+      {
+        slug: "architecture-roulette",
+        label: "Architecture Decision Roulette",
+        href: "/tools/architecture-roulette",
+        variant: "secondary",
+      },
+    ]);
   });
 });
 

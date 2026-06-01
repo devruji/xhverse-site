@@ -1,0 +1,62 @@
+---
+description: Blog content, cover image, SEO, and related-tool CTA rules
+globs: ["src/data/blog.ts", "src/data/blog.test.ts", "src/pages/blog/**/*.astro", "public/images/blog-*", ".tmp/blog-*.md"]
+---
+
+# Blog Content Rules
+
+Use `AGENTS.md`, `CLAUDE.md`, and `.agents/skills/blog-content-strategy/SKILL.md`
+as the source of truth for blog work.
+
+## Content Shape
+
+- Blog posts must stay practical, concise, and credible for data/platform peers.
+- Before drafting body copy, define:
+  - document type (`explanation`, `how-to`, `reference`, `lab companion`)
+  - target audience
+  - intended reader goal
+  - scope boundaries
+  - brief outline
+- Add complete metadata: slug, title, excerpt, date, tags, reading time, SEO
+  title/description, and cover alt text when a cover is present.
+- Shape the article for scanning:
+  - start with the decision or takeaway
+  - use typed callouts only when they clarify the reading path
+  - use markdown tables for comparisons, constraints, and decision matrices
+  - use normal markdown lists for checklists and decision details; article
+    styles render symbolic markers
+  - keep paragraphs short enough for mobile reading
+- Add `## References` with public URLs for technical claims, design patterns,
+  and vendor-specific guidance. Prefer primary docs, vendor docs, standards, or
+  widely recognized public references.
+- Add `## Disclosure` when AI assists drafting or editing. State that the post
+  was co-written with an AI agent and reviewed by Rujikorn Ngoensaard.
+- Preserve identity signals where relevant: `Rujikorn Ngoensaard`, `bossruji`,
+  `XH`, and `xhverse`.
+- Do not invent private client claims or unverifiable production stories.
+
+## Related Tool CTAs
+
+- Prefer typed `relatedTools` metadata over hardcoded one-off CTA sections.
+- Use only known internal tool slugs from `/tools`.
+- Keep CTAs lightweight: normal links or static cards, no embedded tool apps.
+- Use one primary CTA and no more than two supporting CTAs unless there is a
+  clear reader workflow.
+- Do not add inline handlers, scripts, dynamic injection, third-party tracking,
+  or lead capture to blog CTAs.
+
+## Cover Images
+
+- Store project-bound covers under `public/images/` with stable filenames.
+- Use generated covers only when the topic benefits from a real visual asset.
+- Avoid readable text inside generated images; diagrams should be recognizable
+  by shape, not labels.
+- Every cover must have useful alt text.
+
+## Verification
+
+- If touching `src/data/blog.ts` or related types, update `src/data/blog.test.ts`
+  and run coverage.
+- If touching blog pages, run typecheck and at least the blog route E2E coverage
+  if available.
+- Full sign-off still requires `bun run check`.

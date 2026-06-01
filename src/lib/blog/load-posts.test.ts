@@ -93,7 +93,8 @@ describe("loadPublishedPostsForBuild", () => {
       data: null,
       error: { message: "failed" },
     });
-    const not = vi.fn().mockReturnValue({ order });
+    const lte = vi.fn().mockReturnValue({ order });
+    const not = vi.fn().mockReturnValue({ lte });
     const eq = vi.fn().mockReturnValue({ not });
     const select = vi.fn().mockReturnValue({ eq });
     const from = vi.fn().mockReturnValue({ select });
@@ -113,7 +114,8 @@ describe("loadPublishedPostsForBuild", () => {
       data: null,
       error: {},
     });
-    const not = vi.fn().mockReturnValue({ order });
+    const lte = vi.fn().mockReturnValue({ order });
+    const not = vi.fn().mockReturnValue({ lte });
     const eq = vi.fn().mockReturnValue({ not });
     const select = vi.fn().mockReturnValue({ eq });
     const from = vi.fn().mockReturnValue({ select });
@@ -130,7 +132,8 @@ describe("loadPublishedPostsForBuild", () => {
       data: [],
       error: null,
     });
-    const not = vi.fn().mockReturnValue({ order });
+    const lte = vi.fn().mockReturnValue({ order });
+    const not = vi.fn().mockReturnValue({ lte });
     const eq = vi.fn().mockReturnValue({ not });
     const select = vi.fn().mockReturnValue({ eq });
     const from = vi.fn().mockReturnValue({ select });
@@ -161,7 +164,8 @@ describe("loadPublishedPostsForBuild", () => {
       ],
       error: null,
     });
-    const not = vi.fn().mockReturnValue({ order });
+    const lte = vi.fn().mockReturnValue({ order });
+    const not = vi.fn().mockReturnValue({ lte });
     const eq = vi.fn().mockReturnValue({ not });
     const select = vi.fn().mockReturnValue({ eq });
     const from = vi.fn().mockReturnValue({ select });
@@ -170,8 +174,48 @@ describe("loadPublishedPostsForBuild", () => {
     const posts = await loadPublishedPostsForBuild(client, staticFallback);
     expect(posts.some((p) => p.slug === "db-post")).toBe(true);
     expect(from).toHaveBeenCalledWith("posts");
+    expect(lte).toHaveBeenCalledWith("published_at", expect.any(String));
     expect(infoSpy).toHaveBeenCalledWith(
       "[blog] Loaded 1 published post(s) from Supabase.",
+    );
+  });
+
+  it("retries legacy columns when enhanced metadata columns are not migrated yet", async () => {
+    const enhancedOrder = vi.fn().mockResolvedValue({
+      data: null,
+      error: { message: "column posts.cover_image_path does not exist" },
+    });
+    const legacyOrder = vi.fn().mockResolvedValue({
+      data: [
+        {
+          slug: "legacy-db-post",
+          title: "Legacy DB",
+          excerpt: "Legacy excerpt.",
+          body_markdown: "# Legacy",
+          tags: ["db"],
+          reading_time: "1 min read",
+          medium_url: null,
+          published_at: "2026-11-01T00:00:00.000Z",
+        },
+      ],
+      error: null,
+    });
+    const enhancedLte = vi.fn().mockReturnValue({ order: enhancedOrder });
+    const legacyLte = vi.fn().mockReturnValue({ order: legacyOrder });
+    const not = vi
+      .fn()
+      .mockReturnValueOnce({ lte: enhancedLte })
+      .mockReturnValueOnce({ lte: legacyLte });
+    const eq = vi.fn().mockReturnValue({ not });
+    const select = vi.fn().mockReturnValue({ eq });
+    const from = vi.fn().mockReturnValue({ select });
+    const client = { from } as never;
+
+    const posts = await loadPublishedPostsForBuild(client, staticFallback);
+    expect(posts.some((p) => p.slug === "legacy-db-post")).toBe(true);
+    expect(select).toHaveBeenCalledTimes(2);
+    expect(warnSpy).toHaveBeenCalledWith(
+      "[blog] Supabase posts metadata columns missing; retrying legacy post columns.",
     );
   });
 });

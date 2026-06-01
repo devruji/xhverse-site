@@ -1,6 +1,7 @@
 ---
 import { buildCanonicalUrl, site } from "../data/site";
 import { shouldNoIndexDeployment } from "../data/seo.js";
+import { serializeJsonLd } from "../lib/json-ld";
 import { ClientRouter } from "astro:transitions";
 import ThemeToggle from "../components/ThemeToggle.astro";
 import "../styles/global.css";
@@ -102,8 +103,9 @@ const socialImage = new URL(image, deploymentSite).toString();
     {structuredData && (
       <script
         is:inline
+        data-cfasync="false"
         type="application/ld+json"
-        set:html={JSON.stringify(structuredData)}
+        set:html={serializeJsonLd(structuredData)}
       />
     )}
     <ClientRouter />
