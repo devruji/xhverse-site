@@ -23,7 +23,35 @@ export function mergePostsWithStaticFallback(
   if (interpretation.kind === "use_fallback") {
     return [...fallback];
   }
-  return interpretation.rows.map((row) => mapPostRowToBlogPost(row));
+
+  const fallbackBySlug = new Map(fallback.map((post) => [post.slug, post]));
+  const mergedBySlug = new Map<string, BlogPost>();
+
+  for (const fallbackPost of fallback) {
+    mergedBySlug.set(fallbackPost.slug, fallbackPost);
+  }
+
+  for (const row of interpretation.rows) {
+    const remotePost = mapPostRowToBlogPost(row);
+    const fallbackPost = fallbackBySlug.get(remotePost.slug);
+    if (fallbackPost) {
+      const mergedPost: BlogPost = {
+        ...fallbackPost,
+        updatedAt: remotePost.updatedAt,
+      };
+      if (remotePost.relatedToolCtas) {
+        mergedPost.relatedToolCtas = remotePost.relatedToolCtas;
+      }
+      mergedBySlug.set(remotePost.slug, mergedPost);
+      continue;
+    }
+    mergedBySlug.set(remotePost.slug, {
+      ...remotePost,
+      relatedToolCtas: remotePost.relatedToolCtas,
+    });
+  }
+
+  return [...mergedBySlug.values()];
 }
 
 export function sortPostsByDateDesc(posts: BlogPost[]): BlogPost[] {

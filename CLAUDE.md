@@ -250,13 +250,17 @@ enabled = true
 [mcp_servers.cloudflare-api]
 url = "https://mcp.cloudflare.com/mcp"
 bearer_token_env_var = "CLOUDFLARE_API_TOKEN"
+
+[mcp_servers.supabase]
+url = "https://mcp.supabase.com/mcp?project_ref=jxfpnfliioqbhzznaphd"
+bearer_token_env_var = "SUPABASE_ACCESS_TOKEN"
 ```
 
 Do not add `[instructions]` or `developer_instructions` tables. Newer Codex config parsing treats that shape as invalid and blocks skill reload. Keep repo guidance in `AGENTS.md`, `CLAUDE.md`, `.cursor/rules/`, `.agents/skills/`, and `.codex/agents/`.
 
 Repo MCP policy:
 - Keep Cloudflare repo-scoped because it supports Pages, Access, Turnstile, security headers, and deployment checks.
-- Keep Supabase available for explicit backend/data/RLS/storage/auth/admin work.
+- Keep Supabase project-scoped to `jxfpnfliioqbhzznaphd` for explicit backend/data/RLS/storage/auth/admin work.
 - Do not add Notion here; xhverse does not use it.
 - Store only env var names in git, never token values.
 
