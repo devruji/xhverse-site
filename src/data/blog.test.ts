@@ -89,4 +89,30 @@ describe("Blog Data", () => {
     expect(post?.bodyMarkdown).toContain("## Disclosure");
     expect(post?.bodyMarkdown).toContain("co-written with an AI agent");
   });
+
+  it("should include required static replacement posts with media and CTAs", () => {
+    const requiredSlugs = [
+      "open-table-formats-operating-model",
+      "real-cost-open-tables",
+      "envelope-encryption-data-platforms",
+    ] as const;
+
+    for (const slug of requiredSlugs) {
+      const post = posts.find((item) => item.slug === slug);
+      expect(post).toBeDefined();
+      expect(post?.coverImageUrl).toBeTruthy();
+      expect(post?.coverImageAlt).toBeTruthy();
+      expect((post?.relatedToolCtas?.length ?? 0)).toBeGreaterThan(0);
+      expect(post?.date).toBe("2026-06-02");
+    }
+  });
+
+  it("should not include old placeholder writing posts", () => {
+    const removedSlugs = ["images-as-interfaces", "fragments-and-worlds"];
+    const slugs = posts.map((post) => post.slug);
+
+    for (const slug of removedSlugs) {
+      expect(slugs).not.toContain(slug);
+    }
+  });
 });

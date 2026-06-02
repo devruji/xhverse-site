@@ -84,6 +84,334 @@ export type BlogPost = {
 
 export const posts: BlogPost[] = [
   {
+    slug: "open-table-formats-operating-model",
+    title: "Open table formats are an operating model decision",
+    excerpt:
+      "Delta, Iceberg, and Hudi are not just file formats. They change who owns metadata, how tables are maintained, and where lock-in appears.",
+    date: "2026-06-02",
+    tags: [
+      "data-architecture",
+      "lakehouse",
+      "governance",
+      "platform",
+    ],
+    mediumUrl: "",
+    readingTime: "8 min read",
+    updatedAt: "2026-06-02",
+    coverImageUrl: "/images/blog-open-table-formats-operating-model-cover.jpg",
+    coverImageAlt:
+      "Abstract lakehouse control room with metadata layers, storage blocks, and operating panels for open table format decisions.",
+    relatedToolCtas: [
+      createRelatedToolCta("architecture-roulette", "primary"),
+      createRelatedToolCta("governance-scorecard", "secondary"),
+      createRelatedToolCta("lakehouse-cost-calculator", "secondary"),
+    ],
+    bodyMarkdown: `Open table format debates usually sound like tech theater. Teams compare features on a slide, then discover the hard part is the contract they just signed by choosing a format.
+
+Formats matter, but they also encode assumptions that your platform team must operate every day: metadata behavior, maintenance ownership, evolution constraints, and support boundaries.
+
+## Why format choice is an operating model
+
+If the table is a shared platform object, the format determines:
+
+- who can safely reason about schema and partition changes,
+- how quickly teams can repair corruption,
+- which team owns table health,
+- what cross-engine support actually works in practice,
+- and which incidents count as infrastructure versus data mistakes.
+
+When we say open table format, we are usually choosing a pattern for shared operating behavior before choosing a SQL syntax.
+
+## Metadata and control plane: more than a pointer file
+
+**Delta Lake** stores transactional history in a JSON-based log. The protocol and feature matrix are not just implementation details:
+
+- protocol versions affect which features are legal in your runtime,
+- table features can silently split compatibility between engines,
+- and upgrade paths depend on which readers your cluster team still has to support.
+
+Delta UniForm is a concrete example. It improves interoperability, but only when your table feature set and runtime versions stay aligned.
+
+**Apache Iceberg** builds a control structure from snapshots and manifests. Good for visibility, but operationally it adds a set of state objects you must care for with intent.
+
+**Apache Hudi** uses table services and timelines, so your maintenance model includes explicit lifecycle steps rather than only append/compaction decisions.
+
+## Table maintenance is now part of your service model
+
+In all three formats, maintenance is not optional:
+
+- Delta relies on compacting and vacuuming as part of normal operations.
+- Iceberg requires periodic rewrite/maintenance behavior to prevent metadata and file bloat.
+- Hudi expects compaction, cleaning, and clustering planning to preserve read cost and correctness.
+
+A platform team that treats this as a one-time setup task quickly inherits backlog from every ingestion owner.
+
+## Schema, partition, and protocol evolution
+
+Most outages are not from wrong SQL; they are from unmanaged evolution. With shared tables, you need governance around:
+
+- partitioning policy (including evolution strategy),
+- schema compatibility windows,
+- protocol changes in Delta,
+- and rollback/repair behavior your job scheduler can explain under pressure.
+
+Delta has protocol and features, Iceberg has snapshot and metadata evolution, and Hudi has timeline-driven evolution patterns. Same surface problem, different control knobs.
+
+## Interoperability without illusions
+
+No engine supports all corner cases equally. Query engine drift is a real thing: the same table can behave differently across engines because of parser, planning, or feature support variance.
+
+You do not need to avoid open formats for this reason. You need explicit compatibility contracts:
+
+- what read/write features are required,
+- what fallback options are allowed,
+- what happens when one engine misses a feature set.
+
+## Performance failure modes and lock-in beyond Parquet
+
+Everyone expects file-level performance. Real incidents happen in metadata paths:
+
+- snapshot/log growth causing planning delay,
+- manifest drift causing unnecessary scan overhead,
+- compaction lag creating too many small files,
+- and cleanup debt causing query instability.
+
+These are still lock-in problems beyond simply staying on a format like Parquet. They may not be vendor lock-in; they can be runbook lock-in if you do not define clear ownership and cost model.
+
+## Governance, security, and support boundaries
+
+Treat open table formats as product decisions with clear ownership:
+
+- platform team owns feature/reader policy,
+- domain teams own data quality and evolution requests,
+- platform SRE owns operational cadence and alerting,
+- leaders own the explicit cost of incident ownership.
+
+When everyone agrees on this, table format debates get easier and incidents cheaper.
+
+## Related tools
+
+- Try [Architecture Decision Roulette](/tools/architecture-roulette) to compare operating assumptions under different trade-offs.
+- Validate team readiness using [Governance Readiness Scorecard](/tools/governance-scorecard).
+- Estimate maintenance and compute trade-offs with [Lakehouse Cost Calculator](/tools/lakehouse-cost-calculator).
+
+## References
+
+- [Delta Lake documentation](https://docs.delta.io/)
+- [Delta Lake UniForm](https://docs.delta.io/delta-uniform/)
+- [Apache Iceberg documentation](https://iceberg.apache.org/docs/latest/)
+- [Apache Iceberg maintenance](https://iceberg.apache.org/docs/1.4.1/maintenance/)
+- [Apache Hudi overview](https://hudi.apache.org/docs/overview/)
+- [Apache Hudi compaction](https://hudi.apache.org/docs/compaction/)
+- [Apache Hudi cleaning](https://hudi.apache.org/docs/cleaning/)
+
+## Disclosure
+
+This article was co-written with an AI agent and reviewed by Rujikorn Ngoensaard.
+`,
+  },
+  {
+    slug: "real-cost-open-tables",
+    title: "The real cost of open tables",
+    excerpt:
+      "Open formats move cost from one place to another. The winning teams track metadata health, compaction debt, and ownership load as first-class operating costs.",
+    date: "2026-06-02",
+    tags: ["lakehouse", "performance", "platform", "operations"],
+    mediumUrl: "",
+    readingTime: "7 min read",
+    updatedAt: "2026-06-02",
+    coverImageUrl: "/images/blog-real-cost-open-tables-cover.jpg",
+    coverImageAlt:
+      "Hundreds of small data-file tiles being compacted into organized table blocks with metadata and maintenance overlays.",
+    relatedToolCtas: [
+      createRelatedToolCta("lakehouse-cost-calculator", "primary"),
+      createRelatedToolCta("spark-explained", "secondary"),
+    ],
+    bodyMarkdown: `Open table formats remove one class of storage cost argument, but they do not remove operational cost. They relocate it into metadata health, file layout, maintenance jobs, and ownership.
+
+That is a good move when teams intentionally budget for it. It is expensive when teams assume the format choice itself is the full cost model.
+
+## The new recurring cost buckets
+
+### Small file handling
+
+Small file pressure is the most common tax. Ingesting too fast or too fragmented creates thousands of tiny objects. Without compaction or clustering discipline, query performance degrades and your job runtimes become noisy and expensive.
+
+## Snapshot, log, and manifest growth
+
+Every table format tracks history differently:
+
+- Delta keeps transaction logs and checkpoints.
+- Iceberg has snapshots and manifests.
+- Hudi tracks timeline actions.
+
+Growth in these state layers is expected. Unmanaged growth is not.
+
+## Retention, vacuum, expire, and orphan cleanup
+
+You need to define retention windows and enforce them.
+
+- Delta: VACUUM for stale file cleanup, with retention policy aligned to replay requirements.
+- Iceberg: snapshot expiration and orphan file removal, plus periodic manifest rewrites for consistent planning.
+- Hudi: compaction, cleaning, and clustering as part of the table service budget.
+
+## Query engine drift and rewrite overhead
+
+Multiple engines on the same table means your optimization settings are never purely a storage problem. You must monitor:
+
+- read amplification,
+- metadata cache misses,
+- manifest/log bloat,
+- and write/read latency shifts after schema or partition changes.
+
+When one engine writes to one table and another reads, the team should assume ongoing compatibility work, not one-time setup.
+
+## What to monitor
+
+Track at least:
+
+- file sizes and compaction age,
+- stale snapshots/log checkpoints,
+- small file ratio,
+- orphan and undeleted file growth,
+- queue lag in maintenance jobs,
+- and ownership response times for table incidents.
+
+## Who owns table health
+
+If no one owns maintenance, no one owns cost. If no one owns cost, nobody owns incidents.
+
+Create a small matrix per domain:
+
+- domain owner: schema and business contract,
+- platform owner: maintenance and feature policy,
+- incident owner: on-call escalation.
+
+## Small checklist
+
+1. Set table-level compaction and retention policy before onboarding the first producer.
+2. Decide retention and snapshot/orphan cleanup jobs by default, not per team.
+3. Validate read/write feature compatibility across engines before production launch.
+4. Add maintenance debt metrics to every platform health dashboard.
+5. Assign a clear owner when metadata or maintenance deviates from expected behavior.
+
+## Related tools
+
+- Estimate this cost using [Lakehouse Cost Calculator](/tools/lakehouse-cost-calculator).
+- Refresh engine-level intuition with [Spark Explained](/tools/spark-explained).
+
+## References
+
+- [Delta Lake documentation](https://docs.delta.io/)
+- [Apache Iceberg documentation](https://iceberg.apache.org/docs/latest/)
+- [Apache Iceberg maintenance](https://iceberg.apache.org/docs/1.4.1/maintenance/)
+- [Apache Hudi overview](https://hudi.apache.org/docs/overview/)
+- [Apache Hudi compaction](https://hudi.apache.org/docs/compaction/)
+- [Apache Hudi cleaning](https://hudi.apache.org/docs/cleaning/)
+
+## Disclosure
+
+This article was co-written with an AI agent and reviewed by Rujikorn Ngoensaard.
+`,
+  },
+  {
+    slug: "envelope-encryption-data-platforms",
+    title: "Envelope encryption for data platforms",
+    excerpt:
+      "Most teams adopt envelope encryption to scale security, then keep treating key management like an afterthought. This breaks quickly under shared-platform operating pressure.",
+    date: "2026-06-02",
+    tags: ["security", "governance", "platform", "encryption"],
+    mediumUrl: "",
+    readingTime: "7 min read",
+    updatedAt: "2026-06-02",
+    coverImageUrl: "/images/blog-envelope-encryption-data-platforms-cover.jpg",
+    coverImageAlt:
+      "Layered data platform vault showing data-key capsules, a central key boundary, and separated storage and workload zones.",
+    relatedToolCtas: [
+      createRelatedToolCta("governance-scorecard", "primary"),
+      createRelatedToolCta("architecture-roulette", "secondary"),
+      createRelatedToolCta("data-platform-maturity-checker", "secondary"),
+    ],
+    bodyMarkdown: `Most data platforms do not fail because AES is weak.
+
+Most fail because too many systems can decrypt too much data with too little control.
+
+Envelope encryption is the practical way to keep encryption usable at platform scale. It is not a promise that decryption is impossible. It is a framework to reduce blast radius.
+
+## The key stack: DEK, CEK, KEK, and KMS
+
+In practical terms:
+
+- **DEK/CEK** protects actual data at rest.
+- **KEK** (or CMK, depending on provider language) protects DEKs in a central key service.
+- **KMS** keeps keys in a central policy boundary.
+- **Wrapping** means the DEK is encrypted by a key from the KMS and stored alongside data metadata.
+
+This is good because you do not need to re-encrypt all stored data every time you rotate a top-level key.
+
+## Why symmetric encryption plus central KMS
+
+Symmetric encryption at storage/service layers stays fast and manageable. The KMS adds centralized control: audit, lifecycle, and separation between storage operators and key operators. The result is better than embedding keys per service, as long as governance is explicit.
+
+## Rotation: rewrap vs full re-encryption
+
+Rotation confusion causes many false incidents.
+
+- If you rotate KEK with wrapped DEKs, you often only need rewrap operations.
+- If crypto policy requires algorithmic upgrades, some cases still require data re-encryption.
+
+Treat this as an operating decision, not just a compliance checkbox.
+
+## Where plaintext still appears
+
+Envelope encryption protects stored bytes. Plaintext still appears in memory and in authorized compute paths. Anyone with strong workload access can still process plaintext if access controls are weak.
+
+So security still depends on workload isolation, short-lived credentials, and strict authorization.
+
+## KMS audit logs are not full data access proof
+
+Key usage logs are important. They are also incomplete.
+
+An API call can prove a key was requested. It does not prove which app instance requested the decrypted payload, what transformation happened afterward, or whether least-privilege policy was enforced end-to-end.
+
+## DEK granularity and boundaries
+
+Fine-grained DEKs reduce impact when one dataset segment is rekeyed or revoked. Coarse DEKs increase operational convenience and increase blast radius. You need to choose based on risk profile, not simplicity alone.
+
+## Storage-layer vs application-layer
+
+Storage-layer encryption covers object confidentiality at rest and key rotation mechanics. Application-layer encryption can constrain exposure in memory and application-specific flows, but it increases engineering complexity and key-carrying paths.
+
+Neither layer alone is enough.
+
+## What envelope encryption does not solve
+
+It does not replace authorization.
+
+It does not replace tokenization, masking, row-level permissions, or network segmentation.
+
+It does not prevent misuse by an authorized user or application that legitimately has access. Envelope encryption limits what happens after a boundary breach.
+
+## Related tools
+
+- Measure governance posture with [Governance Readiness Scorecard](/tools/governance-scorecard).
+- Test operating decisions with [Architecture Decision Roulette](/tools/architecture-roulette).
+- Run a quick baseline check in [Data Platform Maturity Checker](/tools/data-platform-maturity-checker).
+
+## References
+
+- [AWS KMS cryptographic details](https://docs.aws.amazon.com/kms/latest/developerguide/kms-cryptography.html)
+- [Google Cloud KMS envelope encryption](https://cloud.google.com/kms/docs/envelope-encryption)
+- [Azure Storage client-side encryption](https://learn.microsoft.com/en-us/azure/storage/blobs/client-side-encryption)
+- [NIST KEK glossary](https://csrc.nist.gov/glossary/term/key_encrypting_key)
+- [NIST SP 800-38F](https://csrc.nist.gov/publications/detail/sp/800-38f/final)
+
+## Disclosure
+
+This article was co-written with an AI agent and reviewed by Rujikorn Ngoensaard.
+`,
+  },
+  {
     slug: "big-table-vs-star-schema",
     title: "Big table vs star schema",
     excerpt:
@@ -369,62 +697,5 @@ These public references informed the terminology and trade-off framing in this a
 ## Disclosure
 
 This article was co-written with an AI agent and reviewed by Rujikorn Ngoensaard for technical framing, editorial judgment, and fit with xhverse.`,
-  },
-  {
-    slug: "building-xhverse",
-    title: "Building xhverse",
-    excerpt:
-      "Notes on the design, architecture, and guiding ideas behind this small corner of the web.",
-    date: "2026-03-01",
-    tags: ["process", "astro", "design"],
-    mediumUrl: "https://medium.xhverse.co/building-xhverse",
-    readingTime: "6 min read",
-    bodyMarkdown: `## Why this site exists
-
-xhverse is a **personal archive**: a stable place on my own domain for projects, writing, and references.
-
-## What I optimized for
-
-- **Clarity** over novelty
-- **Fast static delivery** with Astro
-- **Honest metadata** and readable structure
-
-## Medium
-
-A longer version of some pieces may also appear on [Medium](https://medium.xhverse.co); this page is the canonical, full-text home when published here.`,
-  },
-  {
-    slug: "images-as-interfaces",
-    title: "Images as interfaces",
-    excerpt:
-      "Thinking about images not just as decoration, but as interactive surfaces for navigation and story.",
-    date: "2026-02-14",
-    tags: ["visuals", "interaction"],
-    mediumUrl: "https://medium.xhverse.co/images-as-interfaces",
-    readingTime: "4 min read",
-    bodyMarkdown: `## Beyond illustration
-
-Images can do more than illustrate a paragraph. They can **carry hierarchy**, suggest sequence, and invite exploration.
-
-## Quiet interaction
-
-Not every interface needs motion. Sometimes contrast, cropping, and placement are enough to signal *where to look next*.`,
-  },
-  {
-    slug: "fragments-and-worlds",
-    title: "Fragments & worlds",
-    excerpt:
-      "On using tiny textual fragments to suggest larger fictional spaces without fully defining them.",
-    date: "2026-01-27",
-    tags: ["writing", "worldbuilding"],
-    mediumUrl: "https://medium.xhverse.co/fragments-and-worlds",
-    readingTime: "5 min read",
-    bodyMarkdown: `## Small pieces, large implication
-
-A single line can imply history, geography, or conflict if the reader meets it in the right context.
-
-## Leaving room
-
-Worldbuilding does not require a wiki. **Strategic gaps** often feel more alive than exhaustive explanation.`,
   },
 ];
