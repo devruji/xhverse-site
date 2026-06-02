@@ -32,3 +32,24 @@ test("contact links are visible", async ({ page }) => {
     page.getByRole("link", { name: /github.com\/devruji/i }).first(),
   ).toBeVisible();
 });
+
+test("writing cards stay synced with the blog index", async ({ page }) => {
+  await page.goto("/blog");
+
+  const firstBlogLink = page.locator("main article").first().getByRole("link", { name: /^Read article:/ });
+  const firstBlogHref = await firstBlogLink.getAttribute("href");
+  const firstBlogLabel = await firstBlogLink.getAttribute("aria-label");
+
+  expect(firstBlogHref).toBeTruthy();
+  expect(firstBlogLabel).toBeTruthy();
+
+  await page.goto("/");
+
+  const writingSection = page.locator("#writing");
+
+  const articleLink = writingSection.getByRole("link", { name: firstBlogLabel ?? "" });
+  await expect(articleLink).toBeVisible();
+  await expect(articleLink).toHaveAttribute("href", firstBlogHref ?? "");
+
+  await expect(writingSection).not.toContainText("Modern data platforms in practice");
+});

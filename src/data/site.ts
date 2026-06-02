@@ -9,7 +9,7 @@ export const site = {
   linkedin: "https://www.linkedin.com/in/rujikorn/",
   xHandle: "@xhverse",
   locale: "en_US",
-  ogImage: "/images/og-cover.png",
+  ogImage: "/images/og-cover.jpg",
   manifest: "/site.webmanifest",
 };
 
