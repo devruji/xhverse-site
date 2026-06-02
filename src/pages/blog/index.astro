@@ -76,6 +76,17 @@ const deploymentSite = (Astro.site ?? site.siteUrl).toString();
                   <time>{post.date}</time>
                   <span>·</span>
                   <span>{post.readingTime}</span>
+                  <span class="hidden" data-blog-view-wrapper>
+                    <span>·</span>
+                    <span
+                      data-blog-view-count={post.slug}
+                      aria-live="polite"
+                      aria-atomic="true"
+                      aria-busy="true"
+                    >
+                      -- views
+                    </span>
+                  </span>
                 </div>
                 <h2 class="text-lg font-semibold leading-snug text-white">
                   {post.title}
@@ -108,4 +119,7 @@ const deploymentSite = (Astro.site ?? site.siteUrl).toString();
   </main>
   <Footer />
   </div>
+  <script>
+    import "../../scripts/blog-view-counts";
+  </script>
 </BaseLayout>

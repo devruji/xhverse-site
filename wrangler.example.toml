@@ -1,0 +1,15 @@
+"$schema" = "./node_modules/wrangler/config-schema.json"
+name = "xhverse-site"
+pages_build_output_dir = "./dist"
+compatibility_date = "2026-06-02"
+
+# Example only. Do not rename this file to wrangler.toml until the current
+# Cloudflare Pages dashboard configuration has been downloaded and reconciled.
+# A checked-in wrangler.toml can become the source of truth for Pages config.
+
+[[d1_databases]]
+binding = "BLOG_ANALYTICS_DB"
+database_name = "xhverse_blog_analytics"
+database_id = "<production-d1-database-id>"
+preview_database_id = "<preview-d1-database-id>"
+
