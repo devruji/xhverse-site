@@ -14,7 +14,8 @@ Personal portfolio, blog, and interactive tools site for [Rujikorn Ngoensaard](h
 - **Runtime:** [Bun](https://bun.sh/) + Node 22.16.0
 - **Testing:** [Vitest](https://vitest.dev/) (100% coverage) & [Playwright](https://playwright.dev/) (E2E)
 - **Database:** [Supabase](https://supabase.com/) (build-time blog, client-side benchmarks, CV gate)
-- **Edge Functions:** Supabase Edge Functions (Deno) for email delivery
+- **Blog Analytics:** Cloudflare Pages Functions + D1 for anonymous aggregate blog views
+- **Edge Functions:** Supabase Edge Functions (Deno) for CV email delivery
 - **Deployment:** [Cloudflare Pages](https://pages.cloudflare.com/) (Git integration)
 - **Admin:** Protected by [Cloudflare Access](https://www.cloudflare.com/products/zero-trust/) (Zero Trust, email OTP)
 
@@ -34,12 +35,19 @@ graph LR
         B -->|Git integration| D[Cloudflare Pages]
         D -->|serves| E["Static Site<br/>xhverse.co"]
         F["Cloudflare Access"] -->|protects /admin/*| E
+        E -->|POST /api/blog/views| K["Pages Function<br/>blog view counter"]
+        E -->|GET /admin/api/blog/views| L["Pages Function<br/>editorial analytics"]
+        F -->|protects /admin/* and /admin/api/*| L
     end
 
     subgraph Supabase
         G["PostgreSQL<br/>(posts, benchmarks,<br/>cv_requests, leads)"]
         H["Storage<br/>(CV PDF)"]
-        I["Edge Functions<br/>(send-cv)"]
+        I["Edge Functions<br/>(send-cv only)"]
+    end
+
+    subgraph CloudflareD1["Cloudflare D1"]
+        M["blog view counters<br/>daily + referrer rollups"]
     end
 
     C -->|build-time fetch| G
@@ -47,17 +55,22 @@ graph LR
     E -->|direct download| H
     G -->|webhook on UPDATE| I
     I -->|sends email via Resend| J[User Inbox]
+    K -->|aggregate by slug| M
+    L -->|read admin rollups| M
+
+    %% v3 deferred: no unique visitor tracking or fingerprinting in this phase
 ```
 
 See [docs/architecture.md](docs/architecture.md) for detailed data flow, security model, and page inventory.
+For the blog view-count runtime, see [docs/blog-analytics.md](docs/blog-analytics.md).
 
 ## Features
 
-- **Portfolio & Blog** — Static content with optional Supabase blog overlay
+- **Portfolio & Blog** — Static content with optional Supabase blog overlay and anonymous aggregate view counts
 - **Interactive Tools** — Data Platform Maturity Checker, Governance Readiness Scorecard
 - **Advisory Services** — Engagement types, process flow, conversion path
 - **CV Gate** — Email capture modal → admin approval → automated PDF delivery via Edge Function
-- **Admin Panel** — Dashboard, CV request management, lead tracking, tool submissions
+- **Admin Panel** — Dashboard, CV request management, lead tracking, tool submissions, blog analytics
 - **Dark/Light Theme** — CSS variable system with anti-FOUC, zero-JS theme swap
 - **100% Test Coverage** — Unit tests on all data/logic modules, E2E on all pages
 
@@ -97,12 +110,24 @@ bun run check        # Full pipeline: typecheck + build + coverage + e2e
 bun run build        # Output → ./dist/
 ```
 
-### Edge Functions
+### Edge Runtime
 
 ```sh
 bunx supabase functions deploy send-cv    # Deploy CV email function
 bunx supabase secrets set RESEND_API_KEY=re_xxxxx
 ```
+
+- **Cloudflare Pages Functions:** `/api/blog/views` and `/admin/api/blog/views`
+- **Cloudflare D1 binding:** `BLOG_ANALYTICS_DB` for anonymous aggregate blog views
+- **Supabase Edge Functions:** `send-cv` for approved CV email delivery
+
+### Blog Analytics Roadmap
+
+| Phase | Scope | Status |
+|-------|-------|--------|
+| v1 | Public anonymous aggregate page views by blog slug | Code path added; Cloudflare D1 binding configured |
+| v2 | Admin/editorial rollups by post, date, and referrer bucket | Code path added under `/admin/blog/analytics/`; Cloudflare D1 binding configured |
+| v3 | Unique visitor counting or de-duplication | Deferred; no fingerprinting or identity tracking |
 
 ## Deployment
 
@@ -128,6 +153,12 @@ Cloudflare Pages settings:
 | `PUBLIC_SUPABASE_URL` | Build + client | For CSP connect-src |
 | `PUBLIC_SITE_URL` | Production | Canonical URL override |
 | `PUBLIC_ALLOW_INDEXING` | Preview (optional) | Force indexing on preview |
+| `BLOG_VIEW_TRACKING` | Pages Functions (optional) | Set `disabled` to read counts without incrementing |
+
+Cloudflare D1 is configured in both preview and production Pages environments as a binding named `BLOG_ANALYTICS_DB`; it is not a client-exposed environment variable.
+Use `wrangler.example.toml` for the expected binding shape. Do not commit a real
+`wrangler.toml` until the current Cloudflare Pages dashboard configuration has
+been downloaded and reconciled.
 
 ### Branch Flow
 

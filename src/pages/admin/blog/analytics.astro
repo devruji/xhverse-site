@@ -1,0 +1,167 @@
+---
+import AdminLayout from "../../../layouts/AdminLayout.astro";
+---
+
+<AdminLayout title="Blog Analytics" activePage="blog-analytics">
+  <section>
+    <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Editorial analytics</p>
+    <h1 class="mt-3 text-3xl font-semibold tracking-tight text-white">Blog view counts</h1>
+    <p class="mt-3 max-w-2xl text-sm leading-7 text-zinc-400">
+      Anonymous aggregate page views by post slug. These counts are directional
+      editorial signals, not unique readers or verified human visitors.
+    </p>
+  </section>
+
+  <div class="mt-8 grid gap-3 sm:grid-cols-3">
+    <div class="border border-white/10 bg-white/[0.03] p-4">
+      <p class="text-[11px] uppercase tracking-[0.22em] text-zinc-500">Total Views</p>
+      <p id="blog-views-total" class="mt-2 text-2xl font-semibold text-white">-</p>
+    </div>
+    <div class="border border-white/10 bg-white/[0.03] p-4">
+      <p class="text-[11px] uppercase tracking-[0.22em] text-zinc-500">Tracked Posts</p>
+      <p id="blog-views-posts" class="mt-2 text-2xl font-semibold text-white">-</p>
+    </div>
+    <div class="border border-white/10 bg-white/[0.03] p-4">
+      <p class="text-[11px] uppercase tracking-[0.22em] text-zinc-500">Last View</p>
+      <p id="blog-views-last" class="mt-2 text-2xl font-semibold text-white">-</p>
+    </div>
+  </div>
+
+  <div id="blog-analytics-error" class="mt-6 hidden border border-amber-300/20 bg-amber-300/8 px-4 py-3 text-sm text-amber-200">
+    Blog analytics are unavailable. Check the Cloudflare D1 binding and migration status.
+  </div>
+
+  <div class="mt-8 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,0.8fr)]">
+    <section class="border border-white/10 bg-white/[0.03] p-5">
+      <div class="flex items-center justify-between gap-4">
+        <div>
+          <p class="text-[11px] uppercase tracking-[0.22em] text-zinc-500">Posts</p>
+          <h2 class="mt-2 text-lg font-semibold text-white">Top viewed posts</h2>
+        </div>
+      </div>
+      <div id="blog-analytics-totals" class="mt-5 space-y-2">
+        <p class="py-8 text-center text-sm text-zinc-500">Loading...</p>
+      </div>
+    </section>
+
+    <section class="border border-white/10 bg-white/[0.03] p-5">
+      <p class="text-[11px] uppercase tracking-[0.22em] text-zinc-500">Referrers</p>
+      <h2 class="mt-2 text-lg font-semibold text-white">Recent source buckets</h2>
+      <div id="blog-analytics-referrers" class="mt-5 space-y-2">
+        <p class="py-8 text-center text-sm text-zinc-500">Loading...</p>
+      </div>
+    </section>
+  </div>
+
+  <section class="mt-6 border border-white/10 bg-white/[0.03] p-5">
+    <p class="text-[11px] uppercase tracking-[0.22em] text-zinc-500">Daily rollup</p>
+    <div id="blog-analytics-daily" class="mt-5 space-y-2">
+      <p class="py-8 text-center text-sm text-zinc-500">Loading...</p>
+    </div>
+  </section>
+
+  <section class="mt-6 border border-white/10 bg-white/[0.03] p-5">
+    <p class="text-[11px] uppercase tracking-[0.22em] text-zinc-500">Deferred</p>
+    <p class="mt-3 text-sm leading-7 text-zinc-400">
+      Unique visitor counts are intentionally not implemented in this phase.
+      That would require a separate privacy and accuracy decision.
+    </p>
+  </section>
+
+  <script>
+    import { formatBlogViewCount, type BlogViewAnalyticsResponse } from "../../../lib/blog-views/core";
+
+    function text(id: string, value: string): void {
+      const element = document.querySelector<HTMLElement>(id);
+      if (element) element.textContent = value;
+    }
+
+    function escapeHtml(value: string): string {
+      const div = document.createElement("div");
+      div.textContent = value;
+      return div.innerHTML;
+    }
+
+    function formatDate(value: string | null): string {
+      if (!value) return "-";
+      return new Date(value).toLocaleDateString("en-GB", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+      });
+    }
+
+    function renderRows(target: string, rows: string[], emptyLabel: string): void {
+      const element = document.querySelector<HTMLElement>(target);
+      if (!element) return;
+      element.innerHTML = rows.length
+        ? rows.join("")
+        : `<p class="py-8 text-center text-sm text-zinc-500">${emptyLabel}</p>`;
+    }
+
+    async function loadBlogAnalytics(): Promise<void> {
+      const response = await fetch("/admin/api/blog/views", {
+        credentials: "same-origin",
+      });
+      if (!response.ok) throw new Error("Blog analytics unavailable.");
+      const analytics = (await response.json()) as BlogViewAnalyticsResponse;
+      const totalViews = analytics.totals.reduce((sum, row) => sum + row.totalViews, 0);
+      const latest = analytics.totals
+        .map((row) => row.lastViewedAt)
+        .filter((value): value is string => Boolean(value))
+        .sort()
+        .at(-1) ?? null;
+
+      text("#blog-views-total", formatBlogViewCount(totalViews));
+      text("#blog-views-posts", String(analytics.totals.length));
+      text("#blog-views-last", formatDate(latest));
+
+      renderRows(
+        "#blog-analytics-totals",
+        analytics.totals.map((row) => `
+          <div class="flex items-center justify-between gap-4 border-b border-white/5 py-2.5">
+            <span class="min-w-0 truncate text-sm text-zinc-300">${escapeHtml(row.slug)}</span>
+            <span class="shrink-0 text-sm font-semibold text-white">${formatBlogViewCount(row.totalViews)}</span>
+          </div>
+        `),
+        "No views tracked yet.",
+      );
+
+      renderRows(
+        "#blog-analytics-referrers",
+        analytics.referrers.slice(0, 12).map((row) => `
+          <div class="border-b border-white/5 py-2.5">
+            <div class="flex items-center justify-between gap-3">
+              <span class="min-w-0 truncate text-sm text-zinc-300">${escapeHtml(row.referrerOrigin || "Direct / same-origin")}</span>
+              <span class="shrink-0 text-sm font-semibold text-white">${formatBlogViewCount(row.totalViews)}</span>
+            </div>
+            <p class="mt-1 truncate text-[11px] text-zinc-500">${escapeHtml(row.slug)} · ${escapeHtml(row.viewDate)}</p>
+          </div>
+        `),
+        "No referrer data yet.",
+      );
+
+      renderRows(
+        "#blog-analytics-daily",
+        analytics.daily.slice(0, 20).map((row) => `
+          <div class="grid gap-2 border-b border-white/5 py-2.5 sm:grid-cols-[8rem_minmax(0,1fr)_7rem] sm:items-center">
+            <span class="text-xs text-zinc-500">${escapeHtml(row.viewDate)}</span>
+            <span class="min-w-0 truncate text-sm text-zinc-300">${escapeHtml(row.slug)}</span>
+            <span class="text-sm font-semibold text-white sm:text-right">${formatBlogViewCount(row.totalViews)}</span>
+          </div>
+        `),
+        "No daily rollups yet.",
+      );
+    }
+
+    window.addEventListener("admin:authenticated", () => {
+      loadBlogAnalytics().catch(() => {
+        const error = document.querySelector<HTMLElement>("#blog-analytics-error");
+        error?.classList.remove("hidden");
+        renderRows("#blog-analytics-totals", [], "Analytics unavailable.");
+        renderRows("#blog-analytics-referrers", [], "Analytics unavailable.");
+        renderRows("#blog-analytics-daily", [], "Analytics unavailable.");
+      });
+    });
+  </script>
+</AdminLayout>
