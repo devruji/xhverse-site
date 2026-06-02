@@ -28,6 +28,10 @@ test("blog article page renders markdown body", async ({ page }) => {
   await expect(page.locator(".article-body")).toBeVisible();
   await expect(page.getByRole("navigation", { name: "Table of contents" })).toBeVisible();
   await expect(page.locator(".article-body :is(h2, h3)[id]").first()).toBeVisible();
+  await expect(page.locator("[data-blog-view-count]").first()).toHaveAttribute(
+    "aria-live",
+    "polite",
+  );
 });
 
 test("blog article mobile layout has no horizontal overflow", async ({ page }) => {
@@ -48,6 +52,10 @@ test("admin blog routes load the protected shell", async ({ page }) => {
 
   await page.goto("/admin/blog/new/");
   await expect(page).toHaveTitle(/New Post \| Admin \| XHVERSE/);
+  await expect(page.getByRole("heading", { name: "Sign in" })).toBeVisible();
+
+  await page.goto("/admin/blog/analytics/");
+  await expect(page).toHaveTitle(/Blog Analytics \| Admin \| XHVERSE/);
   await expect(page.getByRole("heading", { name: "Sign in" })).toBeVisible();
 });
 
