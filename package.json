@@ -18,10 +18,10 @@
     "check": "bun run typecheck && bun run build && bun run coverage && bun run test:e2e"
   },
   "dependencies": {
-    "@astrojs/sitemap": "^3.7.2",
-    "@supabase/supabase-js": "^2.106.0",
+    "@astrojs/sitemap": "^3.7.3",
+    "@supabase/supabase-js": "^2.107.0",
     "@tailwindcss/vite": "^4.3.0",
-    "astro": "^6.3.5",
+    "astro": "^6.4.3",
     "marked": "^18.0.4",
     "sanitize-html": "^2.17.4",
     "tailwindcss": "^4.3.0"
@@ -29,13 +29,13 @@
   "devDependencies": {
     "@astrojs/check": "^0.9.9",
     "@playwright/test": "^1.60.0",
-    "@types/node": "^25.9.0",
+    "@types/node": "^25.9.1",
     "@types/sanitize-html": "^2.16.1",
-    "@vitest/coverage-v8": "^4.1.6",
-    "supabase": "^2.100.0",
+    "@vitest/coverage-v8": "^4.1.8",
+    "supabase": "^2.104.0",
     "typescript": "^6.0.3",
-    "vitest": "^4.1.6",
-    "wrangler": "^4.92.0"
+    "vitest": "^4.1.8",
+    "wrangler": "^4.97.0"
   },
   "overrides": {
     "devalue": "^5.8.1",
