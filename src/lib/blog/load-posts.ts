@@ -41,9 +41,6 @@ export async function loadPublishedPostsForBuild(
   staticFallback: BlogPost[],
 ): Promise<BlogPost[]> {
   if (!client) {
-    console.warn(
-      "[blog] Supabase build credentials missing; using static fallback posts.",
-    );
     return sortPostsByDateDesc(staticFallback);
   }
   const nowIso = new Date().toISOString();
@@ -68,13 +65,11 @@ export async function loadPublishedPostsForBuild(
 
   if (interpretation.kind === "use_fallback") {
     if (interpretation.reason === "query_error") {
-      console.warn(
-        `[blog] Supabase posts query failed; using static fallback posts. ${error?.message ?? ""}`.trim(),
-      );
+      // Supabase is an optional build-time overlay. Static posts remain the
+      // canonical fallback when the remote source is unavailable.
     } else {
-      console.warn(
-        "[blog] Supabase returned no published posts; using static fallback posts.",
-      );
+      // Static posts are a supported content source; an empty remote table is not
+      // a build warning.
     }
   } else {
     console.info(

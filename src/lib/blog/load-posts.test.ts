@@ -83,9 +83,8 @@ describe("loadPublishedPostsForBuild", () => {
     const dates = posts.map((p) => p.date);
     const sorted = [...dates].sort((a, b) => b.localeCompare(a));
     expect(dates).toEqual(sorted);
-    expect(warnSpy).toHaveBeenCalledWith(
-      "[blog] Supabase build credentials missing; using static fallback posts.",
-    );
+    expect(warnSpy).not.toHaveBeenCalled();
+    expect(infoSpy).not.toHaveBeenCalled();
   });
 
   it("falls back when the query returns an error", async () => {
@@ -104,9 +103,8 @@ describe("loadPublishedPostsForBuild", () => {
     expect(posts.map((p) => p.slug).sort()).toEqual(
       staticFallback.map((p) => p.slug).sort(),
     );
-    expect(warnSpy).toHaveBeenCalledWith(
-      "[blog] Supabase posts query failed; using static fallback posts. failed",
-    );
+    expect(warnSpy).not.toHaveBeenCalled();
+    expect(infoSpy).not.toHaveBeenCalled();
   });
 
   it("falls back when the query returns an error without a message", async () => {
@@ -122,9 +120,8 @@ describe("loadPublishedPostsForBuild", () => {
     const client = { from } as never;
 
     await loadPublishedPostsForBuild(client, staticFallback);
-    expect(warnSpy).toHaveBeenCalledWith(
-      "[blog] Supabase posts query failed; using static fallback posts.",
-    );
+    expect(warnSpy).not.toHaveBeenCalled();
+    expect(infoSpy).not.toHaveBeenCalled();
   });
 
   it("falls back when the query returns no published rows", async () => {
@@ -143,9 +140,8 @@ describe("loadPublishedPostsForBuild", () => {
     expect(posts.map((p) => p.slug).sort()).toEqual(
       staticFallback.map((p) => p.slug).sort(),
     );
-    expect(warnSpy).toHaveBeenCalledWith(
-      "[blog] Supabase returned no published posts; using static fallback posts.",
-    );
+    expect(warnSpy).not.toHaveBeenCalled();
+    expect(infoSpy).not.toHaveBeenCalled();
   });
 
   it("uses Supabase rows when the query succeeds", async () => {
