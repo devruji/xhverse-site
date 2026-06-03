@@ -90,12 +90,73 @@ describe("Blog Data", () => {
     expect(post?.bodyMarkdown).toContain("co-written with an AI agent");
   });
 
+  it("should include the data product platform contract post metadata", () => {
+    const post = posts.find(
+      (item) => item.slug === "data-product-as-platform-contract",
+    );
+
+    expect(post).toBeDefined();
+    expect(post?.date).toBe("2026-06-03");
+    expect(post?.updatedAt).toBe("2026-06-03");
+    expect(post?.coverImageUrl).toBe(
+      "/images/blog-data-product-as-platform-contract-cover.jpg",
+    );
+    expect(post?.coverImageAlt).toContain("central data product");
+    expect(post?.seoTitle).toBe(
+      "Data Product as a Platform Contract | XHVERSE",
+    );
+    expect(post?.seoDescription).toContain("minimal governed slice");
+    expect(post?.relatedToolCtas).toEqual([
+      {
+        slug: "data-platform-maturity-checker",
+        label: "Data Platform Maturity Checker",
+        href: "/tools/data-platform-maturity-checker",
+        variant: "primary",
+      },
+      {
+        slug: "governance-scorecard",
+        label: "Governance Readiness Scorecard",
+        href: "/tools/governance-scorecard",
+        variant: "secondary",
+      },
+      {
+        slug: "architecture-roulette",
+        label: "Architecture Decision Roulette",
+        href: "/tools/architecture-roulette",
+        variant: "secondary",
+      },
+    ]);
+    expect(post?.bodyMarkdown).toContain("## Should we have one or not?");
+    expect(post?.bodyMarkdown).toContain("## Good vs bad data products");
+    expect(post?.bodyMarkdown).toContain("## Real-world data products");
+    expect(post?.bodyMarkdown).toContain(
+      "## XH data product thinking, for later",
+    );
+    expect(post?.bodyMarkdown).toContain(
+      "Data Platform Maturity Checker](/tools/data-platform-maturity-checker)",
+    );
+    expect(post?.bodyMarkdown).toContain("## References");
+    expect(post?.bodyMarkdown).toContain(
+      "https://martinfowler.com/articles/designing-data-products.html",
+    );
+    expect(post?.bodyMarkdown).toContain("## Disclosure");
+    expect(post?.bodyMarkdown).toContain("co-written with an AI agent");
+  });
+
   it("should include required static replacement posts with media and CTAs", () => {
     const requiredSlugs = [
+      "data-product-as-platform-contract",
       "open-table-formats-operating-model",
       "real-cost-open-tables",
       "envelope-encryption-data-platforms",
     ] as const;
+
+    const expectedDates = {
+      "data-product-as-platform-contract": "2026-06-03",
+      "open-table-formats-operating-model": "2026-06-02",
+      "real-cost-open-tables": "2026-06-02",
+      "envelope-encryption-data-platforms": "2026-06-02",
+    } satisfies Record<(typeof requiredSlugs)[number], string>;
 
     for (const slug of requiredSlugs) {
       const post = posts.find((item) => item.slug === slug);
@@ -103,7 +164,7 @@ describe("Blog Data", () => {
       expect(post?.coverImageUrl).toBeTruthy();
       expect(post?.coverImageAlt).toBeTruthy();
       expect((post?.relatedToolCtas?.length ?? 0)).toBeGreaterThan(0);
-      expect(post?.date).toBe("2026-06-02");
+      expect(post?.date).toBe(expectedDates[slug]);
     }
   });
 
