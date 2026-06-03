@@ -34,6 +34,20 @@ test("blog article page renders markdown body", async ({ page }) => {
   );
 });
 
+test("blog article uses its cover image for social metadata", async ({ page }) => {
+  await page.goto("/blog/data-product-as-platform-contract");
+  await expect(
+    page.locator(
+      'meta[property="og:image"][content="https://xhverse.co/images/blog-data-product-as-platform-contract-cover.jpg"]',
+    ),
+  ).toHaveCount(1);
+  await expect(
+    page.locator(
+      'meta[name="twitter:image"][content="https://xhverse.co/images/blog-data-product-as-platform-contract-cover.jpg"]',
+    ),
+  ).toHaveCount(1);
+});
+
 test("blog article mobile layout has no horizontal overflow", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/blog");
