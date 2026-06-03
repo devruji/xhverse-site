@@ -84,6 +84,193 @@ export type BlogPost = {
 
 export const posts: BlogPost[] = [
   {
+    slug: "data-product-as-platform-contract",
+    title: "Data product as a platform contract",
+    excerpt:
+      "Data products work when teams treat them as platform contracts: named consumers, explicit owners, quality expectations, access boundaries, and lifecycle rules before the consumer count grows.",
+    date: "2026-06-03",
+    tags: ["data-architecture", "platform", "governance", "operations"],
+    mediumUrl: "",
+    readingTime: "8 min read",
+    updatedAt: "2026-06-03",
+    coverImageUrl: "/images/blog-data-product-as-platform-contract-cover.jpg",
+    coverImageAlt:
+      "Isometric data platform operating board showing a central data product connected to sources, quality checks, governance controls, monitoring, and consumers.",
+    seoTitle: "Data Product as a Platform Contract | XHVERSE",
+    seoDescription:
+      "A practical guide to deciding when a data product is worth building, what separates good products from rebranded datasets, and how to start with a minimal governed slice.",
+    relatedToolCtas: [
+      createRelatedToolCta("data-platform-maturity-checker", "primary"),
+      createRelatedToolCta("governance-scorecard", "secondary"),
+      createRelatedToolCta("architecture-roulette", "secondary"),
+    ],
+    bodyMarkdown: `A data product is not a table with a nicer name. It is a platform contract around data that someone depends on repeatedly.
+
+That contract has a consumer, an owner, a use case, a stable interface, quality expectations, access rules, support behavior, and a lifecycle. Without those pieces, the word product mostly hides an unmanaged dataset.
+
+> [!decision]
+> You need a data product when a data asset has repeat users, business dependency, and failure consequences. You do not need one for every table.
+
+## What a data product actually is
+
+A **data product** is a reusable data asset designed around a real consumer workflow. The asset might be a table, semantic model, feature set, API, dashboard-ready mart, or governed bundle of assets. The shape matters less than the contract.
+
+The minimum contract should answer:
+
+- who consumes it,
+- what decision or workflow it supports,
+- what one row or output represents,
+- who owns changes,
+- how fresh and complete it should be,
+- what access is allowed,
+- how consumers report issues,
+- and how breaking changes are handled.
+
+If those answers are missing, the asset may still be useful. It is just not production-shaped yet.
+
+## Should we have one or not?
+
+Most teams should not start by launching a data product program. Start by finding one data dependency that already behaves like a product because people rely on it.
+
+| Situation | Recommendation | Reason |
+| --- | --- | --- |
+| Repeated use, multiple consumers, and high trust requirement | Build a data product | The asset already has product-like blast radius. |
+| One team exploring an unstable definition | Wait | The contract will churn before consumers can trust it. |
+| One-off extract or dashboard | Do not productize | Support cost will be higher than reuse value. |
+| Core metric used by finance, operations, or leadership | Productize carefully | Failure changes decisions, not just query results. |
+| Domain data needed by many downstream teams | Build a narrow first version | Shared meaning is worth explicit ownership. |
+
+The rule is simple: productize where reliability has a cost. Do not productize because the catalog needs more impressive objects.
+
+## Good vs bad data products
+
+A good data product makes a promise that consumers can understand and operators can keep.
+
+Good data products usually have:
+
+- a named owner,
+- a named consumer or consumer group,
+- a clear grain or interface,
+- documented freshness and quality expectations,
+- known limitations,
+- access and privacy boundaries,
+- usage feedback,
+- incident ownership,
+- and a deprecation path.
+
+A bad data product is usually just platform debt with product language wrapped around it.
+
+Bad patterns include:
+
+- a gold table renamed as a product,
+- a dashboard nobody owns,
+- a metric layer without governance,
+- a catalog entry with no support path,
+- a dataset with ten meanings and no grain,
+- or a product backlog that exists only because a transformation program needs one.
+
+> [!warning]
+> If nobody can name the user, the decision, the owner, and the failure mode, the team does not have a data product yet.
+
+## Real-world data products
+
+Useful data products are usually boring in the right way. They serve repeated work.
+
+Retail operations might need a store performance product: daily sales, footfall, margin, staffing signal, promotion context, and store hierarchy at an agreed grain. The consumer is not "the business" in general. It is operations, regional managers, finance, or planning teams with specific decisions.
+
+A loyalty or CRM team might need a customer 360 product. That does not mean every customer field goes into one giant table. It means the product contract explains identity resolution, consent boundaries, segmentation logic, freshness, and where current state differs from point-in-time truth.
+
+An e-commerce team might depend on inventory availability. That product needs latency, stock status semantics, reservation behavior, exception handling, and ownership between merchandising, supply chain, and platform teams.
+
+Finance might need a certified revenue metric product. The value is not only the calculation. The value is the release process, reconciliation path, auditability, and agreement about when the metric can change.
+
+Planning teams might consume a demand forecast output. The data product includes model output, confidence or error behavior, retraining cadence, scenario limitations, and escalation when actual demand drifts.
+
+Governance teams can also consume data products. A data quality signal product can expose freshness, completeness, policy exceptions, and incident counts so platform health becomes measurable instead of anecdotal.
+
+## The minimal version that is still real
+
+Start smaller than the architecture diagram.
+
+Choose one recurring workflow where unreliable data creates visible cost. Name one consumer group. Define one output. Write the contract before expanding the surface.
+
+The first version should include:
+
+1. Consumer: who uses it and for what decision.
+2. Grain: what one row, record, feature vector, or API response means.
+3. Source boundary: which systems are included and which are not.
+4. Quality checks: freshness, completeness, valid ranges, duplicates, and reconciliation where needed.
+5. Access rules: who can use it, what sensitive fields are excluded, and how access is reviewed.
+6. Change policy: what counts as breaking and how much notice consumers receive.
+7. Support path: who answers issues and what incident severity means.
+8. Usage signal: subscriptions, queries, dashboard dependencies, or downstream jobs.
+
+This does not require a large platform program. It requires enough discipline that consumers can trust the asset without reading the source pipeline.
+
+## The operating model matters more than the label
+
+A data product needs platform behavior around it:
+
+- publish with documented intent,
+- monitor freshness and quality,
+- alert the owner before consumers discover breakage,
+- track consumers and downstream dependencies,
+- version breaking changes,
+- review access,
+- retire stale outputs,
+- and keep support ownership visible.
+
+The platform team should provide shared capabilities for those behaviors. Domain or product owners should own the meaning, quality targets, and consumer commitments. When all ownership sits with one central data team, the product becomes a service queue. When all ownership sits with a domain team but the platform has no guardrails, every product becomes a special case.
+
+> [!summary]
+> The useful balance is centralized platform capability plus explicit domain accountability.
+
+## XH data product thinking, for later
+
+For xhverse, the interesting future data product is not a generic SaaS promise. It is a focused diagnostic asset.
+
+The site already has practical tools around maturity, governance, architecture trade-offs, cost, and modeling. Over time, those interactions could support an anonymized benchmark or advisory signal:
+
+- How ready is this platform compared with similar enterprise patterns?
+- Which governance gaps usually block lakehouse adoption?
+- Which operating-model fix should a team make first?
+- What maturity profile appears before teams can safely productize shared data assets?
+
+That should stay narrow. A useful XH data product would help teams reason about readiness and next action. It should not pretend that a form score replaces platform discovery, stakeholder interviews, or production evidence.
+
+## Design check
+
+Before calling something a data product, ask:
+
+- Can a consumer explain what it is for?
+- Can the owner explain what can safely change?
+- Can the platform detect freshness or quality failure?
+- Can access be reviewed without reading pipeline code?
+- Can a breaking change be versioned or communicated?
+- Can the product be retired when nobody depends on it?
+
+If the answer is no, build the missing contract first.
+
+## Related tools
+
+- Run the [Data Platform Maturity Checker](/tools/data-platform-maturity-checker) before calling a shared dataset a product.
+- Use the [Governance Readiness Scorecard](/tools/governance-scorecard) to test ownership, trust, and policy readiness.
+- Try [Architecture Decision Roulette](/tools/architecture-roulette) when the product boundary is really an architecture trade-off.
+
+## References
+
+- [Martin Fowler: Data Mesh Principles and Logical Architecture](https://martinfowler.com/articles/data-mesh-principles.html)
+- [Martin Fowler: Designing Data Products](https://martinfowler.com/articles/designing-data-products.html)
+- [Thoughtworks: Data Mesh in practice, technology and the architecture](https://www.thoughtworks.com/insights/articles/data-mesh-in-practice-technology-and-the-architecture)
+- [Microsoft Learn: Data Products in Unified Catalog](https://learn.microsoft.com/en-au/purview/concept-data-products)
+- [OpenMetadata: Creating Data Contracts](https://docs.open-metadata.org/v1.9.x/how-to-guides/data-contracts/spec)
+
+## Disclosure
+
+This article was co-written with an AI agent and reviewed by Rujikorn Ngoensaard.
+`,
+  },
+  {
     slug: "open-table-formats-operating-model",
     title: "Open table formats are an operating model decision",
     excerpt:
