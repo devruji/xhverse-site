@@ -77,6 +77,11 @@ test("cv page gates CV access via email capture modal", async ({ page }) => {
   const modal = page.locator("#cv-request-modal");
   await expect(modal).toBeVisible();
   await expect(modal.getByRole("heading", { name: "Get the CV in your inbox" })).toBeVisible();
+  await modal.locator("#cv-email").fill("requester@example.com");
+  await modal.getByRole("button", { name: "Request CV" }).click();
+  await expect(modal.locator("#cv-form-error")).toHaveText(
+    "Please complete the verification challenge.",
+  );
   await page.keyboard.press("Escape");
   await expect(modal).toBeHidden();
 });
