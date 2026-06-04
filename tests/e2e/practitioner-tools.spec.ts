@@ -3,12 +3,26 @@ import type { Page } from "@playwright/test";
 import { toolCatalog } from "../../src/data/tools";
 import { practitionerToolDefinitions } from "../../src/lib/practitioner-tools/definitions";
 
-async function selectOperatedAnswerForEveryQuestion(page: Page): Promise<void> {
-  const fieldsets = page.locator("fieldset");
-  const fieldsetCount = await fieldsets.count();
+const journeyThemeCopy: Record<string, string> = {
+  contract: "Assemble the contract clauses",
+  access: "Pass the access gates",
+  layout: "Map the layout signals",
+  semantic: "Diagnose the metric layers",
+  recovery: "Run the recovery drill",
+};
 
-  for (let index = 0; index < fieldsetCount; index += 1) {
-    await fieldsets.nth(index).locator("label").nth(3).click();
+async function selectOperatedAnswerForEveryQuestion(page: Page): Promise<void> {
+  const journeySteps = page.locator("[data-journey-step]");
+  const journeyStepCount = await journeySteps.count();
+
+  for (let index = 0; index < journeyStepCount; index += 1) {
+    const activeFieldset = page.locator("fieldset:visible");
+    await expect(activeFieldset).toHaveCount(1);
+    await activeFieldset.locator("label").nth(3).click();
+
+    if (index < journeyStepCount - 1) {
+      await page.getByRole("button", { name: "Next checkpoint" }).click();
+    }
   }
 }
 
@@ -25,6 +39,29 @@ test("tools catalog links to all live tools", async ({ page }) => {
   }
 });
 
+test("generated practitioner tools initialize after catalog navigation", async ({
+  page,
+}) => {
+  for (const definition of practitionerToolDefinitions) {
+    await page.goto("/tools");
+    const link = page.getByRole("link", { name: new RegExp(definition.title, "i") });
+    await link.scrollIntoViewIfNeeded();
+    await link.click();
+    await page.waitForURL(new RegExp(`/tools/${definition.slug}/?$`));
+
+    await expect(page.locator("[data-practitioner-tool-root]")).toHaveAttribute(
+      "data-practitioner-tool-ready",
+      "true",
+    );
+    await expect(page.getByTestId("journey-board")).toBeVisible();
+    await expect(page.locator("fieldset:visible")).toHaveCount(1);
+    await expect(page.locator("[data-journey-step]").first()).toHaveAttribute(
+      "aria-current",
+      "step",
+    );
+  }
+});
+
 for (const definition of practitionerToolDefinitions) {
   test(`${definition.title} generates a copyable brief and resets`, async ({
     context,
@@ -37,6 +74,37 @@ for (const definition of practitionerToolDefinitions) {
       page.getByRole("heading", { name: definition.title }),
     ).toBeVisible();
     await expect(page.getByText(definition.blogSync.title)).toBeVisible();
+    await expect(page.getByTestId("journey-board")).toBeVisible();
+    await expect(page.getByTestId("journey-guide")).toBeVisible();
+    await expect(page.getByText(journeyThemeCopy[definition.experience.theme])).toBeVisible();
+    await expect(page.locator("[data-journey-step]")).toHaveCount(
+      definition.questions.length,
+    );
+    await expect(page.locator("[data-journey-step]").first()).toHaveAttribute(
+      "aria-current",
+      "step",
+    );
+    await expect(page.locator("fieldset:visible")).toHaveCount(1);
+    await expect(page.getByTestId("journey-progress")).toContainText(
+      `0/${definition.questions.length}`,
+    );
+
+    await page.locator("fieldset:visible").locator("label").nth(3).click();
+    await expect(page.getByTestId("journey-progress")).toContainText(
+      `1/${definition.questions.length}`,
+    );
+    await expect(page.locator("#journey-selected-move")).toContainText(
+      definition.questions[0].actions[4],
+    );
+    await page.getByRole("button", { name: "Next checkpoint" }).click();
+    await expect(page.locator("fieldset:visible")).toContainText(
+      definition.questions[1].dimension,
+    );
+    await page.locator("[data-journey-step]").first().click();
+    await expect(page.locator("fieldset:visible")).toContainText(
+      definition.questions[0].dimension,
+    );
+    await expect(page.locator('input[type="radio"]:checked')).toHaveCount(1);
 
     await selectOperatedAnswerForEveryQuestion(page);
 
@@ -57,6 +125,13 @@ for (const definition of practitionerToolDefinitions) {
     await page.getByRole("button", { name: "Reset" }).click();
     await expect(page.getByTestId("result-panel")).toBeHidden();
     await expect(page.locator('input[type="radio"]:checked')).toHaveCount(0);
+    await expect(page.getByTestId("journey-progress")).toContainText(
+      `0/${definition.questions.length}`,
+    );
+    await expect(page.locator("[data-journey-step]").first()).toHaveAttribute(
+      "aria-current",
+      "step",
+    );
   });
 }
 
@@ -66,14 +141,16 @@ test("new practitioner tools give mobile validation feedback without clearing se
   await page.setViewportSize({ width: 390, height: 844 });
 
   for (const definition of practitionerToolDefinitions) {
-    await page.goto("/tools/");
-    await page.getByRole("link", { name: new RegExp(definition.title, "i") }).click();
-    await page.waitForURL(new RegExp(`/tools/${definition.slug}/?$`));
+    await page.goto(`/tools/${definition.slug}`);
 
     const fieldsets = page.locator("fieldset");
+    await expect(page.locator("fieldset:visible")).toHaveCount(1);
     await fieldsets.nth(0).locator("label").nth(3).click();
+    await expect(page.getByTestId("journey-progress")).toContainText(
+      `1/${definition.questions.length}`,
+    );
 
-    await page.getByRole("button", { name: "Generate brief" }).click();
+    await page.locator('form button[type="submit"]').click();
 
     await expect(page.getByTestId("result-panel")).toBeHidden();
     await expect(page.getByTestId("form-status")).toBeVisible();
@@ -81,14 +158,23 @@ test("new practitioner tools give mobile validation feedback without clearing se
       "selections are still preserved",
     );
     await expect(page.locator('input[type="radio"]:checked')).toHaveCount(1);
+    await expect(page.locator("fieldset:visible")).toContainText(
+      definition.questions[1].dimension,
+    );
 
     await page.getByRole("button", { name: "Reset" }).click();
     await expect(page.getByTestId("form-status")).toBeHidden();
     await expect(page.locator('input[type="radio"]:checked')).toHaveCount(0);
     await expect(page.locator("[data-question-error]:visible")).toHaveCount(0);
+    await expect(page.getByTestId("journey-progress")).toContainText(
+      `0/${definition.questions.length}`,
+    );
+    await expect(page.locator("fieldset:visible")).toContainText(
+      definition.questions[0].dimension,
+    );
 
     await selectOperatedAnswerForEveryQuestion(page);
-    await page.getByRole("button", { name: "Generate brief" }).click();
+    await page.locator('form button[type="submit"]').click();
 
     await expect(page.getByTestId("form-status")).toBeHidden();
     await expect(page.getByTestId("result-panel")).toBeVisible();
