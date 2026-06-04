@@ -1,6 +1,16 @@
 import { expect, test } from "@playwright/test";
+import type { Page } from "@playwright/test";
 import { toolCatalog } from "../../src/data/tools";
 import { practitionerToolDefinitions } from "../../src/lib/practitioner-tools/definitions";
+
+async function selectOperatedAnswerForEveryQuestion(page: Page): Promise<void> {
+  const fieldsets = page.locator("fieldset");
+  const fieldsetCount = await fieldsets.count();
+
+  for (let index = 0; index < fieldsetCount; index += 1) {
+    await fieldsets.nth(index).locator("label").nth(3).click();
+  }
+}
 
 test("tools catalog links to all live tools", async ({ page }) => {
   await page.goto("/tools");
@@ -28,11 +38,7 @@ for (const definition of practitionerToolDefinitions) {
     ).toBeVisible();
     await expect(page.getByText(definition.blogSync.title)).toBeVisible();
 
-    for (const input of await page
-      .locator('[data-testid^="answer-"][data-testid$="-4"]')
-      .all()) {
-      await input.check({ force: true });
-    }
+    await selectOperatedAnswerForEveryQuestion(page);
 
     await page.getByRole("button", { name: "Generate brief" }).click();
 
@@ -50,8 +56,45 @@ for (const definition of practitionerToolDefinitions) {
 
     await page.getByRole("button", { name: "Reset" }).click();
     await expect(page.getByTestId("result-panel")).toBeHidden();
+    await expect(page.locator('input[type="radio"]:checked')).toHaveCount(0);
   });
 }
+
+test("new practitioner tools give mobile validation feedback without clearing selections", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+
+  for (const definition of practitionerToolDefinitions) {
+    await page.goto("/tools/");
+    await page.getByRole("link", { name: new RegExp(definition.title, "i") }).click();
+    await page.waitForURL(new RegExp(`/tools/${definition.slug}/?$`));
+
+    const fieldsets = page.locator("fieldset");
+    await fieldsets.nth(0).locator("label").nth(3).click();
+
+    await page.getByRole("button", { name: "Generate brief" }).click();
+
+    await expect(page.getByTestId("result-panel")).toBeHidden();
+    await expect(page.getByTestId("form-status")).toBeVisible();
+    await expect(page.getByTestId("form-status")).toContainText(
+      "selections are still preserved",
+    );
+    await expect(page.locator('input[type="radio"]:checked')).toHaveCount(1);
+
+    await page.getByRole("button", { name: "Reset" }).click();
+    await expect(page.getByTestId("form-status")).toBeHidden();
+    await expect(page.locator('input[type="radio"]:checked')).toHaveCount(0);
+    await expect(page.locator("[data-question-error]:visible")).toHaveCount(0);
+
+    await selectOperatedAnswerForEveryQuestion(page);
+    await page.getByRole("button", { name: "Generate brief" }).click();
+
+    await expect(page.getByTestId("form-status")).toBeHidden();
+    await expect(page.getByTestId("result-panel")).toBeVisible();
+    await expect(page.getByText("100/100").first()).toBeVisible();
+  }
+});
 
 test("new practitioner tools do not create mobile horizontal overflow", async ({
   page,

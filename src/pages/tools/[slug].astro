@@ -31,74 +31,83 @@ const definition = Astro.props.definition as PractitionerToolDefinition;
 >
   <div class="min-h-screen bg-[var(--bg-page)] font-sans text-[var(--text)]">
     <Header current="/tools" />
-    <main class="mx-auto max-w-7xl px-5 py-6 sm:px-8 sm:py-8 lg:px-10" data-tool-slug={definition.slug}>
+    <main
+      class="practitioner-tool-root mx-auto max-w-7xl px-5 py-6 sm:px-8 sm:py-8 lg:px-10"
+      data-practitioner-tool-root
+      data-tool-slug={definition.slug}
+      data-tool-theme={definition.experience.theme}
+    >
       <section class="grid gap-10 py-10 sm:py-14 lg:grid-cols-[0.95fr_1.05fr]">
         <div>
-          <p class="text-[12px] uppercase tracking-[0.32em] text-emerald-200">{definition.kicker}</p>
+          <p class="text-[12px] uppercase tracking-[0.32em] text-[var(--tool-accent-text)]">
+            {definition.kicker}
+          </p>
           <h1 class="mt-4 max-w-4xl text-[2.45rem] font-semibold leading-[0.98] tracking-tight text-white sm:text-[4.1rem]">
             {definition.title}
           </h1>
           <p class="mt-6 max-w-2xl text-base leading-8 text-zinc-300 sm:text-lg">
             {definition.description}
           </p>
-          <div class="mt-7 border border-cyan-300/20 bg-cyan-300/8 p-4 text-sm leading-7 text-cyan-50">
-            This is a directional planning tool. Do not paste confidential platform, customer, credential, or incident
-            details into the form.
+          <div class="mt-7 border border-[color:var(--tool-accent-muted)] bg-[var(--tool-accent-soft)] p-4 text-sm leading-7 text-zinc-300">
+            <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-[var(--tool-accent-text)]">
+              {definition.experience.modeLabel}
+            </p>
+            <p class="mt-2">{definition.experience.openingSignal}</p>
+            <p class="mt-3 text-xs leading-6 text-zinc-500">
+              Directional planning only. Do not paste confidential platform, customer, credential, or incident details.
+            </p>
           </div>
         </div>
 
         <aside class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
-          <p class="text-[11px] uppercase tracking-[0.24em] text-zinc-500">Outputs</p>
+          <p class="text-[11px] uppercase tracking-[0.24em] text-zinc-500">What this produces</p>
           <div class="mt-5 grid gap-3">
-            <div class="border border-white/10 bg-black/20 p-4">
-              <h2 class="text-base font-semibold tracking-tight text-white">Score and tier</h2>
-              <p class="mt-2 text-sm leading-6 text-zinc-400">
-                A quick signal for whether the design is production-ready, usable with gaps, or still too risky.
-              </p>
-            </div>
-            <div class="border border-white/10 bg-black/20 p-4">
-              <h2 class="text-base font-semibold tracking-tight text-white">Priority gaps</h2>
-              <p class="mt-2 text-sm leading-6 text-zinc-400">
-                The first operating details to fix before treating the result as production guidance.
-              </p>
-            </div>
-            <div class="border border-white/10 bg-black/20 p-4">
-              <h2 class="text-base font-semibold tracking-tight text-white">Copyable brief</h2>
-              <p class="mt-2 text-sm leading-6 text-zinc-400">
-                A compact artifact for architecture notes, review tickets, or follow-up advisory discussion.
-              </p>
-            </div>
+            {definition.experience.outputCards.map((card) => (
+              <div class="border border-white/10 bg-black/20 p-4">
+                <h2 class="text-base font-semibold tracking-tight text-white">{card.title}</h2>
+                <p class="mt-2 text-sm leading-6 text-zinc-400">{card.description}</p>
+              </div>
+            ))}
           </div>
         </aside>
       </section>
 
       <section class="grid gap-8 border-t border-white/10 py-10 lg:grid-cols-[1fr_21rem]">
-        <form id="practitioner-tool-form" class="space-y-5" data-testid="practitioner-tool-form">
+        <form id="practitioner-tool-form" class="space-y-5" data-testid="practitioner-tool-form" novalidate>
           <div class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
             <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Assessment</p>
-            <h2 class="mt-3 text-3xl font-semibold tracking-tight text-white">Rate the current operating reality.</h2>
+            <h2 class="mt-3 text-3xl font-semibold tracking-tight text-white">
+              {definition.experience.assessmentHeading}
+            </h2>
             <p class="mt-4 text-sm leading-7 text-zinc-400">
-              Select the closest answer for each dimension. The result is useful when it reflects how the team actually
-              operates, not how the target design is supposed to look.
+              {definition.experience.assessmentLead}
             </p>
           </div>
 
           {definition.questions.map((question, index) => (
-            <fieldset class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
-              <legend class="text-sm font-semibold text-emerald-200">
+            <fieldset
+              id={`question-${question.id}`}
+              class="practitioner-question border border-white/10 bg-white/[0.03] p-5 sm:p-6"
+              data-question-id={question.id}
+              tabindex="-1"
+            >
+              <legend class="text-sm font-semibold text-[var(--tool-accent-text)]">
                 {String(index + 1).padStart(2, "0")} · {question.dimension}
               </legend>
               <h3 class="mt-3 text-xl font-semibold tracking-tight text-white">{question.prompt}</h3>
-              <p class="mt-2 text-sm leading-6 text-zinc-400">{question.helpText}</p>
+              <p id={`question-${question.id}-help`} class="mt-2 text-sm leading-6 text-zinc-400">
+                {question.helpText}
+              </p>
               <div class="mt-5 grid gap-2 sm:grid-cols-4">
                 {question.options.map((option) => (
-                  <label class="block cursor-pointer border border-white/10 bg-black/20 p-3 transition has-[:checked]:border-emerald-300/80 has-[:checked]:bg-emerald-300/10">
+                  <label class="block min-h-24 cursor-pointer border border-white/10 bg-black/20 p-3 transition has-[:checked]:border-[color:var(--tool-accent)] has-[:checked]:bg-[var(--tool-accent-soft)]">
                     <input
                       class="peer sr-only"
                       type="radio"
                       name={question.id}
                       value={option.value}
                       required
+                      aria-describedby={`question-${question.id}-help question-${question.id}-error`}
                       data-testid={`answer-${question.id}-${option.value}`}
                     />
                     <span class="block text-sm font-semibold text-white">{option.value}. {option.label}</span>
@@ -108,6 +117,13 @@ const definition = Astro.props.definition as PractitionerToolDefinition;
                   </label>
                 ))}
               </div>
+              <p
+                id={`question-${question.id}-error`}
+                class="mt-3 hidden text-sm leading-6 text-rose-200"
+                data-question-error
+              >
+                Choose one option for {question.dimension}.
+              </p>
             </fieldset>
           ))}
 
@@ -115,6 +131,12 @@ const definition = Astro.props.definition as PractitionerToolDefinition;
             <button type="submit" class="cta-primary">Generate brief</button>
             <button id="reset-button" type="button" class="cta-secondary">Reset</button>
           </div>
+          <p
+            id="form-status"
+            class="hidden border border-rose-300/30 bg-rose-300/10 p-3 text-sm leading-6 text-rose-100"
+            data-testid="form-status"
+            role="alert"
+          ></p>
         </form>
 
         <aside class="h-fit border border-white/10 bg-white/[0.03] p-5 text-sm leading-7 text-zinc-400 lg:sticky lg:top-6">
@@ -133,7 +155,9 @@ const definition = Astro.props.definition as PractitionerToolDefinition;
         <div class="grid gap-6 lg:grid-cols-[1fr_0.9fr]">
           <div class="space-y-6">
             <div class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
-              <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Result</p>
+              <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">
+                {definition.experience.resultLabel}
+              </p>
               <div class="mt-4 grid gap-4 sm:grid-cols-2">
                 <div class="border border-white/10 bg-black/20 p-5">
                   <p class="text-sm text-zinc-500">Overall score</p>
@@ -141,7 +165,7 @@ const definition = Astro.props.definition as PractitionerToolDefinition;
                 </div>
                 <div class="border border-white/10 bg-black/20 p-5">
                   <p class="text-sm text-zinc-500">Tier</p>
-                  <p id="tool-tier" class="mt-2 text-2xl font-semibold tracking-tight text-emerald-200"></p>
+                  <p id="tool-tier" class="mt-2 text-2xl font-semibold tracking-tight text-[var(--tool-accent-text)]"></p>
                 </div>
               </div>
               <p id="tool-summary" class="mt-5 text-sm leading-7 text-zinc-400"></p>
@@ -193,6 +217,113 @@ const definition = Astro.props.definition as PractitionerToolDefinition;
     <Footer />
   </div>
 
+  <style>
+    .practitioner-tool-root {
+      --tool-accent: #34d399;
+      --tool-accent-text: #a7f3d0;
+      --tool-accent-muted: rgba(52, 211, 153, 0.38);
+      --tool-accent-soft: rgba(52, 211, 153, 0.08);
+    }
+
+    .practitioner-tool-root[data-tool-theme="access"] {
+      --tool-accent: #38bdf8;
+      --tool-accent-text: #bae6fd;
+      --tool-accent-muted: rgba(56, 189, 248, 0.38);
+      --tool-accent-soft: rgba(56, 189, 248, 0.08);
+    }
+
+    .practitioner-tool-root[data-tool-theme="layout"] {
+      --tool-accent: #fbbf24;
+      --tool-accent-text: #fde68a;
+      --tool-accent-muted: rgba(251, 191, 36, 0.38);
+      --tool-accent-soft: rgba(251, 191, 36, 0.08);
+    }
+
+    .practitioner-tool-root[data-tool-theme="semantic"] {
+      --tool-accent: #c4b5fd;
+      --tool-accent-text: #ddd6fe;
+      --tool-accent-muted: rgba(196, 181, 253, 0.4);
+      --tool-accent-soft: rgba(196, 181, 253, 0.08);
+    }
+
+    .practitioner-tool-root[data-tool-theme="recovery"] {
+      --tool-accent: #fb7185;
+      --tool-accent-text: #fecdd3;
+      --tool-accent-muted: rgba(251, 113, 133, 0.4);
+      --tool-accent-soft: rgba(251, 113, 133, 0.08);
+    }
+
+    html.light .practitioner-tool-root {
+      --tool-accent: #059669;
+      --tool-accent-text: #047857;
+      --tool-accent-muted: rgba(5, 150, 105, 0.34);
+      --tool-accent-soft: rgba(5, 150, 105, 0.08);
+    }
+
+    html.light .practitioner-tool-root[data-tool-theme="access"] {
+      --tool-accent: #0284c7;
+      --tool-accent-text: #0369a1;
+      --tool-accent-muted: rgba(2, 132, 199, 0.32);
+      --tool-accent-soft: rgba(2, 132, 199, 0.07);
+    }
+
+    html.light .practitioner-tool-root[data-tool-theme="layout"] {
+      --tool-accent: #d97706;
+      --tool-accent-text: #b45309;
+      --tool-accent-muted: rgba(217, 119, 6, 0.34);
+      --tool-accent-soft: rgba(217, 119, 6, 0.08);
+    }
+
+    html.light .practitioner-tool-root[data-tool-theme="semantic"] {
+      --tool-accent: #7c3aed;
+      --tool-accent-text: #6d28d9;
+      --tool-accent-muted: rgba(124, 58, 237, 0.32);
+      --tool-accent-soft: rgba(124, 58, 237, 0.07);
+    }
+
+    html.light .practitioner-tool-root[data-tool-theme="recovery"] {
+      --tool-accent: #e11d48;
+      --tool-accent-text: #be123c;
+      --tool-accent-muted: rgba(225, 29, 72, 0.32);
+      --tool-accent-soft: rgba(225, 29, 72, 0.07);
+    }
+
+    .practitioner-question {
+      scroll-margin-top: 5rem;
+    }
+
+    .practitioner-question:focus {
+      outline: 2px solid var(--tool-accent-muted);
+      outline-offset: 3px;
+    }
+
+    .practitioner-question[data-invalid="true"] {
+      border-color: rgba(251, 113, 133, 0.65);
+      background-color: rgba(251, 113, 133, 0.06);
+    }
+
+    .practitioner-question label:has(input:focus-visible) {
+      border-color: var(--tool-accent);
+      outline: 2px solid var(--tool-accent-muted);
+      outline-offset: 3px;
+    }
+
+    html.light .practitioner-question[data-invalid="true"] {
+      border-color: rgba(225, 29, 72, 0.38);
+      background-color: rgba(225, 29, 72, 0.06);
+    }
+
+    .practitioner-text-block {
+      border-left: 2px solid var(--tool-accent-muted);
+      padding-left: 0.75rem;
+    }
+
+    html.light .practitioner-tool-root .text-rose-100,
+    html.light .practitioner-tool-root .text-rose-200 {
+      color: #be123c;
+    }
+  </style>
+
   <script>
     import {
       getPractitionerToolDefinition,
@@ -202,23 +333,12 @@ const definition = Astro.props.definition as PractitionerToolDefinition;
       calculatePractitionerToolResult,
       isAnswerValue,
     } from "../../lib/practitioner-tools/engine";
-    import type { AnswerValue, ToolAnswers, ToolQuestionResult } from "../../lib/practitioner-tools/types";
-
-    const root = document.querySelector<HTMLElement>("[data-tool-slug]");
-    const definition = root?.dataset.toolSlug
-      ? getPractitionerToolDefinition(root.dataset.toolSlug)
-      : undefined;
-    const form = document.querySelector<HTMLFormElement>("#practitioner-tool-form");
-    const resultPanel = document.querySelector<HTMLElement>("#result-panel");
-    const resetButton = document.querySelector<HTMLButtonElement>("#reset-button");
-    const copyButton = document.querySelector<HTMLButtonElement>("#copy-brief");
-    const briefTextarea = document.querySelector<HTMLTextAreaElement>("#tool-brief");
-    const copyStatus = document.querySelector<HTMLElement>("#copy-status");
-
-    function setText(selector: string, value: string): void {
-      const element = document.querySelector<HTMLElement>(selector);
-      if (element) element.textContent = value;
-    }
+    import type {
+      AnswerValue,
+      ToolAnswers,
+      ToolQuestion,
+      ToolQuestionResult,
+    } from "../../lib/practitioner-tools/types";
 
     function toAnswerValue(value: FormDataEntryValue | null): AnswerValue | null {
       const parsed = Number(value);
@@ -227,7 +347,7 @@ const definition = Astro.props.definition as PractitionerToolDefinition;
 
     function makeTextBlock(title: string, body: string): HTMLElement {
       const wrapper = document.createElement("div");
-      wrapper.className = "border-l-2 border-emerald-300/40 pl-3";
+      wrapper.className = "practitioner-text-block";
 
       const heading = document.createElement("p");
       heading.className = "text-sm font-semibold text-white";
@@ -248,111 +368,230 @@ const definition = Astro.props.definition as PractitionerToolDefinition;
       return paragraph;
     }
 
-    function renderBreakdown(items: ToolQuestionResult[]): void {
-      const breakdown = document.querySelector<HTMLElement>("#dimension-breakdown");
-      if (!breakdown) return;
-
-      const blocks = items.map((item) => {
-        const wrapper = document.createElement("div");
-        wrapper.className = "border border-white/10 bg-black/20 p-3";
-
-        const header = document.createElement("div");
-        header.className = "flex items-center justify-between gap-3 text-sm";
-
-        const label = document.createElement("span");
-        label.className = "font-medium text-zinc-200";
-        label.textContent = item.dimension;
-
-        const score = document.createElement("span");
-        score.className = "text-zinc-500";
-        score.textContent = `${item.score}/100`;
-
-        const answer = document.createElement("p");
-        answer.className = "mt-2 text-xs leading-5 text-zinc-500";
-        answer.textContent = item.answerLabel ?? "Not answered";
-
-        header.append(label, score);
-        wrapper.append(header, answer);
-        return wrapper;
-      });
-
-      breakdown.replaceChildren(...blocks);
+    function isRadioInput(target: EventTarget | null): target is HTMLInputElement {
+      return target instanceof HTMLInputElement && target.type === "radio";
     }
 
-    function renderTextList(selector: string, items: ToolQuestionResult[], emptyText: string): void {
-      const container = document.querySelector<HTMLElement>(selector);
-      if (!container) return;
+    function initPractitionerToolPage(): void {
+      const root = document.querySelector<HTMLElement>("[data-practitioner-tool-root]");
+      if (!root || root.dataset.practitionerToolReady === "true") return;
 
-      if (items.length === 0) {
-        container.replaceChildren(makeEmptyBlock(emptyText));
-        return;
-      }
+      const definition = root.dataset.toolSlug
+        ? getPractitionerToolDefinition(root.dataset.toolSlug)
+        : undefined;
+      const form = root.querySelector<HTMLFormElement>("#practitioner-tool-form");
+      const resultPanel = root.querySelector<HTMLElement>("#result-panel");
+      const resetButton = root.querySelector<HTMLButtonElement>("#reset-button");
+      const copyButton = root.querySelector<HTMLButtonElement>("#copy-brief");
+      const briefTextarea = root.querySelector<HTMLTextAreaElement>("#tool-brief");
+      const copyStatus = root.querySelector<HTMLElement>("#copy-status");
+      const formStatus = root.querySelector<HTMLElement>("#form-status");
 
-      container.replaceChildren(
-        ...items.map((item) => makeTextBlock(item.dimension, item.action)),
-      );
-    }
-
-    function renderActions(actions: string[]): void {
-      const actionList = document.querySelector<HTMLOListElement>("#action-list");
-      if (!actionList) return;
-
-      const items = actions.map((action) => {
-        const item = document.createElement("li");
-        item.className = "border border-white/10 bg-black/20 p-3 text-sm leading-7 text-zinc-300";
-        item.textContent = action;
-        return item;
-      });
-
-      actionList.replaceChildren(...items);
-    }
-
-    form?.addEventListener("submit", (event) => {
-      event.preventDefault();
       if (!definition || !form) return;
+      const toolRoot = root;
+      const toolDefinition = definition;
+      const toolForm = form;
 
-      const formData = new FormData(form);
-      const answers: ToolAnswers = {};
+      toolRoot.dataset.practitionerToolReady = "true";
 
-      for (const question of definition.questions) {
-        const answerValue = toAnswerValue(formData.get(question.id));
-        if (answerValue !== null) answers[question.id] = answerValue;
+      function setText(selector: string, value: string): void {
+        const element = toolRoot.querySelector<HTMLElement>(selector);
+        if (element) element.textContent = value;
       }
 
-      const result = calculatePractitionerToolResult(definition, answers);
-      setText("#tool-score", `${result.score}/100`);
-      setText("#tool-tier", result.tier.label);
-      setText("#tool-summary", result.tier.summary);
-      renderBreakdown(result.questionResults);
-      renderTextList("#gap-list", result.gaps, "No critical gaps identified.");
-      renderTextList("#strength-list", result.strengths, "No operated strengths selected yet.");
-      renderActions(result.priorityActions);
-
-      if (briefTextarea) {
-        briefTextarea.value = buildPractitionerToolBrief(definition, result);
+      function getQuestionFieldset(questionId: string): HTMLElement | null {
+        const fieldsets = [...toolRoot.querySelectorAll<HTMLElement>("[data-question-id]")];
+        return fieldsets.find((fieldset) => fieldset.dataset.questionId === questionId) ?? null;
       }
 
-      resultPanel?.classList.remove("hidden");
-      resultPanel?.scrollIntoView({ block: "start", behavior: "smooth" });
-    });
-
-    resetButton?.addEventListener("click", () => {
-      form?.reset();
-      resultPanel?.classList.add("hidden");
-      if (briefTextarea) briefTextarea.value = "";
-      if (copyStatus) copyStatus.textContent = "";
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    });
-
-    copyButton?.addEventListener("click", async () => {
-      if (!briefTextarea) return;
-      briefTextarea.select();
-      try {
-        await navigator.clipboard.writeText(briefTextarea.value);
-        if (copyStatus) copyStatus.textContent = "Brief copied.";
-      } catch {
-        if (copyStatus) copyStatus.textContent = "Select the brief text and copy it from your browser.";
+      function getQuestionRadios(questionId: string): HTMLInputElement[] {
+        const fieldset = getQuestionFieldset(questionId);
+        return fieldset ? [...fieldset.querySelectorAll<HTMLInputElement>('input[type="radio"]')] : [];
       }
-    });
+
+      function readAnswers(): ToolAnswers {
+        const formData = new FormData(toolForm);
+        const answers: ToolAnswers = {};
+
+        for (const question of toolDefinition.questions) {
+          const answerValue = toAnswerValue(formData.get(question.id));
+          if (answerValue !== null) answers[question.id] = answerValue;
+        }
+
+        return answers;
+      }
+
+      function getMissingQuestions(answers: ToolAnswers): ToolQuestion[] {
+        return toolDefinition.questions.filter((question) => answers[question.id] === undefined);
+      }
+
+      function clearQuestionValidation(questionId: string): void {
+        const fieldset = getQuestionFieldset(questionId);
+        if (!fieldset) return;
+
+        delete fieldset.dataset.invalid;
+        const error = fieldset.querySelector<HTMLElement>("[data-question-error]");
+        error?.classList.add("hidden");
+
+        for (const input of getQuestionRadios(questionId)) {
+          input.removeAttribute("aria-invalid");
+        }
+      }
+
+      function clearValidation(): void {
+        formStatus?.classList.add("hidden");
+        if (formStatus) formStatus.textContent = "";
+
+        for (const question of toolDefinition.questions) {
+          clearQuestionValidation(question.id);
+        }
+      }
+
+      function showValidation(missingQuestions: ToolQuestion[]): void {
+        const remainingLabel = missingQuestions.length === 1 ? "dimension still needs" : "dimensions still need";
+
+        if (formStatus) {
+          formStatus.textContent = `${missingQuestions.length} ${remainingLabel} an answer before the brief can be generated. Your current selections are still preserved.`;
+          formStatus.classList.remove("hidden");
+        }
+
+        for (const question of missingQuestions) {
+          const fieldset = getQuestionFieldset(question.id);
+          if (!fieldset) continue;
+
+          fieldset.dataset.invalid = "true";
+          const error = fieldset.querySelector<HTMLElement>("[data-question-error]");
+          error?.classList.remove("hidden");
+
+          for (const input of getQuestionRadios(question.id)) {
+            input.setAttribute("aria-invalid", "true");
+          }
+        }
+
+        const firstMissing = getQuestionFieldset(missingQuestions[0]?.id ?? "");
+        firstMissing?.focus({ preventScroll: true });
+        firstMissing?.scrollIntoView({ block: "center", behavior: "smooth" });
+      }
+
+      function renderBreakdown(items: ToolQuestionResult[]): void {
+        const breakdown = toolRoot.querySelector<HTMLElement>("#dimension-breakdown");
+        if (!breakdown) return;
+
+        const blocks = items.map((item) => {
+          const wrapper = document.createElement("div");
+          wrapper.className = "border border-white/10 bg-black/20 p-3";
+
+          const header = document.createElement("div");
+          header.className = "flex items-center justify-between gap-3 text-sm";
+
+          const label = document.createElement("span");
+          label.className = "font-medium text-zinc-200";
+          label.textContent = item.dimension;
+
+          const score = document.createElement("span");
+          score.className = "text-zinc-500";
+          score.textContent = `${item.score}/100`;
+
+          const answer = document.createElement("p");
+          answer.className = "mt-2 text-xs leading-5 text-zinc-500";
+          answer.textContent = item.answerLabel ?? "Not answered";
+
+          header.append(label, score);
+          wrapper.append(header, answer);
+          return wrapper;
+        });
+
+        breakdown.replaceChildren(...blocks);
+      }
+
+      function renderTextList(selector: string, items: ToolQuestionResult[], emptyText: string): void {
+        const container = toolRoot.querySelector<HTMLElement>(selector);
+        if (!container) return;
+
+        if (items.length === 0) {
+          container.replaceChildren(makeEmptyBlock(emptyText));
+          return;
+        }
+
+        container.replaceChildren(
+          ...items.map((item) => makeTextBlock(item.dimension, item.action)),
+        );
+      }
+
+      function renderActions(actions: string[]): void {
+        const actionList = toolRoot.querySelector<HTMLOListElement>("#action-list");
+        if (!actionList) return;
+
+        const items = actions.map((action) => {
+          const item = document.createElement("li");
+          item.className = "border border-white/10 bg-black/20 p-3 text-sm leading-7 text-zinc-300";
+          item.textContent = action;
+          return item;
+        });
+
+        actionList.replaceChildren(...items);
+      }
+
+      toolForm.addEventListener("change", (event) => {
+        if (!isRadioInput(event.target)) return;
+        clearQuestionValidation(event.target.name);
+        if (getMissingQuestions(readAnswers()).length === 0) {
+          formStatus?.classList.add("hidden");
+        }
+      });
+
+      toolForm.addEventListener("submit", (event) => {
+        event.preventDefault();
+
+        const answers = readAnswers();
+        const missingQuestions = getMissingQuestions(answers);
+
+        clearValidation();
+        if (missingQuestions.length > 0) {
+          resultPanel?.classList.add("hidden");
+          showValidation(missingQuestions);
+          return;
+        }
+
+        const result = calculatePractitionerToolResult(toolDefinition, answers);
+        setText("#tool-score", `${result.score}/100`);
+        setText("#tool-tier", result.tier.label);
+        setText("#tool-summary", result.tier.summary);
+        renderBreakdown(result.questionResults);
+        renderTextList("#gap-list", result.gaps, "No critical gaps identified.");
+        renderTextList("#strength-list", result.strengths, "No operated strengths selected yet.");
+        renderActions(result.priorityActions);
+
+        if (briefTextarea) {
+          briefTextarea.value = buildPractitionerToolBrief(toolDefinition, result);
+        }
+
+        resultPanel?.classList.remove("hidden");
+        resultPanel?.scrollIntoView({ block: "start", behavior: "smooth" });
+      });
+
+      resetButton?.addEventListener("click", () => {
+        toolForm.reset();
+        clearValidation();
+        resultPanel?.classList.add("hidden");
+        if (briefTextarea) briefTextarea.value = "";
+        if (copyStatus) copyStatus.textContent = "";
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+
+      copyButton?.addEventListener("click", async () => {
+        if (!briefTextarea) return;
+        briefTextarea.select();
+        try {
+          await navigator.clipboard.writeText(briefTextarea.value);
+          if (copyStatus) copyStatus.textContent = "Brief copied.";
+        } catch {
+          if (copyStatus) copyStatus.textContent = "Select the brief text and copy it from your browser.";
+        }
+      });
+    }
+
+    initPractitionerToolPage();
+    document.addEventListener("astro:page-load", initPractitionerToolPage);
   </script>
 </BaseLayout>

@@ -24,7 +24,7 @@ Run the full CI pipeline locally:
 bun run check
 ```
 
-This executes: typecheck → build → coverage (100%) → E2E (44 checks).
+This executes: typecheck → build → coverage (100%) → E2E (46 checks).
 
 **CRITICAL**: If this fails, stop here. Do not proceed.
 

@@ -18,7 +18,7 @@ Typed TypeScript exports that define all site content. Pages import from these.
 - gallery.ts — gallery items
 - supabase-config.ts — single source for Supabase URL/key resolution
 
-### src/lib/ — Business Logic (14 domain folders, 520 tests)
+### src/lib/ — Business Logic (14 domain folders, 521 tests)
 Each module has co-located *.test.ts files with 100% coverage.
 
 **Tool modules (13 live tools):**

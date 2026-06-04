@@ -35,6 +35,28 @@ export type ServiceCta = {
   href: "/services";
 };
 
+export type PractitionerToolTheme =
+  | "contract"
+  | "access"
+  | "layout"
+  | "semantic"
+  | "recovery";
+
+export type ToolOutputCard = {
+  title: string;
+  description: string;
+};
+
+export type PractitionerToolExperience = {
+  theme: PractitionerToolTheme;
+  modeLabel: string;
+  openingSignal: string;
+  assessmentHeading: string;
+  assessmentLead: string;
+  resultLabel: string;
+  outputCards: readonly ToolOutputCard[];
+};
+
 export type PractitionerToolDefinition = {
   slug: string;
   title: string;
@@ -42,6 +64,7 @@ export type PractitionerToolDefinition = {
   kicker: string;
   description: string;
   artifactLabel: string;
+  experience: PractitionerToolExperience;
   blogSync: BlogSync;
   serviceCta: ServiceCta;
   tiers: readonly ToolTier[];
