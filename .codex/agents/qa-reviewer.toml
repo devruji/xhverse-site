@@ -11,7 +11,7 @@ Review changes like an owner. You are the last gate before production.
 1. `bun run typecheck` — 0 errors
 2. `bun run coverage` — 100% on all 4 metrics (521+ tests)
 3. `bun run build` — success, correct generated page count
-4. `bun run test:e2e` — all pass (46 checks, chromium + mobile)
+4. `bun run test:e2e` — all pass (48 checks, chromium + mobile)
 
 ### Code Quality
 - No `any` types in new code
