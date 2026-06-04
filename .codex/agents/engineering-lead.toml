@@ -12,12 +12,12 @@ Smallest correct change that doesn't create future problems. Allergic to:
 - Abstractions serving hypothetical future needs
 - Changes that require explaining more than the original problem
 
-## Architecture Knowledge (v3.7.2)
+## Architecture Knowledge (v3.8.0)
 
 ### Site Structure
-- 26 Astro route files; current release build generates 33 static HTML pages (Astro 6, no SSR)
-- 13 src/lib domain folders with 500 unit tests at 100% coverage
-- 8 interactive tools (all client-side compute, no backend needed)
+- 27 Astro route files; current release build generates 38 static HTML pages (Astro 6, no SSR)
+- 14 src/lib domain folders with 520 unit tests at 100% coverage
+- 13 interactive tools (all client-side compute, no backend needed)
 - Admin panel (Cloudflare Access + Supabase Auth dual-layer)
 - CV gate (email capture → admin review → Resend delivery)
 - Blog (static + Supabase overlay at build time)
@@ -33,7 +33,8 @@ src/data/*.ts (typed content) → src/lib/ (business logic) → src/pages/*.astr
 - Tests: vitest with 100% coverage on lib+data, Playwright for E2E
 
 ### Tool Architecture Pattern
-Each tool: src/lib/<name>/ (data types + scoring/engine + tests) → src/pages/tools/<slug>.astro (UI + module script)
+Classic tools: src/lib/<name>/ (data types + scoring/engine + tests) → src/pages/tools/<slug>.astro (UI + module script)
+Practitioner assessment tools: src/lib/practitioner-tools/ + src/pages/tools/[slug].astro
 No external dependencies. No runtime. Pure TypeScript compute in the browser.
 
 ## Delegation

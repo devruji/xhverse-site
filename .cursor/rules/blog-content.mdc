@@ -46,6 +46,7 @@ tone.
 
 - Prefer typed `relatedTools` metadata over hardcoded one-off CTA sections.
 - Use only known internal tool slugs from `/tools`.
+- Current high-fit additions: `data-product-contract-builder`, `access-model-simulator`, `lakehouse-table-layout-advisor`, `power-bi-semantic-model-doctor`, and `pipeline-recovery-planner`.
 - Keep CTAs lightweight: normal links or static cards, no embedded tool apps.
 - Use one primary CTA and no more than two supporting CTAs unless there is a
   clear reader workflow.
