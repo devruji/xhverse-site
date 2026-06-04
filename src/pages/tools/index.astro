@@ -3,75 +3,9 @@ import BaseLayout from "../../layouts/BaseLayout.astro";
 import Header from "../../components/Header.astro";
 import Footer from "../../components/Footer.astro";
 import { site } from "../../data/site";
+import { liveToolCount, toolCatalog } from "../../data/tools";
 
 const deploymentSite = (Astro.site ?? site.siteUrl).toString();
-
-const tools = [
-  {
-    slug: "scd-design-lab",
-    title: "SCD Design Lab",
-    description:
-      "Practice Slowly Changing Dimension design with realistic customer, product, and membership changes. Preview Type 1, Type 2, Type 3, Type 6, and ignore strategies.",
-    category: "Education",
-    status: "New",
-  },
-  {
-    slug: "data-platform-maturity-checker",
-    title: "Data Platform Maturity Checker",
-    description:
-      "A lightweight, anonymous maturity signal for platform architecture, governance, analytics delivery, operations, and documentation. Get a directional benchmark in under 3 minutes.",
-    category: "Assessment",
-    status: "Live",
-  },
-  {
-    slug: "governance-scorecard",
-    title: "Governance Readiness Scorecard",
-    description:
-      "Evaluate whether your organization is ready to implement a data governance program. Get a readiness tier, top blockers, and a prioritized 90-day action plan.",
-    category: "Governance",
-    status: "Live",
-  },
-  {
-    slug: "architecture-roulette",
-    title: "Architecture Decision Roulette",
-    description:
-      "10 real-world data platform scenarios. Pick your approach, then see how a Senior Data Engineer would call it.",
-    category: "Architecture",
-    status: "Live",
-  },
-  {
-    slug: "data-stack-roast",
-    title: "Data Stack Roast",
-    description:
-      "Select your stack components and get a brutally honest 3-paragraph roast of your architecture choices.",
-    category: "Architecture",
-    status: "Live",
-  },
-  {
-    slug: "sql-deathmatch",
-    title: "SQL Deathmatch",
-    description:
-      "15 rounds of paired Spark SQL queries. Pick the winner, learn execution plan reasoning, and discover your tier.",
-    category: "SQL",
-    status: "Live",
-  },
-  {
-    slug: "lakehouse-cost-calculator",
-    title: "Lakehouse Cost Calculator",
-    description:
-      "Estimate monthly Databricks costs from your cluster config. See optimization suggestions with projected savings.",
-    category: "Cost",
-    status: "Live",
-  },
-  {
-    slug: "spark-explained",
-    title: "Spark Explained",
-    description:
-      "Animated pipeline visualizer showing how data flows through Spark stages — partitions, shuffles, skew, and spills.",
-    category: "Education",
-    status: "Live",
-  },
-];
 ---
 
 <BaseLayout
@@ -94,11 +28,11 @@ const tools = [
         Interactive tools
       </h1>
       <p class="mt-4 max-w-xl text-sm leading-7 text-zinc-400">
-        8 free tools for data platform teams — assessments, challenges, calculators, visualizers, and practical learning labs. Fast, anonymous, and useful without context.
+        {liveToolCount} free tools for data platform teams — assessments, challenges, calculators, visualizers, and practical learning labs. Fast, anonymous, and useful without context.
       </p>
 
       <div class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {tools.map((tool) => (
+        {toolCatalog.map((tool) => (
           <a
             href={`/tools/${tool.slug}`}
             class="interactive-card group relative flex flex-col rounded-2xl p-6"

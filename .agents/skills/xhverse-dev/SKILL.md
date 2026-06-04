@@ -67,6 +67,11 @@ Single test file: `bunx vitest run src/data/blog.test.ts`
 - `/tools/sql-deathmatch`: SQL challenge game
 - `/tools/lakehouse-cost-calculator`: Cost estimator
 - `/tools/spark-explained`: Pipeline visualizer
+- `/tools/data-product-contract-builder`: Data product contract assessment and brief
+- `/tools/access-model-simulator`: Least-privilege access model assessment and brief
+- `/tools/lakehouse-table-layout-advisor`: Lakehouse table layout and maintenance advisor
+- `/tools/power-bi-semantic-model-doctor`: Power BI semantic model diagnosis
+- `/tools/pipeline-recovery-planner`: Pipeline recovery runbook planner
 
 ## Agent Surfaces
 

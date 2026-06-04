@@ -5,6 +5,7 @@ import Footer from "../components/Footer.astro";
 import { profile } from "../data/profile";
 import { site } from "../data/site";
 import { posts as staticFallback } from "../data/blog";
+import { featuredTools, liveToolCount } from "../data/tools";
 import {
   createSupabaseClientForBuild,
   loadPublishedPostsForBuild,
@@ -78,44 +79,6 @@ const capabilityGroups = [
   {
     title: "Analytics delivery",
     items: ["Semantic layers", "Reporting foundations", "Operational handover"],
-  },
-];
-
-const tools = [
-  {
-    label: "Data modeling lab",
-    title: "SCD Design Lab",
-    description:
-      "Practice Slowly Changing Dimension design through realistic customer, product, and membership change scenarios.",
-    href: "/tools/scd-design-lab",
-  },
-  {
-    label: "Benchmark tool",
-    title: "Data Platform Maturity Checker",
-    description:
-      "A lightweight, anonymous maturity signal for platform architecture, governance, analytics delivery, operations, and documentation.",
-    href: "/tools/data-platform-maturity-checker",
-  },
-  {
-    label: "Governance tool",
-    title: "Governance Readiness Scorecard",
-    description:
-      "Evaluate whether your organization is ready to implement a data governance program. Get a readiness tier, top blockers, and a prioritized 90-day action plan.",
-    href: "/tools/governance-scorecard",
-  },
-  {
-    label: "Architecture game",
-    title: "Data Stack Roast",
-    description:
-      "Select your stack components and get a brutally honest 3-paragraph roast of your architecture choices.",
-    href: "/tools/data-stack-roast",
-  },
-  {
-    label: "SQL challenge",
-    title: "SQL Deathmatch",
-    description:
-      "15 rounds of paired Spark SQL queries. Pick the winner, learn execution plan reasoning, and discover your tier.",
-    href: "/tools/sql-deathmatch",
   },
 ];
 
@@ -463,13 +426,13 @@ const homeStructuredData = {
             Practical checks for data platform clarity.
           </h3>
           <p class="mt-4 max-w-xl text-sm leading-7 text-zinc-400">
-            Free tools and labs for platform decisions, modeling practice, and fast architecture checks. No login required.
+            Free tools and labs for platform decisions, access design, table layout, semantic models, recovery planning, and fast architecture checks. No login required.
           </p>
         </div>
         <div class="grid gap-4 sm:grid-cols-2">
-          {tools.map((item) => (
-            <a href={item.href} class="interactive-card group flex flex-col p-6">
-              <p class="text-[10px] uppercase tracking-[0.22em] text-emerald-200/70">{item.label}</p>
+          {featuredTools.map((item) => (
+            <a href={`/tools/${item.slug}`} class="interactive-card group flex flex-col p-6">
+              <p class="text-[10px] uppercase tracking-[0.22em] text-emerald-200/70">{item.homeLabel}</p>
               <h4 class="mt-3 text-lg font-semibold tracking-tight text-white">{item.title}</h4>
               <p class="mt-2 flex-1 text-sm leading-7 text-zinc-400">{item.description}</p>
               <p class="link-cue mt-5 text-sm font-medium">Open tool →</p>
@@ -477,7 +440,7 @@ const homeStructuredData = {
           ))}
         </div>
         <div class="mt-6 text-center">
-          <a href="/tools" class="cta-secondary">See all 8 tools →</a>
+          <a href="/tools" class="cta-secondary">See all {liveToolCount} tools →</a>
         </div>
       </section>
 

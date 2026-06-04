@@ -6,10 +6,10 @@ This file provides shared context for all Claude Code agents working in this rep
 
 - **Site**: xhverse.co — portfolio, blog, and interactive tools for Rujikorn Ngoensaard (XH / bossruji)
 - **Role**: Senior Data Engineer | Platform Architecture
-- **Version**: v3.7.2
+- **Version**: v3.8.0
 - **Stack**: Astro 6 (static only), Tailwind CSS v4, Bun, Cloudflare Pages, Supabase, Resend
-- **Pages**: 26 Astro route files; current release build generates 33 static HTML pages
-- **Tests**: 500 unit tests at 100% coverage + 30 E2E tests
+- **Pages**: 27 Astro route files; current release build generates 38 static HTML pages
+- **Tests**: 520 unit tests at 100% coverage + 44 E2E checks
 
 ## Commands
 
@@ -29,20 +29,22 @@ Kill dev server: `lsof -ti :4321 | xargs kill -9 2>/dev/null`
 
 ```
 src/data/*.ts     → Static typed content (profile, cv, site, services, blog, gallery)
-src/lib/          → Business logic + tests (13 domain folders, 100% coverage)
-src/pages/*.astro → Routes → generated static HTML (26 route files, 33 current build pages)
+src/lib/          → Business logic + tests (14 domain folders, 100% coverage)
+src/pages/*.astro → Routes → generated static HTML (27 route files, 38 current build pages)
 src/components/   → Shared Astro components (10)
 src/layouts/      → BaseLayout (SEO/CSP) + AdminLayout (admin panel)
 dist/             → Deployed to Cloudflare CDN
 ```
 
-### Interactive Tools (8 live)
+### Interactive Tools (13 live)
 
 All tools are fully client-side. Each follows:
 ```
 src/lib/<tool-name>/   → Data + logic + tests
 src/pages/tools/<slug>.astro → Page with <script> block
 ```
+
+The five practitioner assessment tools share `src/lib/practitioner-tools/` and are generated through `src/pages/tools/[slug].astro`.
 
 | Tool | Type |
 |------|------|
@@ -54,6 +56,11 @@ src/pages/tools/<slug>.astro → Page with <script> block
 | SQL Deathmatch | Challenge (15 SQL rounds, tier ranking) |
 | Lakehouse Cost Calculator | Calculator (cluster config → USD + optimizations) |
 | Spark Explained | Visualizer (pipeline stages, animated partitions) |
+| Data Product Contract Builder | Assessment (contract dimensions → copyable brief) |
+| Access Model Simulator | Governance simulator (access dimensions → risk/actions) |
+| Lakehouse Table Layout Advisor | Architecture advisor (layout dimensions → maintenance plan) |
+| Power BI Semantic Model Doctor | Semantic model diagnosis (grain/model dimensions → actions) |
+| Pipeline Recovery Planner | Operations planner (recovery dimensions → runbook brief) |
 
 ### Key Systems
 
