@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { existsSync } from "node:fs";
 import { blogToolCtaDefinitions, posts } from "./blog";
+import { toolDefinitions } from "./tools";
 
 describe("Blog Data", () => {
   it("should export a list of posts", () => {
@@ -37,6 +38,10 @@ describe("Blog Data", () => {
   });
 
   it("should have valid related tool CTA metadata", () => {
+    expect(Object.keys(blogToolCtaDefinitions).sort()).toEqual(
+      Object.keys(toolDefinitions).sort(),
+    );
+
     for (const post of posts) {
       const ctas = post.relatedToolCtas ?? [];
       const ctaSlugs = ctas.map((cta) => cta.slug);
@@ -66,10 +71,16 @@ describe("Blog Data", () => {
     expect(post?.seoDescription).toContain("semantic layers");
     expect(post?.relatedToolCtas).toEqual([
       {
+        slug: "power-bi-semantic-model-doctor",
+        label: "Power BI Semantic Model Doctor",
+        href: "/tools/power-bi-semantic-model-doctor",
+        variant: "primary",
+      },
+      {
         slug: "scd-design-lab",
         label: "SCD Design Lab",
         href: "/tools/scd-design-lab",
-        variant: "primary",
+        variant: "secondary",
       },
       {
         slug: "lakehouse-cost-calculator",
@@ -77,14 +88,12 @@ describe("Blog Data", () => {
         href: "/tools/lakehouse-cost-calculator",
         variant: "secondary",
       },
-      {
-        slug: "architecture-roulette",
-        label: "Architecture Decision Roulette",
-        href: "/tools/architecture-roulette",
-        variant: "secondary",
-      },
     ]);
     expect(post?.bodyMarkdown).toContain("## The hybrid that usually works");
+    expect(post?.bodyMarkdown).toContain("## Related tools");
+    expect(post?.bodyMarkdown).toContain(
+      "Power BI Semantic Model Doctor](/tools/power-bi-semantic-model-doctor)",
+    );
     expect(post?.bodyMarkdown).toContain("## References");
     expect(post?.bodyMarkdown).toContain("https://learn.microsoft.com/en-us/power-bi/guidance/star-schema");
     expect(post?.bodyMarkdown).toContain("## Disclosure");
@@ -109,9 +118,9 @@ describe("Blog Data", () => {
     expect(post?.seoDescription).toContain("minimal governed slice");
     expect(post?.relatedToolCtas).toEqual([
       {
-        slug: "data-platform-maturity-checker",
-        label: "Data Platform Maturity Checker",
-        href: "/tools/data-platform-maturity-checker",
+        slug: "data-product-contract-builder",
+        label: "Data Product Contract Builder",
+        href: "/tools/data-product-contract-builder",
         variant: "primary",
       },
       {
@@ -121,9 +130,9 @@ describe("Blog Data", () => {
         variant: "secondary",
       },
       {
-        slug: "architecture-roulette",
-        label: "Architecture Decision Roulette",
-        href: "/tools/architecture-roulette",
+        slug: "data-platform-maturity-checker",
+        label: "Data Platform Maturity Checker",
+        href: "/tools/data-platform-maturity-checker",
         variant: "secondary",
       },
     ]);
@@ -134,7 +143,7 @@ describe("Blog Data", () => {
       "## XH data product thinking, for later",
     );
     expect(post?.bodyMarkdown).toContain(
-      "Data Platform Maturity Checker](/tools/data-platform-maturity-checker)",
+      "Data Product Contract Builder](/tools/data-product-contract-builder)",
     );
     expect(post?.bodyMarkdown).toContain("## References");
     expect(post?.bodyMarkdown).toContain(
@@ -152,13 +161,14 @@ describe("Blog Data", () => {
         coverImageUrl:
           "/images/blog-onelake-platform-contract-not-storage-cover.jpg",
         readingTime: "6 min read",
-        primaryCtaSlug: "data-platform-maturity-checker",
-        secondaryCtaSlugs: ["governance-scorecard", "architecture-roulette"],
+        primaryCtaSlug: "access-model-simulator",
+        secondaryCtaSlugs: ["governance-scorecard", "data-product-contract-builder"],
         reference: "https://learn.microsoft.com/en-us/fabric/onelake/onelake-overview",
         bodyChecks: [
           "## Shortcuts are not ownership shortcuts",
           "## Security has more than one plane",
           "## API and external access belong in the contract",
+          "Access Model Simulator](/tools/access-model-simulator)",
         ],
       },
       {
@@ -167,14 +177,15 @@ describe("Blog Data", () => {
         coverImageUrl:
           "/images/blog-abac-row-filters-column-masks-production-ownership-cover.jpg",
         readingTime: "6 min read",
-        primaryCtaSlug: "governance-scorecard",
-        secondaryCtaSlugs: ["data-platform-maturity-checker"],
+        primaryCtaSlug: "access-model-simulator",
+        secondaryCtaSlugs: ["governance-scorecard", "data-platform-maturity-checker"],
         reference:
           "https://docs.databricks.com/aws/en/data-governance/unity-catalog/abac",
         bodyChecks: [
           "## What ABAC actually centralizes",
           "## UDFs are production code",
           "## Verification is part of the rollout",
+          "Access Model Simulator](/tools/access-model-simulator)",
         ],
       },
       {
@@ -184,12 +195,13 @@ describe("Blog Data", () => {
           "/images/blog-serverless-data-engineering-operating-model-cover.jpg",
         readingTime: "5 min read",
         primaryCtaSlug: "data-platform-maturity-checker",
-        secondaryCtaSlugs: ["governance-scorecard", "lakehouse-cost-calculator"],
+        secondaryCtaSlugs: ["pipeline-recovery-planner", "lakehouse-cost-calculator"],
         reference: "https://docs.databricks.com/aws/en/jobs/run-serverless-jobs",
         bodyChecks: [
           "## Eligibility is a release gate",
           "## Cost attribution needs new evidence",
           "## Recovery still needs an owner",
+          "Pipeline Recovery Planner](/tools/pipeline-recovery-planner)",
         ],
       },
     ] as const;

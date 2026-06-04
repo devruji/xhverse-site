@@ -1,9 +1,9 @@
 ---
-description: Project-wide rule for xhverse site (v3.7.2)
+description: Project-wide rule for xhverse site (v3.8.0)
 alwaysApply: true
 ---
 
-# xhverse-site v3.7.2
+# xhverse-site v3.8.0
 
 Follow `AGENTS.md` and `CLAUDE.md` as primary sources of truth.
 
@@ -16,9 +16,9 @@ Follow `AGENTS.md` and `CLAUDE.md` as primary sources of truth.
 - Current employer: Central Pattana (Oct 2024–Present) — named publicly
 
 ## Architecture
-- **26 Astro route files**; current release build generates 33 static HTML pages (Astro 6, static output only, no SSR)
-- **8 interactive tools** (all client-side compute, no external deps)
-- **13 src/lib domain folders** with 500 unit tests at 100% coverage
+- **27 Astro route files**; current release build generates 38 static HTML pages (Astro 6, static output only, no SSR)
+- **13 interactive tools** (all client-side compute, no external deps)
+- **14 src/lib domain folders** with 520 unit tests at 100% coverage
 - **Admin panel** behind Cloudflare Access (Zero Trust)
 - **CV** gated via email capture + admin review + Resend delivery
 - **CSP** dual-layer: `scripts/generate-headers.ts` + `BaseLayout.astro` meta tag
@@ -32,6 +32,7 @@ src/data/*.ts → src/lib/ → src/pages/*.astro → dist/ → Cloudflare CDN
 ```
 src/lib/<tool>/   (data + logic + tests)  ← backend-engineer
 src/pages/tools/<slug>.astro (UI + script) ← frontend-engineer
+src/lib/practitioner-tools/ + src/pages/tools/[slug].astro ← shared practitioner assessment tools
 ```
 
 ## Agent Instruction Surfaces
@@ -82,8 +83,8 @@ bun run check        # Full pipeline (typecheck + build + coverage + e2e)
 bun run dev          # Dev server at localhost:4321
 bun run typecheck    # Type checks (0 errors required)
 bun run coverage     # Tests + 100% enforcement
-bun run test:e2e     # Playwright (30 tests, chromium + mobile)
-bun run build        # Production build (33 generated pages in the current release)
+bun run test:e2e     # Playwright (44 checks, chromium + mobile)
+bun run build        # Production build (38 generated pages in the current release)
 ```
 
 ## Implementation Rules

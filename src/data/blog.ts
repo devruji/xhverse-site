@@ -1,3 +1,5 @@
+import type { ToolSlug } from "./tools";
+
 export const blogToolCtaDefinitions = {
   "scd-design-lab": {
     label: "SCD Design Lab",
@@ -31,8 +33,28 @@ export const blogToolCtaDefinitions = {
     label: "Spark Explained",
     href: "/tools/spark-explained",
   },
+  "data-product-contract-builder": {
+    label: "Data Product Contract Builder",
+    href: "/tools/data-product-contract-builder",
+  },
+  "access-model-simulator": {
+    label: "Access Model Simulator",
+    href: "/tools/access-model-simulator",
+  },
+  "lakehouse-table-layout-advisor": {
+    label: "Lakehouse Table Layout Advisor",
+    href: "/tools/lakehouse-table-layout-advisor",
+  },
+  "power-bi-semantic-model-doctor": {
+    label: "Power BI Semantic Model Doctor",
+    href: "/tools/power-bi-semantic-model-doctor",
+  },
+  "pipeline-recovery-planner": {
+    label: "Pipeline Recovery Planner",
+    href: "/tools/pipeline-recovery-planner",
+  },
 } as const satisfies Record<
-  string,
+  ToolSlug,
   {
     label: string;
     href: `/tools/${string}`;
@@ -105,9 +127,9 @@ export const posts: BlogPost[] = [
     seoDescription:
       "A practical Microsoft Fabric architecture brief on treating OneLake as a platform contract for ownership, access, shortcuts, discovery, and governance.",
     relatedToolCtas: [
-      createRelatedToolCta("data-platform-maturity-checker", "primary"),
+      createRelatedToolCta("access-model-simulator", "primary"),
       createRelatedToolCta("governance-scorecard", "secondary"),
-      createRelatedToolCta("architecture-roulette", "secondary"),
+      createRelatedToolCta("data-product-contract-builder", "secondary"),
     ],
     bodyMarkdown: `OneLake is easy to undersell because the word lake sounds like storage. In Fabric, that framing is too small.
 
@@ -252,9 +274,9 @@ If those answers are missing, landing data is easy but operating the platform ge
 
 ## Related tools
 
-- Run the [Data Platform Maturity Checker](/tools/data-platform-maturity-checker) before treating OneLake as a shared platform surface.
-- Use the [Governance Readiness Scorecard](/tools/governance-scorecard) to test ownership and access-review readiness.
-- Try [Architecture Decision Roulette](/tools/architecture-roulette) when shortcut boundaries or workspace ownership are really architecture trade-offs.
+- Use the [Access Model Simulator](/tools/access-model-simulator) before assuming workspace, item, API, and shortcut paths behave the same way.
+- Run the [Governance Readiness Scorecard](/tools/governance-scorecard) to test ownership and access-review readiness.
+- Draft the minimum contract with the [Data Product Contract Builder](/tools/data-product-contract-builder) before publishing shared OneLake assets.
 
 ## References
 
@@ -290,7 +312,8 @@ This article was co-written with an AI agent and reviewed by Rujikorn Ngoensaard
     seoDescription:
       "A practical guide to owning Databricks Unity Catalog ABAC row filters, column masks, governed tags, UDFs, exemptions, and runtime risk in production.",
     relatedToolCtas: [
-      createRelatedToolCta("governance-scorecard", "primary"),
+      createRelatedToolCta("access-model-simulator", "primary"),
+      createRelatedToolCta("governance-scorecard", "secondary"),
       createRelatedToolCta("data-platform-maturity-checker", "secondary"),
     ],
     bodyMarkdown: `ABAC is a strong control pattern because it can move row and column rules away from one-table-at-a-time patching. That does not make it automatic governance.
@@ -418,8 +441,9 @@ If those answers are unclear, row filters and column masks may still be useful, 
 
 ## Related tools
 
-- Use the [Governance Readiness Scorecard](/tools/governance-scorecard) before centralizing row and column controls.
-- Run the [Data Platform Maturity Checker](/tools/data-platform-maturity-checker) to test whether the broader platform can support policy ownership.
+- Use the [Access Model Simulator](/tools/access-model-simulator) before centralizing row and column controls.
+- Run the [Governance Readiness Scorecard](/tools/governance-scorecard) to test whether the broader platform can support policy ownership.
+- Check the broader operating model with the [Data Platform Maturity Checker](/tools/data-platform-maturity-checker).
 
 ## References
 
@@ -457,7 +481,7 @@ This article was co-written with an AI agent and reviewed by Rujikorn Ngoensaard
       "A practical operating model for serverless Databricks data engineering: ownership, workload eligibility, cost attribution, observability, CI/CD, and recovery.",
     relatedToolCtas: [
       createRelatedToolCta("data-platform-maturity-checker", "primary"),
-      createRelatedToolCta("governance-scorecard", "secondary"),
+      createRelatedToolCta("pipeline-recovery-planner", "secondary"),
       createRelatedToolCta("lakehouse-cost-calculator", "secondary"),
     ],
     bodyMarkdown: `Serverless data engineering removes a lot of cluster work. It does not remove operational accountability.
@@ -610,7 +634,7 @@ If those answers are visible, serverless can reduce friction. If they are missin
 ## Related tools
 
 - Use the [Data Platform Maturity Checker](/tools/data-platform-maturity-checker) before migrating shared data engineering workloads.
-- Validate ownership and policy readiness with the [Governance Readiness Scorecard](/tools/governance-scorecard).
+- Draft a recovery runbook with the [Pipeline Recovery Planner](/tools/pipeline-recovery-planner).
 - Estimate workload trade-offs with the [Lakehouse Cost Calculator](/tools/lakehouse-cost-calculator).
 
 ## References
@@ -646,9 +670,9 @@ This article was co-written with an AI agent and reviewed by Rujikorn Ngoensaard
     seoDescription:
       "A practical guide to deciding when a data product is worth building, what separates good products from rebranded datasets, and how to start with a minimal governed slice.",
     relatedToolCtas: [
-      createRelatedToolCta("data-platform-maturity-checker", "primary"),
+      createRelatedToolCta("data-product-contract-builder", "primary"),
       createRelatedToolCta("governance-scorecard", "secondary"),
-      createRelatedToolCta("architecture-roulette", "secondary"),
+      createRelatedToolCta("data-platform-maturity-checker", "secondary"),
     ],
     bodyMarkdown: `A data product is not a table with a nicer name. It is a platform contract around data that someone depends on repeatedly.
 
@@ -799,9 +823,9 @@ If the answer is no, build the missing contract first.
 
 ## Related tools
 
-- Run the [Data Platform Maturity Checker](/tools/data-platform-maturity-checker) before calling a shared dataset a product.
+- Draft the product contract with the [Data Product Contract Builder](/tools/data-product-contract-builder) before calling a shared dataset a product.
 - Use the [Governance Readiness Scorecard](/tools/governance-scorecard) to test ownership, trust, and policy readiness.
-- Try [Architecture Decision Roulette](/tools/architecture-roulette) when the product boundary is really an architecture trade-off.
+- Run the [Data Platform Maturity Checker](/tools/data-platform-maturity-checker) to check whether the platform can operate the contract.
 
 ## References
 
@@ -835,7 +859,7 @@ This article was co-written with an AI agent and reviewed by Rujikorn Ngoensaard
     coverImageAlt:
       "Abstract lakehouse control room with metadata layers, storage blocks, and operating panels for open table format decisions.",
     relatedToolCtas: [
-      createRelatedToolCta("architecture-roulette", "primary"),
+      createRelatedToolCta("lakehouse-table-layout-advisor", "primary"),
       createRelatedToolCta("governance-scorecard", "secondary"),
       createRelatedToolCta("lakehouse-cost-calculator", "secondary"),
     ],
@@ -924,7 +948,7 @@ When everyone agrees on this, table format debates get easier and incidents chea
 
 ## Related tools
 
-- Try [Architecture Decision Roulette](/tools/architecture-roulette) to compare operating assumptions under different trade-offs.
+- Use the [Lakehouse Table Layout Advisor](/tools/lakehouse-table-layout-advisor) to turn table-format trade-offs into operating checks.
 - Validate team readiness using [Governance Readiness Scorecard](/tools/governance-scorecard).
 - Estimate maintenance and compute trade-offs with [Lakehouse Cost Calculator](/tools/lakehouse-cost-calculator).
 
@@ -958,6 +982,7 @@ This article was co-written with an AI agent and reviewed by Rujikorn Ngoensaard
       "Hundreds of small data-file tiles being compacted into organized table blocks with metadata and maintenance overlays.",
     relatedToolCtas: [
       createRelatedToolCta("lakehouse-cost-calculator", "primary"),
+      createRelatedToolCta("lakehouse-table-layout-advisor", "secondary"),
       createRelatedToolCta("spark-explained", "secondary"),
     ],
     bodyMarkdown: `Open table formats remove one class of storage cost argument, but they do not remove operational cost. They relocate it into metadata health, file layout, maintenance jobs, and ownership.
@@ -1031,6 +1056,7 @@ Create a small matrix per domain:
 ## Related tools
 
 - Estimate this cost using [Lakehouse Cost Calculator](/tools/lakehouse-cost-calculator).
+- Check layout and maintenance pressure with the [Lakehouse Table Layout Advisor](/tools/lakehouse-table-layout-advisor).
 - Refresh engine-level intuition with [Spark Explained](/tools/spark-explained).
 
 ## References
@@ -1161,9 +1187,9 @@ This article was co-written with an AI agent and reviewed by Rujikorn Ngoensaard
     seoDescription:
       "Trade-offs, constraints, and design strategy for choosing between big-table analytics models, star schemas, and hybrid semantic layers.",
     relatedToolCtas: [
-      createRelatedToolCta("scd-design-lab", "primary"),
+      createRelatedToolCta("power-bi-semantic-model-doctor", "primary"),
+      createRelatedToolCta("scd-design-lab", "secondary"),
       createRelatedToolCta("lakehouse-cost-calculator", "secondary"),
-      createRelatedToolCta("architecture-roulette", "secondary"),
     ],
     bodyMarkdown: `A table design is not good because it has fewer joins. It is good when it answers the right questions with the right amount of friction.
 
@@ -1417,6 +1443,12 @@ Use star schemas to protect shared meaning. Use big tables to package stable con
 When those are missing, every pattern eventually becomes just another table people are afraid to touch.
 
 ---
+
+## Related tools
+
+- Diagnose model grain, relationships, measures, and refresh behavior with the [Power BI Semantic Model Doctor](/tools/power-bi-semantic-model-doctor).
+- Practice history and dimensional boundaries with the [SCD Design Lab](/tools/scd-design-lab).
+- Estimate serving-table and compute trade-offs with the [Lakehouse Cost Calculator](/tools/lakehouse-cost-calculator).
 
 ## References
 

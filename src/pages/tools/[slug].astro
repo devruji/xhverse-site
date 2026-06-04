@@ -1,0 +1,358 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+import {
+  practitionerToolDefinitions,
+} from "../../lib/practitioner-tools/definitions";
+import type { PractitionerToolDefinition } from "../../lib/practitioner-tools/types";
+
+export function getStaticPaths() {
+  return practitionerToolDefinitions.map((definition) => ({
+    params: { slug: definition.slug },
+    props: { definition },
+  }));
+}
+
+const definition = Astro.props.definition as PractitionerToolDefinition;
+---
+
+<BaseLayout
+  title={`${definition.title} | XHVERSE`}
+  description={definition.description}
+  structuredData={{
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: definition.title,
+    applicationCategory: "BusinessApplication",
+    operatingSystem: "Web",
+    description: definition.description,
+  }}
+>
+  <div class="min-h-screen bg-[var(--bg-page)] font-sans text-[var(--text)]">
+    <Header current="/tools" />
+    <main class="mx-auto max-w-7xl px-5 py-6 sm:px-8 sm:py-8 lg:px-10" data-tool-slug={definition.slug}>
+      <section class="grid gap-10 py-10 sm:py-14 lg:grid-cols-[0.95fr_1.05fr]">
+        <div>
+          <p class="text-[12px] uppercase tracking-[0.32em] text-emerald-200">{definition.kicker}</p>
+          <h1 class="mt-4 max-w-4xl text-[2.45rem] font-semibold leading-[0.98] tracking-tight text-white sm:text-[4.1rem]">
+            {definition.title}
+          </h1>
+          <p class="mt-6 max-w-2xl text-base leading-8 text-zinc-300 sm:text-lg">
+            {definition.description}
+          </p>
+          <div class="mt-7 border border-cyan-300/20 bg-cyan-300/8 p-4 text-sm leading-7 text-cyan-50">
+            This is a directional planning tool. Do not paste confidential platform, customer, credential, or incident
+            details into the form.
+          </div>
+        </div>
+
+        <aside class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+          <p class="text-[11px] uppercase tracking-[0.24em] text-zinc-500">Outputs</p>
+          <div class="mt-5 grid gap-3">
+            <div class="border border-white/10 bg-black/20 p-4">
+              <h2 class="text-base font-semibold tracking-tight text-white">Score and tier</h2>
+              <p class="mt-2 text-sm leading-6 text-zinc-400">
+                A quick signal for whether the design is production-ready, usable with gaps, or still too risky.
+              </p>
+            </div>
+            <div class="border border-white/10 bg-black/20 p-4">
+              <h2 class="text-base font-semibold tracking-tight text-white">Priority gaps</h2>
+              <p class="mt-2 text-sm leading-6 text-zinc-400">
+                The first operating details to fix before treating the result as production guidance.
+              </p>
+            </div>
+            <div class="border border-white/10 bg-black/20 p-4">
+              <h2 class="text-base font-semibold tracking-tight text-white">Copyable brief</h2>
+              <p class="mt-2 text-sm leading-6 text-zinc-400">
+                A compact artifact for architecture notes, review tickets, or follow-up advisory discussion.
+              </p>
+            </div>
+          </div>
+        </aside>
+      </section>
+
+      <section class="grid gap-8 border-t border-white/10 py-10 lg:grid-cols-[1fr_21rem]">
+        <form id="practitioner-tool-form" class="space-y-5" data-testid="practitioner-tool-form">
+          <div class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+            <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Assessment</p>
+            <h2 class="mt-3 text-3xl font-semibold tracking-tight text-white">Rate the current operating reality.</h2>
+            <p class="mt-4 text-sm leading-7 text-zinc-400">
+              Select the closest answer for each dimension. The result is useful when it reflects how the team actually
+              operates, not how the target design is supposed to look.
+            </p>
+          </div>
+
+          {definition.questions.map((question, index) => (
+            <fieldset class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+              <legend class="text-sm font-semibold text-emerald-200">
+                {String(index + 1).padStart(2, "0")} · {question.dimension}
+              </legend>
+              <h3 class="mt-3 text-xl font-semibold tracking-tight text-white">{question.prompt}</h3>
+              <p class="mt-2 text-sm leading-6 text-zinc-400">{question.helpText}</p>
+              <div class="mt-5 grid gap-2 sm:grid-cols-4">
+                {question.options.map((option) => (
+                  <label class="block cursor-pointer border border-white/10 bg-black/20 p-3 transition has-[:checked]:border-emerald-300/80 has-[:checked]:bg-emerald-300/10">
+                    <input
+                      class="peer sr-only"
+                      type="radio"
+                      name={question.id}
+                      value={option.value}
+                      required
+                      data-testid={`answer-${question.id}-${option.value}`}
+                    />
+                    <span class="block text-sm font-semibold text-white">{option.value}. {option.label}</span>
+                    <span class="mt-1 block text-xs leading-5 text-zinc-500 peer-checked:text-zinc-300">
+                      {option.description}
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+          ))}
+
+          <div class="flex flex-col gap-3 sm:flex-row">
+            <button type="submit" class="cta-primary">Generate brief</button>
+            <button id="reset-button" type="button" class="cta-secondary">Reset</button>
+          </div>
+        </form>
+
+        <aside class="h-fit border border-white/10 bg-white/[0.03] p-5 text-sm leading-7 text-zinc-400 lg:sticky lg:top-6">
+          <p class="text-[11px] uppercase tracking-[0.24em] text-zinc-500">Blog sync</p>
+          <p class="mt-4">
+            This tool extends the thinking in
+            <a href={definition.blogSync.href} class="text-link font-medium">{definition.blogSync.title}</a>.
+          </p>
+          <a href={definition.serviceCta.href} class="text-link mt-5 inline-flex text-sm font-medium">
+            {definition.serviceCta.label} →
+          </a>
+        </aside>
+      </section>
+
+      <section id="result-panel" class="hidden border-t border-white/10 py-10" data-testid="result-panel" aria-live="polite">
+        <div class="grid gap-6 lg:grid-cols-[1fr_0.9fr]">
+          <div class="space-y-6">
+            <div class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+              <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Result</p>
+              <div class="mt-4 grid gap-4 sm:grid-cols-2">
+                <div class="border border-white/10 bg-black/20 p-5">
+                  <p class="text-sm text-zinc-500">Overall score</p>
+                  <p id="tool-score" class="mt-2 text-5xl font-semibold tracking-tight text-white">0/100</p>
+                </div>
+                <div class="border border-white/10 bg-black/20 p-5">
+                  <p class="text-sm text-zinc-500">Tier</p>
+                  <p id="tool-tier" class="mt-2 text-2xl font-semibold tracking-tight text-emerald-200"></p>
+                </div>
+              </div>
+              <p id="tool-summary" class="mt-5 text-sm leading-7 text-zinc-400"></p>
+            </div>
+
+            <div class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+              <h2 class="text-xl font-semibold tracking-tight text-white">Dimension breakdown</h2>
+              <div id="dimension-breakdown" class="mt-4 grid gap-3"></div>
+            </div>
+
+            <div class="grid gap-6 lg:grid-cols-2">
+              <div class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+                <h2 class="text-xl font-semibold tracking-tight text-white">Gaps</h2>
+                <div id="gap-list" class="mt-4 space-y-3"></div>
+              </div>
+              <div class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+                <h2 class="text-xl font-semibold tracking-tight text-white">Strengths</h2>
+                <div id="strength-list" class="mt-4 space-y-3"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="space-y-6">
+            <div class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+              <h2 class="text-xl font-semibold tracking-tight text-white">Recommended actions</h2>
+              <ol id="action-list" class="mt-4 space-y-3"></ol>
+            </div>
+
+            <div class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+              <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Brief</p>
+                  <h2 class="mt-2 text-xl font-semibold tracking-tight text-white">{definition.artifactLabel}</h2>
+                </div>
+                <button id="copy-brief" type="button" class="cta-secondary px-4 py-2">Copy brief</button>
+              </div>
+              <textarea
+                id="tool-brief"
+                readonly
+                data-testid="tool-brief"
+                class="mt-4 min-h-[24rem] w-full resize-y border border-white/10 bg-black/30 p-4 font-mono text-xs leading-6 text-zinc-300 outline-none"
+              ></textarea>
+              <p id="copy-status" class="mt-3 text-xs text-zinc-500"></p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <Footer />
+  </div>
+
+  <script>
+    import {
+      getPractitionerToolDefinition,
+    } from "../../lib/practitioner-tools/definitions";
+    import {
+      buildPractitionerToolBrief,
+      calculatePractitionerToolResult,
+      isAnswerValue,
+    } from "../../lib/practitioner-tools/engine";
+    import type { AnswerValue, ToolAnswers, ToolQuestionResult } from "../../lib/practitioner-tools/types";
+
+    const root = document.querySelector<HTMLElement>("[data-tool-slug]");
+    const definition = root?.dataset.toolSlug
+      ? getPractitionerToolDefinition(root.dataset.toolSlug)
+      : undefined;
+    const form = document.querySelector<HTMLFormElement>("#practitioner-tool-form");
+    const resultPanel = document.querySelector<HTMLElement>("#result-panel");
+    const resetButton = document.querySelector<HTMLButtonElement>("#reset-button");
+    const copyButton = document.querySelector<HTMLButtonElement>("#copy-brief");
+    const briefTextarea = document.querySelector<HTMLTextAreaElement>("#tool-brief");
+    const copyStatus = document.querySelector<HTMLElement>("#copy-status");
+
+    function setText(selector: string, value: string): void {
+      const element = document.querySelector<HTMLElement>(selector);
+      if (element) element.textContent = value;
+    }
+
+    function toAnswerValue(value: FormDataEntryValue | null): AnswerValue | null {
+      const parsed = Number(value);
+      return Number.isInteger(parsed) && isAnswerValue(parsed) ? parsed : null;
+    }
+
+    function makeTextBlock(title: string, body: string): HTMLElement {
+      const wrapper = document.createElement("div");
+      wrapper.className = "border-l-2 border-emerald-300/40 pl-3";
+
+      const heading = document.createElement("p");
+      heading.className = "text-sm font-semibold text-white";
+      heading.textContent = title;
+
+      const paragraph = document.createElement("p");
+      paragraph.className = "mt-1 text-sm leading-6 text-zinc-400";
+      paragraph.textContent = body;
+
+      wrapper.append(heading, paragraph);
+      return wrapper;
+    }
+
+    function makeEmptyBlock(text: string): HTMLElement {
+      const paragraph = document.createElement("p");
+      paragraph.className = "text-sm leading-6 text-zinc-400";
+      paragraph.textContent = text;
+      return paragraph;
+    }
+
+    function renderBreakdown(items: ToolQuestionResult[]): void {
+      const breakdown = document.querySelector<HTMLElement>("#dimension-breakdown");
+      if (!breakdown) return;
+
+      const blocks = items.map((item) => {
+        const wrapper = document.createElement("div");
+        wrapper.className = "border border-white/10 bg-black/20 p-3";
+
+        const header = document.createElement("div");
+        header.className = "flex items-center justify-between gap-3 text-sm";
+
+        const label = document.createElement("span");
+        label.className = "font-medium text-zinc-200";
+        label.textContent = item.dimension;
+
+        const score = document.createElement("span");
+        score.className = "text-zinc-500";
+        score.textContent = `${item.score}/100`;
+
+        const answer = document.createElement("p");
+        answer.className = "mt-2 text-xs leading-5 text-zinc-500";
+        answer.textContent = item.answerLabel ?? "Not answered";
+
+        header.append(label, score);
+        wrapper.append(header, answer);
+        return wrapper;
+      });
+
+      breakdown.replaceChildren(...blocks);
+    }
+
+    function renderTextList(selector: string, items: ToolQuestionResult[], emptyText: string): void {
+      const container = document.querySelector<HTMLElement>(selector);
+      if (!container) return;
+
+      if (items.length === 0) {
+        container.replaceChildren(makeEmptyBlock(emptyText));
+        return;
+      }
+
+      container.replaceChildren(
+        ...items.map((item) => makeTextBlock(item.dimension, item.action)),
+      );
+    }
+
+    function renderActions(actions: string[]): void {
+      const actionList = document.querySelector<HTMLOListElement>("#action-list");
+      if (!actionList) return;
+
+      const items = actions.map((action) => {
+        const item = document.createElement("li");
+        item.className = "border border-white/10 bg-black/20 p-3 text-sm leading-7 text-zinc-300";
+        item.textContent = action;
+        return item;
+      });
+
+      actionList.replaceChildren(...items);
+    }
+
+    form?.addEventListener("submit", (event) => {
+      event.preventDefault();
+      if (!definition || !form) return;
+
+      const formData = new FormData(form);
+      const answers: ToolAnswers = {};
+
+      for (const question of definition.questions) {
+        const answerValue = toAnswerValue(formData.get(question.id));
+        if (answerValue !== null) answers[question.id] = answerValue;
+      }
+
+      const result = calculatePractitionerToolResult(definition, answers);
+      setText("#tool-score", `${result.score}/100`);
+      setText("#tool-tier", result.tier.label);
+      setText("#tool-summary", result.tier.summary);
+      renderBreakdown(result.questionResults);
+      renderTextList("#gap-list", result.gaps, "No critical gaps identified.");
+      renderTextList("#strength-list", result.strengths, "No operated strengths selected yet.");
+      renderActions(result.priorityActions);
+
+      if (briefTextarea) {
+        briefTextarea.value = buildPractitionerToolBrief(definition, result);
+      }
+
+      resultPanel?.classList.remove("hidden");
+      resultPanel?.scrollIntoView({ block: "start", behavior: "smooth" });
+    });
+
+    resetButton?.addEventListener("click", () => {
+      form?.reset();
+      resultPanel?.classList.add("hidden");
+      if (briefTextarea) briefTextarea.value = "";
+      if (copyStatus) copyStatus.textContent = "";
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    copyButton?.addEventListener("click", async () => {
+      if (!briefTextarea) return;
+      briefTextarea.select();
+      try {
+        await navigator.clipboard.writeText(briefTextarea.value);
+        if (copyStatus) copyStatus.textContent = "Brief copied.";
+      } catch {
+        if (copyStatus) copyStatus.textContent = "Select the brief text and copy it from your browser.";
+      }
+    });
+  </script>
+</BaseLayout>
