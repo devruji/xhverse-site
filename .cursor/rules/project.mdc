@@ -1,9 +1,9 @@
 ---
-description: Project-wide rule for xhverse site (v3.7.1)
+description: Project-wide rule for xhverse site (v3.7.2)
 alwaysApply: true
 ---
 
-# xhverse-site v3.7.1
+# xhverse-site v3.7.2
 
 Follow `AGENTS.md` and `CLAUDE.md` as primary sources of truth.
 
@@ -83,7 +83,7 @@ bun run dev          # Dev server at localhost:4321
 bun run typecheck    # Type checks (0 errors required)
 bun run coverage     # Tests + 100% enforcement
 bun run test:e2e     # Playwright (30 tests, chromium + mobile)
-bun run build        # Production build (33 generated pages in v3.7.1)
+bun run build        # Production build (33 generated pages in the current release)
 ```
 
 ## Implementation Rules
