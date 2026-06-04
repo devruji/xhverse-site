@@ -1,9 +1,9 @@
 ---
-description: Project-wide rule for xhverse site (v3.8.1)
+description: Project-wide rule for xhverse site (v3.9.0)
 alwaysApply: true
 ---
 
-# xhverse-site v3.8.1
+# xhverse-site v3.9.0
 
 Follow `AGENTS.md` and `CLAUDE.md` as primary sources of truth.
 
@@ -32,7 +32,7 @@ src/data/*.ts → src/lib/ → src/pages/*.astro → dist/ → Cloudflare CDN
 ```
 src/lib/<tool>/   (data + logic + tests)  ← backend-engineer
 src/pages/tools/<slug>.astro (UI + script) ← frontend-engineer
-src/lib/practitioner-tools/ + src/pages/tools/[slug].astro ← shared practitioner assessment tools
+src/lib/practitioner-tools/ + src/pages/tools/[slug].astro ← shared guided practitioner decision journeys
 ```
 
 ## Agent Instruction Surfaces
@@ -83,7 +83,7 @@ bun run check        # Full pipeline (typecheck + build + coverage + e2e)
 bun run dev          # Dev server at localhost:4321
 bun run typecheck    # Type checks (0 errors required)
 bun run coverage     # Tests + 100% enforcement
-bun run test:e2e     # Playwright (46 checks, chromium + mobile)
+bun run test:e2e     # Playwright (48 checks, chromium + mobile)
 bun run build        # Production build (38 generated pages in the current release)
 ```
 

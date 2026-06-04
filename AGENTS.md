@@ -6,10 +6,10 @@ This file provides shared context for all Claude Code agents working in this rep
 
 - **Site**: xhverse.co — portfolio, blog, and interactive tools for Rujikorn Ngoensaard (XH / bossruji)
 - **Role**: Senior Data Engineer | Platform Architecture
-- **Version**: v3.8.1
+- **Version**: v3.9.0
 - **Stack**: Astro 6 (static only), Tailwind CSS v4, Bun, Cloudflare Pages, Supabase, Resend
 - **Pages**: 27 Astro route files; current release build generates 38 static HTML pages
-- **Tests**: 521 unit tests at 100% coverage + 46 E2E checks
+- **Tests**: 521 unit tests at 100% coverage + 48 E2E checks
 
 ## Commands
 
@@ -44,7 +44,7 @@ src/lib/<tool-name>/   → Data + logic + tests
 src/pages/tools/<slug>.astro → Page with <script> block
 ```
 
-The five practitioner assessment tools share `src/lib/practitioner-tools/` and are generated through `src/pages/tools/[slug].astro`.
+The five practitioner assessment tools share `src/lib/practitioner-tools/` and are generated through guided decision journeys in `src/pages/tools/[slug].astro`.
 
 | Tool | Type |
 |------|------|
@@ -56,11 +56,11 @@ The five practitioner assessment tools share `src/lib/practitioner-tools/` and a
 | SQL Deathmatch | Challenge (15 SQL rounds, tier ranking) |
 | Lakehouse Cost Calculator | Calculator (cluster config → USD + optimizations) |
 | Spark Explained | Visualizer (pipeline stages, animated partitions) |
-| Data Product Contract Builder | Assessment (contract dimensions → copyable brief) |
-| Access Model Simulator | Governance simulator (access dimensions → risk/actions) |
-| Lakehouse Table Layout Advisor | Architecture advisor (layout dimensions → maintenance plan) |
-| Power BI Semantic Model Doctor | Semantic model diagnosis (grain/model dimensions → actions) |
-| Pipeline Recovery Planner | Operations planner (recovery dimensions → runbook brief) |
+| Data Product Contract Builder | Guided contract journey (clauses → copyable brief) |
+| Access Model Simulator | Guided governance journey (policy gates → risk/actions) |
+| Lakehouse Table Layout Advisor | Guided architecture journey (layout signals → maintenance plan) |
+| Power BI Semantic Model Doctor | Guided semantic journey (metric diagnosis → actions) |
+| Pipeline Recovery Planner | Guided recovery journey (drill checkpoints → runbook brief) |
 
 ### Key Systems
 

@@ -14,7 +14,7 @@ Act as a planning-focused architect. Understand the request, inspect relevant co
 5. Identify risks and dependencies
 6. Define verification commands, and for Cursor-assisted work assign those commands to Cursor
 
-## Architecture Knowledge (v3.8.1)
+## Architecture Knowledge (v3.9.0)
 
 ### File Ownership
 - src/data/*.ts → backend-engineer (profile, cv, site, blog, services, gallery)

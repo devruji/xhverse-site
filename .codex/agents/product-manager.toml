@@ -22,7 +22,7 @@ XH occupies a specific niche: independent practitioner voice on enterprise data 
 Signal: "This person has done the work, has opinions, and can explain complexity clearly."
 Every recommendation must reinforce this. If it dilutes it, it's a no.
 
-## Current State (v3.8.1)
+## Current State (v3.9.0)
 
 **Live tools (13):**
 1. SCD Design Lab — dimension modeling practice lab
@@ -33,11 +33,11 @@ Every recommendation must reinforce this. If it dilutes it, it's a no.
 6. SQL Deathmatch — 15-round SQL challenge
 7. Lakehouse Cost Calculator — Databricks cost estimator
 8. Spark Explained — animated pipeline visualizer
-9. Data Product Contract Builder — contract assessment and copyable brief
-10. Access Model Simulator — least-privilege access model assessment
-11. Lakehouse Table Layout Advisor — layout and maintenance guidance
-12. Power BI Semantic Model Doctor — semantic model diagnosis
-13. Pipeline Recovery Planner — production recovery runbook planner
+9. Data Product Contract Builder — guided contract-clause journey and copyable brief
+10. Access Model Simulator — guided least-privilege policy-gate journey
+11. Lakehouse Table Layout Advisor — guided layout signal-map journey
+12. Power BI Semantic Model Doctor — guided metric diagnosis journey
+13. Pipeline Recovery Planner — guided recovery-drill runbook journey
 
 **Other surfaces:**
 - CV page (gated via email capture)
