@@ -58,6 +58,16 @@ src/pages/tools/<slug>.astro (UI + script) ← frontend-engineer
 - When Codex hands work to Cursor, follow the skill lens named in the `.tmp/*-handoff.md`.
 - For Codex-managed Cursor work, Cursor runs the requested verification commands, including `bun run check` when full confidence is needed; Codex reviews Cursor's output and reruns tests only if evidence is incomplete or the user asks.
 
+## Implementation Lane
+- Default code implementation to `codex-spark` for bounded build/edit work when available.
+- Switch back to the smarter Codex lane when `codex-spark` is buggy, misses repo rules, cannot produce production-grade output, or the work is high-risk/complex.
+- Codex remains accountable for planning, review, verification evidence, and final acceptance regardless of implementation lane.
+
+## Content Writing Defaults
+- Use the repo-local `technical_writer` sub-agent lens when starting, outlining, drafting, or reviewing public content: blog posts, technical docs, release notes, page copy, metadata, references, and related-tool CTAs.
+- For blog work, pair `technical_writer` with `blog-content-strategy` and `document-writer`; use `product-manager` first when topic selection or business rationale is still open.
+- Writer output must preserve xhverse voice: practical, peer-facing, source-backed, no vendor hype, no invented private client claims.
+
 ## Git Workflow
 - Branch from `development` — never `main`
 - **NEVER** edit on `development` or `main` — create branch first

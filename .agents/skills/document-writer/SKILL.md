@@ -7,6 +7,11 @@ description: Write technical documentation and blog content for xhverse projects
 
 Write documentation and blog content that matches xhverse conventions: concise, professional, technically credible, no filler.
 
+When starting or reviewing public content, use the repo-local `technical_writer`
+sub-agent lens when the current runtime supports repo-local sub-agents. For blog
+work, pair it with `blog-content-strategy` before body drafting and before
+pre-publish review.
+
 ## Two Modes
 
 ### Technical Documentation

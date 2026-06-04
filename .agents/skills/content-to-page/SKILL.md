@@ -6,6 +6,10 @@ description: Use this when turning rough content, notes, or copy into page-ready
 # Goal
 Convert content ideas into clean, structured, production-ready page sections.
 
+For substantial public copy, apply the repo-local `technical_writer` lens before
+finalizing the section structure so reader goal, claims, voice, and CTA fit are
+checked early.
+
 # Rules
 1. Keep tone concise, professional, minimal, and credible.
 2. Avoid generic startup or marketing language.

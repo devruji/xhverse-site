@@ -49,6 +49,12 @@ For any feature recommendation:
 4. What's the effort vs. lead-gen payoff?
 5. Does it compete with content creation time?
 
+For content strategy:
+1. Select topics that reinforce independent practitioner credibility.
+2. Prefer topics tied to current enterprise data-platform decisions.
+3. Hand off selected topics to `technical_writer` for reader goal, thesis, outline, metadata, source plan, and CTA fit.
+4. Avoid vendor-announcement rewrites unless xhverse adds an operating-model or implementation decision angle.
+
 ## Personas
 
 1. **Evaluator** — hiring manager/CTO checking credentials (needs frictionless CV access, proof of depth)
