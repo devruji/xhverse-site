@@ -24,7 +24,7 @@ Run the full CI pipeline locally:
 bun run check
 ```
 
-This executes: typecheck → build → coverage (100%) → E2E (20 tests).
+This executes: typecheck → build → coverage (100%) → E2E (30 tests).
 
 **CRITICAL**: If this fails, stop here. Do not proceed.
 
@@ -35,7 +35,7 @@ After build, verify the generated output:
 ```bash
 # Check all pages were generated
 ls dist/*.html dist/**/*.html 2>/dev/null | wc -l
-# Expected: 8+ pages (index, about, cv, gallery, 404, blog/index, blog/[slugs], tools/*)
+# Expected: 33 generated static HTML pages in v3.7.1
 
 # Verify _headers file was generated with correct CSP
 grep "connect-src" dist/_headers
@@ -61,7 +61,7 @@ Check production HTML for theme infrastructure:
 ```bash
 # Anti-FOUC script present and NOT mangled by Cloudflare
 curl -s http://127.0.0.1:4321 | grep 'data-cfasync="false"' | wc -l
-# Expected: 3 (anti-FOUC + page effects + theme toggle)
+# Expected: 5 on the current homepage
 
 # Theme toggle button exists
 curl -s http://127.0.0.1:4321 | grep 'id="theme-toggle"' | wc -l
@@ -69,7 +69,7 @@ curl -s http://127.0.0.1:4321 | grep 'id="theme-toggle"' | wc -l
 
 # html.light CSS variables present in stylesheet
 curl -s http://127.0.0.1:4321 | grep -oP 'href="/_astro/[^"]*\.css"' | head -1 | xargs -I{} curl -s "http://127.0.0.1:4321{}" | grep -c "html.light"
-# Expected: 50+ rules
+# Expected: 1+ (minified CSS may collapse repeated selectors)
 
 # No inline onclick handlers (Cloudflare Rocket Loader blocks them)
 curl -s http://127.0.0.1:4321 | grep -c 'onclick='
@@ -81,15 +81,11 @@ curl -s http://127.0.0.1:4321 | grep -c 'onclick='
 Verify every page returns 200 and has key elements:
 
 ```bash
-for page in / /blog /blog/building-xhverse /about /cv /gallery /tools/data-platform-maturity-checker; do
+for page in / /blog /blog/onelake-platform-contract-not-storage /about /cv /gallery /tools /tools/data-platform-maturity-checker; do
   status=$(curl -s -o /dev/null -w "%{http_code}" "http://127.0.0.1:4321${page}")
   echo "${page}: ${status}"
 done
 # All should be 200
-
-# /tools should 404 (no index page)
-curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:4321/tools
-# Expected: 404
 ```
 
 Check key elements on each page:
@@ -115,9 +111,9 @@ curl -s http://127.0.0.1:4321 | grep -o '"@type":"Person"' | wc -l
 # Expected: 1+
 
 # Blog posts have BlogPosting with author
-curl -s http://127.0.0.1:4321/blog/building-xhverse | grep -o '"@type":"BlogPosting"'
+curl -s http://127.0.0.1:4321/blog/onelake-platform-contract-not-storage | grep -o '"@type":"BlogPosting"'
 # Expected: 1
-curl -s http://127.0.0.1:4321/blog/building-xhverse | grep -o '"author"'
+curl -s http://127.0.0.1:4321/blog/onelake-platform-contract-not-storage | grep -o '"author"'
 # Expected: 1
 
 # OG image is raster (not SVG)
@@ -177,7 +173,7 @@ curl -s -o /dev/null -w "%{http_code}" https://xhverse.co
 # Verify production has the latest CSS (check for html.light rules)
 CSS_URL=$(curl -s https://xhverse.co | grep -oP 'href="/_astro/[^"]*\.css"' | head -1 | sed 's/href="//' | sed 's/"//')
 curl -s "https://xhverse.co${CSS_URL}" | grep -c "html.light"
-# Expected: 50+
+# Expected: 1+ (minified CSS may collapse repeated selectors)
 
 # Verify scripts aren't blocked by Rocket Loader
 curl -s https://xhverse.co | grep -c 'type=".*text/javascript"'
@@ -185,7 +181,7 @@ curl -s https://xhverse.co | grep -c 'type=".*text/javascript"'
 
 # Verify theme toggle script runs (not deferred)
 curl -s https://xhverse.co | grep 'data-cfasync="false"' | grep -c "addEventListener\|initThemeToggle\|initPageEffects\|localStorage"
-# Expected: 3
+# Expected: 5 on the current homepage
 
 # Check response headers from Cloudflare
 curl -sI https://xhverse.co | grep -i "x-frame-options\|strict-transport\|content-security-policy"
@@ -232,6 +228,6 @@ These are issues that have broken production before — always verify:
 3. **CSS opacity:0 on scroll elements**: Must use progressive enhancement (`.will-animate` added by JS, not CSS default).
 4. **Inline onclick handlers**: Blocked by Rocket Loader. Use `addEventListener` in `data-cfasync="false"` scripts instead.
 5. **SVG OG images**: Social platforms can't render them. Must be raster PNG.
-6. **`/tools` is 404**: Only `/tools/data-platform-maturity-checker` exists. Footer must link to full path.
+6. **`/tools` exists**: The tools index should return 200 and link to all eight live tools.
 7. **CV page inline footer**: Must use shared `<Footer />` component, not inline HTML.
 8. **AWS logo dual-theme**: Needs both `aws.png` (light) and `aws-dark.png` (dark), no CSS invert hack.
