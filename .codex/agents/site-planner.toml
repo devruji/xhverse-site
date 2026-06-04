@@ -14,12 +14,12 @@ Act as a planning-focused architect. Understand the request, inspect relevant co
 5. Identify risks and dependencies
 6. Define verification commands, and for Cursor-assisted work assign those commands to Cursor
 
-## Architecture Knowledge (v3.0.0)
+## Architecture Knowledge (v3.7.2)
 
 ### File Ownership
 - src/data/*.ts → backend-engineer (profile, cv, site, blog, services, gallery)
-- src/lib/*/ → backend-engineer (11 modules, must maintain 100% coverage)
-- src/pages/*.astro → frontend-engineer (20 pages)
+- src/lib/*/ → backend-engineer (13 domain folders, must maintain 100% coverage)
+- src/pages/*.astro → frontend-engineer (26 route files; current release build generates 33 static HTML pages)
 - src/components/*.astro → frontend-engineer (10 components)
 - src/layouts/*.astro → frontend-engineer (BaseLayout, AdminLayout)
 - blog/article briefs, docs, page copy, metadata, references → technical-writer

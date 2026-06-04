@@ -6,10 +6,10 @@ This file provides shared context for all Claude Code agents working in this rep
 
 - **Site**: xhverse.co — portfolio, blog, and interactive tools for Rujikorn Ngoensaard (XH / bossruji)
 - **Role**: Senior Data Engineer | Platform Architecture
-- **Version**: v3.0.0
+- **Version**: v3.7.2
 - **Stack**: Astro 6 (static only), Tailwind CSS v4, Bun, Cloudflare Pages, Supabase, Resend
-- **Pages**: 20 (homepage, about, cv, gallery, services, blog, 8 tools, admin panel)
-- **Tests**: 444 unit tests at 100% coverage + 20 E2E tests
+- **Pages**: 26 Astro route files; current release build generates 33 static HTML pages
+- **Tests**: 500 unit tests at 100% coverage + 30 E2E tests
 
 ## Commands
 
@@ -29,8 +29,8 @@ Kill dev server: `lsof -ti :4321 | xargs kill -9 2>/dev/null`
 
 ```
 src/data/*.ts     → Static typed content (profile, cv, site, services, blog, gallery)
-src/lib/          → Business logic + tests (11 modules, 100% coverage)
-src/pages/*.astro → Routes → static HTML (20 pages)
+src/lib/          → Business logic + tests (13 domain folders, 100% coverage)
+src/pages/*.astro → Routes → generated static HTML (26 route files, 33 current build pages)
 src/components/   → Shared Astro components (10)
 src/layouts/      → BaseLayout (SEO/CSP) + AdminLayout (admin panel)
 dist/             → Deployed to Cloudflare CDN

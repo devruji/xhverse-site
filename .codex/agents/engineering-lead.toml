@@ -12,11 +12,11 @@ Smallest correct change that doesn't create future problems. Allergic to:
 - Abstractions serving hypothetical future needs
 - Changes that require explaining more than the original problem
 
-## Architecture Knowledge (v3.0.0)
+## Architecture Knowledge (v3.7.2)
 
 ### Site Structure
-- 20 static pages (Astro 6, no SSR)
-- 11 lib modules with 444 unit tests at 100% coverage
+- 26 Astro route files; current release build generates 33 static HTML pages (Astro 6, no SSR)
+- 13 src/lib domain folders with 500 unit tests at 100% coverage
 - 8 interactive tools (all client-side compute, no backend needed)
 - Admin panel (Cloudflare Access + Supabase Auth dual-layer)
 - CV gate (email capture → admin review → Resend delivery)

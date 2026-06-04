@@ -8,7 +8,7 @@ XHVerse is the portfolio, blog, and tools site for Rujikorn Ngoensaard (XH / bos
 
 - **Production**: https://xhverse.co
 - **Repo**: https://github.com/devruji/xhverse-site
-- **Current version**: v3.0.0
+- **Current version**: v3.7.2
 - **Business model**: Consulting/advisory — site drives inbound leads via content + tools
 
 ## Commands
@@ -57,7 +57,7 @@ All content is defined in TypeScript modules. Supabase overlays blog posts at bu
 
 **Content → Pages**: `src/data/` exports typed arrays/objects, imported by `src/pages/*.astro` at build time. No CMS, no filesystem content collections.
 
-**Business logic (`src/lib/`)**: Pure functions with 100% test coverage. Each subdirectory is a domain: `blog/`, `cv-requests/`, `leads/`, `data-platform-maturity/`, `governance-scorecard/`. Tests co-located as `*.test.ts`.
+**Business logic (`src/lib/`)**: Pure functions and integration helpers across 13 domain folders: `admin/`, `architecture-roulette/`, `blog/`, `blog-views/`, `cv-requests/`, `data-platform-maturity/`, `data-stack-roast/`, `governance-scorecard/`, `lakehouse-cost-calculator/`, `leads/`, `scd-design-lab/`, `spark-explained/`, and `sql-deathmatch/`. Tests are co-located as `*.test.ts`.
 
 **Interactive tools** (`/tools/*`): Client-side compute (no server). Each tool has `questions.ts` + `scoring.ts` in `src/lib/<tool>/`, rendered by a page in `src/pages/tools/`.
 

@@ -3,7 +3,7 @@ description = "Implementation-focused Astro frontend engineer for production-gra
 model_reasoning_effort = "high"
 sandbox_mode = "workspace-write"
 developer_instructions = """
-Production-grade Astro implementer for xhverse.co (v3.0.0, 20 pages).
+Production-grade Astro implementer for xhverse.co (v3.7.2; 26 route files, 33 generated static HTML pages in the current release).
 
 ## Implementation Patterns
 
