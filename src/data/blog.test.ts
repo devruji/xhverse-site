@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest";
+import { existsSync } from "node:fs";
 import { blogToolCtaDefinitions, posts } from "./blog";
 
 describe("Blog Data", () => {
@@ -141,6 +142,86 @@ describe("Blog Data", () => {
     );
     expect(post?.bodyMarkdown).toContain("## Disclosure");
     expect(post?.bodyMarkdown).toContain("co-written with an AI agent");
+  });
+
+  it("should include the June 4 technical blog launch posts", () => {
+    const expectedPosts = [
+      {
+        slug: "onelake-platform-contract-not-storage",
+        title: "OneLake is a platform contract, not just storage",
+        coverImageUrl:
+          "/images/blog-onelake-platform-contract-not-storage-cover.jpg",
+        readingTime: "6 min read",
+        primaryCtaSlug: "data-platform-maturity-checker",
+        secondaryCtaSlugs: ["governance-scorecard", "architecture-roulette"],
+        reference: "https://learn.microsoft.com/en-us/fabric/onelake/onelake-overview",
+        bodyChecks: [
+          "## Shortcuts are not ownership shortcuts",
+          "## Security has more than one plane",
+          "## API and external access belong in the contract",
+        ],
+      },
+      {
+        slug: "abac-row-filters-column-masks-production-ownership",
+        title: "ABAC row filters and column masks need production ownership",
+        coverImageUrl:
+          "/images/blog-abac-row-filters-column-masks-production-ownership-cover.jpg",
+        readingTime: "6 min read",
+        primaryCtaSlug: "governance-scorecard",
+        secondaryCtaSlugs: ["data-platform-maturity-checker"],
+        reference:
+          "https://docs.databricks.com/aws/en/data-governance/unity-catalog/abac",
+        bodyChecks: [
+          "## What ABAC actually centralizes",
+          "## UDFs are production code",
+          "## Verification is part of the rollout",
+        ],
+      },
+      {
+        slug: "serverless-data-engineering-operating-model",
+        title: "Serverless data engineering still needs an operating model",
+        coverImageUrl:
+          "/images/blog-serverless-data-engineering-operating-model-cover.jpg",
+        readingTime: "5 min read",
+        primaryCtaSlug: "data-platform-maturity-checker",
+        secondaryCtaSlugs: ["governance-scorecard", "lakehouse-cost-calculator"],
+        reference: "https://docs.databricks.com/aws/en/jobs/run-serverless-jobs",
+        bodyChecks: [
+          "## Eligibility is a release gate",
+          "## Cost attribution needs new evidence",
+          "## Recovery still needs an owner",
+        ],
+      },
+    ] as const;
+
+    for (const expectedPost of expectedPosts) {
+      const post = posts.find((item) => item.slug === expectedPost.slug);
+      expect(post).toBeDefined();
+      expect(post?.title).toBe(expectedPost.title);
+      expect(post?.date).toBe("2026-06-04");
+      expect(post?.updatedAt).toBe("2026-06-04");
+      expect(post?.readingTime).toBe(expectedPost.readingTime);
+      expect(post?.coverImageUrl).toBe(expectedPost.coverImageUrl);
+      expect(
+        existsSync(new URL(`../../public${expectedPost.coverImageUrl}`, import.meta.url)),
+      ).toBe(true);
+      expect(post?.coverImageAlt).toBeTruthy();
+      expect(post?.seoTitle).toBeTruthy();
+      expect(post?.seoDescription).toBeTruthy();
+      expect(post?.bodyMarkdown).toContain("## References");
+      expect(post?.bodyMarkdown).toContain(expectedPost.reference);
+      expect(post?.bodyMarkdown).toContain("## Disclosure");
+      expect(post?.bodyMarkdown).toContain("co-written with an AI agent");
+      expect(post?.relatedToolCtas?.[0]?.slug).toBe(expectedPost.primaryCtaSlug);
+      expect(post?.relatedToolCtas?.[0]?.variant).toBe("primary");
+      expect(post?.relatedToolCtas?.slice(1).map((cta) => cta.slug)).toEqual(
+        expectedPost.secondaryCtaSlugs,
+      );
+
+      for (const bodyCheck of expectedPost.bodyChecks) {
+        expect(post?.bodyMarkdown).toContain(bodyCheck);
+      }
+    }
   });
 
   it("should include required static replacement posts with media and CTAs", () => {

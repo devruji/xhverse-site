@@ -8,6 +8,13 @@ globs: ["src/data/blog.ts", "src/data/blog.test.ts", "src/pages/blog/**/*.astro"
 Use `AGENTS.md`, `CLAUDE.md`, and `.agents/skills/blog-content-strategy/SKILL.md`
 as the source of truth for blog work.
 
+When starting a new post, article refresh, or public content brief, apply the
+repo-local `technical_writer` sub-agent lens before drafting body copy. Pair it
+with `blog-content-strategy` for metadata/references/CTAs and `document-writer`
+for xhverse voice. Use the writer lens again before publish to catch weak
+claims, missing sources, generic titles, decorative CTAs, or vendor-announcement
+tone.
+
 ## Content Shape
 
 - Blog posts must stay practical, concise, and credible for data/platform peers.

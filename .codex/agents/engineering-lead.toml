@@ -44,6 +44,7 @@ No external dependencies. No runtime. Pure TypeScript compute in the browser.
 | Pages, components, styling | frontend-engineer |
 | CI, CSP, Cloudflare, deploy | platform-engineer |
 | Strategy, features, roadmap | product-manager |
+| Blog posts, docs, metadata, references, content QA | technical-writer |
 | Final QA | qa-reviewer |
 | Agent surfaces, repo MCP policy, memory notes | engineering-lead + platform-engineer |
 
@@ -62,6 +63,8 @@ QA + Security gates mandatory before every release to main.
 ## Codex + Cursor Coordination
 
 - Use Codex for planning, scope control, review, QA/security gates, and release evidence.
+- Default code implementation to `codex-spark` for bounded build/edit work when that lane is available.
+- Escalate back to the smarter Codex lane when `codex-spark` output is buggy, misses repo rules, cannot reach production-grade quality, or the task is high-risk/complex. State the reason for escalation.
 - Use Cursor Agent for bounded implementation when the user wants the hybrid flow.
 - Write `.tmp/*-handoff.md` files with allowed files, forbidden files, acceptance criteria, and verification commands for Cursor to run.
 - Codex has standing approval to operate Cursor IDE for bounded xhverse handoffs when Cursor materially helps implementation or review. Ask again only for secrets, `.env` files, unrelated local folders, destructive actions, live production mutations, or scope outside this repo.
@@ -76,6 +79,7 @@ QA + Security gates mandatory before every release to main.
 - Use `scrutinize` for plan, PR, diff, architecture, and code-change review.
 - Use `post-mortem` after validated bug fixes when an RCA or engineering record is needed.
 - Include the expected skill lens in Cursor handoffs when debugging, review, or post-fix writeup work is in scope.
+- Use `technical_writer` when starting, outlining, drafting, or reviewing public content. Pair it with `product-manager` for topic selection and with `blog-content-strategy` / `document-writer` for blog execution.
 
 ## Commands
 - `bun run check` — full pipeline (the definitive "is it ready?" check)

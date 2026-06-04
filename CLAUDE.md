@@ -148,13 +148,15 @@ Use this flow when the user wants Codex to manage planning, review, QA, security
 1. Codex checks branch and dirty state, then creates or reuses a feature branch from `development`.
 2. Codex writes a scoped handoff file under `.tmp/`, usually `.tmp/<task>-handoff.md`.
 3. The handoff must include allowed files, forbidden files, acceptance criteria, risk notes, and verification commands for Cursor to run.
-4. Cursor implements from that handoff. Prefer one focused Cursor Agent for one focused change.
-5. Use Cursor multi-agent or multitask mode only when file ownership is non-overlapping and the handoff assigns each workstream clearly.
-6. The user has granted standing approval for Codex to operate Cursor IDE with Computer Use and submit bounded xhverse handoffs to Cursor Agent when it materially helps implementation. Ask again only for secrets, `.env` files, unrelated local folders, destructive actions, live production mutations, or scope outside this repo.
-7. After Cursor finishes, Codex inspects `git status`, `git diff`, and the actual changed files before trusting any Cursor summary.
-8. Cursor runs the narrowest sufficient checks for the change, including `bun run check` when full confidence is needed, and captures the output in its response.
-9. Codex reviews Cursor's test evidence plus `git status`, `git diff`, and the actual changed files before trusting any Cursor summary. Codex reruns tests directly only if Cursor cannot run them, evidence is incomplete, or the user asks.
-10. If Cursor chat context becomes noisy, open a fresh Cursor conversation and point it to the current handoff file, branch, and allowed file list.
+4. Default code implementation to `codex-spark` for bounded build/edit work when that lane is available. Keep Codex accountable for the plan, review, QA evidence, and final acceptance.
+5. Switch back to the smarter Codex lane for implementation when `codex-spark` produces too many bugs, misses repo rules, cannot reach production-grade quality, or the task is high-risk/complex. State the reason for escalation.
+6. Cursor implements from that handoff only when explicitly used or when it materially helps the workflow. Prefer one focused Cursor Agent for one focused change.
+7. Use Cursor multi-agent or multitask mode only when file ownership is non-overlapping and the handoff assigns each workstream clearly.
+8. The user has granted standing approval for Codex to operate Cursor IDE with Computer Use and submit bounded xhverse handoffs to Cursor Agent when it materially helps implementation. Ask again only for secrets, `.env` files, unrelated local folders, destructive actions, live production mutations, or scope outside this repo.
+9. After Cursor finishes, Codex inspects `git status`, `git diff`, and the actual changed files before trusting any Cursor summary.
+10. Cursor runs the narrowest sufficient checks for the change, including `bun run check` when full confidence is needed, and captures the output in its response.
+11. Codex reviews Cursor's test evidence plus `git status`, `git diff`, and the actual changed files before trusting any Cursor summary. Codex reruns tests directly only if Cursor cannot run them, evidence is incomplete, or the user asks.
+12. If Cursor chat context becomes noisy, open a fresh Cursor conversation and point it to the current handoff file, branch, and allowed file list.
 
 For this split, Codex remains the accountable gate. Cursor implementation is not done until Codex review and verification pass.
 
@@ -189,6 +191,7 @@ Repo-local sub-agent definitions live in `.codex/agents/*.toml`. Use them for ex
 | `backend-engineer` | Data layer, tests, types, Supabase | `src/data/`, `src/lib/`, coverage, type errors |
 | `platform-engineer` | Deploy, CI, CSP, Cloudflare | CI failures, headers, build pipeline, edge/platform work, repo MCP config |
 | `product-manager` | Product strategy, roadmap, content direction | Feature evaluation, prioritization, business rationale |
+| `technical-writer` | Blog posts, technical docs, metadata, references, content QA | New content starts, draft review, article outlines, SEO descriptions, disclosure, CTA fit |
 | `qa-reviewer` | Read-only QA and release readiness | Regression review, a11y, security, release gate findings |
 
 ### Delegation Pattern
@@ -197,7 +200,17 @@ Repo-local sub-agent definitions live in `.codex/agents/*.toml`. Use them for ex
 2. **Frontend** handles visual implementation
 3. **Backend** handles data/logic/tests (100% coverage)
 4. **Platform** handles deploy/headers/CI
-5. **QA + Security** gate releases
+5. **Product + Writer** shape public content before implementation
+6. **QA + Security** gate releases
+
+### Content Writing Pattern
+
+For new blog posts, technical docs, release notes, page copy, or article-series planning:
+
+1. Use `product-manager` first when topic selection or business rationale matters.
+2. Use `technical-writer` before body drafting to define reader goal, thesis, outline, metadata, references, disclosure, and related tool CTA fit.
+3. Use `.agents/skills/blog-content-strategy/SKILL.md` and `.agents/skills/document-writer/SKILL.md` as the source workflow for blog body and metadata.
+4. Use `technical-writer` again for pre-publish content QA before `backend-engineer` implements static `src/data/blog.ts` changes.
 
 ## Rules (`.cursor/rules/`)
 
@@ -209,6 +222,7 @@ Repo-local sub-agent definitions live in `.codex/agents/*.toml`. Use them for ex
 | `git-workflow` | All files | Branch from development, verify locally before push |
 | `agent-surfaces` | Agent/rule/config files | Keep skills, rules, memory notes, and repo MCP config synchronized |
 | `codex-cursor-handoff` | All files | Codex plans/reviews/gates, Cursor implements bounded handoffs |
+| `blog-content` | Blog files and blog assets | Use `technical-writer` plus blog/document skills for new content starts |
 
 ## Available Skills (`.agents/skills/`)
 
@@ -217,6 +231,7 @@ Repo-local sub-agent definitions live in `.codex/agents/*.toml`. Use them for ex
 | `xhverse-dev` | Auto-triggers for all work in this repo |
 | `astro-site-init` | Updating CLAUDE.md / agent onboarding for this Astro site |
 | `astro-page-implementation` | Creating or editing Astro pages |
+| `blog-content-strategy` | Blog article briefs, metadata, references, cover briefs, related tool CTAs |
 | `content-to-page` | Turning content notes into page-ready sections |
 | `document-writer` | Technical docs, blog posts, ADRs |
 | `cloudflare-platform` | Cloudflare Pages/Workers/DNS config |
@@ -284,6 +299,7 @@ Repo MCP policy:
 - **Instruction-surface sync**: When workflow or agent rules change, update `AGENTS.md`, `CLAUDE.md`, `.cursor/rules/`, `.agents/skills/`, and `.codex/agents/` together so future sessions do not inherit stale rules.
 - **Repo-scoped MCP curation**: Prefer a small project-relevant set. Cloudflare is default for xhverse; Supabase is task-scoped; Notion stays out of this repo.
 - **Codex + Cursor split**: For hybrid work, Codex owns planning, review, QA/security gates, and evidence. Cursor implements from `.tmp/*-handoff.md`. Codex has standing approval to operate Cursor IDE for bounded xhverse handoffs, then must review the real diff before accepting the change.
+- **Implementation lane default**: Use `codex-spark` for bounded code implementation first. Escalate to the smarter Codex lane when Spark output is buggy, misses repo constraints, is not production-grade, or the task is high-risk/complex.
 - **Engineering skill defaults**: Use `debug-mantra` for debugging, `scrutinize` for plan/PR/diff review, and `post-mortem` only after a reproduced, root-caused, validated fix. Apply the same lens in Cursor handoffs when relevant.
 
 ## Key Constraints
