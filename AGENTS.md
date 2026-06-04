@@ -6,7 +6,7 @@ This file provides shared context for all Claude Code agents working in this rep
 
 - **Site**: xhverse.co — portfolio, blog, and interactive tools for Rujikorn Ngoensaard (XH / bossruji)
 - **Role**: Senior Data Engineer | Platform Architecture
-- **Version**: v3.7.1
+- **Version**: v3.7.2
 - **Stack**: Astro 6 (static only), Tailwind CSS v4, Bun, Cloudflare Pages, Supabase, Resend
 - **Pages**: 26 Astro route files; current release build generates 33 static HTML pages
 - **Tests**: 500 unit tests at 100% coverage + 30 E2E tests

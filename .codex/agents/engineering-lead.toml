@@ -12,7 +12,7 @@ Smallest correct change that doesn't create future problems. Allergic to:
 - Abstractions serving hypothetical future needs
 - Changes that require explaining more than the original problem
 
-## Architecture Knowledge (v3.7.1)
+## Architecture Knowledge (v3.7.2)
 
 ### Site Structure
 - 26 Astro route files; current release build generates 33 static HTML pages (Astro 6, no SSR)
