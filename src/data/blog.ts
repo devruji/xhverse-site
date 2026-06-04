@@ -84,6 +84,552 @@ export type BlogPost = {
 
 export const posts: BlogPost[] = [
   {
+    slug: "onelake-platform-contract-not-storage",
+    title: "OneLake is a platform contract, not just storage",
+    excerpt:
+      "OneLake works best when teams treat it as a tenant-wide platform contract for ownership, access, shortcuts, discovery, and cross-engine reuse, not just a managed storage layer.",
+    date: "2026-06-04",
+    tags: [
+      "data-architecture",
+      "microsoft-fabric",
+      "lakehouse",
+      "governance",
+    ],
+    mediumUrl: "",
+    readingTime: "6 min read",
+    updatedAt: "2026-06-04",
+    coverImageUrl: "/images/blog-onelake-platform-contract-not-storage-cover.jpg",
+    coverImageAlt:
+      "Isometric OneLake-style platform surface showing a shared logical lake connected to workspaces, shortcuts, governance controls, and access boundaries.",
+    seoTitle: "OneLake Is a Platform Contract, Not Just Storage | XHVERSE",
+    seoDescription:
+      "A practical Microsoft Fabric architecture brief on treating OneLake as a platform contract for ownership, access, shortcuts, discovery, and governance.",
+    relatedToolCtas: [
+      createRelatedToolCta("data-platform-maturity-checker", "primary"),
+      createRelatedToolCta("governance-scorecard", "secondary"),
+      createRelatedToolCta("architecture-roulette", "secondary"),
+    ],
+    bodyMarkdown: `OneLake is easy to undersell because the word lake sounds like storage. In Fabric, that framing is too small.
+
+OneLake is the tenant-level surface where workspace ownership, item boundaries, shortcuts, access, discovery, and engine access all meet. If a team treats it like a nicer storage account, it can recreate lake sprawl inside a unified namespace.
+
+> [!decision]
+> The design question is not "where do we put files?" It is "what ownership and access contract should this namespace enforce?"
+
+## The contract starts at tenant scope
+
+Microsoft Fabric gives a tenant one logical OneLake. That matters because the design unit is not a storage account per team. The design unit is a shared platform namespace that multiple teams, workspaces, items, and engines will depend on.
+
+That does not mean every team shares every asset. It means the platform has to decide how names, workspaces, domains, security boundaries, and shortcuts behave before the first production lakehouse becomes hard to move.
+
+The practical contract should answer:
+
+- which workspaces own which data products or analytical surfaces,
+- which items are production assets rather than experiments,
+- which domains are responsible for stewardship,
+- which shortcuts are allowed and who owns the target,
+- how access is reviewed,
+- how stale items are retired,
+- and which engines or API clients can reach the data.
+
+Without those answers, OneLake can look unified while the operating model remains fragmented.
+
+## Workspaces and items are ownership boundaries
+
+Fabric organizes data through workspaces and items. Those are not just UI containers. They are where ownership, support behavior, access, lifecycle, and cost responsibility become visible.
+
+A lakehouse, warehouse, semantic model, notebook, or pipeline should not be created only because someone needs a place to land data. It should sit in a workspace whose owner can explain:
+
+- what the item is for,
+- who can change it,
+- who consumes it,
+- what happens when it breaks,
+- how access is granted,
+- and when it should be archived or deleted.
+
+If a workspace is a dumping ground, OneLake inherits that confusion. If workspaces map to stable ownership and support behavior, OneLake becomes easier to operate.
+
+## Shortcuts are not ownership shortcuts
+
+Shortcuts are one of the strongest OneLake features because they can make data appear local without moving it. That helps teams reuse ADLS, Amazon S3, Google Cloud Storage, Dataverse, or another Fabric item without building another copy by default.
+
+But a shortcut is still a contract. The consuming workspace depends on:
+
+- the target path staying valid,
+- the source owner keeping the data reliable,
+- the access model remaining compatible,
+- the refresh and latency assumptions being documented,
+- and deletion behavior being understood.
+
+> [!warning]
+> A shortcut can reduce copy pressure. It does not remove source ownership, permission review, lifecycle management, or incident responsibility.
+
+Teams should keep a shortcut register for production dependencies. At minimum, record source, target, owner, consuming item, access pattern, and failure response.
+
+## Security has more than one plane
+
+OneLake security should be discussed before teams argue about folder layout.
+
+Fabric has control-plane behavior around workspace and item management, and data-plane behavior around file and table access. Those are related, but they are not the same thing. A user might have enough workspace permission to perform some item actions while still needing the right data access path for external clients or APIs.
+
+The platform contract should separate:
+
+- who can administer a workspace,
+- who can create or modify items,
+- who can read the data,
+- who can manage shortcuts,
+- who can access OneLake through external tools,
+- and who can review or certify governance status.
+
+This is where a simple "workspace admin can do everything" mental model becomes dangerous. Admin, Member, Contributor, and Viewer roles need to be matched to the data-plane controls and the sensitivity of the item.
+
+OneLake security roles are especially important for Viewer-style access. Workspace Admin, Member, and Contributor users can still read and write item data through their workspace role, so the platform cannot treat OneLake security roles as a universal deny layer.
+
+## Domains and catalog help discovery, not permission magic
+
+Domains and OneLake Catalog are useful because they make ownership and discovery more visible. A domain can group related data and delegate stewardship. The catalog gives users a practical surface to find items, review descriptions, inspect endorsement, and understand governance context.
+
+That is valuable, but it is not a replacement for permissions.
+
+Domain assignment should not be treated as access approval. Catalog visibility should not be treated as production readiness. A certified item with unclear support ownership can still fail consumers.
+
+Use domains and catalog as governance surfaces:
+
+- group items by business ownership,
+- expose stewardship,
+- make endorsement meaningful,
+- find stale or uncertified assets,
+- and support access review.
+
+Then keep the permission model explicit.
+
+## Delta Parquet makes maintenance part of the model
+
+Fabric stores lakehouse tables in Delta Parquet, which supports reuse across Fabric experiences and engines. That is useful because many workloads can operate over the same table format.
+
+It also means table maintenance is not somebody else's problem. File layout, schema changes, retention, shortcut behavior, and cross-engine compatibility become platform concerns. The more shared the table, the less safe it is to let each workspace invent its own pattern.
+
+For production tables, define:
+
+- naming and folder conventions,
+- schema evolution policy,
+- table maintenance expectations,
+- data quality ownership,
+- allowed shortcut exposure,
+- and consumer notification for breaking changes.
+
+The table format helps. The operating model still does the work.
+
+## API and external access belong in the contract
+
+OneLake is not only reached through Fabric screens. API and external tool access matter because platform teams, engineering teams, and BI teams often need automation or direct data access.
+
+The contract should document:
+
+- which URI pattern is approved,
+- whether teams use the global or regional OneLake endpoint,
+- which tenant settings affect external access,
+- how Microsoft Entra ID authentication is handled,
+- which clients are supported,
+- and which operations still belong inside the Fabric experience rather than through ADLS-compatible APIs.
+
+Ignoring this creates shadow conventions. One team uses APIs as a production dependency, another assumes UI-only governance, and the platform cannot explain which access path is authoritative.
+
+## A short checklist before landing the next dataset
+
+Before adding another production item to OneLake, ask:
+
+- Does the workspace have a named owner?
+- Is the item experimental, certified, or production-supported?
+- Is the domain assignment meaningful?
+- Are shortcuts documented as dependencies?
+- Is access reviewed at both workspace and data level?
+- Can external/API access be explained without reading tribal notes?
+- Is the lifecycle policy clear?
+- Do consumers know what will happen during breaking changes?
+
+If those answers are missing, landing data is easy but operating the platform gets harder.
+
+## Related tools
+
+- Run the [Data Platform Maturity Checker](/tools/data-platform-maturity-checker) before treating OneLake as a shared platform surface.
+- Use the [Governance Readiness Scorecard](/tools/governance-scorecard) to test ownership and access-review readiness.
+- Try [Architecture Decision Roulette](/tools/architecture-roulette) when shortcut boundaries or workspace ownership are really architecture trade-offs.
+
+## References
+
+- [Microsoft Fabric overview](https://learn.microsoft.com/en-us/fabric/get-started/microsoft-fabric-overview)
+- [OneLake overview](https://learn.microsoft.com/en-us/fabric/onelake/onelake-overview)
+- [Connecting to Microsoft OneLake](https://learn.microsoft.com/en-us/fabric/onelake/onelake-access-api)
+- [OneLake shortcuts](https://learn.microsoft.com/en-us/fabric/onelake/onelake-shortcuts)
+- [OneLake data security overview](https://learn.microsoft.com/en-us/fabric/onelake/security/get-started-security)
+- [Get started with OneLake security](https://learn.microsoft.com/en-us/fabric/onelake/security/get-started-onelake-security)
+- [OneLake catalog overview](https://learn.microsoft.com/en-us/fabric/governance/onelake-catalog-overview)
+- [Microsoft Fabric domains](https://learn.microsoft.com/en-us/fabric/governance/domains)
+
+## Disclosure
+
+This article was co-written with an AI agent and reviewed by Rujikorn Ngoensaard.
+`,
+  },
+  {
+    slug: "abac-row-filters-column-masks-production-ownership",
+    title: "ABAC row filters and column masks need production ownership",
+    excerpt:
+      "ABAC can make Databricks row and column controls consistent, but only if tags, policies, UDFs, exemptions, performance, and audit readback have named owners.",
+    date: "2026-06-04",
+    tags: ["databricks", "governance", "platform", "security"],
+    mediumUrl: "",
+    readingTime: "6 min read",
+    updatedAt: "2026-06-04",
+    coverImageUrl:
+      "/images/blog-abac-row-filters-column-masks-production-ownership-cover.jpg",
+    coverImageAlt:
+      "Isometric governed table showing row-level access bands, masked columns, policy shields, tags, and owner control panels.",
+    seoTitle: "Databricks ABAC Needs Production Ownership | XHVERSE",
+    seoDescription:
+      "A practical guide to owning Databricks Unity Catalog ABAC row filters, column masks, governed tags, UDFs, exemptions, and runtime risk in production.",
+    relatedToolCtas: [
+      createRelatedToolCta("governance-scorecard", "primary"),
+      createRelatedToolCta("data-platform-maturity-checker", "secondary"),
+    ],
+    bodyMarkdown: `ABAC is a strong control pattern because it can move row and column rules away from one-table-at-a-time patching. That does not make it automatic governance.
+
+In Unity Catalog, attribute-based access control depends on governed tags, policy scope, row filter logic, column mask logic, group membership, and runtime behavior. Each of those needs an owner.
+
+> [!decision]
+> ABAC centralizes policy expression. It does not remove the need for production ownership.
+
+## The policy is not the ownership model
+
+The most common mistake is treating ABAC as a security feature that someone can turn on after access has already sprawled.
+
+ABAC row filters and column masks restrict visibility at query time. They do not replace object-level grants. A user still needs permission to access the object before a policy can constrain what that user sees.
+
+That distinction matters. If grants are too broad, ABAC becomes the last line of defense. If tags are wrong, policies are missing, or exemptions are careless, the control can look consistent while the platform is carrying silent risk.
+
+## What ABAC actually centralizes
+
+ABAC lets platform teams define policies that apply based on governed tags and scope. A policy can apply at catalog, schema, table, or column level depending on how it is written and where the governed tags live.
+
+That is powerful because higher-level ABAC policies are harder for individual table owners to remove or bypass than table-level filters and masks. It helps the platform express cross-domain controls consistently.
+
+But centralization changes the risk shape:
+
+- a tag taxonomy becomes a security boundary,
+- tag assignment becomes an access-control operation,
+- policy UDFs become production code,
+- exempt principals become formal exceptions,
+- and readback becomes part of the release process.
+
+> [!warning]
+> Governed tags are not harmless metadata. Changing tags can change which security policy applies.
+
+Column classification needs special care. A tag inherited at catalog, schema, or table level does not automatically classify every column. Sensitive columns need deliberate column-level treatment where the policy depends on column tags.
+
+## The ownership map
+
+Before production rollout, name owners for each part of the control:
+
+| Surface | Owner question |
+| --- | --- |
+| Governed tag taxonomy | Who can create, rename, or retire security tags? |
+| Tag assignment | Who approves tags on catalogs, schemas, tables, and columns? |
+| Policy logic | Who owns the SQL UDF and policy condition? |
+| Group membership | Who controls the principal lists referenced by policy logic? |
+| Exceptions | Who approves an EXCEPT clause and how often is it reviewed? |
+| Compatibility | Who checks runtimes, workloads, sharing, and cross-engine behavior? |
+| Performance | Who tests representative queries before rollout? |
+| Audit readback | Who proves the effective policy after change? |
+
+If any row says "platform team, probably," the model is not ready yet. Production ABAC needs explicit responsibility, not shared hope.
+
+## Where production risk enters
+
+ABAC risk usually appears around the edges, not in the basic syntax.
+
+Missing tags can stop a policy from applying. Missing or deleted tags and UDFs referenced by a policy can also fail queries, so policy dependencies need the same release discipline as production code. Broad exemptions can turn into permanent bypasses. Older runtimes or unsupported surfaces can make a design look portable when it is not.
+
+Materialized views, streaming tables, Delta Sharing, and cross-engine access deserve separate checks. They do not always behave like a simple interactive query against a managed table. The run identity, refresh behavior, owner permissions, and runtime support can change what "the same policy" means operationally.
+
+> [!check]
+> Do not approve a policy until representative workloads have been tested, not only ad hoc SELECT statements.
+
+## UDFs are production code
+
+Row filters and column masks often rely on SQL UDFs. That makes the UDF part of the platform's security and performance surface.
+
+Keep policy UDFs simple:
+
+- deterministic where possible,
+- small enough to review,
+- typed clearly,
+- tested with representative principals,
+- tested with representative query shapes,
+- and owned like production code.
+
+Avoid heavy Python UDFs, large lookup joins, complex regular expressions over wide text payloads, and anything that turns a security policy into a hidden performance problem.
+
+The policy should be boring. If the logic needs a diagram to explain, it may belong in a governed table design or access model first, not directly inside the mask.
+
+## EXCEPT is an operational contract
+
+The EXCEPT clause is useful. It can keep platform owners, auditors, emergency operators, or trusted service identities from being blocked by a rule that is meant for normal consumers.
+
+It is also easy to misuse.
+
+Treat every exemption as a named exception:
+
+- who is exempt,
+- why they are exempt,
+- who approved it,
+- when it expires or gets reviewed,
+- and what audit evidence confirms the exception is still needed.
+
+If the exception list becomes the easiest place to fix access complaints, the ABAC program is drifting back toward manual policy sprawl.
+
+## Verification is part of the rollout
+
+Production policy work needs readback. Creation syntax is not enough.
+
+Use the available policy inspection commands and evidence surfaces:
+
+- show effective policies for the secured object,
+- list and describe policies after deployment,
+- query as representative principals where possible,
+- inspect audit logs for policy and tag changes,
+- check workload behavior across the intended runtime surfaces,
+- and review exceptions on a schedule.
+
+The goal is not only to prove that a policy exists. The goal is to prove which policy applies, why it applies, who can change it, and what a consumer will actually see.
+
+## A practical rule
+
+ABAC is ready for production when the team can answer six questions:
+
+- Who owns the tag?
+- Who owns the policy?
+- Who can change either one?
+- Who is exempt?
+- What workload might break?
+- How do we know the policy is effective today?
+
+If those answers are unclear, row filters and column masks may still be useful, but they are not yet a production operating model.
+
+## Related tools
+
+- Use the [Governance Readiness Scorecard](/tools/governance-scorecard) before centralizing row and column controls.
+- Run the [Data Platform Maturity Checker](/tools/data-platform-maturity-checker) to test whether the broader platform can support policy ownership.
+
+## References
+
+- [Databricks: Attribute-based access control in Unity Catalog](https://docs.databricks.com/aws/en/data-governance/unity-catalog/abac)
+- [Databricks: Core concepts for ABAC](https://docs.databricks.com/aws/en/data-governance/unity-catalog/abac/core-concepts)
+- [Databricks: Create and manage ABAC policies](https://docs.databricks.com/aws/en/data-governance/unity-catalog/abac/policies)
+- [Databricks: Best practices for ABAC policies](https://docs.databricks.com/aws/en/data-governance/unity-catalog/abac/best-practices)
+- [Databricks: Performance considerations for ABAC policies](https://docs.databricks.com/aws/en/data-governance/unity-catalog/abac/performance)
+- [Databricks: When to use ABAC vs table-level row filters and column masks](https://docs.databricks.com/aws/en/data-governance/unity-catalog/abac/abac-vs-rls-cm)
+- [Databricks: ABAC requirements, quotas, and limitations](https://docs.databricks.com/aws/en/data-governance/unity-catalog/abac/requirements)
+- [Databricks: Policy evaluation and runtime behavior](https://docs.databricks.com/aws/en/data-governance/unity-catalog/abac/policy-evaluation)
+- [Databricks: Row filters and column masks](https://docs.databricks.com/aws/en/data-governance/unity-catalog/filters-and-masks)
+
+## Disclosure
+
+This article was co-written with an AI agent and reviewed by Rujikorn Ngoensaard.
+`,
+  },
+  {
+    slug: "serverless-data-engineering-operating-model",
+    title: "Serverless data engineering still needs an operating model",
+    excerpt:
+      "Serverless removes cluster work, but production data teams still need ownership, eligibility gates, cost attribution, observability, release discipline, and recovery paths.",
+    date: "2026-06-04",
+    tags: ["data-engineering", "platform", "operations", "databricks"],
+    mediumUrl: "",
+    readingTime: "5 min read",
+    updatedAt: "2026-06-04",
+    coverImageUrl:
+      "/images/blog-serverless-data-engineering-operating-model-cover.jpg",
+    coverImageAlt:
+      "Isometric serverless data engineering workflow showing on-demand compute nodes, cost meters, policy gates, monitoring panels, and recovery controls.",
+    seoTitle: "Serverless Data Engineering Operating Model | XHVERSE",
+    seoDescription:
+      "A practical operating model for serverless Databricks data engineering: ownership, workload eligibility, cost attribution, observability, CI/CD, and recovery.",
+    relatedToolCtas: [
+      createRelatedToolCta("data-platform-maturity-checker", "primary"),
+      createRelatedToolCta("governance-scorecard", "secondary"),
+      createRelatedToolCta("lakehouse-cost-calculator", "secondary"),
+    ],
+    bodyMarkdown: `Serverless data engineering removes a lot of cluster work. It does not remove operational accountability.
+
+The control surface changes. Instead of choosing node types, Spark versions, init scripts, and autoscaling settings for every job, teams need to own workload eligibility, run identity, cost attribution, observability, release checks, and recovery behavior.
+
+> [!summary]
+> Serverless is not "no ops." It is a different operating model.
+
+## What changes when compute is managed
+
+Serverless compute is Databricks-managed and versionless from the user side. That is useful because teams spend less time provisioning clusters and more time shipping workloads.
+
+It also means teams should stop pretending runtime ownership disappeared. The work shifts toward:
+
+- knowing which workloads are eligible,
+- testing changes against representative jobs,
+- watching product limitations,
+- reviewing cost evidence,
+- controlling identity and permissions,
+- and defining fallback paths when a workload does not fit.
+
+With classic compute, a platform team can often point to a cluster policy or runtime version. With serverless, the platform team needs clearer workload contracts.
+
+## The platform team still owns guardrails
+
+A mature serverless rollout still needs platform policy.
+
+The platform team should define:
+
+- who may use serverless for jobs or pipelines,
+- which workspaces and environments are approved,
+- what run-as identity pattern is required,
+- which libraries and data access paths are allowed,
+- how usage policies and tags are assigned,
+- how cost is reviewed,
+- and what evidence is needed before migration.
+
+Without that, serverless adoption becomes a hidden migration. Teams stop creating clusters, but the platform loses visibility into why costs changed, which jobs moved, and which workloads are now harder to debug.
+
+## Eligibility is a release gate
+
+Not every data engineering workload belongs on serverless.
+
+Before migration, check the workload against official limitations and the actual code path. Serverless behavior can differ where Spark Connect, DBFS access, custom libraries, streaming triggers, logging, or network-dependent patterns are involved.
+
+Unity Catalog should be treated as part of the operating model, not an optional polish layer. Serverless data engineering depends on governed access paths, external data configuration, and clear ownership of tables, volumes, and credentials.
+
+> [!check]
+> A workload is eligible only after the team has tested the real job, not just confirmed that the notebook opens.
+
+Use an eligibility checklist:
+
+- Does the job use supported Spark APIs and libraries?
+- Does it depend on DBFS paths or local files?
+- Does it need unsupported streaming or trigger behavior?
+- Does it use Unity Catalog governed objects correctly?
+- Does it need external data access or networking review?
+- Does logging still give the team enough incident evidence?
+- Can it run under the intended service principal or run-as owner?
+
+## Cost attribution needs new evidence
+
+Classic cluster tags and legacy habits are not enough.
+
+Serverless cost review should use usage policies, workspace or workload tagging where supported, and billing system tables such as system.billing.usage. The point is not to predict perfect savings. The point is to make cost attributable before usage becomes hard to explain.
+
+Usage policies also need qualification. Databricks documents serverless usage policies as Public Preview, and policy assignment is not a retroactive fix for historical spend. Treat them as one attribution control, not the whole cost-governance system.
+
+For each migrated workload, capture:
+
+- baseline cost or runtime on the old path,
+- expected schedule and concurrency,
+- usage policy or attribution tag,
+- owner,
+- business purpose,
+- and review cadence.
+
+> [!warning]
+> Do not claim serverless is cheaper without representative workload billing evidence. It may be cheaper, more expensive, or simply more operationally convenient depending on the workload.
+
+## Observability is a design requirement
+
+Serverless jobs still need monitoring. The signals may come from different surfaces:
+
+- Lakeflow Jobs run history and notifications,
+- pipeline event logs,
+- query profiles,
+- system tables,
+- expectations and data quality checks,
+- task duration and retry patterns,
+- and cost or usage records.
+
+The team should know where to look before the first incident. If only one person understands how to debug a serverless failure, the operating model is not production-ready.
+
+For important workloads, define:
+
+- success criteria,
+- alert channels,
+- owner and backup owner,
+- expected runtime range,
+- retry behavior,
+- failure severity,
+- and downstream impact.
+
+## CI/CD is not optional polish
+
+Serverless does not remove release discipline. Jobs, notebooks, pipeline definitions, permissions, and environment variables still need a source-controlled deployment path.
+
+Declarative Automation Bundles are a strong fit because they make jobs and pipelines reviewable as project assets. Whether the team uses bundles or another controlled deployment route, the requirement is the same:
+
+- code changes are reviewed,
+- job settings are versioned,
+- environments are separated,
+- permissions are explicit,
+- and rollback behavior is known.
+
+The problem with ad hoc notebook edits is not the notebook. The problem is that production behavior changes without a release record.
+
+## Recovery still needs an owner
+
+A serverless job can fail for ordinary reasons: bad data, broken code, permission changes, dependency issues, timeout, concurrency pressure, or a platform limitation exposed by a workload change.
+
+The recovery model should answer:
+
+- who repairs failed runs,
+- when a task can be rerun,
+- when a full job repair is safer,
+- how timeouts are handled,
+- how downstream consumers are informed,
+- when fallback to non-serverless compute is allowed,
+- and who decides whether the workload should stay serverless.
+
+If the answer is "the platform will check," the workflow is under-owned. Platform teams should provide guardrails and evidence. Workload owners still own the production data path.
+
+## The practical rule
+
+Move a workload to serverless when the team can explain:
+
+- why the workload is eligible,
+- who owns it,
+- which identity runs it,
+- how cost is attributed,
+- how it is deployed,
+- how it is monitored,
+- and how it recovers.
+
+If those answers are visible, serverless can reduce friction. If they are missing, serverless mostly hides cluster work while leaving the operating model unresolved.
+
+## Related tools
+
+- Use the [Data Platform Maturity Checker](/tools/data-platform-maturity-checker) before migrating shared data engineering workloads.
+- Validate ownership and policy readiness with the [Governance Readiness Scorecard](/tools/governance-scorecard).
+- Estimate workload trade-offs with the [Lakehouse Cost Calculator](/tools/lakehouse-cost-calculator).
+
+## References
+
+- [Databricks: Connect to serverless compute](https://docs.databricks.com/aws/en/compute/serverless/)
+- [Databricks: Serverless compute limitations](https://docs.databricks.com/aws/en/compute/serverless/limitations)
+- [Databricks: Run Lakeflow Jobs with serverless compute](https://docs.databricks.com/aws/en/jobs/run-serverless-jobs)
+- [Databricks: Monitoring and observability for Lakeflow Jobs](https://docs.databricks.com/aws/en/jobs/monitor)
+- [Databricks: Attribute usage with serverless usage policies](https://docs.databricks.com/aws/en/admin/usage/budget-policies)
+- [Databricks: Monitor the cost of serverless compute](https://docs.databricks.com/aws/en/admin/system-tables/serverless-billing)
+- [Databricks: What are Declarative Automation Bundles?](https://docs.databricks.com/aws/en/dev-tools/bundles)
+- [Databricks: Best practices for Lakeflow Spark Declarative Pipelines](https://docs.databricks.com/aws/en/ldp/best-practices)
+
+## Disclosure
+
+This article was co-written with an AI agent and reviewed by Rujikorn Ngoensaard.
+`,
+  },
+  {
     slug: "data-product-as-platform-contract",
     title: "Data product as a platform contract",
     excerpt:

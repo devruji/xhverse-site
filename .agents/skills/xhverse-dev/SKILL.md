@@ -81,6 +81,8 @@ Single test file: `bunx vitest run src/data/blog.test.ts`
 ## Codex + Cursor Workflow
 
 - Codex is accountable for planning, review, QA, security gates, and release evidence.
+- Default code implementation to `codex-spark` for bounded build/edit work when that lane is available.
+- Escalate back to the smarter Codex lane when `codex-spark` produces too many bugs, misses repo constraints, cannot reach production-grade quality, or the task is high-risk/complex. State the reason for escalation.
 - Cursor can implement bounded changes from a Codex-authored `.tmp/*-handoff.md` file.
 - Handoff files must list allowed files, forbidden files, acceptance criteria, and verification commands for Cursor to run.
 - Codex has standing approval to operate Cursor IDE through Computer Use for bounded xhverse handoffs when Cursor materially helps implementation or review.
@@ -96,6 +98,12 @@ Single test file: `bunx vitest run src/data/blog.test.ts`
 - Use `scrutinize` for plan review, PR review, diff review, architecture/design sanity checks, and second-opinion review.
 - Use `post-mortem` after a bug fix only when the repro, root cause, fix, and validation are known.
 - For Cursor handoffs, name the expected skill lens in `.tmp/*-handoff.md` whenever debugging, review, or post-fix writeup work is in scope.
+
+## Content Writing Defaults
+
+- Use the repo-local `technical_writer` sub-agent when starting, outlining, drafting, or reviewing public content: blog posts, technical docs, release notes, page copy, article metadata, references, and related-tool CTAs.
+- For blog work, pair `technical_writer` with `blog-content-strategy` and `document-writer`. Use it before body drafting and again for pre-publish content QA.
+- Use `product-manager` before `technical_writer` when the task still needs topic selection, positioning, or business rationale.
 
 ## Constraints
 

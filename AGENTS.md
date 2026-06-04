@@ -76,6 +76,8 @@ src/pages/tools/<slug>.astro → Page with <script> block
 ## Codex + Cursor Flow
 
 - **Default split**: Codex owns planning, scope control, review, QA, security gate, and release evidence. Cursor owns bounded implementation when explicitly used.
+- **Implementation lane**: Default code implementation to `codex-spark` for bounded build/edit work. Codex still owns the plan, review, QA evidence, and final acceptance.
+- **Escalation**: If `codex-spark` produces too many bugs, misses repo rules, cannot reach production-grade quality, or the task is high-risk/complex, switch back to the smarter Codex lane for implementation and say why.
 - **Handoff surface**: Use repo files, usually `.tmp/*-handoff.md`, as the shared instruction channel. Include allowed files, forbidden files, acceptance criteria, and verification commands for Cursor to run.
 - **Cursor Agent use**: The user has granted standing approval for Codex to operate Cursor IDE through Computer Use and submit bounded xhverse handoffs to Cursor Agent when it materially helps implementation. Ask again only if the handoff includes secrets, `.env` files, unrelated local folders, destructive actions, live production mutations, or scope outside this repo.
 - **Mode choice**: Use Cursor normal agent for one focused implementation. Use Cursor multi-agent/multitask mode only when the work can be split into non-overlapping file ownership.
@@ -89,6 +91,12 @@ src/pages/tools/<slug>.astro → Page with <script> block
 - **scrutinize**: Use as the default review lens for plans, PRs, diffs, architecture choices, and code-change sanity checks.
 - **post-mortem**: Use after a bug fix has a reliable repro, known root cause, implemented fix, and validation evidence, especially when a writeup or RCA is requested.
 - These defaults apply to both Codex and Cursor when the relevant skill is available. Codex-authored Cursor handoffs should name the expected skill lens when debugging, review, or post-fix writeup work is in scope.
+
+## Content Writing Defaults
+
+- **technical-writer**: Use the repo-local `technical_writer` sub-agent when starting, outlining, drafting, or reviewing public content: blog posts, technical docs, release notes, page copy, article metadata, references, or related-tool CTAs.
+- Pair `technical_writer` with `blog-content-strategy` and `document-writer` for xhverse blog work. Use it before body drafting and again for pre-publish review.
+- For content strategy, use `product-manager` first to choose the topic and `technical_writer` next to sharpen reader goal, thesis, outline, references, SEO metadata, disclosure, and CTA fit.
 
 ## Branch & Release Rules
 
@@ -120,6 +128,7 @@ src/pages/tools/<slug>.astro → Page with <script> block
 | **backend-engineer** | `src/data/`, `src/lib/`, tests, types, Supabase | 100% coverage, no `any`, mock externals |
 | **platform-engineer** | CI, CSP, headers, Cloudflare, build pipeline, repo MCP config | Dual-layer CSP sync, `generate-headers.ts`, no secrets in config |
 | **product-manager** | Feature strategy, roadmap, UX decisions | Business case for every recommendation |
+| **technical-writer** | Blog posts, technical docs, article briefs, metadata, references, content QA | xhverse voice, primary sources, useful CTAs, no invented claims |
 | **qa-reviewer** | Read-only regression, a11y, security, release readiness | Findings first; verify with real commands |
 
 ## Repo-Scoped MCP Policy

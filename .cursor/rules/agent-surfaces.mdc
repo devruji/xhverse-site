@@ -22,7 +22,9 @@ Use this rule when changing repo instructions, skills, sub-agent cards, Codex co
 - Use `.tmp/*-handoff.md` as the shared instruction surface between Codex and Cursor.
 - Codex has standing approval to operate Cursor IDE for bounded xhverse handoffs when Cursor materially helps; ask again only for secrets, unrelated local folders, destructive actions, live production mutations, or scope outside this repo.
 - Do not put this workflow into `.codex/config.toml`; that file remains runtime config only.
+- Keep implementation-lane defaults synchronized when they change: `codex-spark` first for bounded code implementation, with escalation to the smarter Codex lane when Spark is buggy, misses repo rules, is not production-grade, or the work is high-risk/complex.
 - Keep engineering skill defaults synchronized when they change: `debug-mantra` for debugging, `scrutinize` for reviews, and `post-mortem` for validated post-fix writeups.
+- Keep content-writing defaults synchronized when they change: `technical_writer` for new content starts and pre-publish content QA, paired with `blog-content-strategy` and `document-writer` for blog work.
 
 ## Memory Updates
 

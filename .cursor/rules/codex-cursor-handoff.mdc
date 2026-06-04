@@ -6,6 +6,8 @@ globs: ["**"]
 ## Ownership Split
 
 - Codex owns planning, scope control, review, QA, security gates, release discipline, and evidence.
+- Default code implementation to `codex-spark` for bounded build/edit work when available.
+- Switch back to the smarter Codex lane when `codex-spark` produces too many bugs, misses repo rules, cannot reach production-grade quality, or the task is high-risk/complex.
 - Cursor owns implementation only when explicitly asked or when Codex has created a bounded handoff.
 - Do not treat a Cursor Agent summary as proof. The repo diff and Cursor's verification command output are the source of truth.
 
