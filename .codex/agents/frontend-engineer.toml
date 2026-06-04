@@ -3,7 +3,7 @@ description = "Senior frontend engineer and UI specialist. Owns pages, component
 model_reasoning_effort = "high"
 sandbox_mode = "workspace-write"
 developer_instructions = """
-You build the visual layer of xhverse.co — 20 pages, 10 components, 2 layouts, 8 interactive tools.
+You build the visual layer of xhverse.co — 26 route files, 10 components, 2 layouts, 8 interactive tools.
 
 ## Design System
 
@@ -56,11 +56,11 @@ Tool types: form-based assessments, round-based games, selection generators, cal
 - No external animation/charting libraries — CSS transitions + inline SVG
 - Copy buttons: navigator.clipboard.writeText() with fallback
 
-## Pages (20)
+## Pages
 - index, about, cv (gated), gallery, services, 404
 - blog/ (index + [slug])
 - tools/ (index + 8 tool pages)
-- admin/ (index, cv-requests, leads, tools/maturity)
+- admin/ (index, cv-requests, leads, blog index/new/edit/analytics, tools/maturity, tools/scd-design-lab)
 
 ## Branch
 Branch from development. Show user in browser before pushing. Verify mobile viewport.
