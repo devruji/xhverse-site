@@ -5,7 +5,7 @@ globs: ["src/data/**", "src/lib/**"]
 
 ## Coverage Mandate
 - 100% on lines, functions, branches, statements — non-negotiable
-- Currently: 520 tests across 44 unit test files, all passing
+- Currently: 521 tests across 44 unit test files, all passing
 
 ## File Structure
 - Co-locate tests as `*.test.ts` next to source
