@@ -39,8 +39,22 @@ describe("practitioner tool definitions", () => {
       expect(definition.serviceCta.href).toBe("/services");
       expect(definition.tiers[definition.tiers.length - 1].minScore).toBe(0);
       expect(definition.strongResultActions.length).toBeGreaterThanOrEqual(3);
+      expect(definition.experience.modeLabel.length).toBeGreaterThan(8);
+      expect(definition.experience.openingSignal.length).toBeGreaterThan(80);
+      expect(definition.experience.assessmentHeading.length).toBeGreaterThan(20);
+      expect(definition.experience.assessmentLead.length).toBeGreaterThan(80);
+      expect(definition.experience.resultLabel.length).toBeGreaterThan(8);
+      expect(definition.experience.outputCards).toHaveLength(3);
       expect(definition.questions).toHaveLength(6);
     }
+  });
+
+  it("gives every new practitioner tool a distinct experience theme", () => {
+    const themes = practitionerToolDefinitions.map(
+      (definition) => definition.experience.theme,
+    );
+
+    expect(new Set(themes).size).toBe(practitionerToolDefinitions.length);
   });
 
   it("defines valid question options and action maps", () => {

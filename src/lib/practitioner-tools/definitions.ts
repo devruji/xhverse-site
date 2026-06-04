@@ -78,6 +78,33 @@ export const practitionerToolDefinitions = [
     description:
       "Score the minimum contract behind a data product and produce a copyable brief for owners, consumers, and platform teams.",
     artifactLabel: "Data Product Contract Brief",
+    experience: {
+      theme: "contract",
+      modeLabel: "Contract workshop",
+      openingSignal:
+        "Use this when a dataset is becoming a product and the hidden promises need to become explicit before more consumers depend on it.",
+      assessmentHeading: "Build the contract from operating evidence.",
+      assessmentLead:
+        "Walk through owner, grain, SLA, quality, access, and lifecycle. Missing answers become the first contract clauses to write.",
+      resultLabel: "Contract readiness",
+      outputCards: [
+        {
+          title: "Contract completeness",
+          description:
+            "Shows whether ownership, grain, SLA, quality, access, and lifecycle expectations can be published.",
+        },
+        {
+          title: "Consumer risk",
+          description:
+            "Highlights the promises most likely to break downstream dashboards, jobs, or decision workflows.",
+        },
+        {
+          title: "Publishable brief",
+          description:
+            "Produces a concise contract artifact for catalog notes, review tickets, or owner alignment.",
+        },
+      ],
+    },
     blogSync: {
       title: "Data product as a platform contract",
       href: "/blog/data-product-as-platform-contract",
@@ -175,6 +202,33 @@ export const practitionerToolDefinitions = [
     description:
       "Pressure-test platform access assumptions across role scope, sensitivity, row or column controls, and external access paths.",
     artifactLabel: "Access Model Simulation Brief",
+    experience: {
+      theme: "access",
+      modeLabel: "Policy simulator",
+      openingSignal:
+        "Use this when the role diagram looks clean but real access paths, privileged exceptions, or BI routes may behave differently.",
+      assessmentHeading: "Simulate the access model against real paths.",
+      assessmentLead:
+        "Check scope, sensitivity, policies, access paths, exceptions, and readback so the model is proven instead of assumed.",
+      resultLabel: "Policy confidence",
+      outputCards: [
+        {
+          title: "Least-privilege fit",
+          description:
+            "Tests whether the selected boundary is tight enough for the actual user need.",
+        },
+        {
+          title: "Path divergence",
+          description:
+            "Calls out UI, SQL, API, shortcut, direct lake, and BI paths that could bypass intent.",
+        },
+        {
+          title: "Audit-ready brief",
+          description:
+            "Creates a compact evidence checklist for grant reviews, exceptions, and policy readback.",
+        },
+      ],
+    },
     blogSync: {
       title: "ABAC row filters and column masks need production ownership",
       href: "/blog/abac-row-filters-column-masks-production-ownership",
@@ -272,6 +326,33 @@ export const practitionerToolDefinitions = [
     description:
       "Turn table size, file pressure, query filters, update pattern, and engine mix into practical layout and maintenance guidance.",
     artifactLabel: "Lakehouse Table Layout Brief",
+    experience: {
+      theme: "layout",
+      modeLabel: "Layout workbench",
+      openingSignal:
+        "Use this when a table is getting slower, more expensive, or shared across engines and the layout decision needs evidence.",
+      assessmentHeading: "Diagnose table layout from workload signals.",
+      assessmentLead:
+        "Review file pressure, partitioning, pruning, update pattern, engine mix, and cost evidence before changing layout.",
+      resultLabel: "Layout operating fit",
+      outputCards: [
+        {
+          title: "File pressure",
+          description:
+            "Surfaces small-file, partition, clustering, and maintenance pressure before it becomes platform noise.",
+        },
+        {
+          title: "Engine fit",
+          description:
+            "Checks whether Databricks, Fabric, SQL, BI, or external clients can live with the same table contract.",
+        },
+        {
+          title: "Maintenance plan",
+          description:
+            "Turns layout findings into practical operating guidance tied to scan width, runtime, and cost.",
+        },
+      ],
+    },
     blogSync: {
       title: "Open table formats are an operating model decision",
       href: "/blog/open-table-formats-operating-model",
@@ -369,6 +450,33 @@ export const practitionerToolDefinitions = [
     description:
       "Check whether a Power BI semantic model has clear grain, relationships, measures, refresh behavior, and support ownership.",
     artifactLabel: "Power BI Semantic Model Diagnosis",
+    experience: {
+      theme: "semantic",
+      modeLabel: "Model clinic",
+      openingSignal:
+        "Use this before a semantic model becomes the shared truth layer and ambiguous grain or copied measures become expensive.",
+      assessmentHeading: "Diagnose the model before users inherit its debt.",
+      assessmentLead:
+        "Inspect grain, dimensions, relationships, measures, refresh behavior, and lifecycle so the model can be trusted.",
+      resultLabel: "Model health",
+      outputCards: [
+        {
+          title: "Metric trust",
+          description:
+            "Checks whether fact grain, dimensions, relationships, and measures can explain business totals.",
+        },
+        {
+          title: "Refresh risk",
+          description:
+            "Connects model behavior to refresh mode, performance evidence, and report symptoms.",
+        },
+        {
+          title: "Certification brief",
+          description:
+            "Produces a review artifact for certified models, owner handoff, and lifecycle decisions.",
+        },
+      ],
+    },
     blogSync: {
       title: "Big table vs star schema",
       href: "/blog/big-table-vs-star-schema",
@@ -466,6 +574,33 @@ export const practitionerToolDefinitions = [
     description:
       "Convert failure mode, source behavior, checkpoint state, idempotency, merge logic, and consumer impact into a recovery runbook.",
     artifactLabel: "Pipeline Recovery Runbook Brief",
+    experience: {
+      theme: "recovery",
+      modeLabel: "Incident rehearsal",
+      openingSignal:
+        "Use this before the next production failure, when replay, state, idempotency, and consumer communication still need a script.",
+      assessmentHeading: "Rehearse recovery before the incident.",
+      assessmentLead:
+        "Walk through failure mode, replay boundary, idempotency, state, consumer impact, and evidence capture.",
+      resultLabel: "Recovery readiness",
+      outputCards: [
+        {
+          title: "Failure triage",
+          description:
+            "Clarifies source, transform, state, merge, orchestration, and downstream failure boundaries.",
+        },
+        {
+          title: "Replay safety",
+          description:
+            "Checks whether reruns, checkpoint changes, and backfills can happen without corrupting outputs.",
+        },
+        {
+          title: "Runbook brief",
+          description:
+            "Creates an incident-ready recovery artifact with owner, approval, validation, and communication actions.",
+        },
+      ],
+    },
     blogSync: {
       title: "Serverless data engineering still needs an operating model",
       href: "/blog/serverless-data-engineering-operating-model",
