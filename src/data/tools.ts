@@ -17,6 +17,7 @@ export type ToolMetadata = {
   description: string;
   category: ToolCategory;
   status: ToolStatus;
+  releasedAt: `${number}-${number}-${number}`;
   homeLabel?: string;
 };
 
@@ -28,6 +29,7 @@ export const toolDefinitions = {
       "Practice Slowly Changing Dimension design with realistic customer, product, and membership changes. Preview Type 1, Type 2, Type 3, Type 6, and ignore strategies.",
     category: "Education",
     status: "New",
+    releasedAt: "2026-05-19",
     homeLabel: "Data modeling lab",
   },
   "data-platform-maturity-checker": {
@@ -37,6 +39,7 @@ export const toolDefinitions = {
       "A lightweight, anonymous maturity signal for platform architecture, governance, analytics delivery, operations, and documentation. Get a directional benchmark in under 3 minutes.",
     category: "Assessment",
     status: "Live",
+    releasedAt: "2026-05-02",
     homeLabel: "Benchmark tool",
   },
   "governance-scorecard": {
@@ -46,6 +49,7 @@ export const toolDefinitions = {
       "Evaluate whether your organization is ready to implement a data governance program. Get a readiness tier, top blockers, and a prioritized 90-day action plan.",
     category: "Governance",
     status: "Live",
+    releasedAt: "2026-05-09",
     homeLabel: "Governance tool",
   },
   "architecture-roulette": {
@@ -55,6 +59,7 @@ export const toolDefinitions = {
       "10 real-world data platform scenarios. Pick your approach, then see how a Senior Data Engineer would call it.",
     category: "Architecture",
     status: "Live",
+    releasedAt: "2026-05-11",
   },
   "data-stack-roast": {
     slug: "data-stack-roast",
@@ -63,6 +68,7 @@ export const toolDefinitions = {
       "Select your stack components and get a brutally honest 3-paragraph roast of your architecture choices.",
     category: "Architecture",
     status: "Live",
+    releasedAt: "2026-05-11",
     homeLabel: "Architecture game",
   },
   "sql-deathmatch": {
@@ -72,6 +78,7 @@ export const toolDefinitions = {
       "15 rounds of paired Spark SQL queries. Pick the winner, learn execution plan reasoning, and discover your tier.",
     category: "SQL",
     status: "Live",
+    releasedAt: "2026-05-11",
     homeLabel: "SQL challenge",
   },
   "lakehouse-cost-calculator": {
@@ -81,6 +88,7 @@ export const toolDefinitions = {
       "Estimate monthly Databricks costs from your cluster config. See optimization suggestions with projected savings.",
     category: "Cost",
     status: "Live",
+    releasedAt: "2026-05-11",
   },
   "spark-explained": {
     slug: "spark-explained",
@@ -89,6 +97,7 @@ export const toolDefinitions = {
       "Animated pipeline visualizer showing how data flows through Spark stages - partitions, shuffles, skew, and spills.",
     category: "Education",
     status: "Live",
+    releasedAt: "2026-05-11",
   },
   "data-product-contract-builder": {
     slug: "data-product-contract-builder",
@@ -97,6 +106,7 @@ export const toolDefinitions = {
       "Turn ownership, grain, freshness, quality, access, lifecycle, and consumer expectations into a copyable data product contract brief.",
     category: "Data Product",
     status: "New",
+    releasedAt: "2026-06-04",
     homeLabel: "Contract builder",
   },
   "access-model-simulator": {
@@ -106,6 +116,7 @@ export const toolDefinitions = {
       "Pressure-test Databricks, Fabric, and Power BI access paths against least-privilege controls, sensitivity, and masking expectations.",
     category: "Governance",
     status: "New",
+    releasedAt: "2026-06-04",
     homeLabel: "Access simulator",
   },
   "lakehouse-table-layout-advisor": {
@@ -115,6 +126,7 @@ export const toolDefinitions = {
       "Assess table size, file pressure, query filters, update patterns, and engine mix to get layout and maintenance guidance.",
     category: "Architecture",
     status: "New",
+    releasedAt: "2026-06-04",
     homeLabel: "Layout advisor",
   },
   "power-bi-semantic-model-doctor": {
@@ -124,6 +136,7 @@ export const toolDefinitions = {
       "Check fact grain, relationships, measures, refresh mode, and report symptoms before a semantic model becomes slow or inconsistent.",
     category: "Power BI",
     status: "New",
+    releasedAt: "2026-06-04",
     homeLabel: "Model doctor",
   },
   "pipeline-recovery-planner": {
@@ -133,13 +146,16 @@ export const toolDefinitions = {
       "Choose a failure mode, source behavior, checkpoint state, merge strategy, and consumer impact to produce a recovery runbook.",
     category: "Operations",
     status: "New",
+    releasedAt: "2026-06-04",
     homeLabel: "Recovery planner",
   },
 } as const satisfies Record<string, ToolMetadata>;
 
 export type ToolSlug = keyof typeof toolDefinitions;
 
-export const toolCatalog = Object.values(toolDefinitions);
+export const toolCatalog = Object.values(toolDefinitions).toSorted((left, right) =>
+  right.releasedAt.localeCompare(left.releasedAt),
+);
 
 export const featuredToolSlugs = [
   "data-product-contract-builder",

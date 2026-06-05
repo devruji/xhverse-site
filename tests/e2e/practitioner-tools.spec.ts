@@ -39,6 +39,24 @@ test("tools catalog links to all live tools", async ({ page }) => {
   }
 });
 
+test("tools catalog lists newest practitioner tools first", async ({ page }) => {
+  await page.goto("/tools");
+
+  const visibleToolTitles = await page
+    .locator("main .interactive-card h2")
+    .evaluateAll((headings) =>
+      headings.map((heading) => heading.textContent?.trim() ?? ""),
+    );
+
+  expect(visibleToolTitles.slice(0, 5)).toEqual([
+    "Data Product Contract Builder",
+    "Access Model Simulator",
+    "Lakehouse Table Layout Advisor",
+    "Power BI Semantic Model Doctor",
+    "Pipeline Recovery Planner",
+  ]);
+});
+
 test("generated practitioner tools initialize after catalog navigation", async ({
   page,
 }) => {
