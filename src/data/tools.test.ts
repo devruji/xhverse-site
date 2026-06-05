@@ -39,6 +39,22 @@ describe("tools data", () => {
     }
   });
 
+  it("sorts the catalog newest first by release date", () => {
+    expect(toolCatalog.map((tool) => tool.slug).slice(0, 5)).toEqual([
+      "data-product-contract-builder",
+      "access-model-simulator",
+      "lakehouse-table-layout-advisor",
+      "power-bi-semantic-model-doctor",
+      "pipeline-recovery-planner",
+    ]);
+
+    for (let index = 1; index < toolCatalog.length; index += 1) {
+      expect(toolCatalog[index - 1].releasedAt >= toolCatalog[index].releasedAt).toBe(
+        true,
+      );
+    }
+  });
+
   it("keeps catalog cards useful without placeholder text", () => {
     for (const tool of toolCatalog) {
       expect(tool.title.length).toBeGreaterThan(5);
