@@ -8,7 +8,7 @@ XHVerse is the portfolio, blog, and tools site for Rujikorn Ngoensaard (XH / bos
 
 - **Production**: https://xhverse.co
 - **Repo**: https://github.com/devruji/xhverse-site
-- **Current version**: v3.9.0
+- **Current version**: v3.9.1
 - **Business model**: Consulting/advisory — site drives inbound leads via content + tools
 
 ## Commands

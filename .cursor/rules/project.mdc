@@ -1,9 +1,9 @@
 ---
-description: Project-wide rule for xhverse site (v3.9.0)
+description: Project-wide rule for xhverse site (v3.9.1)
 alwaysApply: true
 ---
 
-# xhverse-site v3.9.0
+# xhverse-site v3.9.1
 
 Follow `AGENTS.md` and `CLAUDE.md` as primary sources of truth.
 
@@ -18,7 +18,7 @@ Follow `AGENTS.md` and `CLAUDE.md` as primary sources of truth.
 ## Architecture
 - **27 Astro route files**; current release build generates 38 static HTML pages (Astro 6, static output only, no SSR)
 - **13 interactive tools** (all client-side compute, no external deps)
-- **14 src/lib domain folders** with 521 unit tests at 100% coverage
+- **14 src/lib domain folders** with 522 unit tests at 100% coverage
 - **Admin panel** behind Cloudflare Access (Zero Trust)
 - **CV** gated via email capture + admin review + Resend delivery
 - **CSP** dual-layer: `scripts/generate-headers.ts` + `BaseLayout.astro` meta tag
@@ -83,7 +83,7 @@ bun run check        # Full pipeline (typecheck + build + coverage + e2e)
 bun run dev          # Dev server at localhost:4321
 bun run typecheck    # Type checks (0 errors required)
 bun run coverage     # Tests + 100% enforcement
-bun run test:e2e     # Playwright (48 checks, chromium + mobile)
+bun run test:e2e     # Playwright (50 checks, chromium + mobile)
 bun run build        # Production build (38 generated pages in the current release)
 ```
 
