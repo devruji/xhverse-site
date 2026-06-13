@@ -74,9 +74,36 @@ and cover-image briefs.
    blog articles.
 11. For generated covers, write an image brief that includes subject,
     composition, style, avoid list, and alt text. Do not use readable text in the
-    image unless explicitly required.
+    image unless explicitly required. Default to the xhverse blog cover series
+    style unless the user asks for a different direction.
 12. Keep Supabase optional. Static posts must build without Supabase env vars,
     and Supabase-sourced posts without related tool metadata must render safely.
+
+## Blog Cover Image Style
+
+All xhverse blog cover images should feel like one coherent publication series.
+For generated covers, use this default visual language:
+
+- Dark, minimal, professional 16:9 editorial technology illustration.
+- Isometric data-architecture composition with abstract platform objects.
+- Charcoal background, glassmorphism panels, cyan/teal glow, and restrained
+  amber accents.
+- Visual metaphor tied to the article thesis: trade-off, bottleneck, ownership
+  boundary, decision gateway, serving layer, governance control, cost signal, or
+  operational workflow.
+- No people, photorealistic office/factory scenes, database logos, product
+  logos, screenshots, readable text, generic dashboards, server racks, AI
+  robots, or decorative gradient blobs.
+- Keep the central message readable as a small blog-card thumbnail.
+- Store the final project asset under `public/images/` and resize/crop to the
+  existing cover shape, usually 960x540.
+
+Prompt anchor for future covers:
+
+> Dark isometric data architecture cover, sleek charcoal background,
+> glassmorphism panels, glowing teal connector lines, restrained amber accents,
+> abstract platform objects, professional technology publication quality,
+> 16:9, thumbnail-readable, no logos, no readable text, no people.
 
 ## Related Tool Rules
 

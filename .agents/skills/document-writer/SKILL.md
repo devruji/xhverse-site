@@ -28,6 +28,64 @@ For articles published on xhverse.co/blog — data architecture, platform engine
 - **Minimal** — prefer short paragraphs, clear headings, and whitespace over dense walls of text.
 - **Quiet confidence** — no exclamation marks, no "amazing", no hyperbole. Let the content speak.
 
+## Architectural Article Style
+
+Use this mode for senior data-platform articles, especially Medium-style
+architecture pieces. Write as a practitioner teaching decision-making through a
+concrete feature, pattern, or platform choice, not as a vendor-documentation
+summary.
+
+Before drafting from an article brief or template, confirm the concrete topic.
+Do not implement a source brief that still has a placeholder topic. Lock the
+strongest angle, core thesis, assumption to challenge, practical takeaway,
+reader goal, scope boundary, source plan, and cover-image concept first.
+
+The article should answer why the topic matters, what breaks if teams do
+nothing, what alternatives exist, why one approach fits, which trade-offs it
+creates, when to use it, when to avoid it, and what production operation teaches.
+Use short paragraphs, practical examples, decision tables, checklists, and
+implementation scenarios. Avoid beginner definitions unless they support a
+deeper architecture point.
+
+Preferred structure:
+1. Production problem hook.
+2. Problem statement with operational and business impact.
+3. First-principles explanation.
+4. Architecture perspective across warehouse, lakehouse, BI, governance,
+   security, cost, and scale where relevant.
+5. Design options with benefits, drawbacks, complexity, cost, and operational
+   impact.
+6. Practical implementation pattern with only necessary code.
+7. Trade-off analysis, hidden costs, and common mistakes.
+8. Decision framework or checklist.
+9. Lessons learned and a non-generic closing takeaway.
+
+Evidence discipline:
+- Separate fact, observation, opinion, vendor behavior, and engineering
+  judgment.
+- Prefer official docs, research, and credible engineering blogs over generic
+  community summaries.
+- Do not invent private client stories or present unverifiable production
+  claims as facts.
+- Include a references section when technical claims depend on external
+  platform behavior or industry practice.
+
+Cover-image briefs should communicate the article thesis, not just the product.
+Prefer architectural metaphors, operational trade-offs, bottlenecks, decision
+visualizations, or production scenarios. Avoid product screenshots, logo
+collages, generic dashboards, server racks, people at monitors, and AI robots.
+Specify main visual, key objects, composition, symbolism, mood, color direction,
+alt text, and thumbnail readability.
+
+For xhverse blog covers, default to the established publication style unless the
+user asks for a different direction: dark isometric data-architecture
+illustration, charcoal background, glassmorphism panels, cyan/teal glow,
+restrained amber accents, abstract platform objects, and a clear visual metaphor
+for the article thesis. Avoid photorealistic scenes, people, logos, screenshots,
+readable text, server racks, AI robots, and decorative gradient blobs. The cover
+must remain legible at blog-card thumbnail size and should normally be delivered
+as a 16:9 asset under `public/images/`, resized to the existing 960x540 pattern.
+
 ## Technical Documentation Rules
 
 ### README Updates

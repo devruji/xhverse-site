@@ -106,6 +106,268 @@ export type BlogPost = {
 
 export const posts: BlogPost[] = [
   {
+    slug: "most-teams-use-materialized-views-too-early",
+    title: "Most Teams Use Materialized Views Too Early",
+    excerpt:
+      "Materialized views can reduce repeated analytical cost, but only after teams diagnose modeling, query shape, layout, freshness, and workload repeatability.",
+    date: "2026-06-13",
+    tags: [
+      "data-architecture",
+      "performance",
+      "lakehouse",
+      "analytics-engineering",
+    ],
+    mediumUrl: "",
+    readingTime: "11 min read",
+    updatedAt: "2026-06-13",
+    coverImageUrl:
+      "/images/blog-most-teams-use-materialized-views-too-early-cover.jpg",
+    coverImageAlt:
+      "Isometric data architecture cover showing a repeated recomputation loop, decision gateway, and shelves of precomputed analytical inventory.",
+    seoTitle:
+      "Most Teams Use Materialized Views Too Early | Data Architecture",
+    seoDescription:
+      "A practical decision framework for when materialized views reduce repeated analytical cost, and when they hide modeling, query, layout, or workload problems.",
+    relatedToolCtas: [
+      createRelatedToolCta("lakehouse-cost-calculator", "primary"),
+      createRelatedToolCta("lakehouse-table-layout-advisor", "secondary"),
+    ],
+    bodyMarkdown: `A dashboard that used to load in five seconds now takes forty-five. The business notices before the platform team does. Executives complain. The BI owner asks whether the warehouse is down. Engineers open the query plan, see a large fact table, several joins, a few aggregations, and one familiar suggestion appears within minutes: create a materialized view.
+
+That suggestion is not wrong. It is just early.
+
+Materialized views are powerful because they replace repeated computation with persisted results. The platform stops rebuilding the same answer every time a dashboard tile refreshes. The query reads from a precomputed structure instead of scanning, joining, and aggregating the base data again.
+
+But that power changes the architecture. It adds storage. It adds refresh behavior. It adds freshness questions. It creates another production object someone must own, monitor, secure, document, and retire.
+
+The engineering question is not whether materialized views are useful. They are. The question is whether the slow query represents a stable repeated access pattern, or whether it is exposing a deeper design problem.
+
+> [!decision]
+> Do not materialize the first slow query. Materialize a stable workload pattern after you understand why the query is slow.
+
+Evidence note: platform-specific behavior in this article is vendor behavior sourced from official documentation. Workload diagnosis, ownership, and sequencing guidance are engineering judgment from operating analytical platforms. View-selection and refresh trade-offs are supported by research and production engineering references near the end.
+
+## Materialized views are architecture, not aspirin
+
+A materialized view is often introduced as a performance fix. In production, it behaves more like an architectural commitment.
+
+With a normal view, the database stores the query definition. Each query against the view still depends on the underlying tables at execution time. The view is a logical contract, not a stored result.
+
+With a materialized view, the platform stores the result of the query. A future query can read that stored result directly or through optimizer rewrite, depending on the engine. The work moves from request time to refresh time.
+
+That shift is the entire design trade-off:
+
+- recompute on every read,
+- or precompute on refresh and serve from stored state.
+
+The first option spends compute during user interaction. The second option spends storage and refresh compute before the user asks.
+
+If the same expensive aggregation is requested hundreds of times a day, precomputation can be a good contract. If the query is unstable, poorly modeled, or different every time, a materialized view can become a cache of confusion.
+
+## Diagnose the workload before you materialize it
+
+Dashboards do not become slow for one reason. They usually slow down because several small design compromises compound over time.
+
+Fact tables grow from millions to billions of rows. A join that was acceptable last year now fans out because a dimension is no longer unique at the expected grain. A BI model pushes transformations into every visual instead of centralizing metrics. Partitioning is based on ingestion date while users filter by business date. Clustering was never revisited after query patterns changed. A dashboard that began with ten users now has hundreds of concurrent viewers at month end.
+
+Adding more compute can hide these symptoms for a while, but it rarely changes their shape. More compute can make a bad scan faster. It does not make the table easier to prune. More compute can finish a repeated aggregation sooner. It does not decide whether that aggregation should be modeled as a reusable metric. More compute can absorb concurrency. It does not separate interactive workloads from batch workloads.
+
+Before creating a materialized view, I want answers to five questions:
+
+1. Is the query expensive because it repeats the same business question, or because the model is poorly shaped?
+2. Is the filter pattern stable enough for precomputation to pay back?
+3. Is the required freshness measured in milliseconds, minutes, hours, or business days?
+4. Is the result much smaller than the base data, or are we copying almost the same table again?
+5. Who owns the refresh, quality, lineage, access, and retirement of this object?
+
+If the team cannot answer those questions, the materialized view may still speed up the dashboard. It may also postpone the real architecture work.
+
+## What a materialized view commits you to
+
+The useful mental model is a factory and a warehouse.
+
+The factory is the raw query path. Every dashboard request triggers the same manufacturing line: scan the fact table, join dimensions, calculate business rules, aggregate the result, and send it to BI.
+
+The warehouse is the materialized view. The result is already sitting on the shelf. The dashboard does not need to manufacture it again.
+
+That warehouse is not free. Inventory must be built, refreshed, stored, counted, secured, and occasionally thrown away.
+
+The commitments are practical:
+
+- Storage cost: The result has to live somewhere.
+- Refresh cost: The query still runs, just on a schedule, trigger, or background maintenance path.
+- Freshness trade-off: Users may read data as of the last refresh, or the engine may have to compensate by reading base changes.
+- Operational ownership: Someone must know when refresh fails and what business impact that creates.
+- Governance: The materialized result can expose a different access surface than the base data.
+- Observability: Query latency improves only if refresh health, staleness, optimizer rewrite, and storage growth are monitored.
+
+This is why I do not treat materialized views as a simple SQL feature. They are a small serving layer inside the warehouse.
+
+## Why teams love them
+
+The appeal is obvious. A slow executive dashboard becomes fast. A repeated daily KPI query stops burning compute every time someone opens a BI page. A semantic model becomes easier to serve because common aggregates are already prepared. A platform team can reduce peak concurrency pressure without asking every analyst to rewrite SQL.
+
+Materialized views work especially well when the output is small and heavily reused. Daily sales by region. Month-to-date margin by category. Active customers by market. Inventory position by store and product class. These are not ad hoc questions. They are repeated business surfaces.
+
+They also help when the expensive part of the query is deterministic and shared. If ten dashboards independently compute the same revenue metric from the same raw tables, the problem is not just query latency. The problem is duplicated business logic. A materialized view can be one implementation of that logic, as long as ownership and definitions are explicit.
+
+The best materialized views feel boring in production. They refresh on time, serve predictable query patterns, have clear lineage, and are boring enough that nobody debates their existence every month.
+
+## The hidden costs nobody talks about
+
+Materialized views are often sold internally as free performance. That framing causes trouble.
+
+Storage is the easiest cost to see, but not always the most expensive one. Refresh can compete with ingestion, transformation, BI, and ad hoc workloads. On capacity-based platforms, refresh consumes slots, warehouse time, or pipeline resources. On cluster-based systems, refresh may run at the same time as other production jobs unless scheduled deliberately.
+
+Freshness is usually the cost that creates trust problems. If a dashboard tile shows sales as of 8:00 a.m. and another tile reads the base table through a live query, users may see two answers for the same metric. Both can be technically correct. The experience still damages confidence.
+
+Governance can be more subtle. A materialized view may aggregate or filter sensitive data, but it is still derived from sensitive data. If row filters, column masks, tags, or access policies are applied only to the base table, the derived object needs the same level of design attention. Materializing data does not remove the obligation to control it.
+
+Maintenance is the long tail. Materialized views accumulate because nobody wants to delete a performance optimization. Months later, teams have twenty nearly identical objects, undocumented refresh schedules, unknown consumers, and stale business logic that still looks official because it runs fast.
+
+Speed can make bad architecture harder to notice.
+
+## When materialized views are the right tool
+
+Use a materialized view when the workload has a stable shape and the economics are clear.
+
+Good candidates include executive dashboards with repeated KPI tiles, financial reporting snapshots, daily operational scorecards, and high-volume BI models that repeatedly aggregate the same fact grain. They also make sense when many consumers need the same certified metric and the result set is meaningfully smaller than the base tables.
+
+The strongest cases usually have these properties:
+
+- The query runs frequently.
+- The query is expensive because of aggregation, filtering, or joins that are stable.
+- The result is smaller than the source.
+- The business can tolerate the refresh interval.
+- The platform can observe refresh health and staleness.
+- Access policy on the derived object is understood.
+- The owner can delete or redesign it when the workload changes.
+
+In those cases, materialized views are not a shortcut. They are a deliberate serving structure.
+
+One practical example is a daily KPI dashboard for leadership. The dashboard may need revenue, transactions, active customers, returns, margin, and loyalty activity across regions. Users open it many times a day, but the numbers only need to be current through the last completed business day. Recomputing those aggregates every time is wasteful. A materialized view refreshed after the finance-close or sales-close pipeline can reduce compute and improve user experience without weakening the architecture.
+
+Another example is a large semantic model that repeatedly asks the same question through different visuals. If the semantic layer is clean but the warehouse still has to scan large tables for every slicer interaction, pre-aggregating the right grain can be more honest than asking BI capacity to absorb the cost.
+
+## When they create debt
+
+Materialized views become debt when they compensate for design mistakes the team should fix directly.
+
+If the fact table has no useful partition strategy, materializing a filtered result may speed up one dashboard while leaving every other workload exposed. If a dimension table has duplicate business keys, materializing the join hides the grain problem instead of correcting it. If analysts are joining raw ingestion tables because curated models do not exist, a materialized view might become a permanent bandage over a missing modeling layer.
+
+Watch for these signals:
+
+- Every dashboard asks for a new materialized view.
+- The materialized view is almost as large as the base table.
+- The refresh query contains business logic that should live in a curated model or semantic layer.
+- Freshness requirements are vague.
+- Nobody can explain the source table grain.
+- The platform team cannot tell which queries actually use the object.
+- Multiple materialized views calculate the same metric differently.
+
+In those cases, fix something else first. Revisit the dimensional model. Align partitioning and clustering with real predicates. Move repeated transformations into a curated layer. Separate interactive BI workloads from exploratory workloads. Reduce fan-out joins. Stabilize metric definitions.
+
+A faster query is not automatically a better architecture.
+
+## Platform behavior is not portable
+
+The phrase materialized view sounds portable. The operating behavior is not.
+
+| Platform | Engineering interpretation |
+| --- | --- |
+| PostgreSQL | Treat the materialized view like a table-like persisted result that you refresh deliberately. It can be indexed, but freshness is your operational responsibility. |
+| Databricks | Treat materialized views as pipeline-managed objects with refresh behavior tied to Lakeflow Spark Declarative Pipelines. They can be incremental, but some changes require full recomputation. |
+| Microsoft Fabric | Do not assume a warehouse materialized-view feature is available. The current Fabric Warehouse T-SQL surface area lists materialized views as unsupported, so choose an alternative serving pattern and validate the current platform state before porting designs. |
+| Snowflake | Treat materialized views as an Enterprise Edition feature with automatic maintenance, but still evaluate whether repeated-query savings offset maintenance and storage costs. |
+| BigQuery | Treat incremental and non-incremental materialized views differently. BigQuery can rewrite queries and maintain views in the background, but SQL support, staleness, and pricing rules matter. |
+| Redshift | Treat refresh and optimizer rewrite as part of the design. Automatic rewrite is useful, but stale materialized views and workload-dependent refresh behavior must be managed. |
+
+This is where teams get into trouble during platform migrations. A design that works in PostgreSQL because a nightly job refreshes a small aggregate may not map cleanly to BigQuery incremental rules. A Snowflake pattern with background maintenance may not map to Fabric Warehouse. A Databricks materialized view may imply pipeline ownership that the BI team did not expect.
+
+Vendor behavior determines the operating model. Architecture should absorb that difference instead of pretending SQL syntax makes everything equivalent.
+
+## Decision checklist
+
+Before approving a materialized view, I use a simple decision table.
+
+| Use a materialized view when... | Fix something else first when... |
+| --- | --- |
+| The query pattern is repeated and business-critical. | The query is a one-off or exploratory workload. |
+| The result is much smaller than the source tables. | The result copies most of the base data. |
+| The business accepts a clear freshness SLA. | Users expect live data but nobody can define live. |
+| The metric definition is stable and owned. | The SQL contains ungoverned business logic. |
+| Refresh cost is lower than repeated query cost. | Refresh would compete with ingestion or close windows. |
+| The platform can monitor staleness and failures. | There is no alerting or owner for refresh failures. |
+| Security on derived data is explicit. | Access rules exist only on the base tables. |
+
+If most answers fall on the left, materialization is a strong candidate. If most fall on the right, the materialized view is probably hiding a platform or modeling issue.
+
+A useful approval question is: what would we fix if materialized views did not exist?
+
+That question forces the team to separate real reuse from accidental workaround.
+
+## Lessons learned
+
+Most teams introduce materialized views too early because the feature provides visible relief. A dashboard goes from slow to acceptable, and the immediate pain disappears. But production architecture is not judged by the first successful query after the change. It is judged by what the system becomes six months later.
+
+The best materialized views I have seen had narrow purpose, clear ownership, and boring operations. Everyone knew what they served. Everyone knew when they refreshed. Everyone knew what freshness meant. They existed because the workload was stable enough to deserve a stored result.
+
+The worst ones looked like performance wins at first. Later they became a parallel data model. Definitions drifted from curated tables. Refresh failures were discovered by users. Nobody knew whether stale results were acceptable. The platform had traded query latency for ambiguity.
+
+Materialized views are not bad. Using them before diagnosis is bad engineering.
+
+Architecture thinking starts one level earlier than the feature. Understand the grain. Understand the workload. Understand freshness. Understand cost. Understand ownership. Then decide whether precomputation belongs in the design.
+
+The best optimization is not always making the slow query faster. Sometimes it is making the workload honest enough that the right optimization becomes obvious.
+
+## Related tools
+
+Use the [Lakehouse Cost Calculator](/tools/lakehouse-cost-calculator) to reason about repeated compute, refresh cost, and workload economics before turning every slow query into another persisted object.
+
+Use the [Lakehouse Table Layout Advisor](/tools/lakehouse-table-layout-advisor) when the real issue may be partitioning, clustering, data skipping, or table-layout drift rather than missing precomputation.
+
+## Key takeaways
+
+- Materialized views solve repeated computation, not every performance problem.
+- They are strongest when query patterns are stable, results are smaller than sources, and freshness is explicit.
+- They introduce storage, refresh, governance, observability, and ownership costs.
+- Platform behavior differs enough that portability should never be assumed.
+- If a materialized view hides modeling, layout, or metric-definition problems, fix the design first.
+
+## References
+
+### Official Documentation
+
+- **PostgreSQL: Materialized Views** - PostgreSQL. [URL](https://www.postgresql.org/docs/current/rules-materializedviews.html). Why it matters: explains the table-like persisted result model and explicit refresh behavior.
+- **PostgreSQL: CREATE MATERIALIZED VIEW** - PostgreSQL. [URL](https://www.postgresql.org/docs/current/sql-creatematerializedview.html). Why it matters: supports implementation and lifecycle details for PostgreSQL materialized views.
+- **Materialized Views** - Databricks. [URL](https://docs.databricks.com/aws/en/ldp/concepts/materialized-views). Why it matters: shows pipeline-managed refresh behavior, incremental processing, and limitations.
+- **T-SQL surface area in Fabric Data Warehouse** - Microsoft Learn. [URL](https://learn.microsoft.com/en-us/fabric/data-warehouse/tsql-surface-area). Why it matters: identifies Fabric Warehouse support boundaries, including materialized-view caveats.
+- **Working with Materialized Views** - Snowflake. [URL](https://docs.snowflake.com/en/user-guide/views-materialized). Why it matters: explains common use cases, automatic maintenance, and cost considerations.
+- **Introduction to materialized views** - Google BigQuery. [URL](https://cloud.google.com/bigquery/docs/materialized-views-intro). Why it matters: covers incremental and non-incremental materialized views, smart tuning, pricing, and limitations.
+- **Materialized views in Amazon Redshift** - AWS. [URL](https://docs.aws.amazon.com/redshift/latest/dg/materialized-view-overview.html). Why it matters: covers refresh, automatic rewrite, monitoring, and stale-result considerations.
+
+### Engineering Blogs
+
+- **Engineering Data Analytics with Presto and Apache Parquet at Uber** - Uber Engineering. [URL](https://www.uber.com/blog/presto/). Why it matters: illustrates how storage layout and scan efficiency can be the real performance lever before precomputation.
+- **How Airbnb achieved metric consistency at scale** - Airbnb Engineering. [URL](https://medium.com/airbnb-engineering/how-airbnb-achieved-metric-consistency-at-scale-f23cc53dea70). Why it matters: supports the argument that repeated business metrics need governed definitions, not only faster queries.
+- **Using Presto in our Big Data Platform on AWS** - Netflix Technology Blog. [URL](https://netflixtechblog.com/using-presto-in-our-big-data-platform-on-aws-938035909fd4). Why it matters: provides a large-scale analytics-platform example where workload patterns matter as much as a single optimization feature.
+- **HTTP analytics for 6M requests per second using ClickHouse** - Cloudflare Blog. [URL](https://blog.cloudflare.com/http-analytics-for-6m-requests-per-second-using-clickhouse/). Why it matters: shows that high-volume analytics performance is often an architecture and workload-shaping problem.
+
+### Research Papers
+
+- **Kaskade: Graph Views for Efficient Graph Analytics** - Microsoft Research and collaborators. [URL](https://arxiv.org/abs/1906.05162). Key relevance: demonstrates view selection as an optimizer and workload-design problem, not just a feature toggle.
+- **Materialized View Selection and Maintenance Using Multi-Query Optimization** - Hoshi Mistry, Prasan Roy, Krithi Ramamritham, and S. Sudarshan. [URL](https://arxiv.org/abs/cs/0003006). Key relevance: connects materialized-view selection to workload-level optimization and maintenance cost.
+- **Enzyme: Incremental View Maintenance for Data Engineering** - Ritwik Yadav et al. [URL](https://arxiv.org/abs/2603.27775). Key relevance: gives modern context for incremental maintenance, refresh planning, and the operational complexity behind materialized views.
+
+### Additional Reading
+
+- **KEA: Tuning an Exabyte-Scale Data Infrastructure** - Microsoft Research. [URL](https://arxiv.org/abs/2106.11445). Why it matters: reinforces that workload optimization at scale is an operating-model problem, not only a feature choice.
+
+## Disclosure
+
+This article was co-written with an AI agent and reviewed by Rujikorn Ngoensaard.`,
+  },
+  {
     slug: "onelake-platform-contract-not-storage",
     title: "OneLake is a platform contract, not just storage",
     excerpt:

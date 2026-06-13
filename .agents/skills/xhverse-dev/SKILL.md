@@ -115,6 +115,10 @@ Single test file: `bunx vitest run src/data/blog.test.ts`
 - Use the repo-local `technical_writer` sub-agent when starting, outlining, drafting, or reviewing public content: blog posts, technical docs, release notes, page copy, article metadata, references, and related-tool CTAs.
 - For blog work, pair `technical_writer` with `blog-content-strategy` and `document-writer`. Use it before body drafting and again for pre-publish content QA.
 - Use `product-manager` before `technical_writer` when the task still needs topic selection, positioning, or business rationale.
+- Generated blog covers should stay in the established xhverse cover series:
+  dark isometric data-architecture visuals, glass panels, teal glow, restrained
+  amber accents, abstract platform objects, no people/logos/screenshots/readable
+  text, and a thumbnail-readable metaphor for the article thesis.
 
 ## Constraints
 

@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { existsSync } from "node:fs";
-import { blogToolCtaDefinitions, posts } from "./blog";
+import { blogToolCtaDefinitions, createRelatedToolCta, posts } from "./blog";
 import { toolDefinitions } from "./tools";
 
 describe("Blog Data", () => {
@@ -56,6 +56,73 @@ describe("Blog Data", () => {
         expect(["primary", "secondary"]).toContain(cta.variant);
       }
     }
+  });
+
+  it("should include the materialized views architecture post metadata", () => {
+    const post = posts.find(
+      (item) => item.slug === "most-teams-use-materialized-views-too-early",
+    );
+
+    expect(post).toBeDefined();
+    expect(post?.title).toBe("Most Teams Use Materialized Views Too Early");
+    expect(post?.date).toBe("2026-06-13");
+    expect(post?.updatedAt).toBe("2026-06-13");
+    expect(post?.readingTime).toBe("11 min read");
+    expect(post?.coverImageUrl).toBe(
+      "/images/blog-most-teams-use-materialized-views-too-early-cover.jpg",
+    );
+    expect(
+      existsSync(
+        new URL(
+          "../../public/images/blog-most-teams-use-materialized-views-too-early-cover.jpg",
+          import.meta.url,
+        ),
+      ),
+    ).toBe(true);
+    expect(post?.coverImageAlt).toContain("repeated recomputation");
+    expect(post?.seoTitle).toBe(
+      "Most Teams Use Materialized Views Too Early | Data Architecture",
+    );
+    expect(post?.seoDescription).toContain("modeling, query, layout");
+    expect(post?.relatedToolCtas).toEqual([
+      createRelatedToolCta("lakehouse-cost-calculator", "primary"),
+      createRelatedToolCta("lakehouse-table-layout-advisor", "secondary"),
+    ]);
+    expect(post?.bodyMarkdown).toContain(
+      "## Materialized views are architecture, not aspirin",
+    );
+    expect(post?.bodyMarkdown).toContain(
+      "## Diagnose the workload before you materialize it",
+    );
+    expect(post?.bodyMarkdown).toContain(
+      "## What a materialized view commits you to",
+    );
+    expect(post?.bodyMarkdown).toContain(
+      "## When materialized views are the right tool",
+    );
+    expect(post?.bodyMarkdown).toContain("## When they create debt");
+    expect(post?.bodyMarkdown).toContain("## Platform behavior is not portable");
+    expect(post?.bodyMarkdown).toContain("## Decision checklist");
+    expect(post?.bodyMarkdown).toContain(
+      "Lakehouse Cost Calculator](/tools/lakehouse-cost-calculator)",
+    );
+    expect(post?.bodyMarkdown).toContain("Evidence note: platform-specific behavior");
+    expect(post?.bodyMarkdown).toContain("## References");
+    expect(post?.bodyMarkdown).toContain("### Official Documentation");
+    expect(post?.bodyMarkdown).toContain("### Engineering Blogs");
+    expect(post?.bodyMarkdown).toContain("### Research Papers");
+    expect(post?.bodyMarkdown).toContain("### Additional Reading");
+    expect(post?.bodyMarkdown).toContain(
+      "https://www.postgresql.org/docs/current/rules-materializedviews.html",
+    );
+    expect(post?.bodyMarkdown).toContain(
+      "https://learn.microsoft.com/en-us/fabric/data-warehouse/tsql-surface-area",
+    );
+    expect(post?.bodyMarkdown).toContain("## Disclosure");
+    expect(post?.bodyMarkdown).toContain("co-written with an AI agent");
+    expect(post?.bodyMarkdown).not.toContain("# Most Teams Use Materialized Views");
+    expect(post?.bodyMarkdown).not.toContain("## Cover image concept");
+    expect(post?.bodyMarkdown).not.toContain("Thumbnail review:");
   });
 
   it("should include the big table vs star schema post metadata", () => {
