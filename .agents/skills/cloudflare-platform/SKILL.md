@@ -57,6 +57,7 @@ Root directory: /
 
 ### Deployment Hooks
 - Git push triggers build automatically
+- Blog Writer content changes can trigger a Pages rebuild through the server-side `BLOG_REBUILD_HOOK_URL` env var and `/admin/api/blog/rebuild` Pages Function.
 - No manual `wrangler pages deploy` needed for normal flow
 - For emergency deploys: `bunx wrangler pages deploy dist --project-name=xhverse-site`
 

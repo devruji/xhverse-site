@@ -5,12 +5,12 @@ description: Guide for working with Supabase as a full backend — database, aut
 
 # Supabase Backend Guide
 
-This project uses Supabase for build-time blog content, selected runtime submissions, admin data access, CV PDF storage, and Edge Functions for CV email delivery. Use this skill only when the task explicitly involves Supabase/backend data work or the changed files already touch Supabase integrations.
+This project uses Supabase as the blog CMS/source of truth, for selected runtime submissions, admin data access, CV PDF storage, and Edge Functions for CV email delivery. Use this skill only when the task explicitly involves Supabase/backend data work or the changed files already touch Supabase integrations.
 
 ## Current Usage in xhverse
 
 ### Database Tables
-- `posts` — blog posts with slug, title, body_markdown, tags, reading_time, medium_url, published_at, status
+- `posts` — blog CMS source of truth with slug, title, body_markdown, tags, reading_time, medium_url, published_at, status, cover metadata, SEO metadata, and related_tool_ctas
 - `data_platform_maturity_submissions` — anonymous maturity assessment submissions and aggregate stats
 - `cv_download_requests` — CV gate requests, approval status, and send lifecycle
 - `leads` — advisory/contact lead tracking for the admin panel
@@ -19,7 +19,7 @@ This project uses Supabase for build-time blog content, selected runtime submiss
 - `documents` bucket → `cv/rujikorn-ngoensaard-cv.pdf` (public read)
 
 ### Client Access Patterns
-- **Build time**: `SUPABASE_URL` + `SUPABASE_SECRET_KEY` (service role) for fetching published posts
+- **Build time**: `SUPABASE_URL` + `SUPABASE_SECRET_KEY` (service role) for fetching published posts; when configured, Supabase posts are authoritative
 - **Client side**: `PUBLIC_SUPABASE_URL` + `PUBLIC_SUPABASE_PUBLISHABLE_KEY` (anon key) for maturity submissions, CV requests, leads, and admin reads/updates gated by RLS and Cloudflare Access
 - **Edge Functions**: Supabase service role + `RESEND_API_KEY` for CV request notifications and PDF delivery
 
@@ -73,7 +73,7 @@ create policy "Service role can manage examples"
 // Fetch published posts (build time, service role)
 const { data, error } = await supabase
   .from("posts")
-  .select("slug,title,excerpt,body_markdown,tags,reading_time,medium_url,published_at")
+  .select("slug,title,excerpt,body_markdown,tags,reading_time,medium_url,published_at,updated_at,cover_image_path,cover_image_alt,seo_title,seo_description,related_tool_ctas")
   .eq("status", "published")
   .not("published_at", "is", null)
   .order("published_at", { ascending: false });

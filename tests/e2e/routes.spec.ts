@@ -57,15 +57,13 @@ test("blog article page renders markdown body", async ({ page }) => {
 
 test("blog article uses its cover image for social metadata", async ({ page }) => {
   await page.goto("/blog/data-product-as-platform-contract");
+  const coverUrl =
+    "https://jxfpnfliioqbhzznaphd.supabase.co/storage/v1/object/public/blog-covers/posts/data-product-as-platform-contract/00000000-0000-4000-8000-000000000005.jpg";
   await expect(
-    page.locator(
-      'meta[property="og:image"][content="https://xhverse.co/images/blog-data-product-as-platform-contract-cover.jpg"]',
-    ),
+    page.locator(`meta[property="og:image"][content="${coverUrl}"]`),
   ).toHaveCount(1);
   await expect(
-    page.locator(
-      'meta[name="twitter:image"][content="https://xhverse.co/images/blog-data-product-as-platform-contract-cover.jpg"]',
-    ),
+    page.locator(`meta[name="twitter:image"][content="${coverUrl}"]`),
   ).toHaveCount(1);
 });
 
@@ -84,7 +82,7 @@ test("data product article exposes canonical article structured data", async ({ 
   expect(jsonLd?.datePublished).toBe("2026-06-03");
   expect(jsonLd?.dateModified).toBe("2026-06-03");
   expect(jsonLd?.image).toBe(
-    "https://xhverse.co/images/blog-data-product-as-platform-contract-cover.jpg",
+    "https://jxfpnfliioqbhzznaphd.supabase.co/storage/v1/object/public/blog-covers/posts/data-product-as-platform-contract/00000000-0000-4000-8000-000000000005.jpg",
   );
   expect(jsonLd?.author).toEqual(
     expect.objectContaining({
@@ -105,7 +103,7 @@ test("materialized views article exposes canonical metadata and content", async 
   const canonicalUrl =
     "https://xhverse.co/blog/most-teams-use-materialized-views-too-early";
   const coverUrl =
-    "https://xhverse.co/images/blog-most-teams-use-materialized-views-too-early-cover.jpg";
+    "https://jxfpnfliioqbhzznaphd.supabase.co/storage/v1/object/public/blog-covers/posts/most-teams-use-materialized-views-too-early/00000000-0000-4000-8000-000000000001.jpg";
 
   await expect(page).toHaveTitle(
     "Most Teams Use Materialized Views Too Early | Data Architecture | XHVERSE",

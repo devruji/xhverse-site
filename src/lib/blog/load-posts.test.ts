@@ -87,7 +87,7 @@ describe("loadPublishedPostsForBuild", () => {
     expect(infoSpy).not.toHaveBeenCalled();
   });
 
-  it("falls back when the query returns an error", async () => {
+  it("throws when configured Supabase returns an error", async () => {
     const order = vi.fn().mockResolvedValue({
       data: null,
       error: { message: "failed" },
@@ -99,15 +99,14 @@ describe("loadPublishedPostsForBuild", () => {
     const from = vi.fn().mockReturnValue({ select });
     const client = { from } as never;
 
-    const posts = await loadPublishedPostsForBuild(client, staticFallback);
-    expect(posts.map((p) => p.slug).sort()).toEqual(
-      staticFallback.map((p) => p.slug).sort(),
+    await expect(loadPublishedPostsForBuild(client, staticFallback)).rejects.toThrow(
+      "failed",
     );
     expect(warnSpy).not.toHaveBeenCalled();
     expect(infoSpy).not.toHaveBeenCalled();
   });
 
-  it("falls back when the query returns an error without a message", async () => {
+  it("throws a generic error when the query error has no message", async () => {
     const order = vi.fn().mockResolvedValue({
       data: null,
       error: {},
@@ -119,12 +118,14 @@ describe("loadPublishedPostsForBuild", () => {
     const from = vi.fn().mockReturnValue({ select });
     const client = { from } as never;
 
-    await loadPublishedPostsForBuild(client, staticFallback);
+    await expect(loadPublishedPostsForBuild(client, staticFallback)).rejects.toThrow(
+      "Supabase posts query failed.",
+    );
     expect(warnSpy).not.toHaveBeenCalled();
     expect(infoSpy).not.toHaveBeenCalled();
   });
 
-  it("falls back when the query returns no published rows", async () => {
+  it("returns no posts when configured Supabase returns no published rows", async () => {
     const order = vi.fn().mockResolvedValue({
       data: [],
       error: null,
@@ -137,11 +138,11 @@ describe("loadPublishedPostsForBuild", () => {
     const client = { from } as never;
 
     const posts = await loadPublishedPostsForBuild(client, staticFallback);
-    expect(posts.map((p) => p.slug).sort()).toEqual(
-      staticFallback.map((p) => p.slug).sort(),
-    );
+    expect(posts).toEqual([]);
     expect(warnSpy).not.toHaveBeenCalled();
-    expect(infoSpy).not.toHaveBeenCalled();
+    expect(infoSpy).toHaveBeenCalledWith(
+      "[blog] Loaded 0 published post(s) from Supabase.",
+    );
   });
 
   it("uses Supabase rows when the query succeeds", async () => {
@@ -156,6 +157,7 @@ describe("loadPublishedPostsForBuild", () => {
           reading_time: "1 min read",
           medium_url: null,
           published_at: "2026-12-01T00:00:00.000Z",
+          related_tool_ctas: [{ slug: "lakehouse-cost-calculator", variant: "primary" }],
         },
       ],
       error: null,
@@ -168,7 +170,16 @@ describe("loadPublishedPostsForBuild", () => {
     const client = { from } as never;
 
     const posts = await loadPublishedPostsForBuild(client, staticFallback);
-    expect(posts.some((p) => p.slug === "db-post")).toBe(true);
+    expect(posts).toHaveLength(1);
+    expect(posts[0]?.slug).toBe("db-post");
+    expect(posts[0]?.relatedToolCtas).toEqual([
+      {
+        slug: "lakehouse-cost-calculator",
+        label: "Lakehouse Cost Calculator",
+        href: "/tools/lakehouse-cost-calculator",
+        variant: "primary",
+      },
+    ]);
     expect(from).toHaveBeenCalledWith("posts");
     expect(lte).toHaveBeenCalledWith("published_at", expect.any(String));
     expect(infoSpy).toHaveBeenCalledWith(

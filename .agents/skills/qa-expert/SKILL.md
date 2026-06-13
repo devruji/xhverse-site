@@ -34,8 +34,8 @@ After build, verify the generated output:
 
 ```bash
 # Check all pages were generated
-ls dist/*.html dist/**/*.html 2>/dev/null | wc -l
-# Expected: 38 generated static HTML pages in the current release
+find dist -name '*.html' -type f | wc -l
+# Expected: 39 generated static HTML pages in the current release
 
 # Verify _headers file was generated with correct CSP
 grep "connect-src" dist/_headers
