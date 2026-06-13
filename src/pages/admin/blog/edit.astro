@@ -32,6 +32,7 @@ import AdminLayout from "../../../layouts/AdminLayout.astro";
             <button id="save-draft" type="button" class="min-h-11 border border-white/15 px-4 text-xs uppercase tracking-[0.18em] text-zinc-300 transition hover:border-white/30 hover:text-white">Save draft</button>
             <button id="publish-post" type="button" class="min-h-11 bg-white px-4 text-xs font-semibold uppercase tracking-[0.18em] text-black transition hover:bg-emerald-100">Publish</button>
             <button id="unpublish-post" type="button" class="min-h-11 border border-amber-300/30 px-4 text-xs uppercase tracking-[0.18em] text-amber-200 transition hover:bg-amber-300/10">Unpublish</button>
+            <button id="delete-post" type="button" class="min-h-11 border border-red-300/30 px-4 text-xs uppercase tracking-[0.18em] text-red-200 transition hover:bg-red-300/10">Delete</button>
           </div>
         </div>
 
@@ -53,6 +54,7 @@ import AdminLayout from "../../../layouts/AdminLayout.astro";
           <label class="mt-4 block"><span class="block text-xs text-zinc-400">Cover image alt</span><input id="post-cover-alt" class="mt-2 min-h-11 w-full border border-white/15 bg-black/30 px-3 text-sm text-white outline-none focus:border-emerald-300/70" /></label>
           <label class="mt-4 block"><span class="block text-xs text-zinc-400">SEO title</span><input id="post-seo-title" class="mt-2 min-h-11 w-full border border-white/15 bg-black/30 px-3 text-sm text-white outline-none focus:border-emerald-300/70" /></label>
           <label class="mt-4 block"><span class="block text-xs text-zinc-400">SEO description</span><textarea id="post-seo-description" rows="3" class="mt-2 w-full border border-white/15 bg-black/30 px-3 py-2 text-sm leading-6 text-white outline-none focus:border-emerald-300/70"></textarea></label>
+          <label class="mt-4 block"><span class="block text-xs text-zinc-400">Related tool CTAs</span><textarea id="post-related-tools" rows="3" class="mt-2 w-full border border-white/15 bg-black/30 px-3 py-2 font-mono text-xs leading-5 text-white outline-none focus:border-emerald-300/70" placeholder="lakehouse-cost-calculator:primary"></textarea></label>
         </div>
       </aside>
     </form>
@@ -107,10 +109,13 @@ import AdminLayout from "../../../layouts/AdminLayout.astro";
     const coverAlt = document.querySelector<HTMLInputElement>("#post-cover-alt");
     const seoTitle = document.querySelector<HTMLInputElement>("#post-seo-title");
     const seoDescription = document.querySelector<HTMLTextAreaElement>("#post-seo-description");
+    const relatedTools = document.querySelector<HTMLTextAreaElement>("#post-related-tools");
     const saveState = document.querySelector<HTMLElement>("#post-save-state");
     const errorBox = document.querySelector<HTMLElement>("#post-form-error");
     const preview = document.querySelector<HTMLElement>("#post-preview");
     let existingCoverPath = "";
+    let existingPostStatus: PostStatus = "draft";
+    let existingPublishedAt: string | null = null;
     let coverRemoved = false;
     let stagedCoverFile: File | null = null;
     let stagedPreviewUrl: string | null = null;
@@ -138,6 +143,7 @@ import AdminLayout from "../../../layouts/AdminLayout.astro";
       if (coverAlt) coverAlt.value = values.coverImageAlt;
       if (seoTitle) seoTitle.value = values.seoTitle;
       if (seoDescription) seoDescription.value = values.seoDescription;
+      if (relatedTools) relatedTools.value = values.relatedToolCtasInput;
     }
 
     function values(): PostFormValues {
@@ -160,6 +166,7 @@ import AdminLayout from "../../../layouts/AdminLayout.astro";
         hasStagedCoverImage: Boolean(stagedCoverFile),
         seoTitle: seoTitle?.value ?? "",
         seoDescription: seoDescription?.value ?? "",
+        relatedToolCtasInput: relatedTools?.value ?? "",
         status: (status?.value === "published" ? "published" : "draft") as PostStatus,
         publishedAt: publishedAt?.value ?? "",
       };
@@ -227,6 +234,40 @@ import AdminLayout from "../../../layouts/AdminLayout.astro";
       return objectPath;
     }
 
+    async function triggerRebuild(reason: string): Promise<string> {
+      const response = await fetch("/admin/api/blog/rebuild", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reason }),
+      });
+      const payload = (await response.json().catch(() => null)) as { message?: string } | null;
+      return payload?.message ?? (response.ok ? "Cloudflare rebuild queued." : "Cloudflare rebuild unavailable.");
+    }
+
+    function isPublicPost(statusValue: PostStatus, publishedAtValue: string | null): boolean {
+      if (statusValue !== "published" || !publishedAtValue) return false;
+      const publishedAtTime = new Date(publishedAtValue).getTime();
+      return Number.isFinite(publishedAtTime) && publishedAtTime <= Date.now();
+    }
+
+    async function rebuildMessageForMutation(options: {
+      previousStatus: PostStatus;
+      previousPublishedAt: string | null;
+      nextStatus: PostStatus | null;
+      nextPublishedAt: string | null;
+      reason: string;
+    }): Promise<string> {
+      const wasPublic = isPublicPost(
+        options.previousStatus,
+        options.previousPublishedAt,
+      );
+      const isPublic = options.nextStatus
+        ? isPublicPost(options.nextStatus, options.nextPublishedAt)
+        : false;
+      if (!wasPublic && !isPublic) return "Draft-only change saved without rebuild.";
+      return triggerRebuild(options.reason);
+    }
+
     function refreshComputedFields(): void {
       if (readingTime && body && !readingManual?.checked) readingTime.value = estimateReadingTime(body.value);
       if (preview && body) preview.innerHTML = renderMarkdownToHtml(body.value || "No body content yet.");
@@ -237,7 +278,10 @@ import AdminLayout from "../../../layouts/AdminLayout.astro";
       if (!postId) { showError("Missing post id."); return; }
       const { data, error } = await client.from("posts").select("*").eq("id", postId).single();
       if (error) { showError(mapSupabasePostError(error)); return; }
-      setValues(formValuesFromAdminPost(data as AdminPostRow));
+      const post = data as AdminPostRow;
+      existingPostStatus = post.status;
+      existingPublishedAt = post.published_at;
+      setValues(formValuesFromAdminPost(post));
       refreshComputedFields();
       setState("Loaded");
     }
@@ -285,6 +329,8 @@ import AdminLayout from "../../../layouts/AdminLayout.astro";
         { ...current, coverImagePath: nextCoverPath },
         intent,
       );
+      const previousStatus = existingPostStatus;
+      const previousPublishedAt = existingPublishedAt;
       const { error } = await client.from("posts").update(payload).eq("id", postId);
       if (error) {
         if (uploadedCoverPath) await removeStorageObjects([uploadedCoverPath]);
@@ -306,9 +352,45 @@ import AdminLayout from "../../../layouts/AdminLayout.astro";
       stagedPreviewUrl = null;
       if (coverFile) coverFile.value = "";
       renderExistingCover();
-      setState("Saved");
       if (status) status.value = payload.status;
       if (publishedAt) publishedAt.value = payload.published_at?.slice(0, 16) ?? "";
+      existingPostStatus = payload.status;
+      existingPublishedAt = payload.published_at;
+      const rebuildMessage = await rebuildMessageForMutation({
+        previousStatus,
+        previousPublishedAt,
+        nextStatus: payload.status,
+        nextPublishedAt: payload.published_at,
+        reason: `blog-${intent}`,
+      });
+      setState(`Saved. ${rebuildMessage}`);
+    }
+
+    async function deletePost(): Promise<void> {
+      clearError();
+      if (!client || !postId) {
+        showError("Missing editor context.");
+        return;
+      }
+      const confirmed = window.confirm("Delete this blog post from Supabase?");
+      if (!confirmed) return;
+      setState("Deleting...");
+      const { error } = await client.from("posts").delete().eq("id", postId);
+      if (error) {
+        showError(mapSupabasePostError(error));
+        setState("Delete failed");
+        return;
+      }
+      if (existingCoverPath) await removeStorageObjects([existingCoverPath]);
+      const rebuildMessage = await rebuildMessageForMutation({
+        previousStatus: existingPostStatus,
+        previousPublishedAt: existingPublishedAt,
+        nextStatus: null,
+        nextPublishedAt: null,
+        reason: "blog-delete",
+      });
+      setState(`Deleted. ${rebuildMessage}`);
+      window.location.href = "/admin/blog/";
     }
 
     body?.addEventListener("input", refreshComputedFields);
@@ -343,6 +425,7 @@ import AdminLayout from "../../../layouts/AdminLayout.astro";
     document.querySelector("#save-draft")?.addEventListener("click", () => { savePost("draft"); });
     document.querySelector("#publish-post")?.addEventListener("click", () => { savePost("publish"); });
     document.querySelector("#unpublish-post")?.addEventListener("click", () => { savePost("unpublish"); });
+    document.querySelector("#delete-post")?.addEventListener("click", () => { deletePost(); });
     document.querySelector<HTMLFormElement>("#post-form")?.addEventListener("submit", (event) => event.preventDefault());
     window.addEventListener("admin:authenticated", () => { loadPost(); });
   </script>

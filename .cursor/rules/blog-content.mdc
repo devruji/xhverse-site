@@ -1,6 +1,6 @@
 ---
 description: Blog content, cover image, SEO, and related-tool CTA rules
-globs: ["src/data/blog.ts", "src/data/blog.test.ts", "src/pages/blog/**/*.astro", "public/images/blog-*", ".tmp/blog-*.md"]
+globs: ["src/data/blog.ts", "src/data/blog.test.ts", "src/pages/blog/**/*.astro", "src/pages/admin/blog/**/*.astro", "public/images/blog-*", ".tmp/blog-*.md"]
 ---
 
 # Blog Content Rules
@@ -14,6 +14,11 @@ with `blog-content-strategy` for metadata/references/CTAs and `document-writer`
 for xhverse voice. Use the writer lens again before publish to catch weak
 claims, missing sources, generic titles, decorative CTAs, or vendor-announcement
 tone.
+
+Supabase `posts` is the editorial source of truth. For normal "make/write a blog
+post" requests, produce a Supabase Blog Writer-ready article package; do not edit
+`src/data/blog.ts` unless the user explicitly asks for a code fallback/seed
+change.
 
 ## Content Shape
 
@@ -45,6 +50,8 @@ tone.
 ## Related Tool CTAs
 
 - Prefer typed `relatedTools` metadata over hardcoded one-off CTA sections.
+- In the Supabase Blog Writer, enter related tools as `tool-slug:primary` or
+  `tool-slug:secondary` lines.
 - Use only known internal tool slugs from `/tools`.
 - Current high-fit additions: `data-product-contract-builder`, `access-model-simulator`, `lakehouse-table-layout-advisor`, `power-bi-semantic-model-doctor`, and `pipeline-recovery-planner`.
 - Keep CTAs lightweight: normal links or static cards, no embedded tool apps.
@@ -72,7 +79,8 @@ tone.
 ## Verification
 
 - If touching `src/data/blog.ts` or related types, update `src/data/blog.test.ts`
-  and run coverage.
+  and run coverage. Normal Supabase-ready content drafts do not require code
+  tests because they should not edit the repo.
 - If touching blog pages, run typecheck and at least the blog route E2E coverage
   if available.
 - Full sign-off still requires `bun run check`.

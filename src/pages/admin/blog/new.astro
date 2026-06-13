@@ -72,6 +72,7 @@ import AdminLayout from "../../../layouts/AdminLayout.astro";
           <label class="mt-4 block"><span class="block text-xs text-zinc-400">Cover image alt</span><input id="post-cover-alt" class="mt-2 min-h-11 w-full border border-white/15 bg-black/30 px-3 text-sm text-white outline-none focus:border-emerald-300/70" /></label>
           <label class="mt-4 block"><span class="block text-xs text-zinc-400">SEO title</span><input id="post-seo-title" class="mt-2 min-h-11 w-full border border-white/15 bg-black/30 px-3 text-sm text-white outline-none focus:border-emerald-300/70" /></label>
           <label class="mt-4 block"><span class="block text-xs text-zinc-400">SEO description</span><textarea id="post-seo-description" rows="3" class="mt-2 w-full border border-white/15 bg-black/30 px-3 py-2 text-sm leading-6 text-white outline-none focus:border-emerald-300/70"></textarea></label>
+          <label class="mt-4 block"><span class="block text-xs text-zinc-400">Related tool CTAs</span><textarea id="post-related-tools" rows="3" class="mt-2 w-full border border-white/15 bg-black/30 px-3 py-2 font-mono text-xs leading-5 text-white outline-none focus:border-emerald-300/70" placeholder="lakehouse-cost-calculator:primary"></textarea></label>
         </div>
       </aside>
     </form>
@@ -119,6 +120,7 @@ import AdminLayout from "../../../layouts/AdminLayout.astro";
     const coverAlt = document.querySelector<HTMLInputElement>("#post-cover-alt");
     const seoTitle = document.querySelector<HTMLInputElement>("#post-seo-title");
     const seoDescription = document.querySelector<HTMLTextAreaElement>("#post-seo-description");
+    const relatedTools = document.querySelector<HTMLTextAreaElement>("#post-related-tools");
     const saveState = document.querySelector<HTMLElement>("#post-save-state");
     const errorBox = document.querySelector<HTMLElement>("#post-form-error");
     const preview = document.querySelector<HTMLElement>("#post-preview");
@@ -157,6 +159,7 @@ import AdminLayout from "../../../layouts/AdminLayout.astro";
         hasStagedCoverImage: Boolean(stagedCoverFile),
         seoTitle: seoTitle?.value ?? "",
         seoDescription: seoDescription?.value ?? "",
+        relatedToolCtasInput: relatedTools?.value ?? "",
         status: (status?.value === "published" ? "published" : "draft") as PostStatus,
         publishedAt: publishedAt?.value ?? "",
       };
@@ -199,6 +202,21 @@ import AdminLayout from "../../../layouts/AdminLayout.astro";
         });
       if (error) throw new Error(error.message);
       return objectPath;
+    }
+
+    async function triggerRebuild(reason: string): Promise<string> {
+      const response = await fetch("/admin/api/blog/rebuild", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reason }),
+      });
+      const payload = (await response.json().catch(() => null)) as { message?: string } | null;
+      return payload?.message ?? (response.ok ? "Cloudflare rebuild queued." : "Cloudflare rebuild unavailable.");
+    }
+
+    async function rebuildMessageForNewPost(intent: PostSaveIntent): Promise<string> {
+      if (intent !== "publish") return "Draft saved without rebuild.";
+      return triggerRebuild("blog-publish");
     }
 
     function refreshComputedFields(): void {
@@ -264,7 +282,8 @@ import AdminLayout from "../../../layouts/AdminLayout.astro";
       }
 
       const id = typeof data === "object" && data && "id" in data ? String(data.id) : "";
-      setState("Saved");
+      const rebuildMessage = await rebuildMessageForNewPost(intent);
+      setState(`Saved. ${rebuildMessage}`);
       if (id) window.location.href = `/admin/blog/edit/?id=${encodeURIComponent(id)}`;
     }
 

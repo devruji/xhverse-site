@@ -8,7 +8,7 @@ XHVerse is the portfolio, blog, and tools site for Rujikorn Ngoensaard (XH / bos
 
 - **Production**: https://xhverse.co
 - **Repo**: https://github.com/devruji/xhverse-site
-- **Current version**: v3.9.1
+- **Current version**: v3.9.4
 - **Business model**: Consulting/advisory — site drives inbound leads via content + tools
 
 ## Commands
@@ -36,14 +36,14 @@ Kill dev server: `lsof -ti :4321 | xargs kill -9 2>/dev/null`
 - **Tailwind CSS v4** via `@tailwindcss/vite` plugin (CSS-first config, no tailwind.config.js)
 - **Bun** (package manager + script runner), Node 22.16.0 (pinned in `.node-version`)
 - **Cloudflare Pages** (Git integration auto-deploy from `main`)
-- **Supabase** (build-time blog overlay + runtime for CV requests, leads, tool benchmarks)
+- **Supabase** (blog CMS/source of truth + runtime for CV requests, leads, tool benchmarks)
 - **Cloudflare Turnstile** (bot protection — Non-interactive mode on CV request form)
 - **Resend** (transactional email — CV delivery + admin notifications)
 
 ### Data Flow
 ```
-src/data/*.ts (static typed content)
-      ↓ (imported by pages at build time)
+Supabase posts + src/data/*.ts fallback/static content
+      ↓ (imported/fetched by pages at build time)
 src/lib/ (business logic — blog merge, scoring engines, markdown)
       ↓
 src/pages/*.astro (routes → static HTML)
@@ -51,11 +51,11 @@ src/pages/*.astro (routes → static HTML)
 dist/ (deployed to Cloudflare CDN)
 ```
 
-All content is defined in TypeScript modules. Supabase overlays blog posts at build time but the site builds without it.
+Supabase `posts` is the editorial source of truth for blog content when build credentials are configured. Astro fetches published rows at build time and generates static HTML; `src/data/blog.ts` remains a no-credentials fallback/seed surface for local builds and tests.
 
 ### Key Patterns
 
-**Content → Pages**: `src/data/` exports typed arrays/objects, imported by `src/pages/*.astro` at build time. No CMS, no filesystem content collections.
+**Content → Pages**: non-blog content comes from typed `src/data/` modules. Blog content comes from Supabase `posts` at build time when `SUPABASE_URL` + `PUBLIC_SUPABASE_PUBLISHABLE_KEY` are configured; `SUPABASE_SECRET_KEY` remains a legacy server-key fallback. Local fallback data is used only when those credentials are absent.
 
 **Business logic (`src/lib/`)**: Pure functions and integration helpers across 14 domain folders: `admin/`, `architecture-roulette/`, `blog/`, `blog-views/`, `cv-requests/`, `data-platform-maturity/`, `data-stack-roast/`, `governance-scorecard/`, `lakehouse-cost-calculator/`, `leads/`, `practitioner-tools/`, `scd-design-lab/`, `spark-explained/`, and `sql-deathmatch/`. Tests are co-located as `*.test.ts`.
 
@@ -232,7 +232,7 @@ For new blog posts, technical docs, release notes, page copy, or article-series 
 2. Use `technical-writer` before body drafting to define reader goal, thesis, outline, metadata, references, disclosure, and related tool CTA fit.
 3. Use `.agents/skills/blog-content-strategy/SKILL.md` and `.agents/skills/document-writer/SKILL.md` as the source workflow for blog body and metadata.
 4. Generate covers in the established xhverse blog series style unless the user asks otherwise: dark isometric data-architecture visuals, glass panels, teal glow, restrained amber accents, abstract platform objects, and no people/logos/screenshots/readable text.
-5. Use `technical-writer` again for pre-publish content QA before `backend-engineer` implements static `src/data/blog.ts` changes.
+5. Use `technical-writer` again for pre-publish content QA, then deliver a Supabase Blog Writer-ready article package. Do not implement `src/data/blog.ts` changes for a normal blog-post request unless the user explicitly asks for code edits.
 
 ## Rules (`.cursor/rules/`)
 
@@ -340,6 +340,6 @@ Repo MCP policy:
 - Keep `.node-version`, CI, and Cloudflare Pages runtime aligned (currently Node 22.16.0)
 - Keep `bun.lock` in sync — never bypass `--frozen-lockfile`
 - Supabase config lives in ONE place: `src/data/supabase-config.ts`
-- Site must build successfully without Supabase env vars (static fallback)
+- Site must build successfully without Supabase env vars (static fallback), but Supabase is authoritative when build credentials are configured
 - Cloudflare Rocket Loader must stay **OFF** (breaks Turnstile widget)
 - Turnstile site key is public (in client HTML); secret key is Supabase secret only

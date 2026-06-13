@@ -76,8 +76,10 @@ and cover-image briefs.
     composition, style, avoid list, and alt text. Do not use readable text in the
     image unless explicitly required. Default to the xhverse blog cover series
     style unless the user asks for a different direction.
-12. Keep Supabase optional. Static posts must build without Supabase env vars,
-    and Supabase-sourced posts without related tool metadata must render safely.
+12. Treat Supabase as the editorial source of truth. Normal blog-post requests
+    should produce a Blog Writer-ready article package, not a `src/data/blog.ts`
+    implementation, unless the user explicitly asks for code changes. Static
+    fallback posts must still build without Supabase env vars.
 
 ## Blog Cover Image Style
 
@@ -112,7 +114,10 @@ Prompt anchor for future covers:
 - Keep CTA labels short and action-oriented.
 - Do not add lead capture, scripts, inline handlers, or tracking pixels from a
   blog CTA.
-- Validate static metadata in `src/data/blog.test.ts`.
+- For Supabase publishing, provide related-tool CTA metadata as
+  `tool-slug:primary` or `tool-slug:secondary` lines for the admin editor.
+- Validate static metadata in `src/data/blog.test.ts` only when explicitly
+  editing fallback/seed blog data in code.
 
 ## Quality Bar
 

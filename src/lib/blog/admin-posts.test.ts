@@ -13,9 +13,12 @@ import {
   isSameOriginImagePath,
   mapSupabasePostError,
   MAX_COVER_IMAGE_BYTES,
+  MAX_RELATED_TOOL_CTAS,
   normalizeSlug,
   parseTags,
+  parseRelatedToolCtasInput,
   resolveCoverPathForSave,
+  validateRelatedToolCtasInput,
   shouldDeleteCoverAfterSave,
   titleToSlugSuggestion,
   validateCoverFile,
@@ -41,6 +44,7 @@ const baseValues: PostFormValues = {
   hasStagedCoverImage: false,
   seoTitle: "",
   seoDescription: "",
+  relatedToolCtasInput: "",
   status: "draft",
   publishedAt: "",
 };
@@ -62,6 +66,7 @@ const baseRow: AdminPostRow = {
   cover_image_alt: null,
   seo_title: null,
   seo_description: null,
+  related_tool_ctas: null,
 };
 
 describe("admin post helpers", () => {
@@ -92,6 +97,7 @@ describe("admin post helpers", () => {
       bodyMarkdown: "",
       mediumUrl: "ftp://example.com",
       coverImagePath: "posts/publishing-quality/11111111-1111-4111-8111-111111111111.webp",
+      relatedToolCtasInput: "missing-tool:primary",
       status: "published",
     });
     expect(hasValidationErrors(errors)).toBe(true);
@@ -102,6 +108,7 @@ describe("admin post helpers", () => {
     expect(errors.excerpt).toBe("Excerpt is required.");
     expect(errors.bodyMarkdown).toBe("Body content is required.");
     expect(errors.publishedAt).toBe("Publish date is required for published posts.");
+    expect(errors.relatedToolCtasInput).toBe("Unknown related tool slug: missing-tool.");
 
     expect(
       validatePostForm({
@@ -128,6 +135,39 @@ describe("admin post helpers", () => {
     ).toEqual({});
 
     expect(validatePostForm({ ...baseValues, mediumUrl: "not a url" }).mediumUrl).toMatch(/valid http/);
+    expect(
+      validatePostForm({
+        ...baseValues,
+        relatedToolCtasInput: "lakehouse-cost-calculator:tertiary",
+      }).relatedToolCtasInput,
+    ).toBe("Related tool variant must be primary or secondary.");
+  });
+
+  it("parses and formats related tool CTAs", () => {
+    expect(
+      parseRelatedToolCtasInput(
+        "lakehouse-cost-calculator:primary\nunknown:primary, architecture-roulette:secondary, lakehouse-cost-calculator:secondary",
+      ),
+    ).toEqual([
+      { slug: "lakehouse-cost-calculator", variant: "primary" },
+      { slug: "architecture-roulette", variant: "secondary" },
+    ]);
+    expect(parseRelatedToolCtasInput("lakehouse-cost-calculator")).toEqual([
+      { slug: "lakehouse-cost-calculator", variant: "secondary" },
+    ]);
+    expect(validateRelatedToolCtasInput("lakehouse-cost-calculator")).toBeNull();
+    expect(validateRelatedToolCtasInput("lakehouse-cost-calculator:primary")).toBeNull();
+    expect(
+      validateRelatedToolCtasInput(
+        "lakehouse-cost-calculator:primary,lakehouse-cost-calculator:secondary",
+      ),
+    ).toBeNull();
+    expect(validateRelatedToolCtasInput(":primary")).toBe("Unknown related tool slug: :primary.");
+    expect(
+      validateRelatedToolCtasInput(
+        "lakehouse-cost-calculator:primary\narchitecture-roulette:secondary\ndata-platform-maturity-checker:secondary\ngovernance-scorecard:secondary",
+      ),
+    ).toBe(`Choose ${MAX_RELATED_TOOL_CTAS} or fewer related tool CTAs.`);
   });
 
   it("validates cover image files and object paths", () => {
@@ -209,6 +249,8 @@ describe("admin post helpers", () => {
         coverImageAlt: "Cover",
         seoTitle: "SEO",
         seoDescription: "Description",
+        relatedToolCtasInput:
+          "lakehouse-cost-calculator:primary\narchitecture-roulette:secondary",
       },
       "publish",
     );
@@ -221,6 +263,10 @@ describe("admin post helpers", () => {
     expect(manual.cover_image_alt).toBe("Cover");
     expect(manual.seo_title).toBe("SEO");
     expect(manual.seo_description).toBe("Description");
+    expect(manual.related_tool_ctas).toEqual([
+      { slug: "lakehouse-cost-calculator", variant: "primary" },
+      { slug: "architecture-roulette", variant: "secondary" },
+    ]);
     expect(manual.published_at).toBeTruthy();
 
     const scheduled = buildPostUpsertPayload(
@@ -275,6 +321,10 @@ describe("admin post helpers", () => {
       cover_image_alt: "Cover",
       seo_title: "SEO",
       seo_description: "Description",
+      related_tool_ctas: [
+        { slug: "lakehouse-cost-calculator", variant: "primary" },
+        { slug: "architecture-roulette", variant: "secondary" },
+      ],
       status: "published",
     });
     expect(publishedValues.readingTimeManual).toBe(false);
@@ -286,6 +336,9 @@ describe("admin post helpers", () => {
     expect(publishedValues.coverImageAlt).toBe("Cover");
     expect(publishedValues.seoTitle).toBe("SEO");
     expect(publishedValues.seoDescription).toBe("Description");
+    expect(publishedValues.relatedToolCtasInput).toBe(
+      "lakehouse-cost-calculator:primary\narchitecture-roulette:secondary",
+    );
   });
 
   it("filters posts by status and query", () => {
@@ -313,6 +366,8 @@ describe("admin post helpers", () => {
     });
 
     expect(mapSupabasePostError({ message: "posts_slug_format_check", code: "23514" })).toBe("Slug must be lowercase kebab-case.");
+    expect(mapSupabasePostError({ message: "posts_related_tool_ctas_check", code: "23514" })).toBe("Choose 3 or fewer related tool CTAs.");
+    expect(mapSupabasePostError({ message: "other_check", code: "23514" })).toBe("Post failed a database validation check.");
     expect(mapSupabasePostError({ message: "JWT expired" })).toBe("Session expired. Please sign in again.");
     expect(mapSupabasePostError({ message: "row-level security violation" })).toBe("You do not have permission to modify posts.");
     expect(mapSupabasePostError({ message: "Other failure" })).toBe("Other failure");

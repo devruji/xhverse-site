@@ -6,10 +6,10 @@ This file provides shared context for all Claude Code agents working in this rep
 
 - **Site**: xhverse.co — portfolio, blog, and interactive tools for Rujikorn Ngoensaard (XH / bossruji)
 - **Role**: Senior Data Engineer | Platform Architecture
-- **Version**: v3.9.1
+- **Version**: v3.9.4
 - **Stack**: Astro 6 (static only), Tailwind CSS v4, Bun, Cloudflare Pages, Supabase, Resend
-- **Pages**: 27 Astro route files; current release build generates 38 static HTML pages
-- **Tests**: 522 unit tests at 100% coverage + 50 E2E checks
+- **Pages**: 27 Astro route files; current release build generates 39 static HTML pages
+- **Tests**: 542 unit tests at 100% coverage + 62 E2E checks
 
 ## Commands
 
@@ -28,9 +28,9 @@ Kill dev server: `lsof -ti :4321 | xargs kill -9 2>/dev/null`
 ## Architecture Overview
 
 ```
-src/data/*.ts     → Static typed content (profile, cv, site, services, blog, gallery)
+src/data/*.ts     → Static typed content (profile, cv, site, services, gallery; blog fallback/seed)
 src/lib/          → Business logic + tests (14 domain folders, 100% coverage)
-src/pages/*.astro → Routes → generated static HTML (27 route files, 38 current build pages)
+src/pages/*.astro → Routes → generated static HTML (27 route files, 39 current build pages)
 src/components/   → Shared Astro components (10)
 src/layouts/      → BaseLayout (SEO/CSP) + AdminLayout (admin panel)
 dist/             → Deployed to Cloudflare CDN
@@ -66,6 +66,7 @@ The five practitioner assessment tools share `src/lib/practitioner-tools/` and a
 
 - **CV Gate**: Email capture → admin review → PDF sent via Resend
 - **Admin Panel**: `/admin/*` behind Cloudflare Access (Zero Trust)
+- **Blog CMS**: Supabase `posts` is the editorial source of truth; Astro publishes static HTML from Supabase at build time
 - **CSP**: Dual-layer (edge `_headers` + HTML meta tag) — must stay synced
 - **Theme**: Dark default, light via `html.light`. Anti-FOUC inline script.
 
@@ -107,6 +108,7 @@ The five practitioner assessment tools share `src/lib/practitioner-tools/` and a
 - **technical-writer**: Use the repo-local `technical_writer` sub-agent when starting, outlining, drafting, or reviewing public content: blog posts, technical docs, release notes, page copy, article metadata, references, or related-tool CTAs.
 - Pair `technical_writer` with `blog-content-strategy` and `document-writer` for xhverse blog work. Use it before body drafting and again for pre-publish review.
 - For content strategy, use `product-manager` first to choose the topic and `technical_writer` next to sharpen reader goal, thesis, outline, references, SEO metadata, disclosure, and CTA fit.
+- When asked to make a blog post, draft the article package for the Supabase Blog Writer/admin workflow; do not implement a `src/data/blog.ts` code change unless explicitly requested.
 - Generated blog covers should match the existing xhverse cover series: dark
   isometric data-architecture visuals, glass panels, teal glow, restrained
   amber accents, abstract platform objects, and no people/logos/screenshots or
@@ -133,6 +135,7 @@ The five practitioner assessment tools share `src/lib/practitioner-tools/` and a
 - `data-cfasync="false"` on all `<script is:inline>` tags
 - No external runtime dependencies for tools (all client-side compute)
 - Site must build without Supabase env vars (graceful degradation)
+- When Supabase build credentials are configured, Supabase `posts` is authoritative; do not merge deleted or stale local fallback posts into public builds
 - Preserve SEO signals: "Rujikorn Ngoensaard", "bossruji", "XH", "xhverse"
 - Branded search improvements must be evidence-backed: inspect current page
   source or built HTML, keep production canonical URLs on `https://xhverse.co`,

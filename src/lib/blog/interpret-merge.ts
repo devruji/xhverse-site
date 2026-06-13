@@ -3,55 +3,35 @@ import { mapPostRowToBlogPost } from "./post-row";
 
 export type PostsQueryInterpretation =
   | { kind: "use_remote"; rows: unknown[] }
-  | { kind: "use_fallback"; reason: "query_error" | "empty_result" };
+  | { kind: "use_fallback"; reason: "no_client" }
+  | { kind: "query_error"; message: string };
 
 export function interpretSupabasePostsResponse(
   data: unknown,
   error: { message: string } | null,
 ): PostsQueryInterpretation {
-  if (error) return { kind: "use_fallback", reason: "query_error" };
-  if (!Array.isArray(data) || data.length === 0) {
-    return { kind: "use_fallback", reason: "empty_result" };
+  if (error) {
+    return {
+      kind: "query_error",
+      message: error.message || "Supabase posts query failed.",
+    };
   }
+  if (!Array.isArray(data)) return { kind: "query_error", message: "Supabase posts query returned an invalid payload." };
   return { kind: "use_remote", rows: data };
 }
 
-export function mergePostsWithStaticFallback(
+export function resolvePostsForBuild(
   interpretation: PostsQueryInterpretation,
   fallback: BlogPost[],
 ): BlogPost[] {
   if (interpretation.kind === "use_fallback") {
     return [...fallback];
   }
-
-  const fallbackBySlug = new Map(fallback.map((post) => [post.slug, post]));
-  const mergedBySlug = new Map<string, BlogPost>();
-
-  for (const fallbackPost of fallback) {
-    mergedBySlug.set(fallbackPost.slug, fallbackPost);
+  if (interpretation.kind === "query_error") {
+    throw new Error(interpretation.message);
   }
 
-  for (const row of interpretation.rows) {
-    const remotePost = mapPostRowToBlogPost(row);
-    const fallbackPost = fallbackBySlug.get(remotePost.slug);
-    if (fallbackPost) {
-      const mergedPost: BlogPost = {
-        ...fallbackPost,
-        updatedAt: remotePost.updatedAt,
-      };
-      if (remotePost.relatedToolCtas) {
-        mergedPost.relatedToolCtas = remotePost.relatedToolCtas;
-      }
-      mergedBySlug.set(remotePost.slug, mergedPost);
-      continue;
-    }
-    mergedBySlug.set(remotePost.slug, {
-      ...remotePost,
-      relatedToolCtas: remotePost.relatedToolCtas,
-    });
-  }
-
-  return [...mergedBySlug.values()];
+  return interpretation.rows.map((row) => mapPostRowToBlogPost(row));
 }
 
 export function sortPostsByDateDesc(posts: BlogPost[]): BlogPost[] {

@@ -18,11 +18,13 @@ graph LR
         F["Cloudflare Access<br/>(Zero Trust)"] -->|protects /admin/*| E
         E -->|POST /api/blog/views| K["Pages Function<br/>blog view counter"]
         E -->|GET /admin/api/blog/views| L["Pages Function<br/>editorial analytics"]
+        E -->|POST /admin/api/blog/rebuild| N["Pages Function<br/>deploy hook caller"]
         F -->|protects /admin/* and /admin/api/*| L
+        F -->|protects /admin/* and /admin/api/*| N
     end
 
     subgraph Supabase
-        G["PostgreSQL<br/>(posts, benchmarks,<br/>cv_requests, leads)"]
+        G["PostgreSQL<br/>(posts CMS, benchmarks,<br/>cv_requests, leads)"]
         H["Storage<br/>(CV PDF)"]
         I["Edge Functions<br/>(send-cv only)"]
     end
@@ -33,6 +35,7 @@ graph LR
 
     C -->|build-time fetch| G
     E -->|client INSERT/SELECT| G
+    N -->|POST deploy hook| D
     E -->|direct download| H
     G -->|webhook on UPDATE| I
     I -->|sends email via Resend| J[User Inbox]
@@ -48,10 +51,10 @@ graph LR
 
 1. CI or Cloudflare Pages runs `bun run build`
 2. `scripts/generate-headers.ts` writes `public/_headers` with CSP derived from `PUBLIC_SUPABASE_URL`
-3. Astro fetches published blog posts from Supabase (`SUPABASE_URL` + `SUPABASE_SECRET_KEY`)
-4. Falls back to `src/data/blog.ts` if credentials are missing or query fails
+3. Astro fetches published blog posts from Supabase (`SUPABASE_URL` + `PUBLIC_SUPABASE_PUBLISHABLE_KEY`; `SUPABASE_SECRET_KEY` is a legacy fallback)
+4. Falls back to `src/data/blog.ts` only when Supabase build credentials are absent
 5. Generates static HTML for all pages and `/blog-post-manifest.json` → `dist/`
-6. The manifest contains the final merged published blog slugs used by the Cloudflare view-count API
+6. The manifest contains the final published blog slugs used by the Cloudflare view-count API
 
 ### Client Side (Browser)
 
@@ -60,6 +63,7 @@ graph LR
 - **CV Gate**: User submits email via modal → INSERT to `cv_download_requests` (status: pending)
 - **Blog Views**: Blog detail pages call same-origin `/api/blog/views` after a short delay; failures hide the count without affecting reading
 - **Admin Panel**: Reads/updates cv_requests, leads, maturity submissions via Supabase anon key + RLS
+- **Admin Blog Writer**: Creates, edits, drafts, publishes, deletes, and stores cover metadata in Supabase; successful mutations can queue a Cloudflare Pages rebuild through `/admin/api/blog/rebuild`
 - **Admin Blog Analytics**: `/admin/blog/analytics/` reads aggregate D1 rollups through `/admin/api/blog/views`
 - **CSP**: Both `_headers` (Cloudflare edge) and `<meta>` (BaseLayout) allow same-origin API calls and restrict external `connect-src` to the Supabase project origin
 
@@ -80,6 +84,7 @@ User clicks "Get a Copy" → CvRequestModal opens
 - **Preview**: push to `development` or `feat/*` → preview URL with auto `noindex`
 - **CI**: GitHub Actions runs typecheck, build, coverage (100%), and E2E on every push/PR
 - **Pages Functions**: `/api/*` and `/admin/api/*` invoke Cloudflare Pages Functions; static routes stay static through `public/_routes.json`
+- **Admin content publish**: Supabase writes are immediate in the admin UI; public static blog pages update after the configured Cloudflare deploy hook rebuilds the site from Supabase
 - **Edge Functions**: deployed separately via `bunx supabase functions deploy send-cv`
 
 ## Security Model
@@ -90,11 +95,12 @@ User clicks "Get a Copy" → CvRequestModal opens
 | HTML meta | `BaseLayout.astro` → CSP `connect-src` from env (production only) |
 | Admin access | Cloudflare Access (Zero Trust) → email OTP for `/admin/*` routes |
 | Admin analytics API | Cloudflare Access protects `/admin/api/*`; API returns aggregate D1 rollups only |
+| Admin rebuild API | Cloudflare Access protects `/admin/api/*`; deploy hook URL is stored server-side only |
 | Blog view API | Same-origin Pages Function validates known published slugs and stores aggregate counters |
 | Database | RLS on all tables; anon: insert-only on submissions, select-only on reads |
 | D1 analytics | Aggregate blog counts, daily rollups, and referrer-origin buckets only; no IP, raw user agent, or fingerprint hash |
 | Storage | Public read on `documents` bucket; no write access via client |
-| Build secrets | `SUPABASE_SECRET_KEY` server-only, never in client bundles |
+| Build read key | `PUBLIC_SUPABASE_PUBLISHABLE_KEY` reads published blog rows through public RLS; `SUPABASE_SECRET_KEY` remains an optional legacy server-side fallback |
 | Edge Function secrets | `RESEND_API_KEY` set via `bunx supabase secrets set` |
 
 ## Pages
@@ -121,7 +127,7 @@ User clicks "Get a Copy" → CvRequestModal opens
 
 | Table | Purpose | RLS |
 |-------|---------|-----|
-| `posts` | Blog posts (fetched at build time) | select: anon; insert/update: service_role |
+| `posts` | Blog CMS source of truth (fetched at build time) | select: anon published rows; admin select/insert/update/delete via RLS |
 | `maturity_submissions` | Anonymous tool submissions | insert: anon; select: anon (aggregate view) |
 | `cv_download_requests` | CV gate email submissions | insert: anon; select/update: service_role + admin |
 | `leads` | Contact/engagement leads | insert: anon; select: service_role + admin |
@@ -152,3 +158,4 @@ addresses, raw user agents, cookies, or fingerprint hashes for blog analytics.
 | `POST /api/blog/views` | Records one anonymous aggregate blog page-view event |
 | `GET /api/blog/views?slugs=a,b` | Returns public aggregate counts for known published blog slugs |
 | `GET /admin/api/blog/views` | Returns protected admin/editorial rollups |
+| `POST /admin/api/blog/rebuild` | Calls the server-side Cloudflare rebuild hook after admin blog mutations |
