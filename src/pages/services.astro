@@ -10,25 +10,10 @@ import {
   fitSignals,
   antiSignals,
 } from "../data/services";
+import { buildAdvisoryServiceJsonLd } from "../lib/seo/structured-data";
 
 const deploymentSite = (Astro.site ?? site.siteUrl).toString();
-
-const servicesStructuredData = {
-  "@context": "https://schema.org",
-  "@type": "Service",
-  name: "Data Platform Advisory",
-  description:
-    "Architecture review, governance design, and platform strategy advisory for enterprise data teams working with Azure, Databricks, and Microsoft Fabric.",
-  provider: {
-    "@type": "Person",
-    "@id": `${deploymentSite}#person`,
-    name: profile.fullName,
-    url: deploymentSite,
-  },
-  serviceType: "Consulting",
-  areaServed: "Worldwide",
-  url: `${deploymentSite}/services`,
-};
+const servicesStructuredData = buildAdvisoryServiceJsonLd(deploymentSite);
 ---
 <BaseLayout
   title="Advisory Services | XHVERSE"

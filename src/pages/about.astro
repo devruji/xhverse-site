@@ -4,36 +4,17 @@ import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import { profile } from "../data/profile";
 import { site } from "../data/site";
+import { buildAboutPageJsonLd } from "../lib/seo/structured-data";
 
 const deploymentSite = (Astro.site ?? site.siteUrl).toString();
-const aboutUrl = new URL("/about", deploymentSite).toString();
+const aboutStructuredData = buildAboutPageJsonLd(deploymentSite);
 ---
 
 <BaseLayout
   title={`About ${profile.fullName}`}
   description={profile.longBio}
   image={profile.avatar}
-  structuredData={{
-    "@context": "https://schema.org",
-    "@type": "AboutPage",
-    "@id": `${aboutUrl}#about-page`,
-    name: `About ${profile.fullName} (XH / bossruji)`,
-    alternateName: ["About XH", "About bossruji", "About xhverse"],
-    url: aboutUrl,
-    mainEntity: {
-      "@type": "Person",
-      "@id": `${deploymentSite}#person`,
-      name: profile.fullName,
-      alternateName: profile.alternateNames,
-      additionalName: ["XH", "bossruji"],
-      url: deploymentSite,
-      description: profile.longBio,
-      image: new URL(profile.avatar, deploymentSite).toString(),
-      email: profile.email,
-      knowsAbout: profile.knowsAbout,
-      sameAs: [site.github, site.medium, site.linkedin],
-    },
-  }}
+  structuredData={aboutStructuredData}
 >
   <div class="min-h-screen bg-[var(--bg-page)] font-sans text-[var(--text)]">
   <Header current="/about" />

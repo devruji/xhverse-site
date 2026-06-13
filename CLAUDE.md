@@ -150,15 +150,36 @@ Use this flow when the user wants Codex to manage planning, review, QA, security
 3. The handoff must include allowed files, forbidden files, acceptance criteria, risk notes, and verification commands for Cursor to run.
 4. Default code implementation to `codex-spark` for bounded build/edit work when that lane is available. Keep Codex accountable for the plan, review, QA evidence, and final acceptance.
 5. Switch back to the smarter Codex lane for implementation when `codex-spark` produces too many bugs, misses repo rules, cannot reach production-grade quality, or the task is high-risk/complex. State the reason for escalation.
-6. Cursor implements from that handoff only when explicitly used or when it materially helps the workflow. Prefer one focused Cursor Agent for one focused change.
-7. Use Cursor multi-agent or multitask mode only when file ownership is non-overlapping and the handoff assigns each workstream clearly.
-8. The user has granted standing approval for Codex to operate Cursor IDE with Computer Use and submit bounded xhverse handoffs to Cursor Agent when it materially helps implementation. Ask again only for secrets, `.env` files, unrelated local folders, destructive actions, live production mutations, or scope outside this repo.
-9. After Cursor finishes, Codex inspects `git status`, `git diff`, and the actual changed files before trusting any Cursor summary.
-10. Cursor runs the narrowest sufficient checks for the change, including `bun run check` when full confidence is needed, and captures the output in its response.
-11. Codex reviews Cursor's test evidence plus `git status`, `git diff`, and the actual changed files before trusting any Cursor summary. Codex reruns tests directly only if Cursor cannot run them, evidence is incomplete, or the user asks.
-12. If Cursor chat context becomes noisy, open a fresh Cursor conversation and point it to the current handoff file, branch, and allowed file list.
+6. Codex does not operate Cursor through Computer Use for this repo. Codex prepares the handoff; the user runs Cursor Agent locally.
+7. Prefer Cursor Agent worktree mode for implementation: `cursor agent --workspace "$PWD" --worktree <task-name> --worktree-base development "Read .tmp/<task>-handoff.md and follow it exactly."`
+8. Only ask the user to run Cursor when it is materially useful. Codex must provide a "Cursor run request" with the reason, exact command, handoff path, expected `.tmp/*-cursor-result.md` path, and what the user should report back.
+9. Cursor implements from that handoff only when explicitly used or when it materially helps the workflow. Prefer one focused Cursor Agent for one focused change.
+10. Use Cursor multi-agent or multitask mode only when file ownership is non-overlapping and the handoff assigns each workstream clearly.
+11. Cursor leaves changes on disk and writes `.tmp/<task>-cursor-result.md` with the worktree path, changed files, commands run with exit status, key output lines, deviations from the handoff, and unresolved risks.
+12. After Cursor finishes, the user gives Codex the worktree path/branch and Cursor result note. Codex inspects `git status`, `git diff`, and the actual changed files before trusting any Cursor summary.
+13. Cursor runs the narrowest sufficient checks for the change, including `bun run check` when full confidence is needed, and captures the output in the result note.
+14. Codex reviews Cursor's test evidence plus `git status`, `git diff`, and the actual changed files before trusting any Cursor summary. Codex reruns tests directly only if Cursor cannot run them, evidence is incomplete, or the user asks.
+15. After Codex accepts the Cursor-assisted implementation and captures any needed evidence in the final response or durable docs, remove temporary `.tmp/*-handoff.md` and `.tmp/*-cursor-result.md` files before final cleanup.
+16. If Cursor chat context becomes noisy, open a fresh Cursor conversation and point it to the current handoff file, worktree path, branch, allowed file list, and latest `.tmp/*-cursor-result.md`.
 
 For this split, Codex remains the accountable gate. Cursor implementation is not done until Codex review and verification pass.
+
+Cursor run request format:
+
+```text
+Cursor is useful here because: <short reason>.
+
+Run from the repo root:
+<exact cursor agent command>
+
+Cursor should read: .tmp/<task>-handoff.md
+Cursor should write: .tmp/<task>-cursor-result.md
+
+Send back to Codex:
+- Worktree path and branch
+- The `.tmp/<task>-cursor-result.md` contents or path
+- Whether Cursor changed anything outside the allowed files
+```
 
 ### Engineering Skill Defaults
 
@@ -239,7 +260,7 @@ For new blog posts, technical docs, release notes, page copy, or article-series 
 | `agent-surface-maintenance` | Skills, rules, memory notes, Codex config, and repo-scoped MCP upkeep |
 | `qa-expert` | Pre-release regression gate |
 | `security-audit-expert` | Security audit (pre-release + on demand) |
-| `seo-metadata-check` | Quick single-page SEO review |
+| `seo-metadata-check` | Branded-query SEO, metadata, structured data, sitemap/robots, canonical, and Search Console follow-up review |
 | `ux-ui-auditor` | Visual + accessibility audit |
 
 Skill frontmatter must stay valid YAML. Use `description: >-` for long descriptions that contain colons, quotes, or branch names.
@@ -298,15 +319,23 @@ Repo MCP policy:
 - **Skill YAML descriptions**: A single-line frontmatter description containing `context:` or similar colon text can break skill loading. Use folded YAML blocks for long descriptions and validate all `SKILL.md` frontmatter after edits.
 - **Instruction-surface sync**: When workflow or agent rules change, update `AGENTS.md`, `CLAUDE.md`, `.cursor/rules/`, `.agents/skills/`, and `.codex/agents/` together so future sessions do not inherit stale rules.
 - **Repo-scoped MCP curation**: Prefer a small project-relevant set. Cloudflare is default for xhverse; Supabase is task-scoped; Notion stays out of this repo.
-- **Codex + Cursor split**: For hybrid work, Codex owns planning, review, QA/security gates, and evidence. Cursor implements from `.tmp/*-handoff.md`. Codex has standing approval to operate Cursor IDE for bounded xhverse handoffs, then must review the real diff before accepting the change.
+- **Codex + Cursor split**: For hybrid work, Codex owns planning, review, QA/security gates, and evidence. Cursor implements from `.tmp/*-handoff.md` after the user runs Cursor Agent locally, preferably in worktree mode. Cursor writes `.tmp/*-cursor-result.md`; Codex reviews the real diff, changed files, and command evidence before accepting the change.
+- **Cursor handoff cleanup**: Remove temporary `.tmp/*-handoff.md` and `.tmp/*-cursor-result.md` files after accepted Cursor work is summarized or recorded elsewhere.
 - **Implementation lane default**: Use `codex-spark` for bounded code implementation first. Escalate to the smarter Codex lane when Spark output is buggy, misses repo constraints, is not production-grade, or the task is high-risk/complex.
 - **Engineering skill defaults**: Use `debug-mantra` for debugging, `scrutinize` for plan/PR/diff review, and `post-mortem` only after a reproduced, root-caused, validated fix. Apply the same lens in Cursor handoffs when relevant.
+- **Branded SEO work**: Use `seo-metadata-check` for `bossruji`,
+  `Rujikorn Ngoensaard`, `xhverse`, and `xhverse co` search symptoms. Inspect
+  current page source or built HTML, keep `https://xhverse.co` canonical, keep
+  previews `noindex`, avoid keyword stuffing, and separate repo fixes from
+  external Search Console/profile actions.
 
 ## Key Constraints
 
 - Do not modify generated folders: `coverage/`, `dist/`, `playwright-report/`, `test-results/`, `.astro/`
 - Do not touch `supabase/` migrations unless explicitly asked
 - Preserve identity SEO signals for "Rujikorn Ngoensaard", "bossruji", "XH", "xhverse"
+- Do not promise a specific Google ranking or recrawl timeline; use Search
+  Console and live search results as evidence with clear uncertainty.
 - Keep `.node-version`, CI, and Cloudflare Pages runtime aligned (currently Node 22.16.0)
 - Keep `bun.lock` in sync — never bypass `--frozen-lockfile`
 - Supabase config lives in ONE place: `src/data/supabase-config.ts`

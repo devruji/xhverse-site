@@ -9,6 +9,10 @@ import {
   createSupabaseClientForBuild,
   loadPublishedPostsForBuild,
 } from "../../lib/blog/load-posts";
+import {
+  buildCollectionPageJsonLd,
+  getPersonId,
+} from "../../lib/seo/structured-data";
 
 const client = createSupabaseClientForBuild({
   SUPABASE_URL: import.meta.env.SUPABASE_URL,
@@ -16,29 +20,31 @@ const client = createSupabaseClientForBuild({
 });
 const sortedPosts = await loadPublishedPostsForBuild(client, staticFallback);
 const deploymentSite = (Astro.site ?? site.siteUrl).toString();
+const blogDescription =
+  "Essays from Rujikorn Ngoensaard, also known as XH and bossruji, on data platform architecture, governance, lakehouse operations, and analytics delivery.";
+const blogStructuredData = buildCollectionPageJsonLd({
+  baseUrl: deploymentSite,
+  path: "/blog",
+  name: `XHVERSE writing by ${profile.fullName}`,
+  alternateName: ["xhverse writing", "bossruji writing", "XH data architecture notes"],
+  description: blogDescription,
+  hasPart: sortedPosts.map((post) => ({
+    "@type": "BlogPosting",
+    headline: post.title,
+    datePublished: post.date,
+    url: new URL(`/blog/${post.slug}`, deploymentSite).toString(),
+    keywords: post.tags.join(", "),
+    description: post.excerpt,
+    author: { "@id": getPersonId(deploymentSite) },
+    image: new URL(site.ogImage, deploymentSite).toString(),
+  })),
+});
 ---
 
 <BaseLayout
-  title="Writing Hub"
-  description="Essays and notes published on xhverse.co, with optional links to Medium when a piece is syndicated."
-  structuredData={{
-    "@context": "https://schema.org",
-    "@type": "CollectionPage",
-    name: "XHVERSE Writing Hub",
-    url: new URL("/blog", deploymentSite).toString(),
-    description:
-      "Writing from XHVERSE: full articles on xhverse.co, with optional Medium links.",
-    hasPart: sortedPosts.map((post) => ({
-      "@type": "BlogPosting",
-      headline: post.title,
-      datePublished: post.date,
-      url: new URL(`/blog/${post.slug}`, deploymentSite).toString(),
-      keywords: post.tags.join(", "),
-      description: post.excerpt,
-      author: { "@type": "Person", "@id": `${deploymentSite}#person`, name: profile.fullName },
-      image: new URL(site.ogImage, deploymentSite).toString(),
-    })),
-  }}
+  title={`Writing by ${profile.fullName}`}
+  description={blogDescription}
+  structuredData={blogStructuredData}
 >
   <div class="min-h-screen bg-[var(--bg-page)] font-sans text-[var(--text)]">
   <Header current="/blog" />
@@ -46,10 +52,12 @@ const deploymentSite = (Astro.site ?? site.siteUrl).toString();
     <div class="mx-auto max-w-7xl px-5 py-14 sm:px-8 sm:py-20 lg:px-10">
       <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Writing hub</p>
       <h1 class="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl lg:text-5xl">
-        Notes, essays, and ongoing thoughts.
+        Writing by Rujikorn Ngoensaard
       </h1>
       <p class="mt-4 max-w-xl text-sm leading-7 text-zinc-400">
-        Full articles are published here on xhverse.co. When a piece is also on
+        Practical notes from XH / bossruji on data platform architecture,
+        governance, lakehouse operations, and analytics delivery. Full articles
+        are published here on xhverse.co. When a piece is also on
         <a href={site.medium} target="_blank" rel="noreferrer" class="text-link external-link">Medium</a>, a
         second link is shown for readers who prefer that surface.
       </p>

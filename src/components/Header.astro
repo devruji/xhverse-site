@@ -10,7 +10,9 @@ const defaultLinks: NavLink[] = [
   { href: "/", label: "Profile" },
   { href: "/about", label: "About" },
   { href: "/blog", label: "Writing" },
+  { href: "/tools", label: "Tools" },
   { href: "/cv", label: "CV" },
+  { href: "/services", label: "Advisory" },
   { href: "/gallery", label: "Gallery" },
   { href: "#contact", label: "Contact" },
 ];
@@ -26,7 +28,7 @@ const { current, links = defaultLinks } = Astro.props;
         XHVERSE
       </span>
     </a>
-    <nav class="hidden items-center gap-6 text-sm text-zinc-400 md:flex" aria-label="Primary navigation">
+    <nav class="hidden items-center gap-4 text-sm text-zinc-400 lg:gap-6 md:flex" aria-label="Primary navigation">
       {links.map((link) => (
         <a
           href={link.href}

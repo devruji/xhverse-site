@@ -5,31 +5,10 @@ import CvRequestModal from "../components/CvRequestModal.astro";
 import { cvHighlights } from "../data/cv";
 import { profile } from "../data/profile";
 import { site } from "../data/site";
+import { buildCvProfilePageJsonLd } from "../lib/seo/structured-data";
 
 const deploymentSite = (Astro.site ?? site.siteUrl).toString();
-const cvUrl = new URL("/cv", deploymentSite).toString();
-
-const cvStructuredData = {
-  "@context": "https://schema.org",
-  "@type": "ProfilePage",
-  "@id": `${cvUrl}#cv-page`,
-  name: `${profile.fullName} CV`,
-  alternateName: ["Rujikorn Ngoensaard resume", "bossruji CV", "XH CV"],
-  url: cvUrl,
-  description:
-    "Public CV and professional background for Rujikorn Ngoensaard, also known as XH and bossruji.",
-  about: {
-    "@type": "Person",
-    "@id": `${deploymentSite}#person`,
-    name: profile.fullName,
-    alternateName: profile.alternateNames,
-    additionalName: ["XH", "bossruji"],
-    url: deploymentSite,
-    jobTitle: profile.title,
-    email: profile.email,
-    sameAs: [site.github, site.medium, site.linkedin],
-  },
-};
+const cvStructuredData = buildCvProfilePageJsonLd(deploymentSite);
 ---
 
 <BaseLayout
@@ -51,6 +30,7 @@ const cvStructuredData = {
           <a href="/" class="transition hover:text-white">Home</a>
           <a href="/about" class="transition hover:text-white">About</a>
           <a href="/blog" class="transition hover:text-white">Writing</a>
+          <a href="/services" class="transition hover:text-white">Advisory</a>
           <a href="/cv" aria-current="page" class="text-white">CV</a>
           <a href="/#contact" class="transition hover:text-white">Contact</a>
         </nav>

@@ -20,7 +20,8 @@ Use this rule when changing repo instructions, skills, sub-agent cards, Codex co
 
 - Keep the Codex-managed/Cursor-implemented workflow synchronized in `AGENTS.md`, `CLAUDE.md`, `.cursor/rules/codex-cursor-handoff.mdc`, `.agents/skills/xhverse-dev/SKILL.md`, and relevant `.codex/agents/*.toml`.
 - Use `.tmp/*-handoff.md` as the shared instruction surface between Codex and Cursor.
-- Codex has standing approval to operate Cursor IDE for bounded xhverse handoffs when Cursor materially helps; ask again only for secrets, unrelated local folders, destructive actions, live production mutations, or scope outside this repo.
+- Codex does not operate Cursor through Computer Use for this repo; Codex prepares handoffs, the user runs Cursor Agent locally, and Cursor writes `.tmp/*-cursor-result.md` for review context.
+- Temporary Cursor handoff/result files should be removed after accepted implementation evidence is captured in the final response or durable docs.
 - Do not put this workflow into `.codex/config.toml`; that file remains runtime config only.
 - Keep implementation-lane defaults synchronized when they change: `codex-spark` first for bounded code implementation, with escalation to the smarter Codex lane when Spark is buggy, misses repo rules, is not production-grade, or the work is high-risk/complex.
 - Keep engineering skill defaults synchronized when they change: `debug-mantra` for debugging, `scrutinize` for reviews, and `post-mortem` for validated post-fix writeups.
