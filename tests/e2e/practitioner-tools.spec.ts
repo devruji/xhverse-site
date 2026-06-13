@@ -29,8 +29,10 @@ async function selectOperatedAnswerForEveryQuestion(page: Page): Promise<void> {
 test("tools catalog links to all live tools", async ({ page }) => {
   await page.goto("/tools");
 
-  await expect(page.getByRole("heading", { name: "Interactive tools" })).toBeVisible();
-  await expect(page.getByText("13 free tools for data platform teams")).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Data platform tools by Rujikorn Ngoensaard" }),
+  ).toBeVisible();
+  await expect(page.getByText("13 free tools from XH / bossruji")).toBeVisible();
 
   for (const tool of toolCatalog) {
     await expect(

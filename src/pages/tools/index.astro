@@ -2,6 +2,7 @@
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import Header from "../../components/Header.astro";
 import Footer from "../../components/Footer.astro";
+import { profile } from "../../data/profile";
 import { site } from "../../data/site";
 import { liveToolCount, toolCatalog } from "../../data/tools";
 
@@ -9,14 +10,19 @@ const deploymentSite = (Astro.site ?? site.siteUrl).toString();
 ---
 
 <BaseLayout
-  title="Tools"
-  description="Interactive tools for data platform architecture, governance assessment, and analytics maturity by Rujikorn Ngoensaard."
+  title={`Data Platform Tools by ${profile.fullName}`}
+  description="Free data platform tools by Rujikorn Ngoensaard, also known as XH and bossruji, for architecture decisions, governance checks, SQL practice, and lakehouse planning."
   structuredData={{
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    name: "XHVERSE Tools",
+    name: `XHVERSE tools by ${profile.fullName}`,
+    alternateName: ["xhverse tools", "bossruji data tools", "XH data platform tools"],
     url: new URL("/tools", deploymentSite).toString(),
-    description: "Interactive tools for data platform architecture and governance assessment.",
+    description:
+      "Free data platform tools by Rujikorn Ngoensaard, also known as XH and bossruji, for architecture decisions, governance checks, SQL practice, and lakehouse planning.",
+    creator: { "@type": "Person", "@id": `${deploymentSite}#person`, name: profile.fullName },
+    publisher: { "@type": "Person", "@id": `${deploymentSite}#person`, name: profile.fullName },
+    isPartOf: { "@type": "WebSite", "@id": `${deploymentSite}#website`, name: site.title },
   }}
 >
   <div class="min-h-screen bg-[var(--bg-page)] font-sans text-[var(--text)]">
@@ -25,10 +31,12 @@ const deploymentSite = (Astro.site ?? site.siteUrl).toString();
     <div class="mx-auto max-w-7xl px-5 py-14 sm:px-8 sm:py-20 lg:px-10">
       <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Toolbox</p>
       <h1 class="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl lg:text-5xl">
-        Interactive tools
+        Data platform tools by Rujikorn Ngoensaard
       </h1>
       <p class="mt-4 max-w-xl text-sm leading-7 text-zinc-400">
-        {liveToolCount} free tools for data platform teams — assessments, challenges, calculators, visualizers, and practical learning labs. Fast, anonymous, and useful without context.
+        {liveToolCount} free tools from XH / bossruji for data platform teams —
+        assessments, challenges, calculators, visualizers, and practical
+        learning labs. Fast, anonymous, and useful without context.
       </p>
 
       <div class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
