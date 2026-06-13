@@ -26,6 +26,8 @@ export type PostRow = {
 
 export const COVER_IMAGE_PATH_PATTERN =
   /^posts\/[a-z0-9]+(?:-[a-z0-9]+)*\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\.(webp|avif|jpg|jpeg|png)$/;
+export const STATIC_COVER_IMAGE_PATH_PATTERN =
+  /^\/images\/[a-z0-9][a-z0-9._/-]*\.(webp|avif|jpg|jpeg|png)$/;
 
 type SupabaseUrlEnv = {
   PUBLIC_SUPABASE_URL?: string;
@@ -100,7 +102,10 @@ export function resolveRelatedToolCtas(value: unknown): RelatedToolCta[] | undef
 }
 
 export function isValidCoverImagePath(value: string): boolean {
-  return COVER_IMAGE_PATH_PATTERN.test(value);
+  return (
+    COVER_IMAGE_PATH_PATTERN.test(value) ||
+    STATIC_COVER_IMAGE_PATH_PATTERN.test(value)
+  );
 }
 
 export function optionalValidCoverImagePath(value: unknown): string | null {
@@ -113,8 +118,10 @@ export function deriveCoverImageUrl(
   pathValue: unknown,
   env: SupabaseUrlEnv = {},
 ): string | undefined {
-  const path = optionalValidCoverImagePath(pathValue);
+  const path = optionalString(pathValue);
   if (!path) return undefined;
+  if (STATIC_COVER_IMAGE_PATH_PATTERN.test(path)) return path;
+  if (!COVER_IMAGE_PATH_PATTERN.test(path)) return undefined;
   return blogCoverPublicUrl(path, env);
 }
 

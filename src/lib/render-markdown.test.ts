@@ -86,6 +86,15 @@ describe("renderMarkdownToHtml", () => {
     expect(html).toContain('decoding="async"');
   });
 
+  it("wraps markdown tables in a scrollable region for narrow screens", () => {
+    const html = renderMarkdownToHtml("| Layer | Why it matters |\n| --- | --- |\n| Log | Snapshot isolation |");
+    expect(html).toContain(
+      '<div class="article-table-scroll" role="region" tabindex="0"><table>',
+    );
+    expect(html).toContain("<th>Layer</th>");
+    expect(html).toContain("<td>Snapshot isolation</td>");
+  });
+
   it("renders typed callouts with sanitized classes", () => {
     const html = renderMarkdownToHtml([
       "> [!decision]",

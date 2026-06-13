@@ -184,6 +184,16 @@ describe("mapPostRowToBlogPost", () => {
     expect(post.coverImageAlt).toBeUndefined();
   });
 
+  it("keeps same-origin static cover image paths for generated hotfix covers", () => {
+    const post = mapPostRowToBlogPost({
+      ...valid,
+      cover_image_path: "/images/blog-delta-lake-transaction-log-cover.png",
+      cover_image_alt: "Generated cover",
+    });
+    expect(post.coverImageUrl).toBe("/images/blog-delta-lake-transaction-log-cover.png");
+    expect(post.coverImageAlt).toBe("Generated cover");
+  });
+
   it("omits blank cover image alt text even when the cover path is valid", () => {
     const post = mapPostRowToBlogPost({
       ...valid,
@@ -210,6 +220,7 @@ describe("cover image path helpers", () => {
 
   it("validates Storage object keys", () => {
     expect(isValidCoverImagePath(validPath)).toBe(true);
+    expect(isValidCoverImagePath("/images/blog-delta-lake-transaction-log-cover.png")).toBe(true);
     expect(isValidCoverImagePath("/posts/my-post/id.jpg")).toBe(false);
     expect(isValidCoverImagePath("posts/my_post/11111111-1111-4111-8111-111111111111.jpg")).toBe(false);
     expect(isValidCoverImagePath("https://cdn.example.com/cover.jpg")).toBe(false);
@@ -217,6 +228,9 @@ describe("cover image path helpers", () => {
 
   it("returns null for invalid optional cover paths", () => {
     expect(optionalValidCoverImagePath(validPath)).toBe(validPath);
+    expect(optionalValidCoverImagePath("/images/blog-delta-lake-transaction-log-cover.png")).toBe(
+      "/images/blog-delta-lake-transaction-log-cover.png",
+    );
     expect(optionalValidCoverImagePath("")).toBeNull();
     expect(optionalValidCoverImagePath("https://example.com/x.jpg")).toBeNull();
   });
@@ -230,6 +244,9 @@ describe("cover image path helpers", () => {
       `https://abc.supabase.co/storage/v1/object/public/blog-covers/${validPath}`,
     );
     expect(deriveCoverImageUrl("https://example.com/x.jpg")).toBeUndefined();
+    expect(deriveCoverImageUrl("/images/blog-delta-lake-transaction-log-cover.png")).toBe(
+      "/images/blog-delta-lake-transaction-log-cover.png",
+    );
   });
 });
 
