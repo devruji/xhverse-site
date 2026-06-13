@@ -107,6 +107,10 @@ The five practitioner assessment tools share `src/lib/practitioner-tools/` and a
 - **technical-writer**: Use the repo-local `technical_writer` sub-agent when starting, outlining, drafting, or reviewing public content: blog posts, technical docs, release notes, page copy, article metadata, references, or related-tool CTAs.
 - Pair `technical_writer` with `blog-content-strategy` and `document-writer` for xhverse blog work. Use it before body drafting and again for pre-publish review.
 - For content strategy, use `product-manager` first to choose the topic and `technical_writer` next to sharpen reader goal, thesis, outline, references, SEO metadata, disclosure, and CTA fit.
+- Generated blog covers should match the existing xhverse cover series: dark
+  isometric data-architecture visuals, glass panels, teal glow, restrained
+  amber accents, abstract platform objects, and no people/logos/screenshots or
+  readable text unless explicitly requested.
 - **seo-metadata-check**: Use for branded-query SEO work, metadata review,
   canonical/robots/sitemap checks, structured data, and Search Console follow-up
   planning. Preserve `Rujikorn Ngoensaard`, `bossruji`, `XH`, and `xhverse`
