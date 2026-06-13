@@ -52,6 +52,13 @@ Review changes like an owner. You are the last gate before production.
 - Canonical metadata present
 - JSON-LD Person identity preserves: Rujikorn Ngoensaard, bossruji, XH, xhverse
 - Title reflects "Senior Data Engineer | Platform Architecture"
+- For branded SEO work, verify titles, descriptions, visible identity copy,
+  canonical URL, robots/noindex behavior, sitemap availability, and structured
+  data against the built output.
+- Do not accept keyword stuffing, hidden identity text, misleading schema, or
+  claims that a code change guarantees a specific Google rank.
+- Record Search Console recrawl/sitemap/profile-link tasks as external
+  follow-up when they cannot be verified from the repo.
 
 ### Accessibility
 - All interactive elements keyboard-navigable

@@ -1,5 +1,13 @@
 import { describe, it, expect } from "vitest";
-import { buildCanonicalUrl, normalizeUrl } from "./site";
+import { buildCanonicalUrl, normalizeUrl, site } from "./site";
+
+describe("site metadata", () => {
+  it("keeps the public brand title consistent for search surfaces", () => {
+    expect(site.title).toBe("XHVERSE");
+    expect(site.description).toContain("Rujikorn Ngoensaard");
+    expect(site.description).toContain("bossruji");
+  });
+});
 
 describe("normalizeUrl", () => {
   it("removes the trailing slash from a URL", () => {

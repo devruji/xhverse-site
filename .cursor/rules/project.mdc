@@ -15,6 +15,19 @@ Follow `AGENTS.md` and `CLAUDE.md` as primary sources of truth.
 - Preserve SEO: "Rujikorn Ngoensaard", "bossruji", "XH", "xhverse"
 - Current employer: Central Pattana (Oct 2024–Present) — named publicly
 
+## Branded SEO
+- Use `.agents/skills/seo-metadata-check/SKILL.md` for branded-query SEO work
+  involving `bossruji`, `Rujikorn Ngoensaard`, `xhverse`, or `xhverse co`.
+- Treat Google ranking and snippets as delayed external evidence, not something
+  a repo diff can guarantee.
+- Inspect current source or built HTML before changing SEO surfaces.
+- Keep `https://xhverse.co` as the production canonical and keep preview builds
+  `noindex`.
+- Improve visible identity copy, titles, descriptions, structured data,
+  sitemap/robots signals, and internal links without keyword stuffing.
+- List Search Console recrawl/sitemap submission and off-site profile-link
+  updates as user follow-up when they cannot be done from the repo.
+
 ## Architecture
 - **27 Astro route files**; current release build generates 38 static HTML pages (Astro 6, static output only, no SSR)
 - **13 interactive tools** (all client-side compute, no external deps)

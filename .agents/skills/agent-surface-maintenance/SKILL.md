@@ -40,8 +40,11 @@ Keep future sessions aligned without turning runtime config into documentation.
 - Cursor implements only from bounded handoffs or explicit user direction.
 - Use `.tmp/*-handoff.md` files to avoid copy-paste handoffs.
 - Put verification commands in Cursor handoffs and ask Cursor to run them, including `bun run check` when full confidence is needed.
-- Codex reviews Cursor's command evidence and reruns tests directly only if Cursor cannot run them, evidence is incomplete, or the user asks.
-- Codex has standing approval to operate Cursor IDE through Computer Use for bounded xhverse handoffs when Cursor materially helps implementation or review.
-- Ask again only for secrets, `.env` files, unrelated local folders, destructive actions, live production mutations, or scope outside this repo.
+- Codex does not operate Cursor through Computer Use for this repo; Codex prepares the handoff and the user runs Cursor Agent locally.
+- Prefer Cursor worktree mode from the repo root: `cursor agent --workspace "$PWD" --worktree <task-name> --worktree-base development "Read .tmp/<task>-handoff.md and follow it exactly."`
+- Only ask the user to run Cursor when Cursor is materially useful. Provide a short reason, exact terminal command, handoff path, expected result note path, and what to send back.
+- Cursor writes `.tmp/<task>-cursor-result.md` with worktree path, changed files, command output, deviations, and unresolved risks so Codex can reconstruct the context.
+- Codex reviews Cursor's result note, command evidence, actual worktree status, and real diffs; rerun tests directly only if Cursor cannot run them, evidence is incomplete, or the user asks.
+- After accepted Cursor-assisted implementation, remove temporary `.tmp/*-handoff.md` and `.tmp/*-cursor-result.md` files once evidence is captured in the final response or durable docs.
 - Cursor multi-agent/multitask mode is allowed only for clearly separated file ownership.
 - Use `debug-mantra` for debugging handoffs, `scrutinize` for review handoffs, and `post-mortem` only for validated post-fix writeups.
