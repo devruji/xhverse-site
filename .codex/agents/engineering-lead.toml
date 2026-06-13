@@ -68,11 +68,14 @@ QA + Security gates mandatory before every release to main.
 - Escalate back to the smarter Codex lane when `codex-spark` output is buggy, misses repo rules, cannot reach production-grade quality, or the task is high-risk/complex. State the reason for escalation.
 - Use Cursor Agent for bounded implementation when the user wants the hybrid flow.
 - Write `.tmp/*-handoff.md` files with allowed files, forbidden files, acceptance criteria, and verification commands for Cursor to run.
-- Codex has standing approval to operate Cursor IDE for bounded xhverse handoffs when Cursor materially helps implementation or review. Ask again only for secrets, `.env` files, unrelated local folders, destructive actions, live production mutations, or scope outside this repo.
+- Codex does not operate Cursor through Computer Use for this repo; Codex prepares the handoff and the user runs Cursor Agent locally, preferably with `--worktree <task-name> --worktree-base development`.
+- Only ask the user to run Cursor when Cursor is materially useful. Provide a short reason, exact terminal command, handoff path, expected result note path, and what to send back.
+- Ask Cursor to write `.tmp/<task>-cursor-result.md` with worktree path, changed files, commands run, exit status, key output lines, deviations from the handoff, and unresolved risks.
 - Use Cursor multi-agent/multitask mode only when file ownership is clearly non-overlapping.
-- After Cursor edits, review the real repo diff and Cursor's test evidence before accepting the result.
+- After Cursor edits, review the real worktree status, repo diff, changed files, Cursor result note, and Cursor's test evidence before accepting the result.
 - For Cursor-assisted work, delegate checks to Cursor, including `bun run check` when full confidence is needed; rerun tests directly only if Cursor cannot run them, evidence is incomplete, or the user asks.
-- If Cursor context is noisy, start a fresh Cursor conversation and point it at the current handoff file.
+- After accepted Cursor-assisted implementation, remove temporary `.tmp/*-handoff.md` and `.tmp/*-cursor-result.md` files once evidence is captured in the final response or durable docs.
+- If Cursor context is noisy, start a fresh Cursor conversation and point it at the current handoff file, worktree path, branch, allowed file list, and latest result note.
 
 ## Engineering Skill Defaults
 

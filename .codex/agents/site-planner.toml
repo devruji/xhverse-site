@@ -48,6 +48,10 @@ Each tool needs:
 - Codex + Cursor handoff: create `.tmp/<task>-handoff.md` with allowed files, forbidden files, acceptance criteria, and verification commands for Cursor to run; include `bun run check` when full confidence is needed; use Cursor multi-agent/multitask only for non-overlapping file ownership
 - Code implementation lane: default bounded implementation to `codex-spark`; escalate to the smarter Codex lane if Spark output is buggy, misses repo rules, cannot reach production-grade quality, or the task is high-risk/complex
 - Engineering skill defaults: use `debug-mantra` for debugging plans, `scrutinize` for plan/code-change sanity checks, and `post-mortem` only after validated fixes
+- Branded SEO plan: use `seo-metadata-check`; inspect built/source output for
+  titles, descriptions, visible identity copy, canonical URLs, robots/noindex,
+  sitemap, JSON-LD, and internal links; separate repo implementation from
+  Search Console or off-site profile follow-up
 
 ## Rules
 - Do not edit code — plan only

@@ -85,12 +85,15 @@ The five practitioner assessment tools share `src/lib/practitioner-tools/` and a
 - **Default split**: Codex owns planning, scope control, review, QA, security gate, and release evidence. Cursor owns bounded implementation when explicitly used.
 - **Implementation lane**: Default code implementation to `codex-spark` for bounded build/edit work. Codex still owns the plan, review, QA evidence, and final acceptance.
 - **Escalation**: If `codex-spark` produces too many bugs, misses repo rules, cannot reach production-grade quality, or the task is high-risk/complex, switch back to the smarter Codex lane for implementation and say why.
-- **Handoff surface**: Use repo files, usually `.tmp/*-handoff.md`, as the shared instruction channel. Include allowed files, forbidden files, acceptance criteria, and verification commands for Cursor to run.
-- **Cursor Agent use**: The user has granted standing approval for Codex to operate Cursor IDE through Computer Use and submit bounded xhverse handoffs to Cursor Agent when it materially helps implementation. Ask again only if the handoff includes secrets, `.env` files, unrelated local folders, destructive actions, live production mutations, or scope outside this repo.
+- **Handoff surface**: Use repo files, usually `.tmp/*-handoff.md`, as the shared instruction channel. Include allowed files, forbidden files, acceptance criteria, verification commands for Cursor to run, and a `.tmp/*-cursor-result.md` result note for Cursor to write back.
+- **Cursor Agent use**: Codex does not operate Cursor through Computer Use for this repo. Codex prepares the handoff; the user runs Cursor Agent locally, preferably with `--worktree <task-name> --worktree-base development`, then returns the worktree path/branch and Cursor's result note for Codex review.
+- **Cursor run request**: Only ask the user to run Cursor when it is materially useful. Provide a short reason, the exact terminal command, the handoff path, the expected result note path, and what to send back to Codex.
 - **Mode choice**: Use Cursor normal agent for one focused implementation. Use Cursor multi-agent/multitask mode only when the work can be split into non-overlapping file ownership.
-- **Review gate**: After Cursor edits, Codex must inspect `git status`, `git diff`, and Cursor's test evidence. For Cursor-assisted work, ask Cursor to run the relevant checks, including `bun run check` when full confidence is needed; Codex reruns tests directly only if Cursor cannot run them, evidence is incomplete, or the user asks.
+- **Result handback**: Cursor should leave all changes on disk and write `.tmp/<task>-cursor-result.md` with worktree path, changed files, commands run with exit status, key output lines, deviations from the handoff, and unresolved risks.
+- **Review gate**: After Cursor edits, Codex must inspect the actual worktree with `git status`, `git diff`, changed files, and Cursor's result/test evidence. For Cursor-assisted work, ask Cursor to run the relevant checks, including `bun run check` when full confidence is needed; Codex reruns tests directly only if Cursor cannot run them, evidence is incomplete, or the user asks.
+- **Handoff cleanup**: After Cursor-assisted implementation is accepted and any needed evidence has been captured in the final response or durable docs, remove the temporary `.tmp/*-handoff.md` and `.tmp/*-cursor-result.md` files before final cleanup.
 - **Edit discipline**: One tool edits a file at a time. If Cursor is implementing, Codex stays review/QA-only unless explicitly asked to patch findings.
-- **Chat hygiene**: If the Cursor chat gets long or confused, start a new Cursor conversation and point it at the current handoff file and branch state.
+- **Chat hygiene**: If the Cursor chat gets long or confused, start a new Cursor conversation and point it at the current handoff file, worktree path, branch state, allowed file list, and latest `.tmp/*-cursor-result.md`.
 
 ## Engineering Skill Defaults
 
@@ -104,6 +107,10 @@ The five practitioner assessment tools share `src/lib/practitioner-tools/` and a
 - **technical-writer**: Use the repo-local `technical_writer` sub-agent when starting, outlining, drafting, or reviewing public content: blog posts, technical docs, release notes, page copy, article metadata, references, or related-tool CTAs.
 - Pair `technical_writer` with `blog-content-strategy` and `document-writer` for xhverse blog work. Use it before body drafting and again for pre-publish review.
 - For content strategy, use `product-manager` first to choose the topic and `technical_writer` next to sharpen reader goal, thesis, outline, references, SEO metadata, disclosure, and CTA fit.
+- **seo-metadata-check**: Use for branded-query SEO work, metadata review,
+  canonical/robots/sitemap checks, structured data, and Search Console follow-up
+  planning. Preserve `Rujikorn Ngoensaard`, `bossruji`, `XH`, and `xhverse`
+  without keyword stuffing or ranking promises.
 
 ## Branch & Release Rules
 
@@ -123,6 +130,10 @@ The five practitioner assessment tools share `src/lib/practitioner-tools/` and a
 - No external runtime dependencies for tools (all client-side compute)
 - Site must build without Supabase env vars (graceful degradation)
 - Preserve SEO signals: "Rujikorn Ngoensaard", "bossruji", "XH", "xhverse"
+- Branded search improvements must be evidence-backed: inspect current page
+  source or built HTML, keep production canonical URLs on `https://xhverse.co`,
+  keep preview deployments `noindex`, and list external Search Console/profile
+  actions separately from repo changes.
 
 ## Agent Responsibilities
 

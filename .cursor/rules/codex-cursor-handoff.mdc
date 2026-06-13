@@ -22,14 +22,19 @@ globs: ["**"]
   - acceptance criteria
   - implementation constraints
   - review plan and verification commands Cursor must run
+  - result note path, usually `.tmp/<task>-cursor-result.md`
 - Cursor must stay inside the allowed files unless it stops and explains why more scope is required.
 
 ## Cursor Agent Mode
 
+- Codex prepares the handoff; the user runs Cursor Agent locally.
+- Only ask the user to run Cursor when Cursor is materially useful. Provide a short reason, exact command, handoff path, expected result note path, and what to report back.
+- Prefer Cursor worktree mode for implementation:
+  - `cursor agent --workspace "$PWD" --worktree <task-name> --worktree-base development "Read .tmp/<task>-handoff.md and follow it exactly."`
 - Use one Cursor Agent for a focused file or component cleanup.
 - Use Cursor multi-agent or multitask mode only when each workstream has non-overlapping file ownership.
 - If multiple Cursor agents are used, assign each agent a bounded task, allowed file list, and expected output.
-- If the chat context gets long, open a fresh Cursor conversation and point it at the current handoff file.
+- If the chat context gets long, open a fresh Cursor conversation and point it at the current handoff file, worktree path, branch, allowed file list, and latest result note.
 
 ## Engineering Skill Lenses
 
@@ -38,17 +43,40 @@ globs: ["**"]
 - Use `post-mortem` only after a bug has a reliable repro, confirmed cause, implemented fix, and validation evidence.
 - If the handoff names one of these skills, treat that lens as part of the acceptance criteria.
 
-## Computer Use Safety
+## Result Handback
 
-- Codex has standing approval to operate Cursor IDE with Computer Use for bounded xhverse handoffs when Cursor materially helps implementation or review.
-- Ask again only for secrets, `.env` files, unrelated local folders, destructive actions, live production mutations, or scope outside this repo.
-- Reason: sending a prompt to Cursor Agent can transmit repo content to Cursor, and this approval is intentionally limited to xhverse-scoped handoffs.
+- Codex does not operate Cursor through Computer Use for this repo.
+- Cursor must leave changes on disk in the repo/worktree that Codex will review.
+- Cursor must write `.tmp/<task>-cursor-result.md` with:
+  - worktree path and branch
+  - changed files
+  - commands run, exit status, and key output lines
+  - deviations from the handoff
+  - unresolved risks or follow-up needs
 - Do not ask Cursor Agent to read secrets, `.env` files, credentials, private keys, or unrelated local folders.
+
+When Codex needs the user to run Cursor, use this handoff message shape:
+
+```text
+Cursor is useful here because: <short reason>.
+
+Run from the repo root:
+<exact cursor agent command>
+
+Cursor should read: .tmp/<task>-handoff.md
+Cursor should write: .tmp/<task>-cursor-result.md
+
+Send back to Codex:
+- Worktree path and branch
+- The `.tmp/<task>-cursor-result.md` contents or path
+- Whether Cursor changed anything outside the allowed files
+```
 
 ## Review Gate
 
 After Cursor edits:
 
+- Start from the worktree path/branch and result note returned by the user.
 - Run `git status --short --branch`.
 - Inspect `git diff --stat`.
 - Inspect diffs for all changed files, not only files Cursor reports.
@@ -61,6 +89,7 @@ After Cursor edits:
 - Use `bun run check` when full confidence is needed or the handoff asks for the full gate.
 - Codex reruns tests directly only if Cursor cannot run them, evidence is incomplete, or the user asks.
 - Report only checks that actually ran and who ran them.
+- After Codex accepts the implementation and captures any needed evidence in the final response or durable docs, remove temporary `.tmp/*-handoff.md` and `.tmp/*-cursor-result.md` files before final cleanup.
 
 ## Edit Discipline
 

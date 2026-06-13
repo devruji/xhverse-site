@@ -51,6 +51,9 @@ Single test file: `bunx vitest run src/data/blog.test.ts`
 - `src/data/seo.js` resolves site URL: `PUBLIC_SITE_URL` > `CF_PAGES_URL` > `https://xhverse.co`
 - Preview deploys get `noindex` automatically via `shouldNoIndexDeployment()`
 - `BaseLayout.astro` handles canonical URLs, OG/Twitter cards, CSP headers, structured data slots
+- Use `seo-metadata-check` for branded search work involving `bossruji`,
+  `Rujikorn Ngoensaard`, `xhverse`, or `xhverse co`; verify current page
+  source/built HTML first, then plan repo changes and Search Console follow-up.
 
 ### Testing Strategy
 - **Unit tests**: Co-located as `*.test.ts` next to source in `src/data/` and `src/lib/`
@@ -90,12 +93,15 @@ Single test file: `bunx vitest run src/data/blog.test.ts`
 - Escalate back to the smarter Codex lane when `codex-spark` produces too many bugs, misses repo constraints, cannot reach production-grade quality, or the task is high-risk/complex. State the reason for escalation.
 - Cursor can implement bounded changes from a Codex-authored `.tmp/*-handoff.md` file.
 - Handoff files must list allowed files, forbidden files, acceptance criteria, and verification commands for Cursor to run.
-- Codex has standing approval to operate Cursor IDE through Computer Use for bounded xhverse handoffs when Cursor materially helps implementation or review.
-- Ask again only for secrets, `.env` files, unrelated local folders, destructive actions, live production mutations, or scope outside this repo.
+- Codex does not operate Cursor through Computer Use for this repo; Codex prepares the handoff and the user runs Cursor Agent locally.
+- Prefer Cursor worktree mode from the repo root: `cursor agent --workspace "$PWD" --worktree <task-name> --worktree-base development "Read .tmp/<task>-handoff.md and follow it exactly."`
+- Only ask the user to run Cursor when Cursor is materially useful. Provide a short reason, exact terminal command, handoff path, expected result note path, and what to send back.
+- Cursor should write `.tmp/<task>-cursor-result.md` with worktree path, changed files, commands run, exit status, key output lines, deviations from the handoff, and unresolved risks.
 - Use Cursor multi-agent/multitask mode only for non-overlapping file ownership.
-- After Cursor edits, review the actual `git diff` and Cursor's test evidence before accepting any summary.
+- After Cursor edits, review the actual worktree `git status`, `git diff`, changed files, Cursor result note, and Cursor's test evidence before accepting any summary.
 - For Cursor-assisted work, ask Cursor to run the relevant checks, including `bun run check` when full confidence is needed; Codex reruns tests directly only if Cursor cannot run them, evidence is incomplete, or the user asks.
-- If Cursor chat context gets noisy, open a fresh Cursor conversation and point it at the current handoff file.
+- After accepted Cursor-assisted implementation, remove temporary `.tmp/*-handoff.md` and `.tmp/*-cursor-result.md` files once evidence is captured in the final response or durable docs.
+- If Cursor chat context gets noisy, open a fresh Cursor conversation and point it at the current handoff file, worktree path, branch, allowed file list, and latest result note.
 
 ## Engineering Skill Defaults
 
@@ -115,6 +121,10 @@ Single test file: `bunx vitest run src/data/blog.test.ts`
 - Do not modify generated folders: `coverage/`, `dist/`, `playwright-report/`, `test-results/`, `.astro/`
 - Do not touch Supabase code/migrations unless explicitly asked
 - Preserve identity SEO signals: "Rujikorn Ngoensaard", "bossruji", "XH", "xhverse"
+- For SEO ranking symptoms, do not promise a specific Google position or timing.
+  Improve titles, descriptions, visible identity copy, canonical links,
+  sitemap/robots signals, structured data, and internal links, then recommend
+  Search Console recrawl/sitemap actions where needed.
 - Keep `.node-version`, CI workflow, and Cloudflare Pages runtime aligned
 - Keep `bun.lock` in sync — never bypass `--frozen-lockfile`
 - CSP headers enforced in production via `<meta>` in BaseLayout — update if adding external resources
