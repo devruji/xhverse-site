@@ -13,3 +13,12 @@ database_name = "xhverse_blog_analytics"
 database_id = "<production-d1-database-id>"
 preview_database_id = "<preview-d1-database-id>"
 
+[vars]
+# Example only. Store real hook/token values as Pages secrets/env vars, not in git.
+BLOG_REBUILD_HOOK_URL = "https://<cloudflare-pages-deploy-hook-url>"
+CLOUDFLARE_ACCOUNT_ID = "<cloudflare-account-id>"
+CLOUDFLARE_PAGES_PROJECT_NAME = "xhverse-site-git"
+CLOUDFLARE_PAGES_REBUILD_BRANCH = "main"
+
+# Store as a secret_text Pages env var, not plain text.
+# Required name: CLOUDFLARE_API_TOKEN

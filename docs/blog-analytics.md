@@ -13,6 +13,10 @@ The implementation does not store IP addresses, raw user agents, cookies, or
 fingerprint hashes. Counts are directional editorial signals, not verified
 unique readers.
 
+The manifest is generated from the same build-time blog source as the public
+pages. In production, that source is Supabase `posts`; local fallback blog data
+is used only when Supabase build credentials are absent.
+
 ## Runtime surfaces
 
 | Surface | Purpose |

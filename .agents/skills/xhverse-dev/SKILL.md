@@ -12,7 +12,7 @@ This skill provides the full context for working productively in xhverse-site �
 - **Framework**: Astro 6, static output
 - **Styling**: Tailwind CSS v4 via `@tailwindcss/vite` plugin
 - **Runtime**: Bun (package manager + scripts), Node 22.16.0 (pinned in `.node-version`)
-- **Data**: Static TypeScript modules in `src/data/` with optional Supabase overlay for blog posts at build time and selected runtime submissions
+- **Data**: Static TypeScript modules in `src/data/`; Supabase `posts` is the blog source of truth when build credentials are configured
 - **Deploy**: Cloudflare Pages via Git integration (no manual deploys)
 
 ## Commands
@@ -42,10 +42,10 @@ Single test file: `bunx vitest run src/data/blog.test.ts`
 ## Architecture Decisions
 
 ### Data Layer
-- `src/data/` contains static typed data (blog posts, gallery items, CV info, site config)
-- `src/lib/blog/` handles Supabase → static merge at build time
-- When `SUPABASE_URL` + `SUPABASE_SECRET_KEY` env vars are set, posts come from Supabase `posts` table with static fallback
-- Without those vars, uses `src/data/blog.ts` directly
+- `src/data/` contains static typed data (gallery items, CV info, site config, and blog fallback/seed data)
+- `src/lib/blog/` handles Supabase → static publishing at build time
+- When `SUPABASE_URL` + `PUBLIC_SUPABASE_PUBLISHABLE_KEY` env vars are set, published posts come only from Supabase `posts`; `SUPABASE_SECRET_KEY` is a legacy fallback and stale local fallback posts must not leak into public builds
+- Without those vars, local builds use `src/data/blog.ts` directly
 
 ### SEO System
 - `src/data/seo.js` resolves site URL: `PUBLIC_SITE_URL` > `CF_PAGES_URL` > `https://xhverse.co`
@@ -115,6 +115,7 @@ Single test file: `bunx vitest run src/data/blog.test.ts`
 - Use the repo-local `technical_writer` sub-agent when starting, outlining, drafting, or reviewing public content: blog posts, technical docs, release notes, page copy, article metadata, references, and related-tool CTAs.
 - For blog work, pair `technical_writer` with `blog-content-strategy` and `document-writer`. Use it before body drafting and again for pre-publish content QA.
 - Use `product-manager` before `technical_writer` when the task still needs topic selection, positioning, or business rationale.
+- For normal "make/write a blog post" requests, deliver a Supabase Blog Writer-ready package instead of editing `src/data/blog.ts`; only implement code when the user explicitly asks for code changes.
 - Generated blog covers should stay in the established xhverse cover series:
   dark isometric data-architecture visuals, glass panels, teal glow, restrained
   amber accents, abstract platform objects, no people/logos/screenshots/readable

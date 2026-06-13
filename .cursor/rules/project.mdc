@@ -1,9 +1,9 @@
 ---
-description: Project-wide rule for xhverse site (v3.9.1)
+description: Project-wide rule for xhverse site (v3.9.4)
 alwaysApply: true
 ---
 
-# xhverse-site v3.9.1
+# xhverse-site v3.9.4
 
 Follow `AGENTS.md` and `CLAUDE.md` as primary sources of truth.
 
@@ -29,9 +29,9 @@ Follow `AGENTS.md` and `CLAUDE.md` as primary sources of truth.
   updates as user follow-up when they cannot be done from the repo.
 
 ## Architecture
-- **27 Astro route files**; current release build generates 38 static HTML pages (Astro 6, static output only, no SSR)
+- **27 Astro route files**; current release build generates 39 static HTML pages (Astro 6, static output only, no SSR)
 - **13 interactive tools** (all client-side compute, no external deps)
-- **14 src/lib domain folders** with 522 unit tests at 100% coverage
+- **14 src/lib domain folders** with 542 unit tests at 100% coverage
 - **Admin panel** behind Cloudflare Access (Zero Trust)
 - **CV** gated via email capture + admin review + Resend delivery
 - **CSP** dual-layer: `scripts/generate-headers.ts` + `BaseLayout.astro` meta tag
@@ -81,6 +81,7 @@ src/lib/practitioner-tools/ + src/pages/tools/[slug].astro ← shared guided pra
 - Use the repo-local `technical_writer` sub-agent lens when starting, outlining, drafting, or reviewing public content: blog posts, technical docs, release notes, page copy, metadata, references, and related-tool CTAs.
 - For blog work, pair `technical_writer` with `blog-content-strategy` and `document-writer`; use `product-manager` first when topic selection or business rationale is still open.
 - Writer output must preserve xhverse voice: practical, peer-facing, source-backed, no vendor hype, no invented private client claims.
+- Blog content publishing uses Supabase as the editorial source of truth. Normal blog-post requests should produce a Blog Writer-ready content package, not a `src/data/blog.ts` implementation, unless the user explicitly asks for code edits.
 - Generated blog covers should match the existing xhverse dark isometric data-architecture series unless the user explicitly asks for another style.
 
 ## Git Workflow
@@ -97,8 +98,8 @@ bun run check        # Full pipeline (typecheck + build + coverage + e2e)
 bun run dev          # Dev server at localhost:4321
 bun run typecheck    # Type checks (0 errors required)
 bun run coverage     # Tests + 100% enforcement
-bun run test:e2e     # Playwright (50 checks, chromium + mobile)
-bun run build        # Production build (38 generated pages in the current release)
+bun run test:e2e     # Playwright (62 checks, chromium + mobile)
+bun run build        # Production build (39 generated pages in the current release)
 ```
 
 ## Implementation Rules

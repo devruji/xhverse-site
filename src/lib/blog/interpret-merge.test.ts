@@ -2,25 +2,28 @@ import { describe, it, expect } from "vitest";
 import { posts } from "../../data/blog";
 import {
   interpretSupabasePostsResponse,
-  mergePostsWithStaticFallback,
+  resolvePostsForBuild,
   sortPostsByDateDesc,
 } from "./interpret-merge";
 
 describe("interpretSupabasePostsResponse", () => {
-  it("falls back on error", () => {
+  it("treats query errors as build-stopping errors", () => {
     expect(
       interpretSupabasePostsResponse([], { message: "nope" }),
-    ).toEqual({ kind: "use_fallback", reason: "query_error" });
+    ).toEqual({ kind: "query_error", message: "nope" });
   });
 
-  it("falls back on empty or non-array data", () => {
+  it("uses remote rows when an array is returned, including empty arrays", () => {
     expect(interpretSupabasePostsResponse([], null)).toEqual({
-      kind: "use_fallback",
-      reason: "empty_result",
+      kind: "use_remote",
+      rows: [],
     });
+  });
+
+  it("treats non-array data as an invalid remote payload", () => {
     expect(interpretSupabasePostsResponse(null, null)).toEqual({
-      kind: "use_fallback",
-      reason: "empty_result",
+      kind: "query_error",
+      message: "Supabase posts query returned an invalid payload.",
     });
   });
 
@@ -33,17 +36,17 @@ describe("interpretSupabasePostsResponse", () => {
   });
 });
 
-describe("mergePostsWithStaticFallback", () => {
-  it("returns fallback copy when interpretation is fallback", () => {
-    const out = mergePostsWithStaticFallback(
-      { kind: "use_fallback", reason: "empty_result" },
+describe("resolvePostsForBuild", () => {
+  it("returns fallback copy only when no Supabase client exists", () => {
+    const out = resolvePostsForBuild(
+      { kind: "use_fallback", reason: "no_client" },
       posts,
     );
     expect(out).toEqual(posts);
     expect(out).not.toBe(posts);
   });
 
-  it("merges remote rows with static-only posts", () => {
+  it("uses remote rows without leaking static-only posts", () => {
     const row = {
       slug: "remote-only",
       title: "Remote",
@@ -54,23 +57,20 @@ describe("mergePostsWithStaticFallback", () => {
       medium_url: null as string | null,
       published_at: "2026-05-01T00:00:00.000Z",
     };
-    const out = mergePostsWithStaticFallback(
+    const out = resolvePostsForBuild(
       { kind: "use_remote", rows: [row] },
       posts,
     );
     expect(out.some((post) => post.slug === "remote-only")).toBe(true);
     expect(out.some((post) => post.slug === "big-table-vs-star-schema")).toBe(
-      true,
+      false,
     );
     expect(out.find((post) => post.slug === "remote-only")?.bodyMarkdown).toContain(
       "Hi",
     );
   });
 
-  it("keeps static content canonical for repo-authored posts", () => {
-    const staticPost = posts.find(
-      (post) => post.slug === "big-table-vs-star-schema",
-    );
+  it("uses remote content for matching static slugs", () => {
     const row = {
       slug: "big-table-vs-star-schema",
       title: "Remote title",
@@ -81,19 +81,17 @@ describe("mergePostsWithStaticFallback", () => {
       medium_url: null as string | null,
       published_at: "2026-06-02T00:00:00.000Z",
     };
-    const out = mergePostsWithStaticFallback(
+    const out = resolvePostsForBuild(
       { kind: "use_remote", rows: [row] },
       posts,
     );
     const merged = out.find((post) => post.slug === "big-table-vs-star-schema");
-    expect(merged?.title).toBe(staticPost?.title);
-    expect(merged?.bodyMarkdown).toBe(staticPost?.bodyMarkdown);
-    expect(merged?.bodyMarkdown).toContain("## References");
+    expect(merged?.title).toBe("Remote title");
+    expect(merged?.bodyMarkdown).toBe("## Remote body");
     expect(merged?.updatedAt).toBe("2026-06-02");
-    expect(merged?.relatedToolCtas).toEqual(staticPost?.relatedToolCtas);
   });
 
-  it("prefers remote updatedAt and remote CTAs when provided for repo-authored posts", () => {
+  it("maps related tool CTAs from remote rows", () => {
     const row = {
       slug: "big-table-vs-star-schema",
       title: "Remote title",
@@ -106,7 +104,7 @@ describe("mergePostsWithStaticFallback", () => {
       medium_url: null as string | null,
       published_at: "2026-06-03T00:00:00.000Z",
     };
-    const out = mergePostsWithStaticFallback(
+    const out = resolvePostsForBuild(
       { kind: "use_remote", rows: [row] },
       posts,
     );
@@ -120,6 +118,12 @@ describe("mergePostsWithStaticFallback", () => {
         variant: "secondary",
       },
     ]);
+  });
+
+  it("throws query errors instead of publishing stale fallback content", () => {
+    expect(() =>
+      resolvePostsForBuild({ kind: "query_error", message: "failed" }, posts),
+    ).toThrow("failed");
   });
 });
 

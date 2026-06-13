@@ -13,7 +13,7 @@ Personal portfolio, blog, and interactive tools site for [Rujikorn Ngoensaard](h
 - **Styling:** [Tailwind CSS v4](https://tailwindcss.com/) via Vite plugin
 - **Runtime:** [Bun](https://bun.sh/) + Node 22.16.0
 - **Testing:** [Vitest](https://vitest.dev/) (100% coverage) & [Playwright](https://playwright.dev/) (E2E)
-- **Database:** [Supabase](https://supabase.com/) (build-time blog, client-side benchmarks, CV gate)
+- **Database:** [Supabase](https://supabase.com/) (blog CMS/source of truth, client-side benchmarks, CV gate)
 - **Blog Analytics:** Cloudflare Pages Functions + D1 for anonymous aggregate blog views
 - **Edge Functions:** Supabase Edge Functions (Deno) for CV email delivery
 - **Deployment:** [Cloudflare Pages](https://pages.cloudflare.com/) (Git integration)
@@ -37,11 +37,12 @@ graph LR
         F["Cloudflare Access"] -->|protects /admin/*| E
         E -->|POST /api/blog/views| K["Pages Function<br/>blog view counter"]
         E -->|GET /admin/api/blog/views| L["Pages Function<br/>editorial analytics"]
+        E -->|POST /admin/api/blog/rebuild| N["Pages Function<br/>rebuild trigger"]
         F -->|protects /admin/* and /admin/api/*| L
     end
 
     subgraph Supabase
-        G["PostgreSQL<br/>(posts, benchmarks,<br/>cv_requests, leads)"]
+        G["PostgreSQL<br/>(posts CMS, benchmarks,<br/>cv_requests, leads)"]
         H["Storage<br/>(CV PDF)"]
         I["Edge Functions<br/>(send-cv only)"]
     end
@@ -51,6 +52,7 @@ graph LR
     end
 
     C -->|build-time fetch| G
+    N -->|deploy hook or Pages API| D
     E -->|client INSERT/SELECT| G
     E -->|direct download| H
     G -->|webhook on UPDATE| I
@@ -66,7 +68,7 @@ For the blog view-count runtime, see [docs/blog-analytics.md](docs/blog-analytic
 
 ## Features
 
-- **Portfolio & Blog** — Static content with optional Supabase blog overlay and anonymous aggregate view counts
+- **Portfolio & Blog** — Static portfolio content plus Supabase-authored blog posts published as static HTML with anonymous aggregate view counts
 - **Interactive Tools** — Data Platform Maturity Checker, Governance Readiness Scorecard
 - **Advisory Services** — Engagement types, process flow, conversion path
 - **CV Gate** — Email capture modal → admin approval → automated PDF delivery via Edge Function
@@ -119,6 +121,7 @@ bunx supabase secrets set RESEND_API_KEY=re_xxxxx
 
 - **Cloudflare Pages Functions:** `/api/blog/views` and `/admin/api/blog/views`
 - **Cloudflare D1 binding:** `BLOG_ANALYTICS_DB` for anonymous aggregate blog views
+- **Cloudflare rebuild trigger:** deploy hook or Pages API env vars for admin-triggered static blog republishing
 - **Supabase Edge Functions:** `send-cv` for approved CV email delivery
 
 ### Blog Analytics Roadmap
@@ -149,16 +152,36 @@ Cloudflare Pages settings:
 | Variable | Environment | Purpose |
 |----------|-------------|---------|
 | `SUPABASE_URL` | Build | Database URL |
-| `SUPABASE_SECRET_KEY` | Build (secret) | Service role key |
+| `PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Build + client | Public read key for published blog rows and browser Supabase clients |
+| `SUPABASE_SECRET_KEY` | Build (secret, optional legacy) | Server read key fallback for published blog rows |
 | `PUBLIC_SUPABASE_URL` | Build + client | For CSP connect-src |
 | `PUBLIC_SITE_URL` | Production | Canonical URL override |
 | `PUBLIC_ALLOW_INDEXING` | Preview (optional) | Force indexing on preview |
 | `BLOG_VIEW_TRACKING` | Pages Functions (optional) | Set `disabled` to read counts without incrementing |
+| `BLOG_REBUILD_HOOK_URL` | Pages Functions (secret, optional) | Cloudflare deploy hook called after admin blog mutations |
+| `CLOUDFLARE_API_TOKEN` | Pages Functions (secret) | Cloudflare API token with Pages deployment edit/create access for admin rebuilds when no deploy hook is configured |
+| `CLOUDFLARE_ACCOUNT_ID` | Pages Functions | Cloudflare account ID used by the admin rebuild API trigger |
+| `CLOUDFLARE_PAGES_PROJECT_NAME` | Pages Functions | Pages project name, currently `xhverse-site-git` |
+| `CLOUDFLARE_PAGES_REBUILD_BRANCH` | Pages Functions (optional) | Branch to rebuild after admin mutations; defaults to `main` |
 
 Cloudflare D1 is configured in both preview and production Pages environments as a binding named `BLOG_ANALYTICS_DB`; it is not a client-exposed environment variable.
 Use `wrangler.example.toml` for the expected binding shape. Do not commit a real
 `wrangler.toml` until the current Cloudflare Pages dashboard configuration has
 been downloaded and reconciled.
+
+Blog authoring uses Supabase as the source of truth. The admin Blog Writer saves
+drafts/published posts to Supabase; public blog pages stay static and update
+after Cloudflare Pages rebuilds from the configured deploy hook or Pages API
+trigger. `src/data/blog.ts` is retained only as local fallback/seed content when
+Supabase build credentials are absent.
+
+To migrate current fallback posts into Supabase, run the seed script with service
+role build credentials after the schema migration is applied:
+
+```sh
+bun run scripts/seed-blog-posts-to-supabase.ts --dry-run
+bun run scripts/seed-blog-posts-to-supabase.ts
+```
 
 ### Branch Flow
 

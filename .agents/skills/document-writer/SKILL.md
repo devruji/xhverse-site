@@ -135,20 +135,29 @@ Follow Keep a Changelog format:
 - End pieces with a forward-looking thought, not a generic conclusion
 - No "In this article, we will discuss..." style intros
 
-### BlogPost Data Format
-When creating blog entries for `src/data/blog.ts`:
-```typescript
-{
-  slug: "kebab-case-title",
-  title: "Title case or sentence case",
-  excerpt: "One sentence summary.",
-  date: "YYYY-MM-DD",
-  tags: ["tag1", "tag2"],
-  mediumUrl: "",  // empty unless syndicated
-  readingTime: "N min read",
-  bodyMarkdown: `## First heading\n\nContent...`
-}
+### Blog Writer Package
+When creating blog entries for the normal xhverse publishing workflow, deliver
+fields for the Supabase admin Blog Writer instead of editing code:
+
+```text
+Title:
+Slug:
+Excerpt:
+Status: draft
+Publish date:
+Tags:
+Reading time:
+Medium URL:
+Cover image alt:
+SEO title:
+SEO description:
+Related tool CTAs:
+Body markdown:
 ```
+
+Use `tool-slug:primary` or `tool-slug:secondary` lines for related tool CTAs.
+Only provide a `src/data/blog.ts` entry when the user explicitly asks for a code
+fallback/seed change.
 
 ## Quality Checklist
 

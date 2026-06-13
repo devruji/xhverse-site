@@ -1,3 +1,8 @@
+import {
+  blogToolCtaDefinitions,
+  type BlogToolSlug,
+  type RelatedToolCtaVariant,
+} from "../../data/blog";
 import { estimateReadingTimeFromMarkdown } from "./post-row";
 
 export const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -8,6 +13,7 @@ export const COVER_IMAGE_MIME_TYPES = [
   "image/jpeg",
   "image/png",
 ] as const;
+export const MAX_RELATED_TOOL_CTAS = 3;
 
 export type PostStatus = "draft" | "published";
 export type CoverImageMimeType = (typeof COVER_IMAGE_MIME_TYPES)[number];
@@ -29,6 +35,7 @@ export type AdminPostRow = {
   cover_image_alt?: string | null;
   seo_title?: string | null;
   seo_description?: string | null;
+  related_tool_ctas?: RelatedToolCtaInput[] | null;
 };
 
 export type PostFormValues = {
@@ -46,6 +53,7 @@ export type PostFormValues = {
   hasStagedCoverImage: boolean;
   seoTitle: string;
   seoDescription: string;
+  relatedToolCtasInput: string;
   status: PostStatus;
   publishedAt: string;
 };
@@ -55,6 +63,10 @@ export type FormValidationErrors = Partial<
 >;
 
 export type PostSaveIntent = "draft" | "publish" | "unpublish";
+export type RelatedToolCtaInput = {
+  slug: BlogToolSlug;
+  variant: RelatedToolCtaVariant;
+};
 
 export function normalizeSlug(input: string): string {
   return input
@@ -100,6 +112,67 @@ export function estimateReadingTime(markdown: string): string {
 function optionalTrimmed(value: string): string | null {
   const trimmed = value.trim();
   return trimmed.length ? trimmed : null;
+}
+
+function isKnownBlogToolSlug(value: string): value is BlogToolSlug {
+  return Object.hasOwn(blogToolCtaDefinitions, value);
+}
+
+function isRelatedToolCtaVariant(value: string): value is RelatedToolCtaVariant {
+  return value === "primary" || value === "secondary";
+}
+
+export function parseRelatedToolCtasInput(input: string): RelatedToolCtaInput[] {
+  const entries: RelatedToolCtaInput[] = [];
+  const seen = new Set<BlogToolSlug>();
+  for (const rawLine of input.split(/\r?\n|,/)) {
+    const line = rawLine.trim();
+    if (!line) continue;
+    const [rawSlug, rawVariant] = line.split(":");
+    const slug = rawSlug.trim();
+    const variant = rawVariant?.trim() ?? "secondary";
+    if (!isKnownBlogToolSlug(slug) || !isRelatedToolCtaVariant(variant)) continue;
+    if (seen.has(slug)) continue;
+    entries.push({ slug, variant });
+    seen.add(slug);
+  }
+  return entries;
+}
+
+export function validateRelatedToolCtasInput(input: string): string | null {
+  const entries: RelatedToolCtaInput[] = [];
+  const seen = new Set<BlogToolSlug>();
+  for (const rawLine of input.split(/\r?\n|,/)) {
+    const line = rawLine.trim();
+    if (!line) continue;
+    const [rawSlug, rawVariant] = line.split(":");
+    const slug = rawSlug.trim();
+    const variant = rawVariant?.trim() ?? "secondary";
+    if (!isKnownBlogToolSlug(slug)) {
+      return `Unknown related tool slug: ${slug || line}.`;
+    }
+    if (!isRelatedToolCtaVariant(variant)) {
+      return "Related tool variant must be primary or secondary.";
+    }
+    if (!seen.has(slug)) {
+      entries.push({ slug, variant });
+      seen.add(slug);
+    }
+  }
+  if (entries.length > MAX_RELATED_TOOL_CTAS) {
+    return `Choose ${MAX_RELATED_TOOL_CTAS} or fewer related tool CTAs.`;
+  }
+  return null;
+}
+
+export function formatRelatedToolCtasForInput(
+  ctas: RelatedToolCtaInput[] | null | undefined,
+): string {
+  if (!Array.isArray(ctas)) return "";
+  return ctas
+    .filter((cta) => isKnownBlogToolSlug(cta.slug) && isRelatedToolCtaVariant(cta.variant))
+    .map((cta) => `${cta.slug}:${cta.variant}`)
+    .join("\n");
 }
 
 function isValidHttpUrl(value: string): boolean {
@@ -201,6 +274,8 @@ export function validatePostForm(values: PostFormValues): FormValidationErrors {
   if (values.status === "published" && !values.publishedAt.trim()) {
     errors.publishedAt = "Publish date is required for published posts.";
   }
+  const relatedToolCtasError = validateRelatedToolCtasInput(values.relatedToolCtasInput);
+  if (relatedToolCtasError) errors.relatedToolCtasInput = relatedToolCtasError;
 
   return errors;
 }
@@ -223,6 +298,7 @@ export type PostUpsertPayload = {
   cover_image_alt: string | null;
   seo_title: string | null;
   seo_description: string | null;
+  related_tool_ctas: RelatedToolCtaInput[] | null;
 };
 
 export function buildPostUpsertPayload(
@@ -268,6 +344,7 @@ export function buildPostUpsertPayload(
       : null,
     seo_title: optionalTrimmed(values.seoTitle),
     seo_description: optionalTrimmed(values.seoDescription),
+    related_tool_ctas: parseRelatedToolCtasInput(values.relatedToolCtasInput),
   };
 }
 
@@ -284,8 +361,14 @@ export function mapSupabasePostError(error: SupabasePostError): string {
   if (error.code === "23505" || lower.includes("duplicate key")) {
     return "A post with this slug already exists.";
   }
-  if (error.code === "23514" || lower.includes("posts_slug_format_check")) {
+  if (error.code === "23514" && lower.includes("posts_related_tool_ctas_check")) {
+    return `Choose ${MAX_RELATED_TOOL_CTAS} or fewer related tool CTAs.`;
+  }
+  if (lower.includes("posts_slug_format_check")) {
     return "Slug must be lowercase kebab-case.";
+  }
+  if (error.code === "23514") {
+    return "Post failed a database validation check.";
   }
   if (lower.includes("jwt") || lower.includes("not authenticated")) {
     return "Session expired. Please sign in again.";
@@ -361,6 +444,7 @@ export function adminPostFromFormValues(
     cover_image_alt: payload.cover_image_alt,
     seo_title: payload.seo_title,
     seo_description: payload.seo_description,
+    related_tool_ctas: payload.related_tool_ctas,
   };
 }
 
@@ -382,6 +466,7 @@ export function formValuesFromAdminPost(post: AdminPostRow): PostFormValues {
     hasStagedCoverImage: false,
     seoTitle: post.seo_title ?? "",
     seoDescription: post.seo_description ?? "",
+    relatedToolCtasInput: formatRelatedToolCtasForInput(post.related_tool_ctas),
     status: post.status,
     publishedAt: post.published_at
       ? post.published_at.slice(0, 16)

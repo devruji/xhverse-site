@@ -57,6 +57,7 @@ Root directory: /
 
 ### Deployment Hooks
 - Git push triggers build automatically
+- Blog Writer content changes can trigger a Pages rebuild through `/admin/api/blog/rebuild` using either server-side `BLOG_REBUILD_HOOK_URL` or the Cloudflare Pages API env vars (`CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_PAGES_PROJECT_NAME`, optional `CLOUDFLARE_PAGES_REBUILD_BRANCH`).
 - No manual `wrangler pages deploy` needed for normal flow
 - For emergency deploys: `bunx wrangler pages deploy dist --project-name=xhverse-site`
 
