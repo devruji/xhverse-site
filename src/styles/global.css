@@ -667,7 +667,9 @@ html.light .interactive-card:focus-within .contact-icon {
 
 .article-body {
   margin-top: 2rem;
+  width: 100%;
   max-width: 42rem;
+  min-width: 0;
 }
 
 .article-body :where(h2, h3, h4) {
@@ -792,15 +794,25 @@ html.light .article-body ul > li::before {
   color: var(--text-heading);
 }
 
-.article-body table {
-  display: block;
+.article-table-scroll {
   width: 100%;
   margin: 1.5rem 0;
   overflow-x: auto;
-  border-collapse: collapse;
+  border: 1px solid var(--border-subtle);
   border-radius: 8px;
-  font-size: 0.9rem;
   -webkit-overflow-scrolling: touch;
+}
+
+.article-table-scroll:focus-visible {
+  outline: 2px solid rgba(110, 231, 183, 0.9);
+  outline-offset: 4px;
+}
+
+.article-body table {
+  width: 100%;
+  min-width: 42rem;
+  border-collapse: collapse;
+  font-size: 0.9rem;
 }
 
 .article-body th,
