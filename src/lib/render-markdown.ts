@@ -121,6 +121,13 @@ function renderCallout(type: CalloutType, content: string): string {
   return `<blockquote class="article-callout article-callout--${type}" data-callout="${type}"><p class="article-callout__label">${CALLOUT_LABELS[type]}</p>${inner}</blockquote>`;
 }
 
+function wrapTables(html: string): string {
+  return html.replace(
+    /<table>([\s\S]*?)<\/table>/g,
+    '<div class="article-table-scroll" role="region" tabindex="0"><table>$1</table></div>',
+  );
+}
+
 export function transformCalloutMarkdown(markdown: string): string {
   const lines = markdown.split("\n");
   const output: string[] = [];
@@ -154,7 +161,7 @@ export function renderMarkdownToHtml(markdown: string): string {
   const toc = extractTableOfContents(transformed);
   const raw = marked.parse(transformed, { async: false }) as string;
   const withIds = injectHeadingIds(raw, toc);
-  return sanitizeHtml(withIds, {
+  const safe = sanitizeHtml(withIds, {
     allowedTags: ALLOWED_TAGS,
     allowedAttributes: {
       blockquote: ["class", "data-callout"],
@@ -211,4 +218,5 @@ export function renderMarkdownToHtml(markdown: string): string {
       },
     },
   });
+  return wrapTables(safe);
 }
