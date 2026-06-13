@@ -12,6 +12,9 @@ test("homepage loads", async ({ page }) => {
 test("primary links are visible", async ({ page }) => {
   await page.goto("/");
   await expect(
+    page.getByRole("link", { name: /Advisory/i }).first(),
+  ).toHaveAttribute("href", "/services");
+  await expect(
     page.getByRole("link", { name: /Focus areas/i }),
   ).toBeVisible();
   await expect(

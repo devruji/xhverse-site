@@ -17,6 +17,7 @@ import {
   createSupabaseClientForBuild,
   loadPublishedPostsForBuild,
 } from "../../lib/blog/load-posts";
+import { getPersonId } from "../../lib/seo/structured-data";
 
 export async function getStaticPaths() {
   const client = createSupabaseClientForBuild({
@@ -41,6 +42,7 @@ const metaTitle = post.seoTitle ?? post.title;
 const metaDescription = post.seoDescription ?? post.excerpt;
 const articleImage = new URL(post.coverImageUrl ?? site.ogImage, deploymentSite).toString();
 const relatedToolCtas = post.relatedToolCtas ?? [];
+const personId = getPersonId(deploymentSite);
 
 const articleStructuredData = {
   "@context": "https://schema.org",
@@ -57,13 +59,13 @@ const articleStructuredData = {
   mainEntityOfPage: { "@type": "WebPage", "@id": canonicalUrl },
   author: {
     "@type": "Person",
-    "@id": `${deploymentSite}#person`,
+    "@id": personId,
     name: profile.fullName,
     url: deploymentSite,
   },
   publisher: {
     "@type": "Person",
-    "@id": `${deploymentSite}#person`,
+    "@id": personId,
     name: profile.fullName,
     image: new URL(profile.avatar, deploymentSite).toString(),
   },

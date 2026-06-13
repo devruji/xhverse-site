@@ -5,25 +5,32 @@ import Footer from "../../components/Footer.astro";
 import { profile } from "../../data/profile";
 import { site } from "../../data/site";
 import { liveToolCount, toolCatalog } from "../../data/tools";
+import { buildCollectionPageJsonLd } from "../../lib/seo/structured-data";
 
 const deploymentSite = (Astro.site ?? site.siteUrl).toString();
+const toolsDescription =
+  "Free data platform tools by Rujikorn Ngoensaard, also known as XH and bossruji, for architecture decisions, governance checks, SQL practice, and lakehouse planning.";
+const toolsStructuredData = buildCollectionPageJsonLd({
+  baseUrl: deploymentSite,
+  path: "/tools",
+  name: `XHVERSE tools by ${profile.fullName}`,
+  alternateName: ["xhverse tools", "bossruji data tools", "XH data platform tools"],
+  description: toolsDescription,
+  hasPart: toolCatalog.map((tool) => ({
+    "@type": "SoftwareApplication",
+    name: tool.title,
+    url: new URL(`/tools/${tool.slug}`, deploymentSite).toString(),
+    description: tool.description,
+    applicationCategory: "WebApplication",
+    operatingSystem: "Web",
+  })),
+});
 ---
 
 <BaseLayout
   title={`Data Platform Tools by ${profile.fullName}`}
-  description="Free data platform tools by Rujikorn Ngoensaard, also known as XH and bossruji, for architecture decisions, governance checks, SQL practice, and lakehouse planning."
-  structuredData={{
-    "@context": "https://schema.org",
-    "@type": "CollectionPage",
-    name: `XHVERSE tools by ${profile.fullName}`,
-    alternateName: ["xhverse tools", "bossruji data tools", "XH data platform tools"],
-    url: new URL("/tools", deploymentSite).toString(),
-    description:
-      "Free data platform tools by Rujikorn Ngoensaard, also known as XH and bossruji, for architecture decisions, governance checks, SQL practice, and lakehouse planning.",
-    creator: { "@type": "Person", "@id": `${deploymentSite}#person`, name: profile.fullName },
-    publisher: { "@type": "Person", "@id": `${deploymentSite}#person`, name: profile.fullName },
-    isPartOf: { "@type": "WebSite", "@id": `${deploymentSite}#website`, name: site.title },
-  }}
+  description={toolsDescription}
+  structuredData={toolsStructuredData}
 >
   <div class="min-h-screen bg-[var(--bg-page)] font-sans text-[var(--text)]">
   <Header current="/tools" />

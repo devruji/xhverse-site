@@ -10,6 +10,7 @@ import {
   createSupabaseClientForBuild,
   loadPublishedPostsForBuild,
 } from "../lib/blog/load-posts";
+import { buildHomeIdentityGraph } from "../lib/seo/structured-data";
 
 const platformStack = [
   { category: "Platform", items: ["Azure", "Databricks", "Fabric", "AWS"] },
@@ -165,48 +166,7 @@ const blogClient = createSupabaseClientForBuild({
 });
 const latestWritingPosts = (await loadPublishedPostsForBuild(blogClient, staticFallback)).slice(0, 3);
 
-const homeStructuredData = {
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "WebSite",
-      "@id": `${deploymentSite}#website`,
-      name: "XHVERSE",
-      alternateName: ["xhverse", "xhverse.co", "XHVERSE by bossruji"],
-      url: deploymentSite,
-      inLanguage: "en",
-      publisher: { "@id": `${deploymentSite}#person` },
-    },
-    {
-      "@type": "Person",
-      "@id": `${deploymentSite}#person`,
-      name: profile.fullName,
-      alternateName: profile.alternateNames,
-      additionalName: ["XH", "bossruji"],
-      url: deploymentSite,
-      mainEntityOfPage: deploymentSite,
-      jobTitle: profile.title,
-      description: profile.longBio,
-      image: new URL(profile.avatar, deploymentSite).toString(),
-      email: profile.email,
-      knowsAbout: profile.knowsAbout,
-      sameAs: [site.github, site.medium, site.linkedin],
-    },
-    {
-      "@type": "ProfilePage",
-      "@id": `${deploymentSite}#profile-page`,
-      name: "Rujikorn Ngoensaard - XHVERSE",
-      alternateName: ["xhverse", "xhverse.co", "bossruji", "XH"],
-      url: deploymentSite,
-      description:
-        "XHVERSE is the data architecture journal and portfolio of Rujikorn Ngoensaard, also known as XH or bossruji.",
-      about: { "@id": `${deploymentSite}#person` },
-      mainEntity: { "@id": `${deploymentSite}#person` },
-      isPartOf: { "@id": `${deploymentSite}#website` },
-      inLanguage: "en",
-    },
-  ],
-};
+const homeStructuredData = buildHomeIdentityGraph(deploymentSite);
 ---
 <BaseLayout
   title="Rujikorn Ngoensaard | XHVERSE"
@@ -265,8 +225,11 @@ const homeStructuredData = {
           <p class="hero-entrance-delayed-2 mt-3 max-w-xl border-l border-cyan-300/35 pl-3 text-xs leading-6 text-zinc-400">
             {profile.craftLine}
           </p>
-          <div class="hero-cta-row hero-entrance-delayed-2 mt-6 grid grid-cols-3 gap-2 sm:flex sm:flex-wrap sm:gap-3">
-            <a href="#work" class="cta-primary px-3 text-xs sm:px-5 sm:text-sm">
+          <div class="hero-cta-row hero-entrance-delayed-2 mt-6 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:gap-3">
+            <a href="/services" class="cta-primary px-3 text-xs sm:px-5 sm:text-sm">
+              Advisory
+            </a>
+            <a href="#work" class="cta-secondary px-3 text-xs sm:px-5 sm:text-sm">
               Focus areas
             </a>
             <a href="/blog" class="cta-secondary px-3 text-xs sm:px-5 sm:text-sm">

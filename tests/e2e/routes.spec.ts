@@ -14,6 +14,13 @@ function getJsonLdByType(items: JsonLdRecord[], type: string) {
   return items.find((item) => item["@type"] === type);
 }
 
+function flattenJsonLd(items: JsonLdRecord[]): JsonLdRecord[] {
+  return items.flatMap((item) => {
+    const graph = item["@graph"];
+    return Array.isArray(graph) ? (graph as JsonLdRecord[]) : [item];
+  });
+}
+
 test("about page loads expected sections", async ({ page }) => {
   await page.goto("/about");
   await expect(
@@ -60,6 +67,37 @@ test("blog article uses its cover image for social metadata", async ({ page }) =
       'meta[name="twitter:image"][content="https://xhverse.co/images/blog-data-product-as-platform-contract-cover.jpg"]',
     ),
   ).toHaveCount(1);
+});
+
+test("data product article exposes canonical article structured data", async ({ page }) => {
+  await page.goto("/blog/data-product-as-platform-contract");
+  const canonicalUrl = "https://xhverse.co/blog/data-product-as-platform-contract";
+
+  await expect(page).toHaveTitle("Data Product as a Platform Contract | XHVERSE");
+  await expect(page.locator(`link[rel="canonical"][href="${canonicalUrl}"]`)).toHaveCount(1);
+  await expect(page.locator(`meta[property="og:url"][content="${canonicalUrl}"]`)).toHaveCount(1);
+
+  const jsonLd = getJsonLdByType(await readJsonLd(page), "BlogPosting");
+  expect(jsonLd?.["@id"]).toBe(canonicalUrl);
+  expect(jsonLd?.headline).toBe("Data product as a platform contract");
+  expect(jsonLd?.url).toBe(canonicalUrl);
+  expect(jsonLd?.datePublished).toBe("2026-06-03");
+  expect(jsonLd?.dateModified).toBe("2026-06-03");
+  expect(jsonLd?.image).toBe(
+    "https://xhverse.co/images/blog-data-product-as-platform-contract-cover.jpg",
+  );
+  expect(jsonLd?.author).toEqual(
+    expect.objectContaining({
+      "@id": "https://xhverse.co/#person",
+      name: "Rujikorn Ngoensaard",
+    }),
+  );
+  expect(jsonLd?.publisher).toEqual(
+    expect.objectContaining({
+      "@id": "https://xhverse.co/#person",
+      name: "Rujikorn Ngoensaard",
+    }),
+  );
 });
 
 test("blog article mobile layout has no horizontal overflow", async ({ page }) => {
@@ -151,6 +189,51 @@ test("homepage exposes a branded Person and WebSite identity graph", async ({ pa
   expect(profilePage?.name).toBe("Rujikorn Ngoensaard - XHVERSE");
 });
 
+test("about and cv pages point profile schema at the shared person identity", async ({ page }) => {
+  const cases = [
+    {
+      path: "/about",
+      canonical: "https://xhverse.co/about",
+      type: "AboutPage",
+      heading: /Senior Data Engineer/i,
+    },
+    {
+      path: "/cv",
+      canonical: "https://xhverse.co/cv",
+      type: "ProfilePage",
+      heading: "Rujikorn Ngoensaard",
+    },
+  ] as const;
+
+  for (const item of cases) {
+    await page.goto(item.path);
+    await expect(page.getByRole("heading", { name: item.heading, level: 1 })).toBeVisible();
+    await expect(page.locator(`link[rel="canonical"][href="${item.canonical}"]`)).toHaveCount(1);
+    await expect(page.locator('meta[name="robots"][content*="noindex"]')).toHaveCount(0);
+
+    const nodes = flattenJsonLd(await readJsonLd(page));
+    const pageNode = getJsonLdByType(nodes, item.type);
+    expect(pageNode?.url).toBe(item.canonical);
+
+    const mainEntity =
+      pageNode?.mainEntity && typeof pageNode.mainEntity === "object"
+        ? (pageNode.mainEntity as JsonLdRecord)
+        : {};
+    const about =
+      pageNode?.about && typeof pageNode.about === "object"
+        ? (pageNode.about as JsonLdRecord)
+        : {};
+    const embeddedPerson = mainEntity.alternateName ? mainEntity : about;
+    const personReference =
+      embeddedPerson["@id"] ?? mainEntity["@id"] ?? about["@id"];
+
+    expect(personReference).toBe("https://xhverse.co/#person");
+    expect(embeddedPerson.alternateName).toEqual(
+      expect.arrayContaining(["XH", "XHVERSE", "xhverse.co", "bossruji"]),
+    );
+  }
+});
+
 test("blog and tools pages reinforce branded search identity", async ({ page }) => {
   await page.goto("/blog");
   await expect(page).toHaveTitle("Writing by Rujikorn Ngoensaard | XHVERSE");
@@ -162,6 +245,7 @@ test("blog and tools pages reinforce branded search identity", async ({ page }) 
   await expect(page.getByRole("heading", { name: "Writing by Rujikorn Ngoensaard" })).toBeVisible();
   await expect(page.getByText(/Practical notes from XH \/ bossruji/i)).toBeVisible();
   const blogJsonLd = getJsonLdByType(await readJsonLd(page), "CollectionPage");
+  expect(blogJsonLd?.["@id"]).toBe("https://xhverse.co/blog#collection");
   expect(blogJsonLd?.name).toBe("XHVERSE writing by Rujikorn Ngoensaard");
   expect(blogJsonLd?.alternateName).toEqual(
     expect.arrayContaining(["xhverse writing", "bossruji writing", "XH data architecture notes"]),
@@ -177,8 +261,31 @@ test("blog and tools pages reinforce branded search identity", async ({ page }) 
   await expect(page.getByRole("heading", { name: "Data platform tools by Rujikorn Ngoensaard" })).toBeVisible();
   await expect(page.getByText(/free tools from XH \/ bossruji/i)).toBeVisible();
   const toolsJsonLd = getJsonLdByType(await readJsonLd(page), "CollectionPage");
+  expect(toolsJsonLd?.["@id"]).toBe("https://xhverse.co/tools#collection");
   expect(toolsJsonLd?.name).toBe("XHVERSE tools by Rujikorn Ngoensaard");
   expect(toolsJsonLd?.alternateName).toEqual(
     expect.arrayContaining(["xhverse tools", "bossruji data tools", "XH data platform tools"]),
   );
+});
+
+test("crawl surfaces expose public URLs and keep admin routes out", async ({ page }) => {
+  const robots = await page.request.get("/robots.txt");
+  expect(robots.ok()).toBe(true);
+  const robotsText = await robots.text();
+  expect(robotsText).toContain("Allow: /");
+  expect(robotsText).toContain("Sitemap: https://xhverse.co/sitemap-index.xml");
+
+  const sitemapIndex = await page.request.get("/sitemap-index.xml");
+  expect(sitemapIndex.ok()).toBe(true);
+  const sitemapIndexXml = await sitemapIndex.text();
+  expect(sitemapIndexXml).toContain("https://xhverse.co/sitemap-0.xml");
+
+  const sitemap = await page.request.get("/sitemap-0.xml");
+  expect(sitemap.ok()).toBe(true);
+  const sitemapXml = await sitemap.text();
+  expect(sitemapXml).toContain("https://xhverse.co/");
+  expect(sitemapXml).toContain("https://xhverse.co/about/");
+  expect(sitemapXml).toContain("https://xhverse.co/services/");
+  expect(sitemapXml).toContain("https://xhverse.co/tools/");
+  expect(sitemapXml).not.toContain("/admin/");
 });

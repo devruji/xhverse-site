@@ -9,6 +9,10 @@ import {
   createSupabaseClientForBuild,
   loadPublishedPostsForBuild,
 } from "../../lib/blog/load-posts";
+import {
+  buildCollectionPageJsonLd,
+  getPersonId,
+} from "../../lib/seo/structured-data";
 
 const client = createSupabaseClientForBuild({
   SUPABASE_URL: import.meta.env.SUPABASE_URL,
@@ -16,33 +20,31 @@ const client = createSupabaseClientForBuild({
 });
 const sortedPosts = await loadPublishedPostsForBuild(client, staticFallback);
 const deploymentSite = (Astro.site ?? site.siteUrl).toString();
+const blogDescription =
+  "Essays from Rujikorn Ngoensaard, also known as XH and bossruji, on data platform architecture, governance, lakehouse operations, and analytics delivery.";
+const blogStructuredData = buildCollectionPageJsonLd({
+  baseUrl: deploymentSite,
+  path: "/blog",
+  name: `XHVERSE writing by ${profile.fullName}`,
+  alternateName: ["xhverse writing", "bossruji writing", "XH data architecture notes"],
+  description: blogDescription,
+  hasPart: sortedPosts.map((post) => ({
+    "@type": "BlogPosting",
+    headline: post.title,
+    datePublished: post.date,
+    url: new URL(`/blog/${post.slug}`, deploymentSite).toString(),
+    keywords: post.tags.join(", "),
+    description: post.excerpt,
+    author: { "@id": getPersonId(deploymentSite) },
+    image: new URL(site.ogImage, deploymentSite).toString(),
+  })),
+});
 ---
 
 <BaseLayout
   title={`Writing by ${profile.fullName}`}
-  description="Essays from Rujikorn Ngoensaard, also known as XH and bossruji, on data platform architecture, governance, lakehouse operations, and analytics delivery."
-  structuredData={{
-    "@context": "https://schema.org",
-    "@type": "CollectionPage",
-    name: `XHVERSE writing by ${profile.fullName}`,
-    alternateName: ["xhverse writing", "bossruji writing", "XH data architecture notes"],
-    url: new URL("/blog", deploymentSite).toString(),
-    description:
-      "Essays from Rujikorn Ngoensaard, also known as XH and bossruji, on data platform architecture, governance, lakehouse operations, and analytics delivery.",
-    author: { "@type": "Person", "@id": `${deploymentSite}#person`, name: profile.fullName },
-    publisher: { "@type": "Person", "@id": `${deploymentSite}#person`, name: profile.fullName },
-    isPartOf: { "@type": "WebSite", "@id": `${deploymentSite}#website`, name: site.title },
-    hasPart: sortedPosts.map((post) => ({
-      "@type": "BlogPosting",
-      headline: post.title,
-      datePublished: post.date,
-      url: new URL(`/blog/${post.slug}`, deploymentSite).toString(),
-      keywords: post.tags.join(", "),
-      description: post.excerpt,
-      author: { "@type": "Person", "@id": `${deploymentSite}#person`, name: profile.fullName },
-      image: new URL(site.ogImage, deploymentSite).toString(),
-    })),
-  }}
+  description={blogDescription}
+  structuredData={blogStructuredData}
 >
   <div class="min-h-screen bg-[var(--bg-page)] font-sans text-[var(--text)]">
   <Header current="/blog" />
