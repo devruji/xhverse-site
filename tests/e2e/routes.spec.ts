@@ -100,6 +100,49 @@ test("data product article exposes canonical article structured data", async ({ 
   );
 });
 
+test("materialized views article exposes canonical metadata and content", async ({ page }) => {
+  await page.goto("/blog/most-teams-use-materialized-views-too-early");
+  const canonicalUrl =
+    "https://xhverse.co/blog/most-teams-use-materialized-views-too-early";
+  const coverUrl =
+    "https://xhverse.co/images/blog-most-teams-use-materialized-views-too-early-cover.jpg";
+
+  await expect(page).toHaveTitle(
+    "Most Teams Use Materialized Views Too Early | Data Architecture | XHVERSE",
+  );
+  await expect(
+    page.locator(`link[rel="canonical"][href="${canonicalUrl}"]`),
+  ).toHaveCount(1);
+  await expect(
+    page.locator(`meta[property="og:image"][content="${coverUrl}"]`),
+  ).toHaveCount(1);
+  await expect(
+    page.locator(`meta[name="twitter:image"][content="${coverUrl}"]`),
+  ).toHaveCount(1);
+  await expect(
+    page.getByRole("heading", {
+      name: "Most Teams Use Materialized Views Too Early",
+      level: 1,
+    }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", {
+      name: "Platform behavior is not portable",
+      level: 2,
+    }),
+  ).toBeVisible();
+  await expect(
+    page.locator('a[href="/tools/lakehouse-cost-calculator"]'),
+  ).toHaveCount(2);
+
+  const jsonLd = getJsonLdByType(await readJsonLd(page), "BlogPosting");
+  expect(jsonLd?.["@id"]).toBe(canonicalUrl);
+  expect(jsonLd?.headline).toBe("Most Teams Use Materialized Views Too Early");
+  expect(jsonLd?.datePublished).toBe("2026-06-13");
+  expect(jsonLd?.dateModified).toBe("2026-06-13");
+  expect(jsonLd?.image).toBe(coverUrl);
+});
+
 test("blog article mobile layout has no horizontal overflow", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto("/blog");

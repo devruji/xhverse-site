@@ -47,6 +47,13 @@ Before body drafting, produce or verify:
 9. related tool CTAs using known xhverse tool slugs,
 10. disclosure when AI assisted drafting or editing.
 
+For generated blog covers, default to the established xhverse cover series
+unless the user asks for another visual direction: dark isometric
+data-architecture illustration, glassmorphism panels, teal/cyan glow,
+restrained amber accents, abstract platform objects, no people, no logos, no
+screenshots, and no readable text. The cover should communicate the article
+thesis and remain readable as a small blog-card thumbnail.
+
 ## Review Lens
 
 Flag issues when:

@@ -231,7 +231,8 @@ For new blog posts, technical docs, release notes, page copy, or article-series 
 1. Use `product-manager` first when topic selection or business rationale matters.
 2. Use `technical-writer` before body drafting to define reader goal, thesis, outline, metadata, references, disclosure, and related tool CTA fit.
 3. Use `.agents/skills/blog-content-strategy/SKILL.md` and `.agents/skills/document-writer/SKILL.md` as the source workflow for blog body and metadata.
-4. Use `technical-writer` again for pre-publish content QA before `backend-engineer` implements static `src/data/blog.ts` changes.
+4. Generate covers in the established xhverse blog series style unless the user asks otherwise: dark isometric data-architecture visuals, glass panels, teal glow, restrained amber accents, abstract platform objects, and no people/logos/screenshots/readable text.
+5. Use `technical-writer` again for pre-publish content QA before `backend-engineer` implements static `src/data/blog.ts` changes.
 
 ## Rules (`.cursor/rules/`)
 

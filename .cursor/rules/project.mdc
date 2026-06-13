@@ -81,6 +81,7 @@ src/lib/practitioner-tools/ + src/pages/tools/[slug].astro ← shared guided pra
 - Use the repo-local `technical_writer` sub-agent lens when starting, outlining, drafting, or reviewing public content: blog posts, technical docs, release notes, page copy, metadata, references, and related-tool CTAs.
 - For blog work, pair `technical_writer` with `blog-content-strategy` and `document-writer`; use `product-manager` first when topic selection or business rationale is still open.
 - Writer output must preserve xhverse voice: practical, peer-facing, source-backed, no vendor hype, no invented private client claims.
+- Generated blog covers should match the existing xhverse dark isometric data-architecture series unless the user explicitly asks for another style.
 
 ## Git Workflow
 - Branch from `development` — never `main`

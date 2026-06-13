@@ -57,8 +57,16 @@ tone.
 
 - Store project-bound covers under `public/images/` with stable filenames.
 - Use generated covers only when the topic benefits from a real visual asset.
+- Match the established xhverse blog cover series by default: dark isometric
+  data-architecture illustration, charcoal background, glassmorphism panels,
+  teal/cyan glow, restrained amber accents, abstract platform objects, and a
+  clear thesis metaphor.
 - Avoid readable text inside generated images; diagrams should be recognizable
   by shape, not labels.
+- Avoid people, photorealistic office/factory scenes, logos, screenshots,
+  generic dashboards, server racks, AI robots, and decorative gradient blobs.
+- Keep 16:9 covers thumbnail-readable and resize/crop to the existing 960x540
+  pattern when saving static assets.
 - Every cover must have useful alt text.
 
 ## Verification
