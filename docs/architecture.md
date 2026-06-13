@@ -18,7 +18,7 @@ graph LR
         F["Cloudflare Access<br/>(Zero Trust)"] -->|protects /admin/*| E
         E -->|POST /api/blog/views| K["Pages Function<br/>blog view counter"]
         E -->|GET /admin/api/blog/views| L["Pages Function<br/>editorial analytics"]
-        E -->|POST /admin/api/blog/rebuild| N["Pages Function<br/>deploy hook caller"]
+        E -->|POST /admin/api/blog/rebuild| N["Pages Function<br/>rebuild trigger"]
         F -->|protects /admin/* and /admin/api/*| L
         F -->|protects /admin/* and /admin/api/*| N
     end
@@ -35,7 +35,7 @@ graph LR
 
     C -->|build-time fetch| G
     E -->|client INSERT/SELECT| G
-    N -->|POST deploy hook| D
+    N -->|deploy hook or Pages API| D
     E -->|direct download| H
     G -->|webhook on UPDATE| I
     I -->|sends email via Resend| J[User Inbox]
@@ -84,7 +84,7 @@ User clicks "Get a Copy" → CvRequestModal opens
 - **Preview**: push to `development` or `feat/*` → preview URL with auto `noindex`
 - **CI**: GitHub Actions runs typecheck, build, coverage (100%), and E2E on every push/PR
 - **Pages Functions**: `/api/*` and `/admin/api/*` invoke Cloudflare Pages Functions; static routes stay static through `public/_routes.json`
-- **Admin content publish**: Supabase writes are immediate in the admin UI; public static blog pages update after the configured Cloudflare deploy hook rebuilds the site from Supabase
+- **Admin content publish**: Supabase writes are immediate in the admin UI; public static blog pages update after the configured Cloudflare deploy hook or Pages API trigger rebuilds the site from Supabase
 - **Edge Functions**: deployed separately via `bunx supabase functions deploy send-cv`
 
 ## Security Model
@@ -95,7 +95,7 @@ User clicks "Get a Copy" → CvRequestModal opens
 | HTML meta | `BaseLayout.astro` → CSP `connect-src` from env (production only) |
 | Admin access | Cloudflare Access (Zero Trust) → email OTP for `/admin/*` routes |
 | Admin analytics API | Cloudflare Access protects `/admin/api/*`; API returns aggregate D1 rollups only |
-| Admin rebuild API | Cloudflare Access protects `/admin/api/*`; deploy hook URL is stored server-side only |
+| Admin rebuild API | Cloudflare Access protects `/admin/api/*`; deploy hook URL or scoped Cloudflare API token is stored server-side only |
 | Blog view API | Same-origin Pages Function validates known published slugs and stores aggregate counters |
 | Database | RLS on all tables; anon: insert-only on submissions, select-only on reads |
 | D1 analytics | Aggregate blog counts, daily rollups, and referrer-origin buckets only; no IP, raw user agent, or fingerprint hash |
@@ -158,4 +158,4 @@ addresses, raw user agents, cookies, or fingerprint hashes for blog analytics.
 | `POST /api/blog/views` | Records one anonymous aggregate blog page-view event |
 | `GET /api/blog/views?slugs=a,b` | Returns public aggregate counts for known published blog slugs |
 | `GET /admin/api/blog/views` | Returns protected admin/editorial rollups |
-| `POST /admin/api/blog/rebuild` | Calls the server-side Cloudflare rebuild hook after admin blog mutations |
+| `POST /admin/api/blog/rebuild` | Queues a Cloudflare Pages rebuild through a server-side deploy hook or scoped Pages API token after admin blog mutations |

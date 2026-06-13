@@ -37,7 +37,7 @@ graph LR
         F["Cloudflare Access"] -->|protects /admin/*| E
         E -->|POST /api/blog/views| K["Pages Function<br/>blog view counter"]
         E -->|GET /admin/api/blog/views| L["Pages Function<br/>editorial analytics"]
-        E -->|POST /admin/api/blog/rebuild| N["Pages Function<br/>rebuild hook"]
+        E -->|POST /admin/api/blog/rebuild| N["Pages Function<br/>rebuild trigger"]
         F -->|protects /admin/* and /admin/api/*| L
     end
 
@@ -52,7 +52,7 @@ graph LR
     end
 
     C -->|build-time fetch| G
-    N -->|POST deploy hook| D
+    N -->|deploy hook or Pages API| D
     E -->|client INSERT/SELECT| G
     E -->|direct download| H
     G -->|webhook on UPDATE| I
@@ -121,7 +121,7 @@ bunx supabase secrets set RESEND_API_KEY=re_xxxxx
 
 - **Cloudflare Pages Functions:** `/api/blog/views` and `/admin/api/blog/views`
 - **Cloudflare D1 binding:** `BLOG_ANALYTICS_DB` for anonymous aggregate blog views
-- **Cloudflare rebuild hook:** `BLOG_REBUILD_HOOK_URL` for admin-triggered static blog republishing
+- **Cloudflare rebuild trigger:** deploy hook or Pages API env vars for admin-triggered static blog republishing
 - **Supabase Edge Functions:** `send-cv` for approved CV email delivery
 
 ### Blog Analytics Roadmap
@@ -158,7 +158,11 @@ Cloudflare Pages settings:
 | `PUBLIC_SITE_URL` | Production | Canonical URL override |
 | `PUBLIC_ALLOW_INDEXING` | Preview (optional) | Force indexing on preview |
 | `BLOG_VIEW_TRACKING` | Pages Functions (optional) | Set `disabled` to read counts without incrementing |
-| `BLOG_REBUILD_HOOK_URL` | Pages Functions (secret) | Cloudflare deploy hook called after admin blog mutations |
+| `BLOG_REBUILD_HOOK_URL` | Pages Functions (secret, optional) | Cloudflare deploy hook called after admin blog mutations |
+| `CLOUDFLARE_API_TOKEN` | Pages Functions (secret) | Cloudflare API token with Pages deployment edit/create access for admin rebuilds when no deploy hook is configured |
+| `CLOUDFLARE_ACCOUNT_ID` | Pages Functions | Cloudflare account ID used by the admin rebuild API trigger |
+| `CLOUDFLARE_PAGES_PROJECT_NAME` | Pages Functions | Pages project name, currently `xhverse-site-git` |
+| `CLOUDFLARE_PAGES_REBUILD_BRANCH` | Pages Functions (optional) | Branch to rebuild after admin mutations; defaults to `main` |
 
 Cloudflare D1 is configured in both preview and production Pages environments as a binding named `BLOG_ANALYTICS_DB`; it is not a client-exposed environment variable.
 Use `wrangler.example.toml` for the expected binding shape. Do not commit a real
@@ -167,9 +171,9 @@ been downloaded and reconciled.
 
 Blog authoring uses Supabase as the source of truth. The admin Blog Writer saves
 drafts/published posts to Supabase; public blog pages stay static and update
-after Cloudflare Pages rebuilds from the configured deploy hook. `src/data/blog.ts`
-is retained only as local fallback/seed content when Supabase build credentials
-are absent.
+after Cloudflare Pages rebuilds from the configured deploy hook or Pages API
+trigger. `src/data/blog.ts` is retained only as local fallback/seed content when
+Supabase build credentials are absent.
 
 To migrate current fallback posts into Supabase, run the seed script with service
 role build credentials after the schema migration is applied:
