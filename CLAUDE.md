@@ -55,7 +55,7 @@ Supabase `posts` is the editorial source of truth for blog content when build cr
 
 ### Key Patterns
 
-**Content → Pages**: non-blog content comes from typed `src/data/` modules. Blog content comes from Supabase `posts` at build time when `SUPABASE_URL` + `SUPABASE_SECRET_KEY` are configured; local fallback data is used only when those credentials are absent.
+**Content → Pages**: non-blog content comes from typed `src/data/` modules. Blog content comes from Supabase `posts` at build time when `SUPABASE_URL` + `PUBLIC_SUPABASE_PUBLISHABLE_KEY` are configured; `SUPABASE_SECRET_KEY` remains a legacy server-key fallback. Local fallback data is used only when those credentials are absent.
 
 **Business logic (`src/lib/`)**: Pure functions and integration helpers across 14 domain folders: `admin/`, `architecture-roulette/`, `blog/`, `blog-views/`, `cv-requests/`, `data-platform-maturity/`, `data-stack-roast/`, `governance-scorecard/`, `lakehouse-cost-calculator/`, `leads/`, `practitioner-tools/`, `scd-design-lab/`, `spark-explained/`, and `sql-deathmatch/`. Tests are co-located as `*.test.ts`.
 

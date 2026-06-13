@@ -10,6 +10,8 @@ export const GET: APIRoute = async () => {
   const client = createSupabaseClientForBuild({
     SUPABASE_URL: import.meta.env.SUPABASE_URL,
     SUPABASE_SECRET_KEY: import.meta.env.SUPABASE_SECRET_KEY,
+    PUBLIC_SUPABASE_PUBLISHABLE_KEY:
+      import.meta.env.PUBLIC_SUPABASE_PUBLISHABLE_KEY,
   });
   const posts = await loadPublishedPostsForBuild(client, staticFallback);
   const manifest: BlogViewPostManifest = {
@@ -27,4 +29,3 @@ export const GET: APIRoute = async () => {
     },
   });
 };
-

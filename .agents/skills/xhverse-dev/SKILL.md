@@ -44,7 +44,7 @@ Single test file: `bunx vitest run src/data/blog.test.ts`
 ### Data Layer
 - `src/data/` contains static typed data (gallery items, CV info, site config, and blog fallback/seed data)
 - `src/lib/blog/` handles Supabase → static publishing at build time
-- When `SUPABASE_URL` + `SUPABASE_SECRET_KEY` env vars are set, published posts come only from Supabase `posts`; stale local fallback posts must not leak into public builds
+- When `SUPABASE_URL` + `PUBLIC_SUPABASE_PUBLISHABLE_KEY` env vars are set, published posts come only from Supabase `posts`; `SUPABASE_SECRET_KEY` is a legacy fallback and stale local fallback posts must not leak into public builds
 - Without those vars, local builds use `src/data/blog.ts` directly
 
 ### SEO System

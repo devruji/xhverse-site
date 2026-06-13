@@ -51,7 +51,7 @@ graph LR
 
 1. CI or Cloudflare Pages runs `bun run build`
 2. `scripts/generate-headers.ts` writes `public/_headers` with CSP derived from `PUBLIC_SUPABASE_URL`
-3. Astro fetches published blog posts from Supabase (`SUPABASE_URL` + `SUPABASE_SECRET_KEY`)
+3. Astro fetches published blog posts from Supabase (`SUPABASE_URL` + `PUBLIC_SUPABASE_PUBLISHABLE_KEY`; `SUPABASE_SECRET_KEY` is a legacy fallback)
 4. Falls back to `src/data/blog.ts` only when Supabase build credentials are absent
 5. Generates static HTML for all pages and `/blog-post-manifest.json` → `dist/`
 6. The manifest contains the final published blog slugs used by the Cloudflare view-count API
@@ -100,7 +100,7 @@ User clicks "Get a Copy" → CvRequestModal opens
 | Database | RLS on all tables; anon: insert-only on submissions, select-only on reads |
 | D1 analytics | Aggregate blog counts, daily rollups, and referrer-origin buckets only; no IP, raw user agent, or fingerprint hash |
 | Storage | Public read on `documents` bucket; no write access via client |
-| Build secrets | `SUPABASE_SECRET_KEY` server-only, never in client bundles |
+| Build read key | `PUBLIC_SUPABASE_PUBLISHABLE_KEY` reads published blog rows through public RLS; `SUPABASE_SECRET_KEY` remains an optional legacy server-side fallback |
 | Edge Function secrets | `RESEND_API_KEY` set via `bunx supabase secrets set` |
 
 ## Pages

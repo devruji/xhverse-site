@@ -19,7 +19,7 @@ This project uses Supabase as the blog CMS/source of truth, for selected runtime
 - `documents` bucket → `cv/rujikorn-ngoensaard-cv.pdf` (public read)
 
 ### Client Access Patterns
-- **Build time**: `SUPABASE_URL` + `SUPABASE_SECRET_KEY` (service role) for fetching published posts; when configured, Supabase posts are authoritative
+- **Build time**: `SUPABASE_URL` + `PUBLIC_SUPABASE_PUBLISHABLE_KEY` for fetching published posts through public RLS; `SUPABASE_SECRET_KEY` is a legacy server-key fallback. When configured, Supabase posts are authoritative
 - **Client side**: `PUBLIC_SUPABASE_URL` + `PUBLIC_SUPABASE_PUBLISHABLE_KEY` (anon key) for maturity submissions, CV requests, leads, and admin reads/updates gated by RLS and Cloudflare Access
 - **Edge Functions**: Supabase service role + `RESEND_API_KEY` for CV request notifications and PDF delivery
 

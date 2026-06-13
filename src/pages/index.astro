@@ -163,6 +163,8 @@ const deploymentSite = (Astro.site ?? site.siteUrl).toString();
 const blogClient = createSupabaseClientForBuild({
   SUPABASE_URL: import.meta.env.SUPABASE_URL,
   SUPABASE_SECRET_KEY: import.meta.env.SUPABASE_SECRET_KEY,
+  PUBLIC_SUPABASE_PUBLISHABLE_KEY:
+    import.meta.env.PUBLIC_SUPABASE_PUBLISHABLE_KEY,
 });
 const latestWritingPosts = (await loadPublishedPostsForBuild(blogClient, staticFallback)).slice(0, 3);
 

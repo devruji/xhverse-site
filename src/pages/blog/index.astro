@@ -17,6 +17,8 @@ import {
 const client = createSupabaseClientForBuild({
   SUPABASE_URL: import.meta.env.SUPABASE_URL,
   SUPABASE_SECRET_KEY: import.meta.env.SUPABASE_SECRET_KEY,
+  PUBLIC_SUPABASE_PUBLISHABLE_KEY:
+    import.meta.env.PUBLIC_SUPABASE_PUBLISHABLE_KEY,
 });
 const sortedPosts = await loadPublishedPostsForBuild(client, staticFallback);
 const deploymentSite = (Astro.site ?? site.siteUrl).toString();

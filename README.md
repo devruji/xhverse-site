@@ -152,7 +152,8 @@ Cloudflare Pages settings:
 | Variable | Environment | Purpose |
 |----------|-------------|---------|
 | `SUPABASE_URL` | Build | Database URL |
-| `SUPABASE_SECRET_KEY` | Build (secret) | Service role key |
+| `PUBLIC_SUPABASE_PUBLISHABLE_KEY` | Build + client | Public read key for published blog rows and browser Supabase clients |
+| `SUPABASE_SECRET_KEY` | Build (secret, optional legacy) | Server read key fallback for published blog rows |
 | `PUBLIC_SUPABASE_URL` | Build + client | For CSP connect-src |
 | `PUBLIC_SITE_URL` | Production | Canonical URL override |
 | `PUBLIC_ALLOW_INDEXING` | Preview (optional) | Force indexing on preview |

@@ -14,9 +14,12 @@ const LEGACY_SELECT_COLUMNS =
 export function readSupabaseBuildCredentials(env: {
   SUPABASE_URL?: string;
   SUPABASE_SECRET_KEY?: string;
+  PUBLIC_SUPABASE_PUBLISHABLE_KEY?: string;
 }): { url: string; key: string } | null {
   const url = env.SUPABASE_URL?.trim();
-  const key = env.SUPABASE_SECRET_KEY?.trim();
+  const key =
+    env.PUBLIC_SUPABASE_PUBLISHABLE_KEY?.trim() ||
+    env.SUPABASE_SECRET_KEY?.trim();
   if (!url || !key) return null;
   return { url, key };
 }
@@ -27,6 +30,7 @@ export function createSupabaseClientForBuild(
   const creds = readSupabaseBuildCredentials({
     SUPABASE_URL: env.SUPABASE_URL,
     SUPABASE_SECRET_KEY: env.SUPABASE_SECRET_KEY,
+    PUBLIC_SUPABASE_PUBLISHABLE_KEY: env.PUBLIC_SUPABASE_PUBLISHABLE_KEY,
   });
   if (!creds) return null;
   return createClient(creds.url, creds.key);

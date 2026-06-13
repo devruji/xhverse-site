@@ -21,6 +21,9 @@ describe("readSupabaseBuildCredentials", () => {
     expect(
       readSupabaseBuildCredentials({ SUPABASE_SECRET_KEY: "k" }),
     ).toBeNull();
+    expect(
+      readSupabaseBuildCredentials({ PUBLIC_SUPABASE_PUBLISHABLE_KEY: "k" }),
+    ).toBeNull();
   });
 
   it("returns null for blank strings", () => {
@@ -40,6 +43,35 @@ describe("readSupabaseBuildCredentials", () => {
       }),
     ).toEqual({ url: "https://x.supabase.co", key: "secret" });
   });
+
+  it("uses the publishable key for public build reads", () => {
+    expect(
+      readSupabaseBuildCredentials({
+        SUPABASE_URL: " https://x.supabase.co ",
+        PUBLIC_SUPABASE_PUBLISHABLE_KEY: " publishable ",
+      }),
+    ).toEqual({ url: "https://x.supabase.co", key: "publishable" });
+  });
+
+  it("prefers the publishable key over a legacy server key", () => {
+    expect(
+      readSupabaseBuildCredentials({
+        SUPABASE_URL: "https://x.supabase.co",
+        SUPABASE_SECRET_KEY: "legacy",
+        PUBLIC_SUPABASE_PUBLISHABLE_KEY: "publishable",
+      }),
+    ).toEqual({ url: "https://x.supabase.co", key: "publishable" });
+  });
+
+  it("falls back to the legacy server key when the publishable key is blank", () => {
+    expect(
+      readSupabaseBuildCredentials({
+        SUPABASE_URL: "https://x.supabase.co",
+        SUPABASE_SECRET_KEY: "legacy",
+        PUBLIC_SUPABASE_PUBLISHABLE_KEY: " ",
+      }),
+    ).toEqual({ url: "https://x.supabase.co", key: "legacy" });
+  });
 });
 
 describe("createSupabaseClientForBuild", () => {
@@ -57,7 +89,7 @@ describe("createSupabaseClientForBuild", () => {
     vi.mocked(createClient).mockReturnValue(fake as never);
     const client = createSupabaseClientForBuild({
       SUPABASE_URL: "https://a.supabase.co",
-      SUPABASE_SECRET_KEY: "k",
+      PUBLIC_SUPABASE_PUBLISHABLE_KEY: "k",
     });
     expect(client).toBe(fake);
     expect(createClient).toHaveBeenCalledWith(
