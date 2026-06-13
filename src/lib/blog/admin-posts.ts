@@ -13,6 +13,7 @@ export const COVER_IMAGE_MIME_TYPES = [
   "image/jpeg",
   "image/png",
 ] as const;
+export const MAX_RELATED_TOOL_CTAS = 3;
 
 export type PostStatus = "draft" | "published";
 export type CoverImageMimeType = (typeof COVER_IMAGE_MIME_TYPES)[number];
@@ -139,6 +140,8 @@ export function parseRelatedToolCtasInput(input: string): RelatedToolCtaInput[] 
 }
 
 export function validateRelatedToolCtasInput(input: string): string | null {
+  const entries: RelatedToolCtaInput[] = [];
+  const seen = new Set<BlogToolSlug>();
   for (const rawLine of input.split(/\r?\n|,/)) {
     const line = rawLine.trim();
     if (!line) continue;
@@ -151,6 +154,13 @@ export function validateRelatedToolCtasInput(input: string): string | null {
     if (!isRelatedToolCtaVariant(variant)) {
       return "Related tool variant must be primary or secondary.";
     }
+    if (!seen.has(slug)) {
+      entries.push({ slug, variant });
+      seen.add(slug);
+    }
+  }
+  if (entries.length > MAX_RELATED_TOOL_CTAS) {
+    return `Choose ${MAX_RELATED_TOOL_CTAS} or fewer related tool CTAs.`;
   }
   return null;
 }
@@ -351,8 +361,14 @@ export function mapSupabasePostError(error: SupabasePostError): string {
   if (error.code === "23505" || lower.includes("duplicate key")) {
     return "A post with this slug already exists.";
   }
-  if (error.code === "23514" || lower.includes("posts_slug_format_check")) {
+  if (error.code === "23514" && lower.includes("posts_related_tool_ctas_check")) {
+    return `Choose ${MAX_RELATED_TOOL_CTAS} or fewer related tool CTAs.`;
+  }
+  if (lower.includes("posts_slug_format_check")) {
     return "Slug must be lowercase kebab-case.";
+  }
+  if (error.code === "23514") {
+    return "Post failed a database validation check.";
   }
   if (lower.includes("jwt") || lower.includes("not authenticated")) {
     return "Session expired. Please sign in again.";

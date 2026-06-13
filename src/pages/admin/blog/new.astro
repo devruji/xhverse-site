@@ -214,6 +214,11 @@ import AdminLayout from "../../../layouts/AdminLayout.astro";
       return payload?.message ?? (response.ok ? "Cloudflare rebuild queued." : "Cloudflare rebuild unavailable.");
     }
 
+    async function rebuildMessageForNewPost(intent: PostSaveIntent): Promise<string> {
+      if (intent !== "publish") return "Draft saved without rebuild.";
+      return triggerRebuild("blog-publish");
+    }
+
     function refreshComputedFields(): void {
       if (slug && title && !slug.dataset.touched) slug.value = normalizeSlug(title.value);
       if (readingTime && body && !readingManual?.checked) {
@@ -277,7 +282,7 @@ import AdminLayout from "../../../layouts/AdminLayout.astro";
       }
 
       const id = typeof data === "object" && data && "id" in data ? String(data.id) : "";
-      const rebuildMessage = await triggerRebuild(`blog-${intent}`);
+      const rebuildMessage = await rebuildMessageForNewPost(intent);
       setState(`Saved. ${rebuildMessage}`);
       if (id) window.location.href = `/admin/blog/edit/?id=${encodeURIComponent(id)}`;
     }

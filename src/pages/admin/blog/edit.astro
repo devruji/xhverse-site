@@ -114,6 +114,8 @@ import AdminLayout from "../../../layouts/AdminLayout.astro";
     const errorBox = document.querySelector<HTMLElement>("#post-form-error");
     const preview = document.querySelector<HTMLElement>("#post-preview");
     let existingCoverPath = "";
+    let existingPostStatus: PostStatus = "draft";
+    let existingPublishedAt: string | null = null;
     let coverRemoved = false;
     let stagedCoverFile: File | null = null;
     let stagedPreviewUrl: string | null = null;
@@ -242,6 +244,30 @@ import AdminLayout from "../../../layouts/AdminLayout.astro";
       return payload?.message ?? (response.ok ? "Cloudflare rebuild queued." : "Cloudflare rebuild unavailable.");
     }
 
+    function isPublicPost(statusValue: PostStatus, publishedAtValue: string | null): boolean {
+      if (statusValue !== "published" || !publishedAtValue) return false;
+      const publishedAtTime = new Date(publishedAtValue).getTime();
+      return Number.isFinite(publishedAtTime) && publishedAtTime <= Date.now();
+    }
+
+    async function rebuildMessageForMutation(options: {
+      previousStatus: PostStatus;
+      previousPublishedAt: string | null;
+      nextStatus: PostStatus | null;
+      nextPublishedAt: string | null;
+      reason: string;
+    }): Promise<string> {
+      const wasPublic = isPublicPost(
+        options.previousStatus,
+        options.previousPublishedAt,
+      );
+      const isPublic = options.nextStatus
+        ? isPublicPost(options.nextStatus, options.nextPublishedAt)
+        : false;
+      if (!wasPublic && !isPublic) return "Draft-only change saved without rebuild.";
+      return triggerRebuild(options.reason);
+    }
+
     function refreshComputedFields(): void {
       if (readingTime && body && !readingManual?.checked) readingTime.value = estimateReadingTime(body.value);
       if (preview && body) preview.innerHTML = renderMarkdownToHtml(body.value || "No body content yet.");
@@ -252,7 +278,10 @@ import AdminLayout from "../../../layouts/AdminLayout.astro";
       if (!postId) { showError("Missing post id."); return; }
       const { data, error } = await client.from("posts").select("*").eq("id", postId).single();
       if (error) { showError(mapSupabasePostError(error)); return; }
-      setValues(formValuesFromAdminPost(data as AdminPostRow));
+      const post = data as AdminPostRow;
+      existingPostStatus = post.status;
+      existingPublishedAt = post.published_at;
+      setValues(formValuesFromAdminPost(post));
       refreshComputedFields();
       setState("Loaded");
     }
@@ -300,6 +329,8 @@ import AdminLayout from "../../../layouts/AdminLayout.astro";
         { ...current, coverImagePath: nextCoverPath },
         intent,
       );
+      const previousStatus = existingPostStatus;
+      const previousPublishedAt = existingPublishedAt;
       const { error } = await client.from("posts").update(payload).eq("id", postId);
       if (error) {
         if (uploadedCoverPath) await removeStorageObjects([uploadedCoverPath]);
@@ -323,7 +354,15 @@ import AdminLayout from "../../../layouts/AdminLayout.astro";
       renderExistingCover();
       if (status) status.value = payload.status;
       if (publishedAt) publishedAt.value = payload.published_at?.slice(0, 16) ?? "";
-      const rebuildMessage = await triggerRebuild(`blog-${intent}`);
+      existingPostStatus = payload.status;
+      existingPublishedAt = payload.published_at;
+      const rebuildMessage = await rebuildMessageForMutation({
+        previousStatus,
+        previousPublishedAt,
+        nextStatus: payload.status,
+        nextPublishedAt: payload.published_at,
+        reason: `blog-${intent}`,
+      });
       setState(`Saved. ${rebuildMessage}`);
     }
 
@@ -343,7 +382,13 @@ import AdminLayout from "../../../layouts/AdminLayout.astro";
         return;
       }
       if (existingCoverPath) await removeStorageObjects([existingCoverPath]);
-      const rebuildMessage = await triggerRebuild("blog-delete");
+      const rebuildMessage = await rebuildMessageForMutation({
+        previousStatus: existingPostStatus,
+        previousPublishedAt: existingPublishedAt,
+        nextStatus: null,
+        nextPublishedAt: null,
+        reason: "blog-delete",
+      });
       setState(`Deleted. ${rebuildMessage}`);
       window.location.href = "/admin/blog/";
     }

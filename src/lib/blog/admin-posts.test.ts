@@ -13,6 +13,7 @@ import {
   isSameOriginImagePath,
   mapSupabasePostError,
   MAX_COVER_IMAGE_BYTES,
+  MAX_RELATED_TOOL_CTAS,
   normalizeSlug,
   parseTags,
   parseRelatedToolCtasInput,
@@ -156,7 +157,17 @@ describe("admin post helpers", () => {
     ]);
     expect(validateRelatedToolCtasInput("lakehouse-cost-calculator")).toBeNull();
     expect(validateRelatedToolCtasInput("lakehouse-cost-calculator:primary")).toBeNull();
+    expect(
+      validateRelatedToolCtasInput(
+        "lakehouse-cost-calculator:primary,lakehouse-cost-calculator:secondary",
+      ),
+    ).toBeNull();
     expect(validateRelatedToolCtasInput(":primary")).toBe("Unknown related tool slug: :primary.");
+    expect(
+      validateRelatedToolCtasInput(
+        "lakehouse-cost-calculator:primary\narchitecture-roulette:secondary\ndata-platform-maturity-checker:secondary\ngovernance-scorecard:secondary",
+      ),
+    ).toBe(`Choose ${MAX_RELATED_TOOL_CTAS} or fewer related tool CTAs.`);
   });
 
   it("validates cover image files and object paths", () => {
@@ -355,6 +366,8 @@ describe("admin post helpers", () => {
     });
 
     expect(mapSupabasePostError({ message: "posts_slug_format_check", code: "23514" })).toBe("Slug must be lowercase kebab-case.");
+    expect(mapSupabasePostError({ message: "posts_related_tool_ctas_check", code: "23514" })).toBe("Choose 3 or fewer related tool CTAs.");
+    expect(mapSupabasePostError({ message: "other_check", code: "23514" })).toBe("Post failed a database validation check.");
     expect(mapSupabasePostError({ message: "JWT expired" })).toBe("Session expired. Please sign in again.");
     expect(mapSupabasePostError({ message: "row-level security violation" })).toBe("You do not have permission to modify posts.");
     expect(mapSupabasePostError({ message: "Other failure" })).toBe("Other failure");

@@ -21,6 +21,29 @@ function flattenJsonLd(items: JsonLdRecord[]): JsonLdRecord[] {
   });
 }
 
+function socialImageUrlFromImageSrc(src: string): string {
+  return new URL(src, "https://xhverse.co").toString();
+}
+
+async function expectArticleCoverMetadata(page: Page): Promise<string> {
+  const coverSrc = await page
+    .locator("figure img")
+    .first()
+    .getAttribute("src");
+  expect(coverSrc).toBeTruthy();
+  const coverUrl = socialImageUrlFromImageSrc(coverSrc ?? "");
+  expect(coverUrl).not.toBe("https://xhverse.co/images/og-cover.jpg");
+
+  await expect(
+    page.locator(`meta[property="og:image"][content="${coverUrl}"]`),
+  ).toHaveCount(1);
+  await expect(
+    page.locator(`meta[name="twitter:image"][content="${coverUrl}"]`),
+  ).toHaveCount(1);
+
+  return coverUrl;
+}
+
 test("about page loads expected sections", async ({ page }) => {
   await page.goto("/about");
   await expect(
@@ -57,14 +80,7 @@ test("blog article page renders markdown body", async ({ page }) => {
 
 test("blog article uses its cover image for social metadata", async ({ page }) => {
   await page.goto("/blog/data-product-as-platform-contract");
-  const coverUrl =
-    "https://jxfpnfliioqbhzznaphd.supabase.co/storage/v1/object/public/blog-covers/posts/data-product-as-platform-contract/00000000-0000-4000-8000-000000000005.jpg";
-  await expect(
-    page.locator(`meta[property="og:image"][content="${coverUrl}"]`),
-  ).toHaveCount(1);
-  await expect(
-    page.locator(`meta[name="twitter:image"][content="${coverUrl}"]`),
-  ).toHaveCount(1);
+  await expectArticleCoverMetadata(page);
 });
 
 test("data product article exposes canonical article structured data", async ({ page }) => {
@@ -74,6 +90,7 @@ test("data product article exposes canonical article structured data", async ({ 
   await expect(page).toHaveTitle("Data Product as a Platform Contract | XHVERSE");
   await expect(page.locator(`link[rel="canonical"][href="${canonicalUrl}"]`)).toHaveCount(1);
   await expect(page.locator(`meta[property="og:url"][content="${canonicalUrl}"]`)).toHaveCount(1);
+  const coverUrl = await expectArticleCoverMetadata(page);
 
   const jsonLd = getJsonLdByType(await readJsonLd(page), "BlogPosting");
   expect(jsonLd?.["@id"]).toBe(canonicalUrl);
@@ -81,9 +98,7 @@ test("data product article exposes canonical article structured data", async ({ 
   expect(jsonLd?.url).toBe(canonicalUrl);
   expect(jsonLd?.datePublished).toBe("2026-06-03");
   expect(jsonLd?.dateModified).toBe("2026-06-03");
-  expect(jsonLd?.image).toBe(
-    "https://jxfpnfliioqbhzznaphd.supabase.co/storage/v1/object/public/blog-covers/posts/data-product-as-platform-contract/00000000-0000-4000-8000-000000000005.jpg",
-  );
+  expect(jsonLd?.image).toBe(coverUrl);
   expect(jsonLd?.author).toEqual(
     expect.objectContaining({
       "@id": "https://xhverse.co/#person",
@@ -102,8 +117,6 @@ test("materialized views article exposes canonical metadata and content", async 
   await page.goto("/blog/most-teams-use-materialized-views-too-early");
   const canonicalUrl =
     "https://xhverse.co/blog/most-teams-use-materialized-views-too-early";
-  const coverUrl =
-    "https://jxfpnfliioqbhzznaphd.supabase.co/storage/v1/object/public/blog-covers/posts/most-teams-use-materialized-views-too-early/00000000-0000-4000-8000-000000000001.jpg";
 
   await expect(page).toHaveTitle(
     "Most Teams Use Materialized Views Too Early | Data Architecture | XHVERSE",
@@ -111,12 +124,7 @@ test("materialized views article exposes canonical metadata and content", async 
   await expect(
     page.locator(`link[rel="canonical"][href="${canonicalUrl}"]`),
   ).toHaveCount(1);
-  await expect(
-    page.locator(`meta[property="og:image"][content="${coverUrl}"]`),
-  ).toHaveCount(1);
-  await expect(
-    page.locator(`meta[name="twitter:image"][content="${coverUrl}"]`),
-  ).toHaveCount(1);
+  const coverUrl = await expectArticleCoverMetadata(page);
   await expect(
     page.getByRole("heading", {
       name: "Most Teams Use Materialized Views Too Early",

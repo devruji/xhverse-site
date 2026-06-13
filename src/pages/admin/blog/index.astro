@@ -175,6 +175,17 @@ import AdminLayout from "../../../layouts/AdminLayout.astro";
       return payload?.message ?? (response.ok ? "Cloudflare rebuild queued." : "Cloudflare rebuild unavailable.");
     }
 
+    function isPublicPost(post: AdminPostRow): boolean {
+      if (post.status !== "published" || !post.published_at) return false;
+      const publishedAtTime = new Date(post.published_at).getTime();
+      return Number.isFinite(publishedAtTime) && publishedAtTime <= Date.now();
+    }
+
+    async function deleteRebuildMessage(post: AdminPostRow): Promise<string> {
+      if (!isPublicPost(post)) return "Draft deleted without rebuild.";
+      return triggerRebuild("blog-delete");
+    }
+
     async function removeStorageObjects(paths: string[]): Promise<void> {
       if (!client || paths.length === 0) return;
       await client.storage.from("blog-covers").remove(paths);
@@ -195,7 +206,7 @@ import AdminLayout from "../../../layouts/AdminLayout.astro";
       if (post.cover_image_path) await removeStorageObjects([post.cover_image_path]);
       posts = posts.filter((item) => item.id !== postId);
       renderPosts();
-      setStatus(await triggerRebuild("blog-delete"));
+      setStatus(await deleteRebuildMessage(post));
     }
 
     function setActiveStatus(button: HTMLElement): void {
