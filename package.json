@@ -19,26 +19,27 @@
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",
-    "@supabase/supabase-js": "^2.107.0",
-    "@tailwindcss/vite": "^4.3.0",
-    "astro": "^6.4.4",
+    "@supabase/supabase-js": "^2.108.1",
+    "@tailwindcss/vite": "^4.3.1",
+    "astro": "^6.4.6",
     "marked": "^18.0.5",
-    "sanitize-html": "^2.17.4",
-    "tailwindcss": "^4.3.0"
+    "sanitize-html": "^2.17.5",
+    "tailwindcss": "^4.3.1"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.9",
     "@playwright/test": "^1.60.0",
-    "@types/node": "^25.9.1",
+    "@types/node": "^25.9.3",
     "@types/sanitize-html": "^2.16.1",
     "@vitest/coverage-v8": "^4.1.8",
-    "supabase": "^2.105.0",
+    "supabase": "^2.106.0",
     "typescript": "^6.0.3",
     "vitest": "^4.1.8",
-    "wrangler": "^4.98.0"
+    "wrangler": "^4.100.0"
   },
   "overrides": {
     "devalue": "^5.8.1",
+    "esbuild": "^0.28.1",
     "fast-uri": "^3.1.2",
     "picomatch": "^4.0.4",
     "postcss": "^8.5.12",
