@@ -59,7 +59,7 @@ fallback path when live credentials are unavailable.
 - In the Supabase Blog Writer, enter related tools as `tool-slug:primary` or
   `tool-slug:secondary` lines.
 - Use only known internal tool slugs from `/tools`.
-- Current high-fit additions: `data-product-contract-builder`, `access-model-simulator`, `lakehouse-table-layout-advisor`, `power-bi-semantic-model-doctor`, and `pipeline-recovery-planner`.
+- Current high-fit additions: `workload-placement-simulator`, `data-product-contract-builder`, `access-model-simulator`, `lakehouse-table-layout-advisor`, `power-bi-semantic-model-doctor`, and `pipeline-recovery-planner`.
 - Keep CTAs lightweight: normal links or static cards, no embedded tool apps.
 - Use one primary CTA and no more than two supporting CTAs unless there is a
   clear reader workflow.

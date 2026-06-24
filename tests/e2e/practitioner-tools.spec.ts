@@ -32,7 +32,7 @@ test("tools catalog links to all live tools", async ({ page }) => {
   await expect(
     page.getByRole("heading", { name: "Data platform tools by Rujikorn Ngoensaard" }),
   ).toBeVisible();
-  await expect(page.getByText("13 free tools from XH / bossruji")).toBeVisible();
+  await expect(page.getByText("14 free tools from XH / bossruji")).toBeVisible();
 
   for (const tool of toolCatalog) {
     await expect(
@@ -50,7 +50,8 @@ test("tools catalog lists newest practitioner tools first", async ({ page }) => 
       headings.map((heading) => heading.textContent?.trim() ?? ""),
     );
 
-  expect(visibleToolTitles.slice(0, 5)).toEqual([
+  expect(visibleToolTitles.slice(0, 6)).toEqual([
+    "Workload Placement Simulator",
     "Data Product Contract Builder",
     "Access Model Simulator",
     "Lakehouse Table Layout Advisor",

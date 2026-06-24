@@ -75,6 +75,7 @@ Single test file: `bunx vitest run src/data/blog.test.ts`
 - `/tools/lakehouse-table-layout-advisor`: Lakehouse table layout and maintenance advisor
 - `/tools/power-bi-semantic-model-doctor`: Power BI semantic model diagnosis
 - `/tools/pipeline-recovery-planner`: Pipeline recovery runbook planner
+- `/tools/workload-placement-simulator`: Databricks/Fabric/Power BI workload placement simulator
 
 ## Agent Surfaces
 

@@ -61,6 +61,7 @@ and cover-image briefs.
    - SCD or dimensional history topics -> `SCD Design Lab`
    - Platform maturity, ownership, and operating model -> `Data Platform Maturity Checker`
    - Governance, contracts, and metric trust -> `Governance Readiness Scorecard`
+   - Workload home, Databricks/Fabric/Power BI placement, or serverless eligibility -> `Workload Placement Simulator`
    - Data product ownership, grain, freshness, access, and lifecycle -> `Data Product Contract Builder`
    - Access model, ABAC, row filters, masks, and OneLake/Fabric security paths -> `Access Model Simulator`
    - Architecture trade-off scenarios -> `Architecture Decision Roulette`

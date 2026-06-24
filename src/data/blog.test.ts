@@ -85,7 +85,8 @@ describe("Blog Data", () => {
     );
     expect(post?.seoDescription).toContain("modeling, query, layout");
     expect(post?.relatedToolCtas).toEqual([
-      createRelatedToolCta("lakehouse-cost-calculator", "primary"),
+      createRelatedToolCta("workload-placement-simulator", "primary"),
+      createRelatedToolCta("lakehouse-cost-calculator", "secondary"),
       createRelatedToolCta("lakehouse-table-layout-advisor", "secondary"),
     ]);
     expect(post?.bodyMarkdown).toContain(
@@ -104,7 +105,7 @@ describe("Blog Data", () => {
     expect(post?.bodyMarkdown).toContain("## Platform behavior is not portable");
     expect(post?.bodyMarkdown).toContain("## Decision checklist");
     expect(post?.bodyMarkdown).toContain(
-      "Lakehouse Cost Calculator](/tools/lakehouse-cost-calculator)",
+      "Workload Placement Simulator](/tools/workload-placement-simulator)",
     );
     expect(post?.bodyMarkdown).toContain("Evidence note: platform-specific behavior");
     expect(post?.bodyMarkdown).toContain("## References");
@@ -144,15 +145,15 @@ describe("Blog Data", () => {
         variant: "primary",
       },
       {
-        slug: "scd-design-lab",
-        label: "SCD Design Lab",
-        href: "/tools/scd-design-lab",
+        slug: "workload-placement-simulator",
+        label: "Workload Placement Simulator",
+        href: "/tools/workload-placement-simulator",
         variant: "secondary",
       },
       {
-        slug: "lakehouse-cost-calculator",
-        label: "Lakehouse Cost Calculator",
-        href: "/tools/lakehouse-cost-calculator",
+        slug: "scd-design-lab",
+        label: "SCD Design Lab",
+        href: "/tools/scd-design-lab",
         variant: "secondary",
       },
     ]);
@@ -160,6 +161,9 @@ describe("Blog Data", () => {
     expect(post?.bodyMarkdown).toContain("## Related tools");
     expect(post?.bodyMarkdown).toContain(
       "Power BI Semantic Model Doctor](/tools/power-bi-semantic-model-doctor)",
+    );
+    expect(post?.bodyMarkdown).toContain(
+      "Workload Placement Simulator](/tools/workload-placement-simulator)",
     );
     expect(post?.bodyMarkdown).toContain("## References");
     expect(post?.bodyMarkdown).toContain("https://learn.microsoft.com/en-us/power-bi/guidance/star-schema");
@@ -229,13 +233,17 @@ describe("Blog Data", () => {
           "/images/blog-onelake-platform-contract-not-storage-cover.jpg",
         readingTime: "6 min read",
         primaryCtaSlug: "access-model-simulator",
-        secondaryCtaSlugs: ["governance-scorecard", "data-product-contract-builder"],
+        secondaryCtaSlugs: [
+          "workload-placement-simulator",
+          "data-product-contract-builder",
+        ],
         reference: "https://learn.microsoft.com/en-us/fabric/onelake/onelake-overview",
         bodyChecks: [
           "## Shortcuts are not ownership shortcuts",
           "## Security has more than one plane",
           "## API and external access belong in the contract",
           "Access Model Simulator](/tools/access-model-simulator)",
+          "Workload Placement Simulator](/tools/workload-placement-simulator)",
         ],
       },
       {
@@ -261,13 +269,14 @@ describe("Blog Data", () => {
         coverImageUrl:
           "/images/blog-serverless-data-engineering-operating-model-cover.jpg",
         readingTime: "5 min read",
-        primaryCtaSlug: "data-platform-maturity-checker",
-        secondaryCtaSlugs: ["pipeline-recovery-planner", "lakehouse-cost-calculator"],
+        primaryCtaSlug: "workload-placement-simulator",
+        secondaryCtaSlugs: ["pipeline-recovery-planner"],
         reference: "https://docs.databricks.com/aws/en/jobs/run-serverless-jobs",
         bodyChecks: [
           "## Eligibility is a release gate",
           "## Cost attribution needs new evidence",
           "## Recovery still needs an owner",
+          "Workload Placement Simulator](/tools/workload-placement-simulator)",
           "Pipeline Recovery Planner](/tools/pipeline-recovery-planner)",
         ],
       },

@@ -53,6 +53,10 @@ export const blogToolCtaDefinitions = {
     label: "Pipeline Recovery Planner",
     href: "/tools/pipeline-recovery-planner",
   },
+  "workload-placement-simulator": {
+    label: "Workload Placement Simulator",
+    href: "/tools/workload-placement-simulator",
+  },
 } as const satisfies Record<
   ToolSlug,
   {
@@ -129,7 +133,8 @@ export const posts: BlogPost[] = [
     seoDescription:
       "A practical decision framework for when materialized views reduce repeated analytical cost, and when they hide modeling, query, layout, or workload problems.",
     relatedToolCtas: [
-      createRelatedToolCta("lakehouse-cost-calculator", "primary"),
+      createRelatedToolCta("workload-placement-simulator", "primary"),
+      createRelatedToolCta("lakehouse-cost-calculator", "secondary"),
       createRelatedToolCta("lakehouse-table-layout-advisor", "secondary"),
     ],
     bodyMarkdown: `A dashboard that used to load in five seconds now takes forty-five. The business notices before the platform team does. Executives complain. The BI owner asks whether the warehouse is down. Engineers open the query plan, see a large fact table, several joins, a few aggregations, and one familiar suggestion appears within minutes: create a materialized view.
@@ -322,7 +327,9 @@ The best optimization is not always making the slow query faster. Sometimes it i
 
 ## Related tools
 
-Use the [Lakehouse Cost Calculator](/tools/lakehouse-cost-calculator) to reason about repeated compute, refresh cost, and workload economics before turning every slow query into another persisted object.
+Use the [Workload Placement Simulator](/tools/workload-placement-simulator) before turning every slow query into another persisted object. It helps decide whether the pattern belongs in BI serving, SQL warehouse, Databricks jobs, Fabric, or a hybrid placement review.
+
+Use the [Lakehouse Cost Calculator](/tools/lakehouse-cost-calculator) to reason about repeated compute, refresh cost, and workload economics after the placement boundary is clear.
 
 Use the [Lakehouse Table Layout Advisor](/tools/lakehouse-table-layout-advisor) when the real issue may be partitioning, clustering, data skipping, or table-layout drift rather than missing precomputation.
 
@@ -390,7 +397,7 @@ This article was co-written with an AI agent and reviewed by Rujikorn Ngoensaard
       "A practical Microsoft Fabric architecture brief on treating OneLake as a platform contract for ownership, access, shortcuts, discovery, and governance.",
     relatedToolCtas: [
       createRelatedToolCta("access-model-simulator", "primary"),
-      createRelatedToolCta("governance-scorecard", "secondary"),
+      createRelatedToolCta("workload-placement-simulator", "secondary"),
       createRelatedToolCta("data-product-contract-builder", "secondary"),
     ],
     bodyMarkdown: `OneLake is easy to undersell because the word lake sounds like storage. In Fabric, that framing is too small.
@@ -537,7 +544,7 @@ If those answers are missing, landing data is easy but operating the platform ge
 ## Related tools
 
 - Use the [Access Model Simulator](/tools/access-model-simulator) before assuming workspace, item, API, and shortcut paths behave the same way.
-- Run the [Governance Readiness Scorecard](/tools/governance-scorecard) to test ownership and access-review readiness.
+- Use the [Workload Placement Simulator](/tools/workload-placement-simulator) when OneLake, Fabric Warehouse, Spark, Direct Lake, and Power BI serving paths are all plausible homes for the workload.
 - Draft the minimum contract with the [Data Product Contract Builder](/tools/data-product-contract-builder) before publishing shared OneLake assets.
 
 ## References
@@ -742,9 +749,8 @@ This article was co-written with an AI agent and reviewed by Rujikorn Ngoensaard
     seoDescription:
       "A practical operating model for serverless Databricks data engineering: ownership, workload eligibility, cost attribution, observability, CI/CD, and recovery.",
     relatedToolCtas: [
-      createRelatedToolCta("data-platform-maturity-checker", "primary"),
+      createRelatedToolCta("workload-placement-simulator", "primary"),
       createRelatedToolCta("pipeline-recovery-planner", "secondary"),
-      createRelatedToolCta("lakehouse-cost-calculator", "secondary"),
     ],
     bodyMarkdown: `Serverless data engineering removes a lot of cluster work. It does not remove operational accountability.
 
@@ -895,9 +901,8 @@ If those answers are visible, serverless can reduce friction. If they are missin
 
 ## Related tools
 
-- Use the [Data Platform Maturity Checker](/tools/data-platform-maturity-checker) before migrating shared data engineering workloads.
+- Use the [Workload Placement Simulator](/tools/workload-placement-simulator) before migrating shared data engineering workloads to serverless, classic jobs, SQL warehouse, Fabric, or a hybrid pattern.
 - Draft a recovery runbook with the [Pipeline Recovery Planner](/tools/pipeline-recovery-planner).
-- Estimate workload trade-offs with the [Lakehouse Cost Calculator](/tools/lakehouse-cost-calculator).
 
 ## References
 
@@ -1450,8 +1455,8 @@ This article was co-written with an AI agent and reviewed by Rujikorn Ngoensaard
       "Trade-offs, constraints, and design strategy for choosing between big-table analytics models, star schemas, and hybrid semantic layers.",
     relatedToolCtas: [
       createRelatedToolCta("power-bi-semantic-model-doctor", "primary"),
+      createRelatedToolCta("workload-placement-simulator", "secondary"),
       createRelatedToolCta("scd-design-lab", "secondary"),
-      createRelatedToolCta("lakehouse-cost-calculator", "secondary"),
     ],
     bodyMarkdown: `A table design is not good because it has fewer joins. It is good when it answers the right questions with the right amount of friction.
 
@@ -1709,8 +1714,8 @@ When those are missing, every pattern eventually becomes just another table peop
 ## Related tools
 
 - Diagnose model grain, relationships, measures, and refresh behavior with the [Power BI Semantic Model Doctor](/tools/power-bi-semantic-model-doctor).
+- Use the [Workload Placement Simulator](/tools/workload-placement-simulator) when the model could live in Power BI Import, Direct Lake, DirectQuery, a SQL warehouse, or a hybrid serving path.
 - Practice history and dimensional boundaries with the [SCD Design Lab](/tools/scd-design-lab).
-- Estimate serving-table and compute trade-offs with the [Lakehouse Cost Calculator](/tools/lakehouse-cost-calculator).
 
 ## References
 
