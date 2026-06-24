@@ -80,6 +80,11 @@ and cover-image briefs.
     should produce a Blog Writer-ready article package, not a `src/data/blog.ts`
     implementation, unless the user explicitly asks for code changes. Static
     fallback posts must still build without Supabase env vars.
+13. After content and cover approval, Codex should complete publishing when
+    Supabase/Cloudflare access is available: upload or register the cover,
+    insert/update `posts`, trigger the Pages rebuild, and verify production
+    `/blog` plus `/blog/<slug>`. If access is unavailable, leave the package
+    ready for `/admin/blog/new` and state the manual step.
 
 ## Blog Cover Image Style
 

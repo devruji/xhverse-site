@@ -23,6 +23,13 @@ This project uses Supabase as the blog CMS/source of truth, for selected runtime
 - **Client side**: `PUBLIC_SUPABASE_URL` + `PUBLIC_SUPABASE_PUBLISHABLE_KEY` (anon key) for maturity submissions, CV requests, leads, and admin reads/updates gated by RLS and Cloudflare Access
 - **Edge Functions**: Supabase service role + `RESEND_API_KEY` for CV request notifications and PDF delivery
 
+### Blog Publishing From Codex
+- After content and cover approval, Codex should publish directly when live access is available instead of handing step 4/5 back to the user.
+- Insert or update the `posts` row with `status = 'published'`, non-future `published_at`, `body_markdown`, SEO fields, cover metadata, and `related_tool_ctas`.
+- Upload covers to the `blog-covers` bucket when using the normal storage path. Use static `/images/...` cover paths only when the asset is committed and will deploy with the site.
+- Read back the Supabase row before triggering or accepting a rebuild.
+- Keep `/admin/blog` unchanged as the manual UI and fallback path when credentials or MCP access are unavailable.
+
 ### Security Model
 - All tables have RLS enabled
 - Anonymous users: insert-only on public submissions and constrained reads where explicitly allowed by RLS

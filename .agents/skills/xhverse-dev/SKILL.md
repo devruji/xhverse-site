@@ -116,6 +116,7 @@ Single test file: `bunx vitest run src/data/blog.test.ts`
 - For blog work, pair `technical_writer` with `blog-content-strategy` and `document-writer`. Use it before body drafting and again for pre-publish content QA.
 - Use `product-manager` before `technical_writer` when the task still needs topic selection, positioning, or business rationale.
 - For normal "make/write a blog post" requests, deliver a Supabase Blog Writer-ready package instead of editing `src/data/blog.ts`; only implement code when the user explicitly asks for code changes.
+- After content and cover approval, Codex should publish Supabase-backed posts directly when Supabase/Cloudflare credentials or MCP access are available: upload or register the cover, insert/update `posts`, trigger the Pages rebuild, and verify production `/blog` plus `/blog/<slug>`. Keep `/admin/blog` unchanged as the manual fallback.
 - Generated blog covers should stay in the established xhverse cover series:
   dark isometric data-architecture visuals, glass panels, teal glow, restrained
   amber accents, abstract platform objects, no people/logos/screenshots/readable
