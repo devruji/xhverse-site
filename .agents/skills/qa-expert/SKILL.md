@@ -24,7 +24,7 @@ Run the full CI pipeline locally:
 bun run check
 ```
 
-This executes: typecheck → build → coverage (100%) → E2E (50 checks).
+This executes: typecheck → build → coverage (100%) → E2E (72 checks).
 
 **CRITICAL**: If this fails, stop here. Do not proceed.
 
@@ -81,7 +81,7 @@ curl -s http://127.0.0.1:4321 | grep -c 'onclick='
 Verify every page returns 200 and has key elements:
 
 ```bash
-for page in / /blog /blog/onelake-platform-contract-not-storage /about /cv /gallery /tools /tools/data-platform-maturity-checker /tools/data-product-contract-builder /tools/access-model-simulator /tools/lakehouse-table-layout-advisor /tools/power-bi-semantic-model-doctor /tools/pipeline-recovery-planner; do
+for page in / /blog /blog/onelake-platform-contract-not-storage /about /cv /gallery /tools /tools/data-platform-maturity-checker /tools/data-product-contract-builder /tools/access-model-simulator /tools/lakehouse-table-layout-advisor /tools/power-bi-semantic-model-doctor /tools/pipeline-recovery-planner /tools/workload-placement-simulator; do
   status=$(curl -s -o /dev/null -w "%{http_code}" "http://127.0.0.1:4321${page}")
   echo "${page}: ${status}"
 done
@@ -228,6 +228,6 @@ These are issues that have broken production before — always verify:
 3. **CSS opacity:0 on scroll elements**: Must use progressive enhancement (`.will-animate` added by JS, not CSS default).
 4. **Inline onclick handlers**: Blocked by Rocket Loader. Use `addEventListener` in `data-cfasync="false"` scripts instead.
 5. **SVG OG images**: Social platforms can't render them. Must be raster PNG.
-6. **`/tools` exists**: The tools index should return 200 and link to all 13 live tools.
+6. **`/tools` exists**: The tools index should return 200 and link to all 14 live tools.
 7. **CV page inline footer**: Must use shared `<Footer />` component, not inline HTML.
 8. **AWS logo dual-theme**: Needs both `aws.png` (light) and `aws-dark.png` (dark), no CSS invert hack.
