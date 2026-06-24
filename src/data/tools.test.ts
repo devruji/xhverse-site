@@ -9,7 +9,7 @@ import {
 
 describe("tools data", () => {
   it("exports the full live tool catalog", () => {
-    expect(liveToolCount).toBe(13);
+    expect(liveToolCount).toBe(14);
     expect(toolCatalog).toHaveLength(liveToolCount);
   });
 
@@ -23,8 +23,9 @@ describe("tools data", () => {
     }
   });
 
-  it("defines five new practitioner tools as featured tools", () => {
+  it("defines the newest decision tools as featured tools", () => {
     expect(featuredToolSlugs).toEqual([
+      "workload-placement-simulator",
       "data-product-contract-builder",
       "access-model-simulator",
       "lakehouse-table-layout-advisor",
@@ -32,7 +33,7 @@ describe("tools data", () => {
       "pipeline-recovery-planner",
     ]);
 
-    expect(featuredTools).toHaveLength(5);
+    expect(featuredTools).toHaveLength(6);
     for (const tool of featuredTools) {
       expect(tool.status).toBe("New");
       expect(tool.homeLabel).toBeTruthy();
@@ -40,7 +41,8 @@ describe("tools data", () => {
   });
 
   it("sorts the catalog newest first by release date", () => {
-    expect(toolCatalog.map((tool) => tool.slug).slice(0, 5)).toEqual([
+    expect(toolCatalog.map((tool) => tool.slug).slice(0, 6)).toEqual([
+      "workload-placement-simulator",
       "data-product-contract-builder",
       "access-model-simulator",
       "lakehouse-table-layout-advisor",

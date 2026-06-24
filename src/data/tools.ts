@@ -22,6 +22,16 @@ export type ToolMetadata = {
 };
 
 export const toolDefinitions = {
+  "workload-placement-simulator": {
+    slug: "workload-placement-simulator",
+    title: "Workload Placement Simulator",
+    description:
+      "Compare Databricks, Fabric, and Power BI placement paths for a workload. Get a directional recommendation, runners-up, and review warnings.",
+    category: "Architecture",
+    status: "New",
+    releasedAt: "2026-06-24",
+    homeLabel: "Placement simulator",
+  },
   "scd-design-lab": {
     slug: "scd-design-lab",
     title: "SCD Design Lab",
@@ -158,6 +168,7 @@ export const toolCatalog = Object.values(toolDefinitions).toSorted((left, right)
 );
 
 export const featuredToolSlugs = [
+  "workload-placement-simulator",
   "data-product-contract-builder",
   "access-model-simulator",
   "lakehouse-table-layout-advisor",

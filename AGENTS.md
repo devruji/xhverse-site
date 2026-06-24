@@ -6,10 +6,10 @@ This file provides shared context for all Claude Code agents working in this rep
 
 - **Site**: xhverse.co — portfolio, blog, and interactive tools for Rujikorn Ngoensaard (XH / bossruji)
 - **Role**: Senior Data Engineer | Platform Architecture
-- **Version**: v3.9.4
+- **Version**: v3.9.6
 - **Stack**: Astro 6 (static only), Tailwind CSS v4, Bun, Cloudflare Pages, Supabase, Resend
-- **Pages**: 27 Astro route files; current release build generates 39 static HTML pages
-- **Tests**: 542 unit tests at 100% coverage + 62 E2E checks
+- **Pages**: 28 Astro route files; current release build generates 43 static HTML pages
+- **Tests**: 560 unit tests at 100% coverage + 72 E2E checks
 
 ## Commands
 
@@ -29,14 +29,14 @@ Kill dev server: `lsof -ti :4321 | xargs kill -9 2>/dev/null`
 
 ```
 src/data/*.ts     → Static typed content (profile, cv, site, services, gallery; blog fallback/seed)
-src/lib/          → Business logic + tests (14 domain folders, 100% coverage)
-src/pages/*.astro → Routes → generated static HTML (27 route files, 39 current build pages)
+src/lib/          → Business logic + tests (16 domain folders, 100% coverage)
+src/pages/*.astro → Routes → generated static HTML (28 route files, 43 current build pages)
 src/components/   → Shared Astro components (10)
 src/layouts/      → BaseLayout (SEO/CSP) + AdminLayout (admin panel)
 dist/             → Deployed to Cloudflare CDN
 ```
 
-### Interactive Tools (13 live)
+### Interactive Tools (14 live)
 
 All tools are fully client-side. Each follows:
 ```
@@ -61,6 +61,7 @@ The five practitioner assessment tools share `src/lib/practitioner-tools/` and a
 | Lakehouse Table Layout Advisor | Guided architecture journey (layout signals → maintenance plan) |
 | Power BI Semantic Model Doctor | Guided semantic journey (metric diagnosis → actions) |
 | Pipeline Recovery Planner | Guided recovery journey (drill checkpoints → runbook brief) |
+| Workload Placement Simulator | Guided architecture journey (Databricks/Fabric/Power BI placement → review brief) |
 
 ### Key Systems
 
@@ -109,6 +110,7 @@ The five practitioner assessment tools share `src/lib/practitioner-tools/` and a
 - Pair `technical_writer` with `blog-content-strategy` and `document-writer` for xhverse blog work. Use it before body drafting and again for pre-publish review.
 - For content strategy, use `product-manager` first to choose the topic and `technical_writer` next to sharpen reader goal, thesis, outline, references, SEO metadata, disclosure, and CTA fit.
 - When asked to make a blog post, draft the article package for the Supabase Blog Writer/admin workflow; do not implement a `src/data/blog.ts` code change unless explicitly requested.
+- After content and cover approval, Codex should publish Supabase-backed posts directly when credentials/MCP access are available: upload or register the cover, insert/update `posts`, trigger the Cloudflare Pages rebuild, and verify `/blog` plus `/blog/<slug>` in production. Keep `/admin/blog` behavior unchanged as the manual fallback.
 - Generated blog covers should match the existing xhverse cover series: dark
   isometric data-architecture visuals, glass panels, teal glow, restrained
   amber accents, abstract platform objects, and no people/logos/screenshots or

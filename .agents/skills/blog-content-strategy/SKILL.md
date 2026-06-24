@@ -61,6 +61,7 @@ and cover-image briefs.
    - SCD or dimensional history topics -> `SCD Design Lab`
    - Platform maturity, ownership, and operating model -> `Data Platform Maturity Checker`
    - Governance, contracts, and metric trust -> `Governance Readiness Scorecard`
+   - Workload home, Databricks/Fabric/Power BI placement, or serverless eligibility -> `Workload Placement Simulator`
    - Data product ownership, grain, freshness, access, and lifecycle -> `Data Product Contract Builder`
    - Access model, ABAC, row filters, masks, and OneLake/Fabric security paths -> `Access Model Simulator`
    - Architecture trade-off scenarios -> `Architecture Decision Roulette`
@@ -80,6 +81,11 @@ and cover-image briefs.
     should produce a Blog Writer-ready article package, not a `src/data/blog.ts`
     implementation, unless the user explicitly asks for code changes. Static
     fallback posts must still build without Supabase env vars.
+13. After content and cover approval, Codex should complete publishing when
+    Supabase/Cloudflare access is available: upload or register the cover,
+    insert/update `posts`, trigger the Pages rebuild, and verify production
+    `/blog` plus `/blog/<slug>`. If access is unavailable, leave the package
+    ready for `/admin/blog/new` and state the manual step.
 
 ## Blog Cover Image Style
 

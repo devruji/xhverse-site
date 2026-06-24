@@ -20,6 +20,12 @@ post" requests, produce a Supabase Blog Writer-ready article package; do not edi
 `src/data/blog.ts` unless the user explicitly asks for a code fallback/seed
 change.
 
+After content and cover approval, Codex should complete the publish path when
+Supabase and Cloudflare access are available: upload or register the cover,
+insert/update the `posts` row, trigger the Pages rebuild, and verify production
+`/blog` plus `/blog/<slug>`. Keep `/admin/blog` unchanged as the manual UI and
+fallback path when live credentials are unavailable.
+
 ## Content Shape
 
 - Blog posts must stay practical, concise, and credible for data/platform peers.
@@ -53,7 +59,7 @@ change.
 - In the Supabase Blog Writer, enter related tools as `tool-slug:primary` or
   `tool-slug:secondary` lines.
 - Use only known internal tool slugs from `/tools`.
-- Current high-fit additions: `data-product-contract-builder`, `access-model-simulator`, `lakehouse-table-layout-advisor`, `power-bi-semantic-model-doctor`, and `pipeline-recovery-planner`.
+- Current high-fit additions: `workload-placement-simulator`, `data-product-contract-builder`, `access-model-simulator`, `lakehouse-table-layout-advisor`, `power-bi-semantic-model-doctor`, and `pipeline-recovery-planner`.
 - Keep CTAs lightweight: normal links or static cards, no embedded tool apps.
 - Use one primary CTA and no more than two supporting CTAs unless there is a
   clear reader workflow.
@@ -81,6 +87,9 @@ change.
 - If touching `src/data/blog.ts` or related types, update `src/data/blog.test.ts`
   and run coverage. Normal Supabase-ready content drafts do not require code
   tests because they should not edit the repo.
+- For Codex-published Supabase posts, read back the `posts` row, confirm the
+  cover URL/path resolves, confirm the rebuild/deployment result, and verify the
+  live article route after deployment.
 - If touching blog pages, run typecheck and at least the blog route E2E coverage
   if available.
 - Full sign-off still requires `bun run check`.

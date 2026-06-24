@@ -1,9 +1,9 @@
 ---
-description: Project-wide rule for xhverse site (v3.9.4)
+description: Project-wide rule for xhverse site (v3.9.6)
 alwaysApply: true
 ---
 
-# xhverse-site v3.9.4
+# xhverse-site v3.9.6
 
 Follow `AGENTS.md` and `CLAUDE.md` as primary sources of truth.
 
@@ -29,9 +29,9 @@ Follow `AGENTS.md` and `CLAUDE.md` as primary sources of truth.
   updates as user follow-up when they cannot be done from the repo.
 
 ## Architecture
-- **27 Astro route files**; current release build generates 39 static HTML pages (Astro 6, static output only, no SSR)
-- **13 interactive tools** (all client-side compute, no external deps)
-- **14 src/lib domain folders** with 542 unit tests at 100% coverage
+- **28 Astro route files**; current release build generates 43 static HTML pages (Astro 6, static output only, no SSR)
+- **14 interactive tools** (all client-side compute, no external deps)
+- **16 src/lib domain folders** with 560 unit tests at 100% coverage
 - **Admin panel** behind Cloudflare Access (Zero Trust)
 - **CV** gated via email capture + admin review + Resend delivery
 - **CSP** dual-layer: `scripts/generate-headers.ts` + `BaseLayout.astro` meta tag
@@ -82,6 +82,7 @@ src/lib/practitioner-tools/ + src/pages/tools/[slug].astro ← shared guided pra
 - For blog work, pair `technical_writer` with `blog-content-strategy` and `document-writer`; use `product-manager` first when topic selection or business rationale is still open.
 - Writer output must preserve xhverse voice: practical, peer-facing, source-backed, no vendor hype, no invented private client claims.
 - Blog content publishing uses Supabase as the editorial source of truth. Normal blog-post requests should produce a Blog Writer-ready content package, not a `src/data/blog.ts` implementation, unless the user explicitly asks for code edits.
+- After approved content and cover are ready, Codex should publish and verify directly when Supabase/Cloudflare access is available; keep `/admin/blog` unchanged as the manual fallback.
 - Generated blog covers should match the existing xhverse dark isometric data-architecture series unless the user explicitly asks for another style.
 
 ## Git Workflow
