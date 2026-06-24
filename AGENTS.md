@@ -109,6 +109,7 @@ The five practitioner assessment tools share `src/lib/practitioner-tools/` and a
 - Pair `technical_writer` with `blog-content-strategy` and `document-writer` for xhverse blog work. Use it before body drafting and again for pre-publish review.
 - For content strategy, use `product-manager` first to choose the topic and `technical_writer` next to sharpen reader goal, thesis, outline, references, SEO metadata, disclosure, and CTA fit.
 - When asked to make a blog post, draft the article package for the Supabase Blog Writer/admin workflow; do not implement a `src/data/blog.ts` code change unless explicitly requested.
+- After content and cover approval, Codex should publish Supabase-backed posts directly when credentials/MCP access are available: upload or register the cover, insert/update `posts`, trigger the Cloudflare Pages rebuild, and verify `/blog` plus `/blog/<slug>` in production. Keep `/admin/blog` behavior unchanged as the manual fallback.
 - Generated blog covers should match the existing xhverse cover series: dark
   isometric data-architecture visuals, glass panels, teal glow, restrained
   amber accents, abstract platform objects, and no people/logos/screenshots or

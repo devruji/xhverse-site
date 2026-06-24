@@ -159,6 +159,13 @@ Use `tool-slug:primary` or `tool-slug:secondary` lines for related tool CTAs.
 Only provide a `src/data/blog.ts` entry when the user explicitly asks for a code
 fallback/seed change.
 
+After the user approves the content and cover, Codex should complete the
+Supabase-backed publish path when credentials or MCP access are available:
+upload or register the cover, insert/update the `posts` row, trigger the
+Cloudflare Pages rebuild, and verify production `/blog` plus `/blog/<slug>`.
+If live access is unavailable, keep the package ready for `/admin/blog/new` and
+state the remaining manual step.
+
 ## Quality Checklist
 
 Before delivering any document:

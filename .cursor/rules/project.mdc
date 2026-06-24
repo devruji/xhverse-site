@@ -82,6 +82,7 @@ src/lib/practitioner-tools/ + src/pages/tools/[slug].astro ← shared guided pra
 - For blog work, pair `technical_writer` with `blog-content-strategy` and `document-writer`; use `product-manager` first when topic selection or business rationale is still open.
 - Writer output must preserve xhverse voice: practical, peer-facing, source-backed, no vendor hype, no invented private client claims.
 - Blog content publishing uses Supabase as the editorial source of truth. Normal blog-post requests should produce a Blog Writer-ready content package, not a `src/data/blog.ts` implementation, unless the user explicitly asks for code edits.
+- After approved content and cover are ready, Codex should publish and verify directly when Supabase/Cloudflare access is available; keep `/admin/blog` unchanged as the manual fallback.
 - Generated blog covers should match the existing xhverse dark isometric data-architecture series unless the user explicitly asks for another style.
 
 ## Git Workflow

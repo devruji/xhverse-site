@@ -233,6 +233,8 @@ For new blog posts, technical docs, release notes, page copy, or article-series 
 3. Use `.agents/skills/blog-content-strategy/SKILL.md` and `.agents/skills/document-writer/SKILL.md` as the source workflow for blog body and metadata.
 4. Generate covers in the established xhverse blog series style unless the user asks otherwise: dark isometric data-architecture visuals, glass panels, teal glow, restrained amber accents, abstract platform objects, and no people/logos/screenshots/readable text.
 5. Use `technical-writer` again for pre-publish content QA, then deliver a Supabase Blog Writer-ready article package. Do not implement `src/data/blog.ts` changes for a normal blog-post request unless the user explicitly asks for code edits.
+6. After content and cover approval, Codex owns publishing when Supabase/Cloudflare access is available: upload the cover to `blog-covers` or use an approved static `/images/...` path, insert/update Supabase `posts`, trigger the Pages rebuild, and verify production `/blog` plus `/blog/<slug>`.
+7. If live credentials or MCP access are unavailable, leave the package and cover ready for `/admin/blog/new` and state exactly what remains manual.
 
 ## Rules (`.cursor/rules/`)
 
