@@ -145,7 +145,7 @@ test("materialized views article exposes canonical metadata and content", async 
   expect(jsonLd?.["@id"]).toBe(canonicalUrl);
   expect(jsonLd?.headline).toBe("Most Teams Use Materialized Views Too Early");
   expect(jsonLd?.datePublished).toBe("2026-06-13");
-  expect(jsonLd?.dateModified).toBe("2026-06-13");
+  expect(jsonLd?.dateModified).toBe("2026-06-24");
   expect(jsonLd?.image).toBe(coverUrl);
 });
 

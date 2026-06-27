@@ -22,6 +22,16 @@ export type ToolMetadata = {
 };
 
 export const toolDefinitions = {
+  "egress-pricing-calculator": {
+    slug: "egress-pricing-calculator",
+    title: "Cloud Egress Pricing Calculator",
+    description:
+      "Estimate AWS, Google Cloud, and Azure egress costs for Thailand and Singapore internet, external cloud, and same-cloud regional paths.",
+    category: "Cost",
+    status: "New",
+    releasedAt: "2026-06-27",
+    homeLabel: "Egress calculator",
+  },
   "workload-placement-simulator": {
     slug: "workload-placement-simulator",
     title: "Workload Placement Simulator",
@@ -168,12 +178,12 @@ export const toolCatalog = Object.values(toolDefinitions).toSorted((left, right)
 );
 
 export const featuredToolSlugs = [
+  "egress-pricing-calculator",
   "workload-placement-simulator",
   "data-product-contract-builder",
   "access-model-simulator",
   "lakehouse-table-layout-advisor",
   "power-bi-semantic-model-doctor",
-  "pipeline-recovery-planner",
 ] as const satisfies readonly ToolSlug[];
 
 export const featuredTools = featuredToolSlugs.map((slug) => toolDefinitions[slug]);

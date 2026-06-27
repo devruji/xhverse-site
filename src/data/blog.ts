@@ -1,6 +1,10 @@
 import type { ToolSlug } from "./tools";
 
 export const blogToolCtaDefinitions = {
+  "egress-pricing-calculator": {
+    label: "Cloud Egress Pricing Calculator",
+    href: "/tools/egress-pricing-calculator",
+  },
   "scd-design-lab": {
     label: "SCD Design Lab",
     href: "/tools/scd-design-lab",
@@ -123,7 +127,7 @@ export const posts: BlogPost[] = [
     ],
     mediumUrl: "",
     readingTime: "11 min read",
-    updatedAt: "2026-06-13",
+    updatedAt: "2026-06-24",
     coverImageUrl:
       "/images/blog-most-teams-use-materialized-views-too-early-cover.jpg",
     coverImageAlt:
