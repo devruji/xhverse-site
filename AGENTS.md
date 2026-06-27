@@ -80,7 +80,7 @@ The five practitioner assessment tools share `src/lib/practitioner-tools/` and a
 - **.codex/agents/*.toml**: Repo-local sub-agent role definitions
 - **.codex/config.toml**: Codex runtime config only. Do not add `[instructions]` or `developer_instructions` tables here; put repo guidance in AGENTS.md, CLAUDE.md, skills, or rules.
 - **Memory updates**: Only when explicitly requested. Add small notes under `/Users/bossruji/.codex/memories/extensions/ad_hoc/notes/`; do not edit generated memory files directly.
-- **Repo-scoped MCPs**: Declare only project-relevant MCPs/connectors in `.codex/config.toml`. Store env var names, never token values. Do not add Notion for this repo.
+- **Repo-scoped MCPs/plugins**: Declare only project-relevant MCPs/connectors in `.codex/config.toml`. Store env var names, never token values. Keep unrelated global plugins disabled here so skill-description context budget stays focused. Do not add Notion for this repo.
 
 ## Codex + Cursor Flow
 

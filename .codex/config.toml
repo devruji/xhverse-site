@@ -5,12 +5,34 @@ sandbox_mode = "workspace-write"
 max_threads = 4
 max_depth = 1
 
-# xhverse uses Cloudflare for Pages, Access, Turnstile, security headers, and deploy checks.
-# Keep Cloudflare enabled here so it is available only when working in this repo.
-[plugins."cloudflare@openai-curated"]
-enabled = true
+# Keep the xhverse Codex skill surface intentionally small. Global artifact and
+# knowledge plugins are useful elsewhere, but they add several unrelated skills
+# here and can trigger skill-description context-budget truncation.
+[plugins."documents@openai-primary-runtime"]
+enabled = false
+
+[plugins."spreadsheets@openai-primary-runtime"]
+enabled = false
+
+[plugins."presentations@openai-primary-runtime"]
+enabled = false
+
+[plugins."pdf@openai-primary-runtime"]
+enabled = false
+
+[plugins."template-creator@openai-primary-runtime"]
+enabled = false
+
+[plugins."notion@openai-curated"]
+enabled = false
 
 [plugins."supabase@openai-curated"]
+enabled = false
+
+# xhverse uses Cloudflare for Pages, Access, Turnstile, security headers, and
+# deploy checks. Keep Cloudflare enabled here so it is available only when
+# working in this repo.
+[plugins."cloudflare@openai-curated"]
 enabled = true
 
 [mcp_servers.cloudflare-api]
