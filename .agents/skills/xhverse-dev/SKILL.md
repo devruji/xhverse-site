@@ -69,6 +69,7 @@ Single test file: `bunx vitest run src/data/blog.test.ts`
 - `/tools/data-stack-roast`: Dropdown generator
 - `/tools/sql-deathmatch`: SQL challenge game
 - `/tools/lakehouse-cost-calculator`: Cost estimator
+- `/tools/egress-pricing-calculator`: AWS/GCP/Azure Thailand/Singapore egress estimator with official source links
 - `/tools/spark-explained`: Pipeline visualizer
 - `/tools/data-product-contract-builder`: Data product contract assessment and brief
 - `/tools/access-model-simulator`: Least-privilege access model assessment and brief

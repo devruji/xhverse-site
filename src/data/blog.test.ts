@@ -66,7 +66,7 @@ describe("Blog Data", () => {
     expect(post).toBeDefined();
     expect(post?.title).toBe("Most Teams Use Materialized Views Too Early");
     expect(post?.date).toBe("2026-06-13");
-    expect(post?.updatedAt).toBe("2026-06-13");
+    expect(post?.updatedAt).toBe("2026-06-24");
     expect(post?.readingTime).toBe("11 min read");
     expect(post?.coverImageUrl).toBe(
       "/images/blog-most-teams-use-materialized-views-too-early-cover.jpg",
