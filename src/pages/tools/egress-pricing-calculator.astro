@@ -1,0 +1,607 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
+import {
+  PRICING_LAST_CHECKED,
+  providerMetadata,
+  regionOptions,
+  routeDirectionLabels,
+  scenarioLabels,
+} from "../../lib/egress-pricing-calculator/pricing";
+
+const toolDescription =
+  "Estimate cloud egress costs for AWS, Google Cloud, and Azure across Thailand and Singapore internet, external cloud, and same-cloud regional paths.";
+const azureThailand = regionOptions.find((region) => region.id === "azure-thailand");
+---
+
+<BaseLayout
+  title="Cloud Egress Pricing Calculator | XHVERSE"
+  description={toolDescription}
+  structuredData={{
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: "Cloud Egress Pricing Calculator",
+    applicationCategory: "BusinessApplication",
+    operatingSystem: "Web",
+    description: toolDescription,
+  }}
+>
+  <div class="min-h-screen bg-[var(--bg-page)] font-sans text-[var(--text)]" data-egress-calculator>
+    <Header current="/tools" />
+    <main class="mx-auto max-w-7xl px-5 py-6 sm:px-8 sm:py-8 lg:px-10">
+      <section class="grid gap-10 py-10 sm:py-14 lg:grid-cols-[0.92fr_1.08fr]">
+        <div>
+          <p class="text-[12px] uppercase tracking-[0.32em] text-emerald-200">
+            Cost tool
+          </p>
+          <h1 class="mt-4 max-w-4xl text-[2.45rem] font-semibold leading-[0.98] tracking-tight text-white sm:text-[4.1rem]">
+            Cloud Egress Pricing Calculator
+          </h1>
+          <p class="mt-6 max-w-2xl text-base leading-8 text-zinc-300 sm:text-lg">
+            Compare directional egress cost across AWS, Google Cloud, and Azure
+            for Thailand and Singapore architecture decisions.
+          </p>
+          <div class="mt-7 border border-emerald-300/20 bg-emerald-300/8 p-4 text-sm leading-7 text-zinc-300">
+            <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-emerald-200">
+              Public pricing estimate
+            </p>
+            <p class="mt-2">
+              Use this for fast directional checks before validating the final
+              quote in the provider calculator. It is not an invoice model,
+              CDN model, private connectivity model, tax model, or enterprise
+              discount model.
+            </p>
+          </div>
+        </div>
+
+        <aside class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+          <p class="text-[11px] uppercase tracking-[0.24em] text-zinc-500">
+            What this produces
+          </p>
+          <div class="mt-5 grid gap-3">
+            <div class="border border-white/10 bg-black/20 p-4">
+              <h2 class="text-base font-semibold tracking-tight text-white">
+                Fast estimate
+              </h2>
+              <p class="mt-2 text-sm leading-6 text-zinc-400">
+                Monthly USD, billable transfer, effective rate, and tier math.
+              </p>
+            </div>
+            <div class="border border-white/10 bg-black/20 p-4">
+              <h2 class="text-base font-semibold tracking-tight text-white">
+                Route comparison
+              </h2>
+              <p class="mt-2 text-sm leading-6 text-zinc-400">
+                Public internet egress, external cloud, same-account regional, and
+                different-account regional paths.
+              </p>
+            </div>
+            <div class="border border-white/10 bg-black/20 p-4">
+              <h2 class="text-base font-semibold tracking-tight text-white">
+                Source-backed brief
+              </h2>
+              <p class="mt-2 text-sm leading-6 text-zinc-400">
+                Copyable assumptions with official pricing and estimator links.
+              </p>
+            </div>
+          </div>
+        </aside>
+      </section>
+
+      <section class="grid min-w-0 gap-8 border-t border-white/10 py-10 lg:grid-cols-[minmax(0,1fr)_24rem]">
+        <form id="egress-form" class="min-w-0 space-y-5" data-testid="egress-form">
+          <div class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+            <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">
+              Scenario
+            </p>
+            <h2 class="mt-3 text-2xl font-semibold tracking-tight text-white sm:text-3xl">
+              Choose the egress path.
+            </h2>
+            <p class="mt-4 text-sm leading-7 text-zinc-400">
+              Start with the default 5 TB/month estimate, then switch the route
+              type or provider when you know the ownership boundary.
+            </p>
+          </div>
+
+          <fieldset class="grid gap-3 sm:grid-cols-2" aria-label="Transfer scenario">
+            {Object.entries(scenarioLabels).map(([value, label], index) => (
+              <label class="min-w-0 cursor-pointer border border-white/10 bg-white/[0.03] p-4 transition has-[:checked]:border-emerald-300/70 has-[:checked]:bg-emerald-300/10">
+                <input
+                  type="radio"
+                  name="scenario"
+                  value={value}
+                  class="sr-only"
+                  checked={index === 0}
+                />
+                <span class="block text-sm font-semibold text-white">{label}</span>
+                <span class="mt-2 block text-xs leading-5 text-zinc-500">
+                  {value === "internet-egress" && "Origin traffic to a public internet endpoint."}
+                  {value === "external-cloud" && "Source cloud sends data to another cloud over public internet."}
+                  {value === "same-cloud-same-account" && "Same provider and account, different Thailand/Singapore region. Uses the same public inter-region rate as the different-account view."}
+                  {value === "same-cloud-different-account" && "Same provider, different account, different Thailand/Singapore region. Rate is the same; the label supports chargeback and ownership review."}
+                </span>
+              </label>
+            ))}
+          </fieldset>
+
+          <div class="grid gap-4 sm:grid-cols-2">
+            <label class="block min-w-0 border border-white/10 bg-white/[0.03] p-4">
+              <span class="block text-sm font-semibold text-white">Provider</span>
+              <select
+                id="provider"
+                name="provider"
+                class="mt-3 w-full border border-white/10 bg-black/30 px-3 py-2.5 text-sm text-zinc-300 outline-none transition focus:border-emerald-300/50"
+              >
+                <option value="all">Compare all providers</option>
+                <option value="aws">AWS</option>
+                <option value="google-cloud">Google Cloud</option>
+                <option value="azure">Azure</option>
+              </select>
+            </label>
+
+            <label id="source-country-field" class="block min-w-0 border border-white/10 bg-white/[0.03] p-4">
+              <span class="block text-sm font-semibold text-white">Source location</span>
+              <select
+                id="source-country"
+                name="sourceCountry"
+                class="mt-3 w-full border border-white/10 bg-black/30 px-3 py-2.5 text-sm text-zinc-300 outline-none transition focus:border-emerald-300/50"
+              >
+                <option value="thailand">Thailand when available</option>
+                <option value="singapore">Singapore</option>
+              </select>
+              <span class="mt-2 block text-xs leading-5 text-zinc-500">
+                Azure Thailand South is shown as unavailable until active pricing exists.
+              </span>
+            </label>
+
+            <label id="route-direction-field" class="hidden min-w-0 border border-white/10 bg-white/[0.03] p-4">
+              <span class="block text-sm font-semibold text-white">Regional direction</span>
+              <select
+                id="route-direction"
+                name="routeDirection"
+                class="mt-3 w-full border border-white/10 bg-black/30 px-3 py-2.5 text-sm text-zinc-300 outline-none transition focus:border-emerald-300/50"
+              >
+                {Object.entries(routeDirectionLabels).map(([value, label]) => (
+                  <option value={value}>{label}</option>
+                ))}
+              </select>
+            </label>
+
+            <label id="destination-provider-field" class="hidden min-w-0 border border-white/10 bg-white/[0.03] p-4">
+              <span class="block text-sm font-semibold text-white">Destination cloud</span>
+              <select
+                id="destination-provider"
+                name="destinationProvider"
+                class="mt-3 w-full border border-white/10 bg-black/30 px-3 py-2.5 text-sm text-zinc-300 outline-none transition focus:border-emerald-300/50"
+              >
+                <option value="aws">AWS</option>
+                <option value="google-cloud">Google Cloud</option>
+                <option value="azure">Azure</option>
+              </select>
+              <span class="mt-2 block text-xs leading-5 text-zinc-500">
+                Estimates source-cloud egress only.
+              </span>
+            </label>
+
+            <div class="grid gap-3 border border-white/10 bg-white/[0.03] p-4 sm:col-span-2 sm:grid-cols-[minmax(0,1fr)_7rem]">
+              <label class="block min-w-0">
+                <span class="block text-sm font-semibold text-white">Monthly outbound transfer</span>
+                <input
+                  id="transfer-amount"
+                  name="transferAmount"
+                  type="number"
+                  min="0"
+                  step="0.1"
+                  value="5"
+                  class="mt-3 w-full border border-white/10 bg-black/30 px-3 py-2.5 text-sm text-zinc-300 outline-none transition focus:border-emerald-300/50"
+                />
+                <span class="mt-2 block text-xs leading-5 text-zinc-500">
+                  For ETL/ELT, enter the total data exported, replicated, or
+                  transferred out of the source region/cloud each month.
+                </span>
+              </label>
+              <label class="block min-w-0">
+                <span class="block text-sm font-semibold text-white">Unit</span>
+                <select
+                  id="transfer-unit"
+                  name="transferUnit"
+                  class="mt-3 w-full border border-white/10 bg-black/30 px-3 py-2.5 text-sm text-zinc-300 outline-none transition focus:border-emerald-300/50"
+                >
+                  <option value="TB">TB</option>
+                  <option value="GB">GB</option>
+                </select>
+              </label>
+            </div>
+
+            <label class="flex min-w-0 items-start gap-3 border border-white/10 bg-white/[0.03] p-4 sm:col-span-2">
+              <input
+                id="apply-free-allowance"
+                name="applyFreeAllowance"
+                type="checkbox"
+                checked
+                class="mt-1 h-4 w-4 accent-emerald-300"
+              />
+              <span>
+                <span class="block text-sm font-semibold text-white">Apply public monthly free allowance</span>
+                <span class="mt-2 block text-xs leading-5 text-zinc-500">
+                  Free allowances are usually account-wide. Turn this off when
+                  another workload already consumed the allowance.
+                </span>
+              </span>
+            </label>
+          </div>
+
+          <div class="border border-amber-300/20 bg-amber-300/8 p-4 text-sm leading-7 text-zinc-300">
+            <p class="text-[11px] font-semibold uppercase tracking-[0.22em] text-amber-200">
+              Unavailable region state
+            </p>
+            <p class="mt-2">
+              Azure Thailand South is visible but not calculable: {azureThailand?.unavailableReason}
+            </p>
+          </div>
+
+          <div class="flex flex-col gap-3 sm:flex-row">
+            <button type="submit" class="cta-primary">
+              Calculate egress
+            </button>
+            <button id="reset-button" type="button" class="cta-secondary">
+              Reset
+            </button>
+          </div>
+        </form>
+
+        <aside class="min-w-0 space-y-5 lg:sticky lg:top-24 lg:self-start">
+          <div class="border border-white/10 bg-white/[0.03] p-5">
+            <p class="text-[11px] uppercase tracking-[0.24em] text-zinc-500">
+              Reference boundaries
+            </p>
+            <div class="mt-4 space-y-4 text-sm leading-6 text-zinc-400">
+              {Object.values(providerMetadata).map((provider) => (
+                <div class="border border-white/10 bg-black/20 p-4">
+                  <h2 class="text-sm font-semibold text-white">{provider.shortLabel}</h2>
+                  <div class="mt-2 flex flex-wrap gap-x-3 gap-y-2 text-xs">
+                    <a href={provider.pricingUrl} target="_blank" rel="noreferrer" class="text-link external-link">
+                      Pricing source
+                    </a>
+                    <a href={provider.estimatorUrl} target="_blank" rel="noreferrer" class="text-link external-link">
+                      Official estimator
+                    </a>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <p class="mt-4 text-xs leading-6 text-zinc-500">
+              Pricing last checked: {PRICING_LAST_CHECKED}. Static public list
+              pricing is used so the tool stays fast and deterministic.
+            </p>
+          </div>
+
+          <div class="border border-white/10 bg-white/[0.03] p-5 text-xs leading-6 text-zinc-500">
+            Excludes CDN, NAT, load balancer processing, private connectivity,
+            storage/API requests, taxes, credits, discounts, and currency
+            conversion.
+          </div>
+        </aside>
+      </section>
+
+      <section
+        id="result-panel"
+        data-testid="egress-result"
+        class="hidden border-t border-white/10 py-10"
+        aria-live="polite"
+        tabindex="-1"
+      >
+        <div class="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
+          <div class="min-w-0 space-y-6">
+            <div class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+              <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">
+                Result
+              </p>
+              <div id="summary-cards" class="mt-4 grid gap-4 sm:grid-cols-3"></div>
+            </div>
+
+            <div class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+              <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">
+                Provider comparison
+              </p>
+              <div id="estimate-cards" class="mt-4 grid gap-4"></div>
+            </div>
+          </div>
+
+          <div class="min-w-0 space-y-6">
+            <div class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+              <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">
+                    Brief
+                  </p>
+                  <h2 class="mt-2 text-xl font-semibold tracking-tight text-white">
+                    Copyable estimate
+                  </h2>
+                </div>
+                <button id="copy-brief" type="button" class="cta-secondary px-4 py-2">
+                  Copy brief
+                </button>
+              </div>
+              <textarea
+                id="brief-textarea"
+                data-testid="egress-brief"
+                readonly
+                class="mt-4 min-h-[18rem] w-full resize-y border border-white/10 bg-black/30 p-4 font-mono text-xs leading-6 text-zinc-300 outline-none"
+              ></textarea>
+              <p id="copy-status" class="mt-3 text-xs text-zinc-500"></p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <Footer />
+  </div>
+
+  <script>
+    import {
+      buildEstimateBrief,
+      calculateEgressEstimates,
+      type EgressCalculatorInput,
+      type EgressEstimate,
+      type ProviderSelection,
+      type TrafficUnit,
+    } from "../../lib/egress-pricing-calculator/calculator";
+    import type {
+      CountryId,
+      ProviderId,
+      RouteDirection,
+      TransferScenario,
+    } from "../../lib/egress-pricing-calculator/pricing";
+
+    const form = document.querySelector<HTMLFormElement>("#egress-form");
+    const resultPanel = document.querySelector<HTMLElement>("#result-panel");
+    const summaryCards = document.querySelector<HTMLElement>("#summary-cards");
+    const estimateCards = document.querySelector<HTMLElement>("#estimate-cards");
+    const briefTextarea = document.querySelector<HTMLTextAreaElement>("#brief-textarea");
+    const copyButton = document.querySelector<HTMLButtonElement>("#copy-brief");
+    const copyStatus = document.querySelector<HTMLElement>("#copy-status");
+    const resetButton = document.querySelector<HTMLButtonElement>("#reset-button");
+    const sourceCountryField = document.querySelector<HTMLElement>("#source-country-field");
+    const routeDirectionField = document.querySelector<HTMLElement>("#route-direction-field");
+    const destinationProviderField = document.querySelector<HTMLElement>("#destination-provider-field");
+
+    function formatCurrency(value: number): string {
+      return `$${value.toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}`;
+    }
+
+    function formatQuantity(value: number): string {
+      return value.toLocaleString("en-US", {
+        maximumFractionDigits: 2,
+      });
+    }
+
+    function getSelectedScenario(): TransferScenario {
+      const checked = document.querySelector<HTMLInputElement>('input[name="scenario"]:checked');
+      return (checked?.value ?? "internet-egress") as TransferScenario;
+    }
+
+    function isSameCloudScenario(scenario: TransferScenario): boolean {
+      return (
+        scenario === "same-cloud-same-account" ||
+        scenario === "same-cloud-different-account"
+      );
+    }
+
+    function updateVisibleFields(): void {
+      const scenario = getSelectedScenario();
+
+      sourceCountryField?.classList.toggle("hidden", isSameCloudScenario(scenario));
+      routeDirectionField?.classList.toggle("hidden", !isSameCloudScenario(scenario));
+      destinationProviderField?.classList.toggle("hidden", scenario !== "external-cloud");
+    }
+
+    function readInput(): EgressCalculatorInput {
+      if (!form) {
+        throw new Error("Egress form is missing.");
+      }
+
+      const formData = new FormData(form);
+      return {
+        scenario: getSelectedScenario(),
+        provider: (formData.get("provider") ?? "all") as ProviderSelection,
+        sourceCountry: (formData.get("sourceCountry") ?? "thailand") as CountryId,
+        routeDirection: (formData.get("routeDirection") ?? "thailand-to-singapore") as RouteDirection,
+        destinationProvider: (formData.get("destinationProvider") ?? "aws") as ProviderId,
+        transferAmount: Number(formData.get("transferAmount") ?? 0),
+        transferUnit: (formData.get("transferUnit") ?? "TB") as TrafficUnit,
+        applyFreeAllowance: formData.get("applyFreeAllowance") === "on",
+      };
+    }
+
+    function createCard(title: string, value: string, detail: string, accent = false): HTMLElement {
+      const card = document.createElement("div");
+      card.className = "border border-white/10 bg-black/20 p-5";
+
+      const label = document.createElement("p");
+      label.className = "text-sm text-zinc-500";
+      label.textContent = title;
+
+      const metric = document.createElement("p");
+      metric.className = `mt-2 text-2xl font-semibold tracking-tight ${accent ? "text-emerald-200" : "text-white"}`;
+      metric.textContent = value;
+
+      const description = document.createElement("p");
+      description.className = "mt-2 text-xs leading-5 text-zinc-500";
+      description.textContent = detail;
+
+      card.append(label, metric, description);
+      return card;
+    }
+
+    function renderEstimate(estimate: EgressEstimate): HTMLElement {
+      const card = document.createElement("article");
+      card.className = estimate.unavailableReason
+        ? "border border-amber-300/20 bg-amber-300/8 p-5"
+        : "border border-white/10 bg-black/20 p-5";
+
+      const header = document.createElement("div");
+      header.className = "flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between";
+
+      const titleWrap = document.createElement("div");
+      const title = document.createElement("h3");
+      title.className = "text-lg font-semibold tracking-tight text-white";
+      title.textContent = estimate.providerLabel;
+      const route = document.createElement("p");
+      route.className = "mt-1 text-xs leading-5 text-zinc-500";
+      route.textContent = `${estimate.sourceRegionLabel} -> ${estimate.destinationLabel}`;
+      titleWrap.append(title, route);
+
+      const cost = document.createElement("p");
+      cost.className = estimate.unavailableReason
+        ? "text-lg font-semibold text-amber-200"
+        : "text-lg font-semibold text-emerald-200";
+      cost.textContent = estimate.unavailableReason
+        ? "Unavailable"
+        : formatCurrency(estimate.netCostUsd);
+
+      header.append(titleWrap, cost);
+      card.append(header);
+
+      const body = document.createElement("p");
+      body.className = "mt-4 text-sm leading-6 text-zinc-400";
+      body.textContent = estimate.unavailableReason ?? estimate.pricingBasis;
+      card.append(body);
+
+      if (!estimate.unavailableReason) {
+        const stats = document.createElement("dl");
+        stats.className = "mt-4 grid gap-3 sm:grid-cols-3";
+        const entries = [
+          ["Billable", `${formatQuantity(estimate.billableQuantity)} ${estimate.billingUnit}`],
+          ["Effective", `${formatCurrency(estimate.effectiveRateUsd)}/${estimate.billingUnit}`],
+          ["Free applied", `${formatQuantity(estimate.freeAllowanceQuantity)} ${estimate.billingUnit}`],
+        ];
+
+        for (const [label, value] of entries) {
+          const item = document.createElement("div");
+          item.className = "border border-white/10 bg-white/[0.03] p-3";
+          const term = document.createElement("dt");
+          term.className = "text-[11px] uppercase tracking-[0.18em] text-zinc-500";
+          term.textContent = label;
+          const description = document.createElement("dd");
+          description.className = "mt-1 text-sm font-semibold text-white";
+          description.textContent = value;
+          item.append(term, description);
+          stats.append(item);
+        }
+        card.append(stats);
+
+        const tierList = document.createElement("ul");
+        tierList.className = "mt-4 space-y-2 text-xs leading-5 text-zinc-500";
+        if (estimate.tierCharges.length === 0) {
+          const item = document.createElement("li");
+          item.textContent = "No paid tier used for this transfer amount.";
+          tierList.append(item);
+        } else {
+          for (const charge of estimate.tierCharges) {
+            const item = document.createElement("li");
+            item.textContent = `${charge.label}: ${formatQuantity(charge.quantity)} ${charge.unit} x ${formatCurrency(charge.unitPriceUsd)} = ${formatCurrency(charge.costUsd)}`;
+            tierList.append(item);
+          }
+        }
+        card.append(tierList);
+      }
+
+      if (estimate.notes.length > 0) {
+        const noteList = document.createElement("ul");
+        noteList.className = "mt-4 space-y-2 text-xs leading-5 text-zinc-500";
+        for (const note of estimate.notes) {
+          const item = document.createElement("li");
+          item.textContent = note;
+          noteList.append(item);
+        }
+        card.append(noteList);
+      }
+
+      const links = document.createElement("div");
+      links.className = "mt-4 flex flex-wrap gap-x-4 gap-y-2 text-xs";
+      for (const [label, href] of [
+        ["Pricing source", estimate.pricingUrl],
+        ["Official estimator", estimate.estimatorUrl],
+      ] as const) {
+        const link = document.createElement("a");
+        link.className = "text-link external-link";
+        link.href = href;
+        link.target = "_blank";
+        link.rel = "noreferrer";
+        link.textContent = label;
+        links.append(link);
+      }
+      card.append(links);
+
+      return card;
+    }
+
+    function renderResults(): void {
+      const result = calculateEgressEstimates(readInput());
+
+      summaryCards?.replaceChildren(
+        createCard(
+          "Lowest estimate",
+          result.lowestEstimate ? formatCurrency(result.lowestEstimate.netCostUsd) : "n/a",
+          result.lowestEstimate
+            ? `${result.lowestEstimate.providerLabel} from ${result.lowestEstimate.sourceRegionLabel}`
+            : "No calculable provider for this selection.",
+          true,
+        ),
+        createCard("Transfer", result.lowestEstimate?.rawTransferDisplay ?? result.unavailable[0]?.rawTransferDisplay ?? "0 GB", "Raw outbound traffic before provider billing-unit conversion."),
+        createCard("Spread", formatCurrency(result.spreadUsd), "Difference between highest and lowest calculable estimate."),
+      );
+
+      const renderedEstimates = [...result.estimates, ...result.unavailable].map(renderEstimate);
+      estimateCards?.replaceChildren(...renderedEstimates);
+
+      if (briefTextarea) {
+        briefTextarea.value = buildEstimateBrief(result);
+      }
+
+      resultPanel?.classList.remove("hidden");
+      resultPanel?.focus({ preventScroll: true });
+      resultPanel?.scrollIntoView({
+        block: "start",
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+      });
+    }
+
+    form?.addEventListener("change", updateVisibleFields);
+
+    form?.addEventListener("submit", (event) => {
+      event.preventDefault();
+      renderResults();
+    });
+
+    resetButton?.addEventListener("click", () => {
+      form?.reset();
+      updateVisibleFields();
+      resultPanel?.classList.add("hidden");
+      if (briefTextarea) briefTextarea.value = "";
+      if (copyStatus) copyStatus.textContent = "";
+      window.scrollTo({
+        top: 0,
+        behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth",
+      });
+    });
+
+    copyButton?.addEventListener("click", async () => {
+      if (!briefTextarea) return;
+      briefTextarea.select();
+      try {
+        await navigator.clipboard.writeText(briefTextarea.value);
+        if (copyStatus) copyStatus.textContent = "Brief copied.";
+      } catch {
+        if (copyStatus) copyStatus.textContent = "Select the brief text and copy it from your browser.";
+      }
+    });
+
+    updateVisibleFields();
+  </script>
+</BaseLayout>

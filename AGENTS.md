@@ -6,10 +6,10 @@ This file provides shared context for all Claude Code agents working in this rep
 
 - **Site**: xhverse.co — portfolio, blog, and interactive tools for Rujikorn Ngoensaard (XH / bossruji)
 - **Role**: Senior Data Engineer | Platform Architecture
-- **Version**: v3.9.6
+- **Version**: v3.9.7
 - **Stack**: Astro 6 (static only), Tailwind CSS v4, Bun, Cloudflare Pages, Supabase, Resend
-- **Pages**: 28 Astro route files; current release build generates 43 static HTML pages
-- **Tests**: 560 unit tests at 100% coverage + 72 E2E checks
+- **Pages**: 29 Astro route files; current release build generates 46 static HTML pages
+- **Tests**: 585 unit tests at 100% coverage + 84 E2E checks
 
 ## Commands
 
@@ -29,14 +29,14 @@ Kill dev server: `lsof -ti :4321 | xargs kill -9 2>/dev/null`
 
 ```
 src/data/*.ts     → Static typed content (profile, cv, site, services, gallery; blog fallback/seed)
-src/lib/          → Business logic + tests (16 domain folders, 100% coverage)
-src/pages/*.astro → Routes → generated static HTML (28 route files, 43 current build pages)
+src/lib/          → Business logic + tests (17 domain folders, 100% coverage)
+src/pages/*.astro → Routes → generated static HTML (29 route files, 46 current build pages)
 src/components/   → Shared Astro components (10)
 src/layouts/      → BaseLayout (SEO/CSP) + AdminLayout (admin panel)
 dist/             → Deployed to Cloudflare CDN
 ```
 
-### Interactive Tools (14 live)
+### Interactive Tools (15 live)
 
 All tools are fully client-side. Each follows:
 ```
@@ -55,6 +55,7 @@ The five practitioner assessment tools share `src/lib/practitioner-tools/` and a
 | Data Stack Roast | Generator (6 dropdowns → 3-paragraph roast) |
 | SQL Deathmatch | Challenge (15 SQL rounds, tier ranking) |
 | Lakehouse Cost Calculator | Calculator (cluster config → USD + optimizations) |
+| Cloud Egress Pricing Calculator | Calculator (AWS/GCP/Azure Thailand/Singapore egress → USD + source links) |
 | Spark Explained | Visualizer (pipeline stages, animated partitions) |
 | Data Product Contract Builder | Guided contract journey (clauses → copyable brief) |
 | Access Model Simulator | Guided governance journey (policy gates → risk/actions) |
