@@ -39,6 +39,9 @@ Use this rule when changing repo instructions, skills, sub-agent cards, Codex co
 - Store only environment variable names, never bearer token values.
 - Cloudflare is the default MCP for this repo.
 - Supabase tooling is allowed for explicit backend/data/RLS work.
+- Keep unrelated global artifact, knowledge, and duplicated platform plugin
+  packs disabled in `.codex/config.toml` so the xhverse skills context budget
+  stays focused.
 - Do not add Notion for xhverse.
 - Remove MCPs that are slow, broken, unused, or not clearly tied to this project.
 

@@ -22,7 +22,7 @@ Keep future sessions aligned without turning runtime config into documentation.
    - `.agents/skills/*/SKILL.md`: task workflows with valid YAML frontmatter.
    - `.codex/config.toml`: runtime config only, including repo-scoped MCP/plugin declarations.
    - Memory: add a small note under the Codex memory extension path only when the user explicitly asks to update memory.
-4. For MCP changes, prefer the smallest repo-scoped set that directly supports xhverse work. Do not add Notion here. Do not store bearer tokens in git.
+4. For MCP/plugin changes, prefer the smallest repo-scoped set that directly supports xhverse work. Keep unrelated global artifact, knowledge, and duplicated platform plugin packs disabled here so skill-description context budget stays focused. Do not add Notion here. Do not store bearer tokens in git.
 5. For Codex + Cursor workflow, implementation-lane defaults, or engineering skill default changes, keep `AGENTS.md`, `CLAUDE.md`, `.cursor/rules/codex-cursor-handoff.mdc`, `.cursor/rules/project.mdc`, `.agents/skills/xhverse-dev/SKILL.md`, and relevant `.codex/agents/*.toml` aligned.
 6. For content-writing defaults, keep `technical_writer`, `blog-content-strategy`, `document-writer`, `AGENTS.md`, `CLAUDE.md`, `.cursor/rules/blog-content.mdc`, `.cursor/rules/project.mdc`, and `.agents/skills/xhverse-dev/SKILL.md` aligned.
 7. Validate changed Markdown, Cursor rule frontmatter, TOML, and skill YAML before sign-off. Run app tests only when application behavior changes.
@@ -32,7 +32,7 @@ Keep future sessions aligned without turning runtime config into documentation.
 - Cloudflare belongs in this repo because xhverse runs on Cloudflare Pages and uses Access, Turnstile, security headers, and deployment checks.
 - Supabase belongs only when the task touches backend data, migrations, RLS, storage, auth, or admin data flows.
 - Browser and GitHub capabilities can remain general tooling; do not duplicate them in repo MCP config unless a concrete workflow needs it.
-- Avoid speculative MCP installs. A broken or slow MCP should be removed rather than carried as session startup tax.
+- Avoid speculative MCP/plugin installs. A broken, slow, unused, or repo-irrelevant plugin should be disabled rather than carried as session startup tax.
 
 ## Codex + Cursor Handoff Policy
 

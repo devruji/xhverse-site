@@ -280,10 +280,28 @@ sandbox_mode = "workspace-write"
 max_threads = 4
 max_depth = 1
 
-[plugins."cloudflare@openai-curated"]
-enabled = true
+[plugins."documents@openai-primary-runtime"]
+enabled = false
+
+[plugins."spreadsheets@openai-primary-runtime"]
+enabled = false
+
+[plugins."presentations@openai-primary-runtime"]
+enabled = false
+
+[plugins."pdf@openai-primary-runtime"]
+enabled = false
+
+[plugins."template-creator@openai-primary-runtime"]
+enabled = false
+
+[plugins."notion@openai-curated"]
+enabled = false
 
 [plugins."supabase@openai-curated"]
+enabled = false
+
+[plugins."cloudflare@openai-curated"]
 enabled = true
 
 [mcp_servers.cloudflare-api]
@@ -299,7 +317,8 @@ Do not add `[instructions]` or `developer_instructions` tables. Newer Codex conf
 
 Repo MCP policy:
 - Keep Cloudflare repo-scoped because it supports Pages, Access, Turnstile, security headers, and deployment checks.
-- Keep Supabase project-scoped to `jxfpnfliioqbhzznaphd` for explicit backend/data/RLS/storage/auth/admin work.
+- Keep Supabase MCP project-scoped to `jxfpnfliioqbhzznaphd` for explicit backend/data/RLS/storage/auth/admin work. The repo-local `supabase-backend` skill covers normal Supabase guidance, so the broad Supabase plugin skill pack stays disabled by default.
+- Keep unrelated global artifact and knowledge plugins disabled here unless the repo starts using them regularly; otherwise they consume the skills context budget.
 - Do not add Notion here; xhverse does not use it.
 - Store only env var names in git, never token values.
 
