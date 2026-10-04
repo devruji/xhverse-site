@@ -56,6 +56,10 @@ src/lib/practitioner-tools/ + src/pages/tools/[slug].astro ← shared guided pra
 - `.codex/agents/*.toml` are repo-local sub-agent role cards.
 - `.codex/config.toml` is runtime config only. Do not add `[instructions]` or `developer_instructions` tables; that shape breaks Codex skill reload.
 
+## Browser Automation
+
+Use Playwright MCP for browser interaction and visual verification. Do not use Computer Use (`cua_repl`) or native desktop automation. If MCP is unavailable in the current session, use the installed Playwright library or CLI and report that fallback.
+
 ## Code Rules
 - No `any` types — explicit types on all public APIs
 - No comments unless WHY is non-obvious

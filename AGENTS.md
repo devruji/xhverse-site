@@ -89,6 +89,10 @@ Repo-local `tdd`, `codebase-design`, and `domain-modeling` are available under `
 
 GitHub Issues configuration lives in `docs/agents/issue-tracker.md`; single-context glossary and ADR rules live in `docs/agents/domain.md`.
 
+## Browser Automation
+
+Use Playwright MCP for browser interaction and visual verification. Do not use Computer Use (`cua_repl`) or native desktop automation. If MCP is unavailable in the current session, use the installed Playwright library or CLI and report that fallback. Keep the browser isolated from the user's personal tabs and profile.
+
 ## Codex + Cursor Flow
 
 - **Default split**: Codex owns planning, scope control, review, QA, security gate, and release evidence. Cursor owns bounded implementation when explicitly used.
@@ -167,6 +171,7 @@ GitHub Issues configuration lives in `docs/agents/issue-tracker.md`; single-cont
 
 ## Repo-Scoped MCP Policy
 
+- **Playwright**: Repo-scoped browser automation and previews; use the isolated session configured in `.codex/config.toml`.
 - **Cloudflare**: Default repo MCP because xhverse runs on Cloudflare Pages and uses Access, Turnstile, security headers, and deployment checks.
 - **Supabase**: Allowed only for explicit backend/data/RLS/storage/auth/admin work.
 - **Notion**: Not used by xhverse; keep it out of repo config.

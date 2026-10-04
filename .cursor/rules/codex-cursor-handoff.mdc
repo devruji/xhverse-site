@@ -46,6 +46,7 @@ globs: ["**"]
 ## Result Handback
 
 - Codex does not operate Cursor through Computer Use for this repo.
+- Browser verification uses Playwright MCP, or the installed Playwright library/CLI if MCP is unavailable; never use Computer Use or native desktop automation.
 - Cursor must leave changes on disk in the repo/worktree that Codex will review.
 - Cursor must write `.tmp/<task>-cursor-result.md` with:
   - worktree path and branch
@@ -85,7 +86,7 @@ After Cursor edits:
   - docs/rules/skills/config only: Markdown/frontmatter/TOML validation plus `git diff --check`
   - source changes: `bun run typecheck`
   - `src/lib/**` or `src/data/**`: `bun run coverage`
-  - user-facing UI: build plus browser or Playwright verification
+  - user-facing UI: build plus Playwright browser verification
 - Use `bun run check` when full confidence is needed or the handoff asks for the full gate.
 - Codex reruns tests directly only if Cursor cannot run them, evidence is incomplete, or the user asks.
 - Report only checks that actually ran and who ran them.

@@ -20,6 +20,7 @@ git clean -fd --dry-run     # Check for untracked contamination
 ```
 
 ## Before Pushing
+- Use Playwright MCP (or the installed Playwright library/CLI when MCP is unavailable) for previews. Do not use Computer Use or native desktop automation.
 - Verify locally in browser (both themes, mobile viewport) — no exceptions
 - Run `bun run check` for full pipeline validation
 - Verify `git diff --stat` shows ONLY intended changes
