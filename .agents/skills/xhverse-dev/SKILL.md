@@ -30,6 +30,10 @@ bun run check            # Full pipeline: typecheck + build + coverage + e2e
 
 Single test file: `bunx vitest run src/data/blog.test.ts`
 
+## Browser Automation
+
+Use Playwright MCP for browser interaction and visual verification. Do not use Computer Use (`cua_repl`) or native desktop automation. If MCP is unavailable in the current session, use the installed Playwright library or CLI and report that fallback. Use an isolated browser session, headed when presenting a preview to the user.
+
 ## Branch & Release Flow
 
 1. **Feature work**: Branch from `development`, PR back to `development`

@@ -5,6 +5,10 @@ sandbox_mode = "read-only"
 developer_instructions = """
 Review changes like an owner. You are the last gate before production.
 
+## Browser Automation
+
+Use Playwright MCP for browser interaction and visual verification. Do not use Computer Use (`cua_repl`) or native desktop automation. If MCP is unavailable in the current session, use the installed Playwright library or CLI and report that fallback. Verify both themes and mobile viewports in an isolated session.
+
 ## What to Check
 
 ### Pipeline (always run these)

@@ -8,7 +8,7 @@ XHVerse is the portfolio, blog, and tools site for Rujikorn Ngoensaard (XH / bos
 
 - **Production**: https://xhverse.co
 - **Repo**: https://github.com/devruji/xhverse-site
-- **Current version**: v3.9.7
+- **Current version**: v3.9.8
 - **Business model**: Consulting/advisory — site drives inbound leads via content + tools
 
 ## Commands
@@ -141,6 +141,15 @@ git clean -fd --dry-run     # Check for untracked contamination from other sessi
 8. **NEVER create PRs targeting `main`** — always target `development`
 9. **NEVER edit files while on `development` or `main`** — create a branch FIRST
 
+### Browser Automation
+
+Use Playwright MCP for browser interaction and visual verification. Do not use Computer Use (`cua_repl`) or native desktop automation. If MCP is unavailable in the current session, use the installed Playwright library or CLI and report that fallback.
+
+- The repo config pins Playwright MCP, uses `--isolated --browser chrome`, and disables the inherited `cua_repl` server; keep personal browser profiles and tabs separate.
+- Use headed mode when showing the user a preview, and verify both themes and mobile viewports through Playwright.
+- Check registration with `codex mcp get playwright`. If the current session does not expose the new MCP tools, restart/reload the MCP connection; use the installed Playwright library or CLI for the current task.
+- Setup references: [Playwright MCP](https://playwright.dev/docs/getting-started-mcp) and [Codex MCP configuration](https://learn.chatgpt.com/docs/extend/mcp?surface=cli).
+
 ### Codex + Cursor Handoff Workflow
 
 Use this flow when the user wants Codex to manage planning, review, QA, security, or release gates while Cursor performs implementation.
@@ -261,6 +270,9 @@ For new blog posts, technical docs, release notes, page copy, or article-series 
 | `cloudflare-platform` | Cloudflare Pages/Workers/DNS config |
 | `supabase-backend` | Database, auth, storage work |
 | `agent-surface-maintenance` | Skills, rules, memory notes, Codex config, and repo-scoped MCP upkeep |
+| `tdd` | Test-first feature and bug-fix work through agreed public interfaces |
+| `codebase-design` | Module interfaces and testability; supporting guidance for `tdd` |
+| `domain-modeling` | Agreed domain terms in `GLOSSARY.md` and meaningful decisions in ADRs |
 | `qa-expert` | Pre-release regression gate |
 | `security-audit-expert` | Security audit (pre-release + on demand) |
 | `seo-metadata-check` | Branded-query SEO, metadata, structured data, sitemap/robots, canonical, and Search Console follow-up review |
@@ -308,6 +320,15 @@ enabled = true
 url = "https://mcp.cloudflare.com/mcp"
 bearer_token_env_var = "CLOUDFLARE_API_TOKEN"
 
+[mcp_servers.playwright]
+command = "npx"
+args = ["-y", "@playwright/mcp@0.0.83", "--isolated", "--browser", "chrome"]
+startup_timeout_sec = 60
+
+[mcp_servers.cua_repl]
+command = "/usr/bin/false"
+enabled = false
+
 [mcp_servers.supabase]
 url = "https://mcp.supabase.com/mcp?project_ref=jxfpnfliioqbhzznaphd"
 bearer_token_env_var = "SUPABASE_ACCESS_TOKEN"
@@ -316,6 +337,8 @@ bearer_token_env_var = "SUPABASE_ACCESS_TOKEN"
 Do not add `[instructions]` or `developer_instructions` tables. Newer Codex config parsing treats that shape as invalid and blocks skill reload. Keep repo guidance in `AGENTS.md`, `CLAUDE.md`, `.cursor/rules/`, `.agents/skills/`, and `.codex/agents/`.
 
 Repo MCP policy:
+- Codex validates MCP transports even for disabled servers. Keep the `cua_repl` command as `/usr/bin/false` so the entry parses and fails closed if accidentally enabled.
+- Use repo-scoped Playwright MCP for browser automation; keep it isolated and do not use Computer Use.
 - Keep Cloudflare repo-scoped because it supports Pages, Access, Turnstile, security headers, and deployment checks.
 - Keep Supabase MCP project-scoped to `jxfpnfliioqbhzznaphd` for explicit backend/data/RLS/storage/auth/admin work. The repo-local `supabase-backend` skill covers normal Supabase guidance, so the broad Supabase plugin skill pack stays disabled by default.
 - Keep unrelated global artifact and knowledge plugins disabled here unless the repo starts using them regularly; otherwise they consume the skills context budget.
@@ -364,3 +387,15 @@ Repo MCP policy:
 - Site must build successfully without Supabase env vars (static fallback), but Supabase is authoritative when build credentials are configured
 - Cloudflare Rocket Loader must stay **OFF** (breaks Turnstile widget)
 - Turnstile site key is public (in client HTML); secret key is Supabase secret only
+
+## Agent skills
+
+Repo-local `tdd`, `codebase-design`, and `domain-modeling` usage, compatibility, and source revision are recorded in `docs/agents/skills.md`.
+
+### Issue tracker
+
+Issues and specs live in GitHub Issues for `devruji/xhverse-site`, managed through `gh`. See `docs/agents/issue-tracker.md`.
+
+### Domain docs
+
+Use a single-context layout: root `GLOSSARY.md` and `docs/adr/`. See `docs/agents/domain.md`.

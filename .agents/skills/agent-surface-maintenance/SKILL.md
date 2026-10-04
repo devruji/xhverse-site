@@ -31,7 +31,7 @@ Keep future sessions aligned without turning runtime config into documentation.
 
 - Cloudflare belongs in this repo because xhverse runs on Cloudflare Pages and uses Access, Turnstile, security headers, and deployment checks.
 - Supabase belongs only when the task touches backend data, migrations, RLS, storage, auth, or admin data flows.
-- Browser and GitHub capabilities can remain general tooling; do not duplicate them in repo MCP config unless a concrete workflow needs it.
+- Playwright MCP is repo-scoped for browser automation and previews. Preserve its isolated-session configuration and the Playwright-only browser rule across agent surfaces; do not use Computer Use or native desktop automation. GitHub can remain general tooling.
 - Avoid speculative MCP/plugin installs. A broken, slow, unused, or repo-irrelevant plugin should be disabled rather than carried as session startup tax.
 
 ## Codex + Cursor Handoff Policy

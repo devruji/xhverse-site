@@ -6,7 +6,7 @@ This file provides shared context for all Claude Code agents working in this rep
 
 - **Site**: xhverse.co — portfolio, blog, and interactive tools for Rujikorn Ngoensaard (XH / bossruji)
 - **Role**: Senior Data Engineer | Platform Architecture
-- **Version**: v3.9.7
+- **Version**: v3.9.8
 - **Stack**: Astro 6 (static only), Tailwind CSS v4, Bun, Cloudflare Pages, Supabase, Resend
 - **Pages**: 29 Astro route files; current release build generates 46 static HTML pages
 - **Tests**: 585 unit tests at 100% coverage + 84 E2E checks
@@ -82,6 +82,16 @@ The five practitioner assessment tools share `src/lib/practitioner-tools/` and a
 - **.codex/config.toml**: Codex runtime config only. Do not add `[instructions]` or `developer_instructions` tables here; put repo guidance in AGENTS.md, CLAUDE.md, skills, or rules.
 - **Memory updates**: Only when explicitly requested. Add small notes under `/Users/bossruji/.codex/memories/extensions/ad_hoc/notes/`; do not edit generated memory files directly.
 - **Repo-scoped MCPs/plugins**: Declare only project-relevant MCPs/connectors in `.codex/config.toml`. Store env var names, never token values. Keep unrelated global plugins disabled here so skill-description context budget stays focused. Do not add Notion for this repo.
+
+## Agent skills
+
+Repo-local `tdd`, `codebase-design`, and `domain-modeling` are available under `.agents/skills/`. Read `docs/agents/skills.md` for usage, compatibility, and the pinned upstream source.
+
+GitHub Issues configuration lives in `docs/agents/issue-tracker.md`; single-context glossary and ADR rules live in `docs/agents/domain.md`.
+
+## Browser Automation
+
+Use Playwright MCP for browser interaction and visual verification. Do not use Computer Use (`cua_repl`) or native desktop automation. If MCP is unavailable in the current session, use the installed Playwright library or CLI and report that fallback. Keep the browser isolated from the user's personal tabs and profile.
 
 ## Codex + Cursor Flow
 
@@ -161,6 +171,7 @@ The five practitioner assessment tools share `src/lib/practitioner-tools/` and a
 
 ## Repo-Scoped MCP Policy
 
+- **Playwright**: Repo-scoped browser automation and previews; use the isolated session configured in `.codex/config.toml`.
 - **Cloudflare**: Default repo MCP because xhverse runs on Cloudflare Pages and uses Access, Turnstile, security headers, and deployment checks.
 - **Supabase**: Allowed only for explicit backend/data/RLS/storage/auth/admin work.
 - **Notion**: Not used by xhverse; keep it out of repo config.

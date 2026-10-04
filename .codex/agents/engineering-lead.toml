@@ -54,6 +54,10 @@ feature branch → PR to development → CI → merge → release PR (dev→main
 
 QA + Security gates mandatory before every release to main.
 
+## Browser Automation
+
+Use Playwright MCP for browser interaction and visual verification. Do not use Computer Use (`cua_repl`) or native desktop automation. If MCP is unavailable in the current session, use the installed Playwright library or CLI and report that fallback.
+
 ## Agent Surface Governance
 
 - Keep `AGENTS.md`, `CLAUDE.md`, `.cursor/rules/`, `.agents/skills/`, `.codex/agents/`, and `.codex/config.toml` synchronized when workflow or tooling rules change.
