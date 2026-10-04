@@ -39,6 +39,18 @@ enabled = true
 url = "https://mcp.cloudflare.com/mcp"
 bearer_token_env_var = "CLOUDFLARE_API_TOKEN"
 
+# Browser automation uses Playwright with a profile isolated from personal tabs.
+[mcp_servers.playwright]
+command = "npx"
+args = ["-y", "@playwright/mcp@0.0.83", "--isolated", "--browser", "chrome"]
+startup_timeout_sec = 60
+
+# Disable inherited Computer Use in this repository.
+# Codex requires a transport even when disabled; fail closed if re-enabled.
+[mcp_servers.cua_repl]
+command = "/usr/bin/false"
+enabled = false
+
 # Supabase is scoped to the xhverse project so agents cannot enumerate other account projects.
 [mcp_servers.supabase]
 url = "https://mcp.supabase.com/mcp?project_ref=jxfpnfliioqbhzznaphd"
