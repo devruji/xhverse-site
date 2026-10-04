@@ -83,6 +83,12 @@ The five practitioner assessment tools share `src/lib/practitioner-tools/` and a
 - **Memory updates**: Only when explicitly requested. Add small notes under `/Users/bossruji/.codex/memories/extensions/ad_hoc/notes/`; do not edit generated memory files directly.
 - **Repo-scoped MCPs/plugins**: Declare only project-relevant MCPs/connectors in `.codex/config.toml`. Store env var names, never token values. Keep unrelated global plugins disabled here so skill-description context budget stays focused. Do not add Notion for this repo.
 
+## Agent skills
+
+Repo-local `tdd`, `codebase-design`, and `domain-modeling` are available under `.agents/skills/`. Read `docs/agents/skills.md` for usage, compatibility, and the pinned upstream source.
+
+GitHub Issues configuration lives in `docs/agents/issue-tracker.md`; single-context glossary and ADR rules live in `docs/agents/domain.md`.
+
 ## Codex + Cursor Flow
 
 - **Default split**: Codex owns planning, scope control, review, QA, security gate, and release evidence. Cursor owns bounded implementation when explicitly used.

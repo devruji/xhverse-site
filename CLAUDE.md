@@ -261,6 +261,9 @@ For new blog posts, technical docs, release notes, page copy, or article-series 
 | `cloudflare-platform` | Cloudflare Pages/Workers/DNS config |
 | `supabase-backend` | Database, auth, storage work |
 | `agent-surface-maintenance` | Skills, rules, memory notes, Codex config, and repo-scoped MCP upkeep |
+| `tdd` | Test-first feature and bug-fix work through agreed public interfaces |
+| `codebase-design` | Module interfaces and testability; supporting guidance for `tdd` |
+| `domain-modeling` | Agreed domain terms in `GLOSSARY.md` and meaningful decisions in ADRs |
 | `qa-expert` | Pre-release regression gate |
 | `security-audit-expert` | Security audit (pre-release + on demand) |
 | `seo-metadata-check` | Branded-query SEO, metadata, structured data, sitemap/robots, canonical, and Search Console follow-up review |
@@ -364,3 +367,15 @@ Repo MCP policy:
 - Site must build successfully without Supabase env vars (static fallback), but Supabase is authoritative when build credentials are configured
 - Cloudflare Rocket Loader must stay **OFF** (breaks Turnstile widget)
 - Turnstile site key is public (in client HTML); secret key is Supabase secret only
+
+## Agent skills
+
+Repo-local `tdd`, `codebase-design`, and `domain-modeling` usage, compatibility, and source revision are recorded in `docs/agents/skills.md`.
+
+### Issue tracker
+
+Issues and specs live in GitHub Issues for `devruji/xhverse-site`, managed through `gh`. See `docs/agents/issue-tracker.md`.
+
+### Domain docs
+
+Use a single-context layout: root `GLOSSARY.md` and `docs/adr/`. See `docs/agents/domain.md`.
