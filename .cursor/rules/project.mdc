@@ -1,9 +1,9 @@
 ---
-description: Project-wide rule for xhverse site (v3.9.7)
+description: Project-wide rule for xhverse site (v3.9.8)
 alwaysApply: true
 ---
 
-# xhverse-site v3.9.7
+# xhverse-site v3.9.8
 
 Follow `AGENTS.md` and `CLAUDE.md` as primary sources of truth.
 
