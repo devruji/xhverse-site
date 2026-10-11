@@ -34,11 +34,20 @@ An explicitly approved retry of the existing production deployment queued new de
 
 ## Remaining rollout checks
 
-Pilot PR CI uses the proposed workflow before merge. Development/main adopt it when reviewed changes merge through the existing flow. Record live results in the PR/release evidence rather than rerunning checks merely to update this document:
+Development adopted the workflow when [application pilot PR #324](https://github.com/devruji/xhverse-site/pull/324) merged on `2026-10-11T10:55:27Z` at `4d3fd25ff0cb11feb8af65b694bb29323c60a4c1`. Main adoption remains pending release promotion. Record live results in the PR/release evidence rather than rerunning checks merely to update this document.
 
-1. Application pilot PR: required full check, both browser projects, preview creation/cache restoration and preview noindex.
-2. Guidance-only pilot PR after adoption: lightweight required check and no Pages build. Confirm no development-push duplicate full run after merge.
-3. Dependabot update: full GitHub validation and no preview. Compare cold/warm preview runs before claiming a timing improvement.
+Completed evidence:
+
+- [Application pilot CI](https://github.com/devruji/xhverse-site/actions/runs/38133352731) passed the required full check: 585 unit tests at 100% coverage, 67 delivery fixtures, 84 desktop/mobile E2E checks and exactly one build. The development preview `ad2d7c9f-a3ee-478a-9f1e-70f7e3c815b9` was created at `2026-10-11T10:55:29.158403Z` and succeeded at `2026-10-11T10:56:01.488971Z`.
+- GitHub's Actions runs query for the merge SHA returned `total_count: 0`, confirming no duplicate development-push run. Development still requires `Test and Build` from GitHub Actions (app `15368`) with `strict: true`; protection was preserved.
+- Application feature preview `9f8338ff` restored both dependencies and build output from cache, as confirmed by the live build logs captured in PR #324.
+- Earlier guidance-only push `04083ee` was skipped by Pages with reason `path_config` (event `8de9fb3e`). This establishes a path-control observation; the new guidance pilot's CI and Pages result remain pending.
+
+Remaining checks:
+
+1. New guidance-only pilot PR from the adopted development branch: lightweight required check and no Pages build; results pending push and PR creation.
+2. Preview indexing and performance: verify preview `noindex` through an authenticated session (Cloudflare Access blocked unauthenticated inspection); compare cold/warm preview runs before claiming a timing improvement.
+3. Dependabot update: full GitHub validation and no preview.
 4. Next application release: merge-candidate CI, scoped QA/security and fresh advisories before merge, then verifier/GitHub record matching active Cloudflare production.
 
 Keep human review time separate from setup, queue, build and verified-production time. Pages watch paths can intentionally build on empty pushes, 20+ commits or 3000+ changed files; exclusions are not an unconditional guarantee for those events. See [Cloudflare watch-path limits](https://developers.cloudflare.com/pages/configuration/build-watch-paths/).
