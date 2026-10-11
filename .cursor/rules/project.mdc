@@ -1,9 +1,11 @@
 ---
-description: Project-wide rule for xhverse site (v3.9.8)
+description: Project-wide rule for xhverse site (v3.9.9 release candidate)
 alwaysApply: true
 ---
 
-# xhverse-site v3.9.8
+# xhverse-site v3.9.9 release candidate
+
+Production promotion is pending QA/security gates and release-candidate CI.
 
 Follow `AGENTS.md` and `CLAUDE.md` as primary sources of truth.
 
@@ -29,7 +31,7 @@ Follow `AGENTS.md` and `CLAUDE.md` as primary sources of truth.
   updates as user follow-up when they cannot be done from the repo.
 
 ## Architecture
-- **29 Astro route files**; current release build generates 46 static HTML pages (Astro 6, static output only, no SSR)
+- **29 Astro route files**; current release build generates 46 static HTML pages (Astro 7, static output only, no SSR)
 - **15 interactive tools** (all client-side compute, no external deps)
 - **17 src/lib domain folders** with 585 unit tests at 100% coverage
 - **Admin panel** behind Cloudflare Access (Zero Trust)

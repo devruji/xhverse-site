@@ -26,7 +26,7 @@ This project deploys to Cloudflare Pages at https://xhverse.co. This skill cover
 - Re-read live settings before future changes; preserve production branch, environment values, bindings, domains, build command and rebuild hooks.
 - **Build command**: `bun run build`
 - **Output directory**: `dist`
-- **Node version**: Read from `.node-version` (currently 22.16.0)
+- **Node version**: Read from `.node-version` (currently 22.23.3)
 - **Framework**: Astro (auto-detected by Cloudflare)
 
 ### Environment Variables
