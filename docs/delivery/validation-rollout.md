@@ -17,8 +17,10 @@ Policy and examples live in [validation.md](../agents/validation.md). Matching e
 
 Local environment: macOS, Bun 1.3.10, Node v22.23.3, locked Astro 6.4.8 and Playwright 1.61.1. CI retains Bun 1.2.21 and `.node-version` (22.16.0). Differences are recorded rather than silently treated as identical environments.
 
+Checked implementation revision: `58fb58b` (delivery code); documentation additions do not change these inputs. Application-input fingerprint: `f1c43bc915370dfaec42f30706bb4849a9c7da11435e27c443a16e2cc387d12b` across 220 files in `src/`, `public/`, `tests/e2e/`, plus package/lockfile, Astro/TypeScript/Vitest/Playwright configs and Node version. Delivery-input fingerprint: `28bb542f9759917beeed0007f101fdde641399d7dfbfa43217e8883cd70fd8ee` across 15 files in `scripts/ci/`, workflow, package/lockfile, Playwright config and Node version. Each is SHA-256 of the sorted compact JSON mapping of path to SHA-256 content. Application source/build/E2E inputs remained unchanged after the full check; final delivery inputs received fresh `test:delivery` and `typecheck` evidence. Build-time Supabase credentials were configured for the full check; isolated standalone E2E had no credentials. These results establish the observed content snapshot, not future editorial changes.
+
 - `bun run check` passed: typecheck, exactly one Astro build, 585 unit tests at 100% of all four coverage metrics, delivery fixtures, and 84 desktop/mobile E2E checks. Application inputs did not change afterward; later delivery edits received fresh fixture and type checks.
-- Final delivery fixtures cover established guidance, application/mixed/unknown paths, deleted and renamed files, malformed frontmatter/YAML/TOML, missing history, occupied-server policy, and failure-safe deployment reporting.
+- Final `bun run test:delivery` passed 67 fixtures covering established guidance, application/mixed/unknown paths, deleted and renamed files, malformed frontmatter/YAML/TOML, missing history, occupied-server policy, and failure-safe deployment reporting. Final `bun run typecheck` passed with zero errors/warnings/hints.
 - Standalone `bun run test:e2e` passed 84 checks from an isolated checkout with no `dist` or `.env`, confirming build-first and no-credentials behavior. A physical dependency copy was necessary: a symlink to another checkout's dependencies produced Astro compile-cache path errors. No application patch was needed.
 - An actual Astro dev server occupying port 4321 caused `test:e2e:built` to fail clearly with “already used.” The test server was terminated; Playwright's own server exited after successful checks.
 - `bun run validate:surfaces` and `git diff --check` passed. No visible UI changed; document and diff review apply.
@@ -28,11 +30,11 @@ Local environment: macOS, Bun 1.3.10, Node v22.23.3, locked Astro 6.4.8 and Play
 
 The applied patch enables `build_config.build_caching`, custom preview includes `*`, excludes `dependabot/*`, watch includes `*`, and watch excludes `AGENTS.md`, `CLAUDE.md`, `README.md`, `docs/*`, `.agents/*`, `.cursor/*`, `.codex/*`. These exclusions are also exported by `scripts/ci/guidance-paths.ts`. Readback matched every patched field; production branch, build command/output/root, environment configuration, bindings, domains and active deployment were preserved.
 
-An explicitly approved retry of the existing production deployment queued new deployment `bb7e1c1a-dc0d-4367-95e8-ad06904eb5fa` with unchanged Git SHA. It completed successfully and became canonical production. This checks rebuild behavior without editing content. Fresh static generation remains enabled; caching only supplies dependency/framework intermediates. Rebuild route verification is recorded separately from CI rollout evidence.
+An explicitly approved retry of the existing production deployment queued new deployment `bb7e1c1a-dc0d-4367-95e8-ad06904eb5fa` with unchanged Git SHA. It completed successfully and became canonical production. The CLI verifier then passed all 32 routes (homepage/blog/tools plus 14 articles and 15 tools), confirmed the new active deployment ID and unchanged main SHA, and checked metadata/security headers in 12.519s. This checks rebuild behavior without editing content. Fresh static generation remains enabled; caching only supplies dependency/framework intermediates.
 
 ## Remaining rollout checks
 
-The workflow becomes active when reviewed changes merge to development/main through the existing flow. Record live results in the PR/release evidence rather than rerunning checks merely to update this document:
+Pilot PR CI uses the proposed workflow before merge. Development/main adopt it when reviewed changes merge through the existing flow. Record live results in the PR/release evidence rather than rerunning checks merely to update this document:
 
 1. Application pilot PR: required full check, both browser projects, preview creation/cache restoration and preview noindex.
 2. Guidance-only pilot PR after adoption: lightweight required check and no Pages build. Confirm no development-push duplicate full run after merge.
