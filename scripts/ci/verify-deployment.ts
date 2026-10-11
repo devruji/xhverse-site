@@ -3,6 +3,7 @@ import { dirname } from 'node:path';
 
 const PRODUCTION_URL = 'https://xhverse.co';
 const DEFAULT_ROUTES = ['/', '/blog', '/tools'];
+const DEPLOYMENT_PAGE_SIZE = 25;
 type JsonObject = Record<string, unknown>;
 export type Fetcher = (url: string, init: RequestInit) => Promise<Response>;
 
@@ -263,7 +264,7 @@ export async function verifyDeployment(options: VerificationOptions,
   }
   async function findCandidate() {
     for (let page = 1; ; page++) {
-      const envelope = await api(`${base}/deployments?env=production&per_page=100&page=${page}`);
+      const envelope = await api(`${base}/deployments?env=production&per_page=${DEPLOYMENT_PAGE_SIZE}&page=${page}`);
       if (!Array.isArray(envelope.result)) throw new Error('Invalid Cloudflare deployments response');
       for (const entry of envelope.result) {
         const deployment = deploymentDetails(entry);
@@ -272,7 +273,7 @@ export async function verifyDeployment(options: VerificationOptions,
         }
       }
       const info = envelope.result_info == null ? undefined : object(envelope.result_info, 'pagination');
-      if (typeof info?.total_pages === 'number' ? page >= info.total_pages : envelope.result.length < 100) return undefined;
+      if (typeof info?.total_pages === 'number' ? page >= info.total_pages : envelope.result.length < DEPLOYMENT_PAGE_SIZE) return undefined;
     }
   }
   function successful(deployment: ReturnType<typeof deploymentDetails> | undefined): boolean {
