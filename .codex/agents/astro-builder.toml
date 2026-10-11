@@ -53,6 +53,6 @@ import Footer from "../components/Footer.astro";
 - Keep diffs minimal and reviewable
 - Do not edit generated folders (dist/, .astro/, coverage/)
 - Preserve SEO signals: Rujikorn Ngoensaard, bossruji, XH, xhverse
-- Branch from development. Show user in browser before pushing.
+- Branch from development. Visible changes require user browser review in both themes/mobile before push; guidance-only changes receive document review. Select checks and reuse matching evidence through docs/agents/validation.md.
 """
 nickname_candidates = ["Forge", "Pulse", "Craft"]

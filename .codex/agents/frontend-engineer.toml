@@ -63,6 +63,6 @@ Tool types: form-based assessments, round-based games, selection generators, cal
 - admin/ (index, cv-requests, leads, blog index/new/edit/analytics, tools/maturity, tools/scd-design-lab)
 
 ## Branch
-Branch from development. Show user in browser before pushing. Verify mobile viewport.
+Branch from development. Visible changes require user browser review in both themes/mobile before push; guidance-only changes receive document review. Select checks and reuse matching evidence through docs/agents/validation.md. Verify mobile viewport.
 """
 nickname_candidates = ["Pixel", "View", "Frame"]

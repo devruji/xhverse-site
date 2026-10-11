@@ -4,6 +4,7 @@ globs: ["src/data/**", "src/lib/**"]
 ---
 
 ## Coverage Mandate
+- Local check scope and evidence reuse follow `docs/agents/validation.md`; full application PR CI remains required.
 - 100% on lines, functions, branches, statements — non-negotiable
 - Currently: 542 tests across 46 unit test files, all passing
 

@@ -9,7 +9,8 @@ graph LR
     end
 
     subgraph GitHub
-        B -->|PR / push| C[CI: Tests + Build]
+        B -->|PR to development/main| C[CI: Required validation]
+        B -->|main push| O[Deployment verification]
     end
 
     subgraph Cloudflare
@@ -33,7 +34,8 @@ graph LR
         M["blog view counters<br/>daily + referrer rollups"]
     end
 
-    C -->|build-time fetch| G
+    C -->|application build-time fetch| G
+    O -.->|read-only active production checks| D
     E -->|client INSERT/SELECT| G
     N -->|deploy hook or Pages API| D
     E -->|direct download| H
@@ -80,9 +82,10 @@ User clicks "Get a Copy" → CvRequestModal opens
 
 ### Deployment
 
-- **Production**: push to `main` → Cloudflare Pages builds and deploys to `xhverse.co`
-- **Preview**: push to `development` or `feat/*` → preview URL with auto `noindex`
-- **CI**: GitHub Actions runs typecheck, build, coverage (100%), and E2E on every push/PR
+- **Production**: eligible application changes promoted to `main` → Cloudflare Git integration builds and deploys to `xhverse.co`. Guidance-only changes do not deploy.
+- **Preview**: human feature branches and `development` → preview URL with auto `noindex`; custom branch include `*`, exclude `dependabot/*`. Watch-path includes `*` exclude the exact guidance manifest in `docs/agents/validation.md`; unknown/mixed paths remain eligible. Build caching is enabled while Astro builds and Supabase reads remain fresh.
+- **CI**: required `Test and Build` runs on PRs to `development` and `main`. Guidance-only changes validate surfaces; application/mixed/unknown/delivery changes run typecheck, one build, 100% coverage, delivery fixtures and desktop/mobile E2E. Development pushes do not repeat full validation.
+- **Deployment verification**: main-push Actions confirms the expected commit is active successful Cloudflare production, then smoke-tests public routes, canonical/indexing metadata and security headers before reporting deployment success. Guidance-only promotions report “deployment not required.” See `docs/agents/validation.md`.
 - **Pages Functions**: `/api/*` and `/admin/api/*` invoke Cloudflare Pages Functions; static routes stay static through `public/_routes.json`
 - **Admin content publish**: Supabase writes are immediate in the admin UI; public static blog pages update after the configured Cloudflare deploy hook or Pages API trigger rebuilds the site from Supabase
 - **Edge Functions**: deployed separately via `bunx supabase functions deploy send-cv`

@@ -19,8 +19,11 @@ bun run build            # Production build → ./dist/
 bun run typecheck        # Type checks
 bun run test             # Unit tests (vitest)
 bun run coverage         # Unit tests + 100% coverage enforcement
-bun run test:e2e         # E2E tests (Playwright)
-bun run check            # Full pipeline: typecheck + build + coverage + e2e
+bun run test:e2e         # Standalone E2E; builds first
+bun run test:e2e:built   # E2E against an existing validated build
+bun run check            # Full pipeline: typecheck + one build + coverage + e2e:built
+bun run validate:surfaces # Guidance Markdown/YAML/TOML validation
+bun run test:delivery    # Delivery-script fixture tests
 ```
 
 Kill dev server: `lsof -ti :4321 | xargs kill -9 2>/dev/null`
@@ -95,6 +98,8 @@ Use Playwright MCP for browser interaction and visual verification. Do not use C
 
 ## Codex + Cursor Flow
 
+Follow `docs/agents/validation.md` for check selection and evidence reuse. Unchanged read-only reviews run no automatic runtime checks; guidance-only changes validate surfaces. Application PRs retain the full pipeline and 100% coverage.
+
 - **Default split**: Codex owns planning, scope control, review, QA, security gate, and release evidence. Cursor owns bounded implementation when explicitly used.
 - **Implementation lane**: Default code implementation to `codex-spark` for bounded build/edit work. Codex still owns the plan, review, QA evidence, and final acceptance.
 - **Escalation**: If `codex-spark` produces too many bugs, misses repo rules, cannot reach production-grade quality, or the task is high-risk/complex, switch back to the smarter Codex lane for implementation and say why.
@@ -102,8 +107,8 @@ Use Playwright MCP for browser interaction and visual verification. Do not use C
 - **Cursor Agent use**: Codex does not operate Cursor through Computer Use for this repo. Codex prepares the handoff; the user runs Cursor Agent locally, preferably with `--worktree <task-name> --worktree-base development`, then returns the worktree path/branch and Cursor's result note for Codex review.
 - **Cursor run request**: Only ask the user to run Cursor when it is materially useful. Provide a short reason, the exact terminal command, the handoff path, the expected result note path, and what to send back to Codex.
 - **Mode choice**: Use Cursor normal agent for one focused implementation. Use Cursor multi-agent/multitask mode only when the work can be split into non-overlapping file ownership.
-- **Result handback**: Cursor should leave all changes on disk and write `.tmp/<task>-cursor-result.md` with worktree path, changed files, commands run with exit status, key output lines, deviations from the handoff, and unresolved risks.
-- **Review gate**: After Cursor edits, Codex must inspect the actual worktree with `git status`, `git diff`, changed files, and Cursor's result/test evidence. For Cursor-assisted work, ask Cursor to run the relevant checks, including `bun run check` when full confidence is needed; Codex reruns tests directly only if Cursor cannot run them, evidence is incomplete, or the user asks.
+- **Result handback**: Cursor leaves changes on disk and records the checked revision or dirty-diff fingerprint (including relevant untracked inputs), environment/tool versions, commands, exit statuses, key output, deviations and unresolved risks in `.tmp/<task>-cursor-result.md`. See `docs/agents/validation.md`.
+- **Review gate**: After Cursor edits, Codex must inspect the actual worktree with `git status`, `git diff`, changed files, and Cursor's result/test evidence. Select checks through `docs/agents/validation.md`; consume matching successful evidence without rerunning it. Repeat affected checks when inputs or environment change, evidence is missing, a failure remains unresolved, or the user requests them.
 - **Handoff cleanup**: After Cursor-assisted implementation is accepted and any needed evidence has been captured in the final response or durable docs, remove the temporary `.tmp/*-handoff.md` and `.tmp/*-cursor-result.md` files before final cleanup.
 - **Edit discipline**: One tool edits a file at a time. If Cursor is implementing, Codex stays review/QA-only unless explicitly asked to patch findings.
 - **Chat hygiene**: If the Cursor chat gets long or confused, start a new Cursor conversation and point it at the current handoff file, worktree path, branch state, allowed file list, and latest `.tmp/*-cursor-result.md`.
@@ -137,8 +142,8 @@ Use Playwright MCP for browser interaction and visual verification. Do not use C
 2. **ALWAYS branch from `development`** — never from `main`
 3. **ALL PRs target `development`** — release PRs are `development` → `main`
 4. **ALWAYS create an annotated release tag with a useful message after `main` promotion**
-5. **ALWAYS show user in browser before push** — no exceptions
-6. **QA + Security gate every release** — both must PASS
+5. **Visible changes require user browser review before push** — both themes and mobile; guidance-only changes receive document review
+6. **QA + Security gate every release** — both must PASS before merge; a draft release PR may collect candidate CI evidence first. Scope review and evidence reuse through `docs/agents/validation.md`; refresh dependency advisories for application releases
 
 ## Non-Negotiable Constraints
 
@@ -190,8 +195,8 @@ Use Playwright MCP for browser interaction and visual verification. Do not use C
 ## Done When
 
 - Requested change is implemented
-- `bun run check` passes (typecheck + build + coverage + e2e)
-- User has verified in browser (both themes, mobile viewport)
+- Checks selected through `docs/agents/validation.md` pass or have matching valid evidence; application PR CI runs the full pipeline
+- Visible changes have user browser review (both themes, mobile); guidance-only changes have document review
 - Final summary includes: changed files, risks, verification status
 
 For docs, rule, skill, or Codex-config-only changes, validate the relevant Markdown/YAML/TOML surfaces and state clearly that app runtime tests were not run.

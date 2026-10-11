@@ -24,5 +24,5 @@ globs: ["src/**/*.ts", "src/**/*.astro", "src/**/*.js"]
 - Tool pattern: `src/lib/<tool>/` (pure logic) + `src/pages/tools/<slug>.astro` (UI)
 
 ## Verification
-- Run `bun run typecheck` before considering work done
-- If you touched src/lib/ or src/data/: also run `bun run coverage`
+- Select checks and reuse matching evidence through `docs/agents/validation.md`; guidance-only or unchanged read-only work requires no runtime checks.
+- Application PR CI preserves typecheck, build, 100% coverage and desktop/mobile E2E; local checks focus on changed inputs and risk.

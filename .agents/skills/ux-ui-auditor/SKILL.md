@@ -184,7 +184,7 @@ When implementing fixes, follow these rules:
 - Maintain the dark aesthetic — never introduce light backgrounds
 - Respect existing spacing scale (don't invent new arbitrary values)
 - Test at 375px and 1280px minimum
-- Changes must pass `bun run typecheck`
+- Select checks and reuse matching evidence through `docs/agents/validation.md`; targeted local typechecks/affected-page checks and full application PR CI remain required. Unchanged read-only review runs no automatic tests/builds.
 
 Produce:
 1. The specific file edits (with before/after)

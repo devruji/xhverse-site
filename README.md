@@ -102,9 +102,14 @@ bun run dev          # http://localhost:4321
 ```sh
 bun run typecheck    # Astro type/content checks
 bun run coverage     # Unit tests + 100% coverage enforcement
-bun run test:e2e     # Playwright (chromium desktop + mobile)
-bun run check        # Full pipeline: typecheck + build + coverage + e2e
+bun run test:e2e     # Standalone Playwright; builds first (desktop + mobile)
+bun run test:e2e:built # Playwright against an existing validated build
+bun run check        # Full pipeline: typecheck + one build + coverage + e2e:built
+bun run validate:surfaces # Guidance Markdown/YAML/TOML validation
+bun run test:delivery # Delivery-script fixture tests
 ```
+
+Local check selection and reusable review evidence follow [validation policy](docs/agents/validation.md). Application PRs keep the full pipeline and 100% coverage; guidance-only changes use surface validation.
 
 ### Building for Production
 
