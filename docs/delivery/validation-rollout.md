@@ -2,6 +2,14 @@
 
 This change keeps Git integration, protected branches and application coverage. The implementation has three reviewable parts: agent policy/local build ownership, PR classification/production verification, and narrow Pages settings. No application feature, Supabase schema, admin behavior, branch protection or release tag changes are included.
 
+## Current release
+
+[v3.9.9](https://github.com/devruji/xhverse-site/releases/tag/v3.9.9) is published with an annotated tag at main `b4f113a992a420ed7062ac51cfbe96b1bc60b859`, promoted through [release PR #326](https://github.com/devruji/xhverse-site/pull/326). Cloudflare production deployment `1e2f0902-5401-40a9-8e5a-5fb13b233fab` is successful and active. Independent verification passed 46 route checks in 13.856s; public homepage metadata reports Astro 7.2.8. GitHub deployment `6995200940` has a successful state with matching commit and Cloudflare deployment ID.
+
+The initial [main verifier run](https://github.com/devruji/xhverse-site/actions/runs/38137337100) failed while the Pages build was queued: deployment listing used `per_page=100`, which the live API rejected with HTTP 400. Pages continued building; the failed verifier did not create a false success record. Verification-only retry passed once the expected deployment was active.
+
+Known limitation in v3.9.9: the waiting-path pagination defect remains. Live read-only requests accepted `per_page=25` and rejected 26, 50 and 100; the original mocks ignored the query parameter. A separate correction is prepared in commit `05f41de8d1a748c2376e8bd5b0b1078c7e04becd`, pending its PR/protected merge. It is not included in v3.9.9.
+
 ## Baseline captured on 2026-10-11
 
 - Base branch: `development` at `389f2e1eb696270d9c4178d40f64b3b72a4df3f0`; existing production main: `9ee99678d2bc7f27bc133b33c2bbfe08ac337c60`.
@@ -34,7 +42,7 @@ An explicitly approved retry of the existing production deployment queued new de
 
 ## Remaining rollout checks
 
-Development adopted the workflow when [application pilot PR #324](https://github.com/devruji/xhverse-site/pull/324) merged on `2026-10-11T10:55:27Z` at `4d3fd25ff0cb11feb8af65b694bb29323c60a4c1`. Main adoption remains pending release promotion. Record live results in the PR/release evidence rather than rerunning checks merely to update this document.
+Development adopted the workflow when [application pilot PR #324](https://github.com/devruji/xhverse-site/pull/324) merged on `2026-10-11T10:55:27Z` at `4d3fd25ff0cb11feb8af65b694bb29323c60a4c1`. Main adopted the workflow with the verified v3.9.9 promotion recorded above. Record live results in the PR/release evidence rather than rerunning checks merely to update this document.
 
 Completed evidence:
 
@@ -43,12 +51,12 @@ Completed evidence:
 - Application feature preview `9f8338ff` restored both dependencies and build output from cache, as confirmed by the live build logs captured in PR #324.
 - Earlier guidance-only push `04083ee` was skipped by Pages with reason `path_config` (event `8de9fb3e`).
 - [Guidance pilot PR #325](https://github.com/devruji/xhverse-site/pull/325) completed: [required lightweight CI](https://github.com/devruji/xhverse-site/actions/runs/38133859144) passed in 18s. Pages skipped both feature commit `738395a` (event `8cacfbed`) and development commit `9748fdf` (event `888af7b6`) for `path_config`; the development Actions query returned zero runs.
-- [Release PR #326](https://github.com/devruji/xhverse-site/pull/326) is a draft. A fresh dependency audit blocked the security gate; approved remediation is recorded in [security-remediation.md](./security-remediation.md). Package/lockfile changes require fresh candidate checks; the historical application evidence above does not validate the dependency migration.
+- [Release PR #326](https://github.com/devruji/xhverse-site/pull/326) was initially blocked by fresh dependency findings. [Remediation PR #328](https://github.com/devruji/xhverse-site/pull/328) merged before promotion; scoped QA/security and refreshed audit passed. [Release merge-candidate CI](https://github.com/devruji/xhverse-site/actions/runs/38136749703) passed candidate `4da9b08` with 585 unit tests at 100% coverage, 68 delivery fixtures, 84 E2E checks and one build; the required job took 100s. Remediation evidence is recorded in [security-remediation.md](./security-remediation.md).
 
 Remaining checks:
 
-1. Approved security remediation: local audit, corrected application/delivery checks and independent scoped code/security review passed; evidence is in [security-remediation.md](./security-remediation.md). Fresh remediation feature-PR CI and merge to development remain pending before release PR #326 can collect updated candidate evidence.
-2. Preview indexing and performance: verify preview `noindex` through an authenticated session (Cloudflare Access blocked unauthenticated inspection); compare cold/warm preview runs before claiming a timing improvement.
+1. Separate deployment-verifier pagination correction: complete its PR/protected merge and future production adoption; v3.9.9 still contains the waiting-path limitation above.
+2. Preview indexing and performance: a controlled preview build passed `noindex` and preview canonical-host checks for 36 public HTML routes. Authenticated live HTML inspection remains unavailable behind Cloudflare Access; compare cold/warm preview runs before claiming a timing improvement.
 3. Dependabot update: full GitHub validation and no preview.
 4. Next application release: merge-candidate CI, scoped QA/security and fresh advisories before merge, then verifier/GitHub record matching active Cloudflare production.
 
