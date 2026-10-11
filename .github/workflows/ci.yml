@@ -1,9 +1,10 @@
 name: CI
 
 on:
-  push:
-    branches: [main, development]
   pull_request:
+    branches: [development, main]
+  push:
+    branches: [main]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -11,17 +12,18 @@ concurrency:
 
 permissions:
   contents: read
-  deployments: write
 
 jobs:
   test:
     name: Test and Build
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
-    timeout-minutes: 8
-
+    timeout-minutes: 10
     steps:
-      - name: Checkout
+      - name: Checkout merge candidate
         uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -33,41 +35,73 @@ jobs:
         with:
           bun-version: 1.2.21
 
-      - name: Cache dependencies + Playwright
-        id: cache
+      - name: Cache Bun dependencies
         uses: actions/cache@v5
         with:
-          path: |
-            ~/.bun/install/cache
-            ~/.cache/ms-playwright
-          key: ${{ runner.os }}-deps-${{ hashFiles('bun.lock') }}
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock') }}
           restore-keys: |
-            ${{ runner.os }}-deps-
+            ${{ runner.os }}-bun-
+
+      - name: Start evidence summary
+        run: |
+          {
+            echo '## Validation evidence'
+            echo "Revision: $(git rev-parse HEAD)"
+            echo "Base: $BASE_SHA"
+            echo "Environment: $RUNNER_OS / Node $(node --version) / Bun $(bun --version)"
+            echo '| Phase | Duration | Result |'
+            echo '|---|---:|---|'
+          } >> "$GITHUB_STEP_SUMMARY"
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
 
       - name: Install dependencies
-        run: bun install --frozen-lockfile
+        run: bun scripts/ci/timed.ts setup bun install --frozen-lockfile
 
-      - name: Install Playwright
+      - name: Classify changes
+        id: changes
+        run: bun scripts/ci/classify-changes.ts --base "$BASE_SHA" --head "$GITHUB_SHA" --output "$RUNNER_TEMP/changes.json" --github-output "$GITHUB_OUTPUT"
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+
+      - name: Validate guidance surfaces and whitespace
         run: |
-          if [ "${{ steps.cache.outputs.cache-hit }}" = "true" ]; then
-            bunx playwright install-deps chromium 2>/dev/null || true
-          else
-            bunx playwright install --with-deps chromium
-          fi
+          bun scripts/ci/timed.ts surfaces bun run validate:surfaces
+          bun scripts/ci/check-whitespace.ts --base "$BASE_SHA" --head "$GITHUB_SHA"
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
 
-      - name: Typecheck + Build + Test
-        run: bun run check
+      - name: Guidance-only result
+        if: steps.changes.outputs.mode == 'guidance'
+        run: echo 'Guidance-only change; application runtime checks and deployment are not required.' >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Upload artifacts
-        if: github.event_name == 'push'
-        uses: actions/upload-artifact@v7
-        with:
-          name: site-dist
-          path: dist/
-          retention-days: 5
+      - name: Delivery fixture tests
+        if: steps.changes.outputs.mode == 'full'
+        run: bun scripts/ci/timed.ts delivery bun run test:delivery
+
+      - name: Install Chromium
+        if: steps.changes.outputs.mode == 'full'
+        run: bun scripts/ci/timed.ts browser-setup bunx playwright install --with-deps chromium
+
+      - name: Typecheck
+        if: steps.changes.outputs.mode == 'full'
+        run: bun scripts/ci/timed.ts typecheck bun run typecheck
+
+      - name: Build
+        if: steps.changes.outputs.mode == 'full'
+        run: bun scripts/ci/timed.ts build bun run build
+
+      - name: Coverage
+        if: steps.changes.outputs.mode == 'full'
+        run: bun scripts/ci/timed.ts coverage bun run coverage
+
+      - name: E2E against existing build
+        if: steps.changes.outputs.mode == 'full'
+        run: bun scripts/ci/timed.ts e2e bun run test:e2e:built
 
       - name: Upload Playwright report
-        if: failure()
+        if: failure() && steps.changes.outputs.mode == 'full'
         uses: actions/upload-artifact@v7
         with:
           name: playwright-report
@@ -75,66 +109,78 @@ jobs:
           retention-days: 5
 
       - name: Coverage summary
-        if: always()
+        if: always() && steps.changes.outputs.mode == 'full'
         run: |
           if [ -f coverage/coverage-summary.json ]; then
-            echo "## Test Coverage" >> "$GITHUB_STEP_SUMMARY"
+            echo '## Test Coverage' >> "$GITHUB_STEP_SUMMARY"
             node -e "const s=require('./coverage/coverage-summary.json').total; console.log('| Metric | % |\\n|---|---:|\\n| Lines | '+s.lines.pct+' |\\n| Statements | '+s.statements.pct+' |\\n| Functions | '+s.functions.pct+' |\\n| Branches | '+s.branches.pct+' |')" >> "$GITHUB_STEP_SUMMARY"
           fi
 
   report-production-deployment:
-    name: Report Production Deployment
-    runs-on: ubuntu-latest
-    timeout-minutes: 3
-    needs: test
+    name: Verify Production Deployment
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      deployments: write
     steps:
-      - name: Create GitHub deployment record
+      - name: Checkout released commit
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.2.21
+
+      - name: Classify promotion
+        id: changes
+        run: |
+          bun scripts/ci/classify-changes.ts --base "$BEFORE_SHA" --head "$GITHUB_SHA" --output "$RUNNER_TEMP/changes.json" --github-output "$GITHUB_OUTPUT"
+          bun -e 'const result = await Bun.file(process.env.RUNNER_TEMP + "/changes.json").json(); await Bun.write(process.env.RUNNER_TEMP + "/routes.json", JSON.stringify(result.routes));'
+        env:
+          BEFORE_SHA: ${{ github.event.before }}
+
+      - name: Deployment not required
+        if: steps.changes.outputs.mode == 'guidance'
+        run: echo 'Guidance-only promotion; deployment not required. No production deployment success record was created.' >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Verify active Cloudflare production and smoke routes
+        if: steps.changes.outputs.mode == 'full'
+        run: bun scripts/ci/verify-deployment.ts --sha "$GITHUB_SHA" --routes-file "$RUNNER_TEMP/routes.json" --output "$RUNNER_TEMP/deployment-verification.json"
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_PAGES_PROJECT_NAME: xhverse-site-git
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Record verified production deployment
+        if: steps.changes.outputs.mode == 'full'
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
-          SHA: ${{ github.sha }}
-          REF: ${{ github.ref_name }}
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
         run: |
-          deployment_payload="$(
-            jq -n \
-              --arg ref "$SHA" \
-              --arg environment "xhverse-site (Production)" \
-              '{
-                ref: $ref,
-                task: "deploy",
-                environment: $environment,
-                description: "Production deployment reported after CI passed on main.",
-                auto_merge: false,
-                required_contexts: [],
-                production_environment: true
-              }'
-          )"
+          active_main="$(gh api "repos/$REPO/git/ref/heads/main" --jq '.object.sha')"
+          test "$active_main" = "$GITHUB_SHA" || { echo 'Release was superseded; no success record created.'; exit 1; }
+          cf_id="$(jq -r '.deploymentId' "$RUNNER_TEMP/deployment-verification.json")"
+          jq -n --arg ref "$GITHUB_SHA" --arg cf_id "$cf_id" '{ref:$ref, task:"deploy", environment:"xhverse-site (Production)", description:("Verified Cloudflare deployment " + $cf_id), auto_merge:false, required_contexts:[], production_environment:true, payload:{cloudflare_deployment_id:$cf_id}}' > "$RUNNER_TEMP/deployment-payload.json"
+          deployment_id="$(gh api "repos/$REPO/deployments" --method POST --input "$RUNNER_TEMP/deployment-payload.json" --jq '.id')"
+          jq -n --arg log_url "$RUN_URL" --arg cf_id "$cf_id" '{state:"success", environment:"xhverse-site (Production)", environment_url:"https://xhverse.co", log_url:$log_url, description:("Verified Cloudflare production " + $cf_id)}' > "$RUNNER_TEMP/deployment-status.json"
+          gh api "repos/$REPO/deployments/$deployment_id/statuses" --method POST --input "$RUNNER_TEMP/deployment-status.json"
+          {
+            echo '## Verified production'
+            echo "Commit: $GITHUB_SHA"
+            echo "Cloudflare deployment: $cf_id"
+            jq -r '"Verification duration: \(.elapsedMs / 1000)s", "Smoke routes: \(.routes | join(", "))"' "$RUNNER_TEMP/deployment-verification.json"
+          } >> "$GITHUB_STEP_SUMMARY"
 
-          deployment_id="$(
-            gh api "repos/$REPO/deployments" \
-              --method POST \
-              --input - \
-              --jq ".id" <<< "$deployment_payload"
-          )"
-
-          status_payload="$(
-            jq -n \
-              --arg environment "xhverse-site (Production)" \
-              --arg environment_url "https://xhverse.co" \
-              --arg log_url "$RUN_URL" \
-              --arg description "Production deployment is up to date for $REF at $SHA." \
-              '{
-                state: "success",
-                environment: $environment,
-                environment_url: $environment_url,
-                log_url: $log_url,
-                description: $description
-              }'
-          )"
-
-          gh api "repos/$REPO/deployments/$deployment_id/statuses" \
-            --method POST \
-            --input - <<< "$status_payload"
+      - name: Upload verification evidence
+        if: success() && steps.changes.outputs.mode == 'full'
+        uses: actions/upload-artifact@v7
+        with:
+          name: production-verification
+          path: ${{ runner.temp }}/deployment-verification.json
+          retention-days: 30

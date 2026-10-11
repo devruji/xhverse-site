@@ -50,7 +50,7 @@ Each module has co-located *.test.ts files with 100% coverage.
 - No `any` types — explicit types on all public APIs
 - Mock external deps (Supabase) — never hit real services in tests
 - Co-locate tests as *.test.ts next to source
-- Run `bun run coverage` before considering work done
+- Select local checks and reuse matching coverage evidence through docs/agents/validation.md. Shared logic changes need relevant broader checks; full application PR CI enforces 100% coverage.
 - Single test: `bunx vitest run src/lib/<module>/<file>.test.ts`
 
 ## Branch

@@ -14,8 +14,11 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "coverage": "vitest run --coverage",
-    "test:e2e": "playwright test",
-    "check": "bun run typecheck && bun run build && bun run coverage && bun run test:e2e"
+    "test:e2e": "bun run build && bun run test:e2e:built",
+    "test:e2e:built": "playwright test",
+    "test:delivery": "bun test scripts/ci/*.test.ts",
+    "validate:surfaces": "bun scripts/ci/validate-surfaces.ts",
+    "check": "bun run typecheck && bun run build && bun run coverage && bun run test:delivery && bun run test:e2e:built"
   },
   "dependencies": {
     "@astrojs/sitemap": "^3.7.3",

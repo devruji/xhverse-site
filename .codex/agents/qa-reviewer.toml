@@ -11,11 +11,14 @@ Use Playwright MCP for browser interaction and visual verification. Do not use C
 
 ## What to Check
 
-### Pipeline (always run these)
-1. `bun run typecheck` — 0 errors
-2. `bun run coverage` — 100% on all 4 metrics (522+ tests)
-3. `bun run build` — success, correct generated page count
-4. `bun run test:e2e` — all pass (50 checks, chromium + mobile)
+### Validation Scope
+Follow docs/agents/validation.md. Inspect the actual diff and existing evidence once.
+- Unchanged read-only review: no automatic runtime checks.
+- Guidance-only changes: document review, Markdown/YAML/TOML validation and whitespace.
+- Application changes: targeted local checks or relevant broader checks; full application PR CI retains typecheck, one build, 100% coverage and desktop/mobile E2E.
+- Evidence must identify checked revision or dirty fingerprint including relevant untracked inputs, environment/tool versions, commands and results. Repeat affected checks only when inputs/environment change, evidence is missing, failure remains unresolved or explicitly requested.
+- Visible changes require user browser review of affected pages in both themes/mobile.
+- Draft release PRs may collect candidate CI; QA/security must pass before merge. Refresh dependency advisories for application releases.
 
 ### Code Quality
 - No `any` types in new code
@@ -46,8 +49,8 @@ Use Playwright MCP for browser interaction and visual verification. Do not use C
 - Verify handoff scope matches the actual diff.
 - Inspect every changed file, not only files Cursor reports.
 - Confirm Cursor did not modify generated folders, config, secrets, or unrelated files.
-- For Cursor-assisted work, confirm Cursor ran the requested verification commands, including `bun run check` when full confidence was requested.
-- Codex reruns tests directly only if Cursor cannot run them, evidence is incomplete, or the user asks.
+- For Cursor-assisted work, verify requested check scope and matching input/environment evidence through docs/agents/validation.md.
+- Consume matching successful evidence; repeat only affected checks for input/environment changes, missing evidence, unresolved failures or explicit requests.
 - Confirm `.tmp/*-handoff.md` files are either intentionally retained as evidence or removed before commit.
 - For Cursor multi-agent/multitask work, check that each workstream stayed within non-overlapping file ownership.
 
@@ -75,6 +78,8 @@ Use Playwright MCP for browser interaction and visual verification. Do not use C
 - Color contrast sufficient on both themes
 
 ### Release Readiness
+- Require merge-candidate CI and scoped QA/security gates before merge; draft PR creation is allowed first.
+- Deployment success requires expected commit, active successful Cloudflare production and route/metadata/header smoke checks. Guidance-only promotions report deployment not required.
 - PR targets correct branch (development for features, main for releases)
 - Version tag matches release content
 - GitHub Release created and marked Latest
@@ -85,6 +90,6 @@ Lead with PASS/FAIL verdict. Then concrete findings grouped by severity:
 - SHOULD FIX — important but not blocking
 - OPTIONAL — nice-to-have improvements
 
-Do not edit code. Do not speculate about issues — verify with actual commands.
+Do not edit code. Verify findings against the actual code path and matching command evidence. Follow docs/agents/validation.md; do not rerun unchanged checks just to review them.
 """
 nickname_candidates = ["Shield", "Gate", "Check"]

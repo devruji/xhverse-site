@@ -5,11 +5,15 @@ description: Full-stack security audit and enforcement for xhverse.co. Use this 
 
 # Security Audit Expert
 
-Full-stack security audit covering application security, infrastructure hardening, and compliance. Produces actionable findings that block releases (critical/high) or track resolution (medium/low).
+Security review covering application security, infrastructure hardening, and privacy. Critical/high findings block release merge; medium/low findings track resolution. Follow `docs/agents/validation.md` for change scope and reusable evidence. A draft release PR may collect merge-candidate CI before the gate finishes.
+
+Inspect the actual diff and existing evidence once. Unchanged read-only review runs no automatic runtime checks; guidance-only work validates documents/surfaces and checks the diff for secrets. Scope the audit phases below to affected trust boundaries, broadening for auth, shared, dependency or platform changes. Evidence records checked revision or dirty fingerprint including relevant untracked inputs, environment/tool versions, commands and results. Repeat affected checks when inputs/environment change, evidence is missing or a failure remains unresolved.
+
+Refresh dependency advisories for every application release even when the lockfile is unchanged: advisory data can change independently of Git. Report lookup failure as an unverified security gate; never hide it behind a passing fallback. QA and security must pass before merge.
 
 ## Audit Phases
 
-Execute in order. Stop and report immediately if a CRITICAL finding is discovered.
+Use the relevant phases for the change and record omitted areas with reasons. Stop and report immediately if a CRITICAL finding is discovered.
 
 ### Phase 1: Secrets & Credential Exposure
 
@@ -92,11 +96,8 @@ grep -rn "sanitize\|sanitizeHtml" src/lib/
 
 #### A06: Vulnerable Components
 ```bash
-# Check for known vulnerabilities in dependencies
-bun audit 2>/dev/null || bunx npm-audit-resolver 2>/dev/null || echo "Run: bun pm ls --all | check against advisories"
-
-# Check for outdated packages with known CVEs
-bun outdated 2>/dev/null
+# Refresh known dependency advisories for application releases; preserve output/exit status
+bun audit
 ```
 
 #### A07: Authentication Failures
@@ -155,11 +156,11 @@ grep -n "storage\|bucket" supabase/migrations/*.sql
 # List all dependencies
 cat package.json | jq '.dependencies, .devDependencies'
 
-# Check for known vulnerabilities
-bunx audit-ci --config audit-ci.jsonc 2>/dev/null || echo "Manual review needed"
+# Refresh known advisories; retain output/exit status and report lookup failures
+bun audit
 
-# Check for packages with no recent maintenance
-bun outdated 2>/dev/null
+# Inspect update availability; preserve errors and review maintenance separately
+bun outdated
 ```
 
 **Flag:**
@@ -217,13 +218,17 @@ bun outdated 2>/dev/null
 If any CRITICAL or HIGH finding exists:
 1. Set verdict to **BLOCK**
 2. List specific fixes required
-3. Do NOT create the release PR
+3. Do NOT merge the release PR. A draft may remain open to collect candidate CI evidence.
 
 ### Issue Tracking (MEDIUM/LOW)
 For medium and low findings, create GitHub issues:
 ```bash
 gh issue create --title "Security: [finding title]" --body "[details + fix recommendation]" --label "security"
 ```
+
+## Production evidence
+
+Report deployment success only after the expected main commit is the active successful Cloudflare production deployment and public route, indexing/canonical and security-header smoke checks pass. Missing credentials, API failure, timeout or supersession cannot pass. Guidance-only promotions require no deployment. See `docs/agents/validation.md`.
 
 ## Known Good Patterns in This Project
 

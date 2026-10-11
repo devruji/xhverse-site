@@ -74,7 +74,7 @@ Use Playwright MCP for browser interaction and visual verification. Do not use C
 - Use `scrutinize` for plan review, PR review, diff review, architecture/design sanity checks, and second-opinion review.
 - Use `post-mortem` only after there is a reliable repro, known root cause, implemented fix, and validation evidence.
 - When Codex hands work to Cursor, follow the skill lens named in the `.tmp/*-handoff.md`.
-- For Codex-managed Cursor work, Cursor runs the requested verification commands, including `bun run check` when full confidence is needed; Codex reviews Cursor's output and reruns tests only if evidence is incomplete or the user asks.
+- For Codex-managed Cursor work, Cursor runs the requested verification commands, selected through `docs/agents/validation.md`; Codex reviews matching evidence once and repeats affected checks only for changed inputs/environment, missing evidence, unresolved failure or explicit request.
 
 ## Implementation Lane
 - Default code implementation to `codex-spark` for bounded build/edit work when available.
@@ -92,18 +92,21 @@ Use Playwright MCP for browser interaction and visual verification. Do not use C
 ## Git Workflow
 - Branch from `development` — never `main`
 - **NEVER** edit on `development` or `main` — create branch first
-- All PRs target `development`
+- Feature PRs target `development`; release PRs target `main`
 - Release: `development` → `main` PR → annotated tag `vX.Y.Z` with a useful message → GitHub Release
-- Verify in browser (both themes, mobile) before pushing
-- QA + Security gate every release
+- Visible changes require user browser review (both themes/mobile) before push; guidance-only changes receive document review
+- QA + Security must pass before release merge; draft PRs may collect candidate CI first. Follow `docs/agents/validation.md` for scope/evidence reuse, fresh application-release advisories and verified deployment reporting
 
 ## Commands
 ```bash
-bun run check        # Full pipeline (typecheck + build + coverage + e2e)
+bun run check        # Full pipeline (typecheck + one build + coverage + e2e:built)
 bun run dev          # Dev server at localhost:4321
 bun run typecheck    # Type checks (0 errors required)
 bun run coverage     # Tests + 100% enforcement
-bun run test:e2e     # Playwright (84 checks, chromium + mobile)
+bun run test:e2e     # Standalone E2E; builds first (desktop + mobile)
+bun run test:e2e:built # E2E against an existing validated build
+bun run validate:surfaces # Guidance Markdown/YAML/TOML validation
+bun run test:delivery # Delivery-script fixture tests
 bun run build        # Production build (46 generated pages in the current release)
 ```
 
@@ -113,7 +116,7 @@ bun run build        # Production build (46 generated pages in the current relea
 - Do not modify: `coverage/`, `dist/`, `playwright-report/`, `test-results/`, `.astro/`
 - Do not touch `supabase/` migrations unless explicitly asked
 - For complex tasks, produce a plan first
-- Show user in browser before pushing — no exceptions
+- Visible changes require user browser review before push; guidance-only changes receive document review
 
 ## Design System (dark-first)
 - Background: `bg-[var(--bg-page)]`
@@ -129,4 +132,4 @@ bun run build        # Production build (46 generated pages in the current relea
 ## Reports
 - Keep concise
 - Report only what was actually changed or verified
-- Do not claim checks were run unless explicitly run
+- Attribute checks to their runner and revision; reuse matching evidence without implying the reviewer reran them

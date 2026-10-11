@@ -17,8 +17,8 @@ Implement Astro pages and sections in a way that matches repository patterns and
 8. Summarize changed files, risks, and verification notes.
 
 # Verification
-- For page/layout changes, prefer at least `bun run typecheck` and focused Playwright coverage.
-- For release-ready changes, run `bun run check` when feasible.
+- Select targeted local typechecks/affected-page Playwright checks through `docs/agents/validation.md`; broaden for shared changes and preserve full application PR CI.
+- Reuse matching successful input/environment evidence; unchanged read-only review runs no automatic tests/builds. Visible changes require user review in both themes/mobile before push. Release QA/security gates must pass before merge.
 - Report only checks that actually ran.
 
 # Output

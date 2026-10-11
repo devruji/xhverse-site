@@ -20,7 +20,10 @@ This project deploys to Cloudflare Pages at https://xhverse.co. This skill cover
 
 ### Pages (Active)
 - **Production branch**: `main` → https://xhverse.co
-- **Preview branches**: `development`, `feat/*` → auto-generated preview URLs
+- **Preview branches**: all human feature branches and `development`; configured custom include `*`, exclude `dependabot/*`.
+- **Build caching**: enabled; fresh Astro builds and Supabase content reads remain required.
+- **Watch paths**: include `*`; exclude the exact guidance manifest in `docs/agents/validation.md`. Unknown/mixed paths remain eligible.
+- Re-read live settings before future changes; preserve production branch, environment values, bindings, domains, build command and rebuild hooks.
 - **Build command**: `bun run build`
 - **Output directory**: `dist`
 - **Node version**: Read from `.node-version` (currently 22.16.0)
@@ -56,14 +59,24 @@ Root directory: /
 ```
 
 ### Deployment Hooks
-- Git push triggers build automatically
+- Git integration triggers builds for eligible paths/branches; known guidance-only changes do not require deployment. Unknown/mixed/application paths remain eligible.
 - Blog Writer content changes can trigger a Pages rebuild through `/admin/api/blog/rebuild` using either server-side `BLOG_REBUILD_HOOK_URL` or the Cloudflare Pages API env vars (`CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_PAGES_PROJECT_NAME`, optional `CLOUDFLARE_PAGES_REBUILD_BRANCH`).
 - For Codex-published Supabase blog posts, trigger the same Pages rebuild path after the `posts` row and cover metadata have been read back, then verify production `/blog` and the article route.
 - No manual `wrangler pages deploy` needed for normal flow
 - For emergency deploys: `bunx wrangler pages deploy dist --project-name=xhverse-site`
 
 ### Preview Deployments
-Every PR and branch push creates a preview URL like `<hash>.<project>.pages.dev`. The app's SEO logic auto-adds `noindex` to preview builds via `shouldNoIndexDeployment()`.
+Eligible human feature branches and development create previews like `<hash>.<project>.pages.dev`; Dependabot previews are excluded. Watch-path includes remain `*` and exclude exactly the known guidance paths in `docs/agents/validation.md`; unknown paths stay eligible. Confirm live readback before claiming the settings are applied. The app's SEO logic auto-adds `noindex` via `shouldNoIndexDeployment()`; verify production canonical URLs stay on `https://xhverse.co`.
+
+### Safe settings changes and build caching
+
+Export current non-secret settings before a narrow patch and compare live readback. Preserve production branch, environment values, bindings, domains and rebuild hooks. Enable dependency/build caching while retaining fresh Astro builds and Supabase content reads; editorial rebuilds with unchanged Git still deploy fresh content. Record cold/warm observations before making timing claims.
+
+### Validation and deployment reporting
+
+Follow `docs/agents/validation.md` for proportional local checks and matching evidence reuse. Full application PR CI remains required; no development-push duplicate full validation. Main-push Actions verifies deployment instead of repeating the pipeline.
+
+For application promotion, poll read-only Cloudflare API with existing secret references every 10 seconds for up to 15 minutes. Require successful production deployment of the expected main commit and confirmation it is active canonical production. Smoke-test homepage, blog, tools and affected public routes; check canonical/indexing metadata and security headers before recording GitHub deployment success. Missing credentials, API failure, timeout, wrong commit, preview-only deployment or supersession cannot pass. Guidance-only promotions report “deployment not required.”
 
 ## Workers & Functions
 
