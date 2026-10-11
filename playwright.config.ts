@@ -9,6 +9,8 @@ export default defineConfig({
   },
   webServer: {
     command: "bun run preview --host 127.0.0.1 --port 4321",
+    // Astro 7 detaches previews when an AI agent is detected; Playwright must own this process.
+    env: { ASTRO_PREVIEW_BACKGROUND: "0" },
     url: "http://127.0.0.1:4321",
     reuseExistingServer: false,
   },

@@ -4,11 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-XHVerse is the portfolio, blog, and tools site for Rujikorn Ngoensaard (XH / bossruji) — a Data Architect specializing in Azure, Databricks, Microsoft Fabric, and data governance. Built with Astro 6, deployed to Cloudflare Pages.
+XHVerse is the portfolio, blog, and tools site for Rujikorn Ngoensaard (XH / bossruji) — a Data Architect specializing in Azure, Databricks, Microsoft Fabric, and data governance. Built with Astro 7, deployed to Cloudflare Pages.
 
 - **Production**: https://xhverse.co
 - **Repo**: https://github.com/devruji/xhverse-site
-- **Current version**: v3.9.8
+- **Current version**: v3.9.9 release candidate — production promotion pending
 - **Business model**: Consulting/advisory — site drives inbound leads via content + tools
 
 ## Commands
@@ -35,9 +35,9 @@ Kill dev server: `lsof -ti :4321 | xargs kill -9 2>/dev/null`
 ## Architecture
 
 ### Stack
-- **Astro 6** (static output only — no SSR, no server runtime)
+- **Astro 7** (static output only — no SSR, no server runtime)
 - **Tailwind CSS v4** via `@tailwindcss/vite` plugin (CSS-first config, no tailwind.config.js)
-- **Bun** (package manager + script runner), Node 22.16.0 (pinned in `.node-version`)
+- **Bun** (package manager + script runner), Node 22.23.3 (pinned in `.node-version`)
 - **Cloudflare Pages** (Git integration auto-deploy from `main`)
 - **Supabase** (blog CMS/source of truth + runtime for CV requests, leads, tool benchmarks)
 - **Cloudflare Turnstile** (bot protection — Non-interactive mode on CV request form)
@@ -382,7 +382,7 @@ Repo MCP policy:
 - Preserve identity SEO signals for "Rujikorn Ngoensaard", "bossruji", "XH", "xhverse"
 - Do not promise a specific Google ranking or recrawl timeline; use Search
   Console and live search results as evidence with clear uncertainty.
-- Keep `.node-version`, CI, and Cloudflare Pages runtime aligned (currently Node 22.16.0)
+- Keep `.node-version`, CI, and Cloudflare Pages runtime aligned (currently Node 22.23.3)
 - Keep `bun.lock` in sync — never bypass `--frozen-lockfile`
 - Supabase config lives in ONE place: `src/data/supabase-config.ts`
 - Site must build successfully without Supabase env vars (static fallback), but Supabase is authoritative when build credentials are configured

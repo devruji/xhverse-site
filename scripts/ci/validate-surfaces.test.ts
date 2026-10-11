@@ -1,9 +1,25 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
 import { mkdtempSync, mkdirSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { validateFiles, validateSurface } from "./validate-surfaces";
+
+test("malformed TOML with an unfinished array comment is rejected without hanging", () => {
+  // Keep the advisory reproduction isolated so a vulnerable parser cannot hang the test runner.
+  const moduleUrl = new URL("./validate-surfaces.ts", import.meta.url).href;
+  const code = `import { validateSurface } from ${JSON.stringify(moduleUrl)};
+    try { validateSurface(".codex/malformed.toml", "a=[1 #"); process.exitCode = 2; }
+    catch { process.stdout.write("rejected"); }`;
+  const result = spawnSync(process.execPath, ["-e", code], {
+    encoding: "utf8",
+    timeout: 2000,
+  });
+  assert.equal(result.error, undefined, "TOML validation did not complete within two seconds");
+  assert.equal(result.status, 0);
+  assert.equal(result.stdout, "rejected");
+});
 
 test("surface validation accepts Markdown, rule/skill YAML, TOML, JSON", () => {
   validateSurface("README.md", "# Guide\n");
