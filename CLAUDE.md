@@ -4,11 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-XHVerse is the portfolio, blog, and tools site for Rujikorn Ngoensaard (XH / bossruji) — a Data Architect specializing in Azure, Databricks, Microsoft Fabric, and data governance. Built with Astro 6, deployed to Cloudflare Pages.
+XHVerse is the portfolio, blog, and tools site for Rujikorn Ngoensaard (XH / bossruji) — a Data Architect specializing in Azure, Databricks, Microsoft Fabric, and data governance. Built with Astro 7, deployed to Cloudflare Pages.
 
 - **Production**: https://xhverse.co
 - **Repo**: https://github.com/devruji/xhverse-site
-- **Current version**: v3.9.8
+- **Current version**: v3.9.9 release candidate — production promotion pending
 - **Business model**: Consulting/advisory — site drives inbound leads via content + tools
 
 ## Commands
@@ -21,8 +21,11 @@ bun run typecheck        # Astro type/content checks
 bun run test             # Unit tests (vitest)
 bun run test:watch       # Unit tests in watch mode
 bun run coverage         # Unit tests + 100% coverage enforcement
-bun run test:e2e         # E2E tests (Playwright, builds site first)
-bun run check            # Full pipeline: typecheck + build + coverage + e2e
+bun run test:e2e         # Standalone E2E; builds first
+bun run test:e2e:built   # E2E against an existing validated build
+bun run check            # Full pipeline: typecheck + one build + coverage + e2e:built
+bun run validate:surfaces # Guidance Markdown/YAML/TOML validation
+bun run test:delivery    # Delivery-script fixture tests
 ```
 
 Single test file: `bunx vitest run src/data/blog.test.ts`
@@ -32,9 +35,9 @@ Kill dev server: `lsof -ti :4321 | xargs kill -9 2>/dev/null`
 ## Architecture
 
 ### Stack
-- **Astro 6** (static output only — no SSR, no server runtime)
+- **Astro 7** (static output only — no SSR, no server runtime)
 - **Tailwind CSS v4** via `@tailwindcss/vite` plugin (CSS-first config, no tailwind.config.js)
-- **Bun** (package manager + script runner), Node 22.16.0 (pinned in `.node-version`)
+- **Bun** (package manager + script runner), Node 22.23.3 (pinned in `.node-version`)
 - **Cloudflare Pages** (Git integration auto-deploy from `main`)
 - **Supabase** (blog CMS/source of truth + runtime for CV requests, leads, tool benchmarks)
 - **Cloudflare Turnstile** (bot protection — Non-interactive mode on CV request form)
@@ -132,13 +135,13 @@ git clean -fd --dry-run     # Check for untracked contamination from other sessi
 ### Making Changes
 
 1. Create feature branch from `development`
-2. Implement + verify; for Cursor-assisted work, have Cursor run `bun run check` and report the output
+2. Implement and select local checks through `docs/agents/validation.md`; record evidence once, including validated inputs and environment
 3. **Verify `git diff --stat` shows ONLY your intended changes**
-4. **Start dev server and show user** before pushing
-5. Wait for user approval in browser (both themes, mobile viewport)
+4. **Show visible changes to the user** in an isolated browser before pushing; guidance-only changes receive document review
+5. Visible changes require user browser review (both themes, mobile viewport)
 6. Once approved: commit, push, create PR to `development`
-7. **NEVER push without user seeing it in browser first**
-8. **NEVER create PRs targeting `main`** — always target `development`
+7. **Visible changes require browser review before push**; follow `docs/agents/validation.md`
+8. **Feature PRs target `development`**; release PRs are `development` → `main`
 9. **NEVER edit files while on `development` or `main`** — create a branch FIRST
 
 ### Browser Automation
@@ -164,10 +167,10 @@ Use this flow when the user wants Codex to manage planning, review, QA, security
 8. Only ask the user to run Cursor when it is materially useful. Codex must provide a "Cursor run request" with the reason, exact command, handoff path, expected `.tmp/*-cursor-result.md` path, and what the user should report back.
 9. Cursor implements from that handoff only when explicitly used or when it materially helps the workflow. Prefer one focused Cursor Agent for one focused change.
 10. Use Cursor multi-agent or multitask mode only when file ownership is non-overlapping and the handoff assigns each workstream clearly.
-11. Cursor leaves changes on disk and writes `.tmp/<task>-cursor-result.md` with the worktree path, changed files, commands run with exit status, key output lines, deviations from the handoff, and unresolved risks.
+11. Cursor leaves changes on disk and records worktree/branch, checked revision or dirty fingerprint including relevant untracked inputs, input scope, environment/tool versions, commands, exit status, useful output, deviations and risks in `.tmp/<task>-cursor-result.md`. See `docs/agents/validation.md`.
 12. After Cursor finishes, the user gives Codex the worktree path/branch and Cursor result note. Codex inspects `git status`, `git diff`, and the actual changed files before trusting any Cursor summary.
-13. Cursor runs the narrowest sufficient checks for the change, including `bun run check` when full confidence is needed, and captures the output in the result note.
-14. Codex reviews Cursor's test evidence plus `git status`, `git diff`, and the actual changed files before trusting any Cursor summary. Codex reruns tests directly only if Cursor cannot run them, evidence is incomplete, or the user asks.
+13. Cursor selects checks through `docs/agents/validation.md` and records their evidence once.
+14. Codex inspects the actual worktree and matching evidence once. Repeat affected checks only when inputs/environment change, evidence is missing, a failure remains unresolved, or the user requests them. Unchanged read-only review requires no automatic tests or builds.
 15. After Codex accepts the Cursor-assisted implementation and captures any needed evidence in the final response or durable docs, remove temporary `.tmp/*-handoff.md` and `.tmp/*-cursor-result.md` files before final cleanup.
 16. If Cursor chat context becomes noisy, open a fresh Cursor conversation and point it to the current handoff file, worktree path, branch, allowed file list, and latest `.tmp/*-cursor-result.md`.
 
@@ -202,11 +205,9 @@ When Codex writes a `.tmp/*-handoff.md` for Cursor, include the expected skill l
 
 ### Pre-Release Gate
 
-Before `development` → `main`, run QA + Security in parallel:
-- `qa-expert` — 8-phase regression (pages, theme, SEO, headers, components)
-- `security-audit-expert` — 6-phase audit (secrets, CSP, OWASP, RLS, privacy, deps)
+A draft `development` → `main` PR may collect merge-candidate CI evidence. Before merging, both QA and security must PASS. Scope local checks and review to the release diff using `docs/agents/validation.md`; reuse matching regression evidence and refresh dependency advisories for application releases. Auth/platform/shared changes need broader relevant checks.
 
-Both must PASS. Either BLOCK → fix before releasing.
+After promotion, confirm the expected commit is the active successful Cloudflare production deployment and smoke-test public routes, indexing metadata and security headers before reporting deployment success. Guidance-only promotions report “deployment not required.”
 
 ## Engineering Team (`.codex/agents/`)
 
@@ -348,7 +349,7 @@ Repo MCP policy:
 ## Lessons Learned
 
 - **CLEAN WORKSPACE FIRST**: Other sessions/agents leave untracked files. If build fails on files you didn't touch — STOP. Run `git clean -fd`.
-- **ALWAYS show user locally before push**: Start dev server, let user check in browser. No exceptions.
+- **Review before push**: Visible changes require user browser review in both themes/mobile. Guidance-only changes receive document review. Use `docs/agents/validation.md` for check selection and evidence reuse.
 - **Cloudflare Rocket Loader**: Blocks ALL inline `onclick`/`onX` handlers and rewrites `<script>` type attributes. Fix: `<script is:inline data-cfasync="false">` with `addEventListener`.
 - **Module scripts + View Transitions**: Astro `<script>` (non-inline) compiles to `type="module"` which may not execute on first load with `<ClientRouter />`. Use `is:inline data-cfasync="false"` for critical scripts.
 - **CSS `background` vs `background-color`**: Use `background-color: var(--bg-page)` for theme-reactive elements. The shorthand can cache initial values.
@@ -381,7 +382,7 @@ Repo MCP policy:
 - Preserve identity SEO signals for "Rujikorn Ngoensaard", "bossruji", "XH", "xhverse"
 - Do not promise a specific Google ranking or recrawl timeline; use Search
   Console and live search results as evidence with clear uncertainty.
-- Keep `.node-version`, CI, and Cloudflare Pages runtime aligned (currently Node 22.16.0)
+- Keep `.node-version`, CI, and Cloudflare Pages runtime aligned (currently Node 22.23.3)
 - Keep `bun.lock` in sync — never bypass `--frozen-lockfile`
 - Supabase config lives in ONE place: `src/data/supabase-config.ts`
 - Site must build successfully without Supabase env vars (static fallback), but Supabase is authoritative when build credentials are configured

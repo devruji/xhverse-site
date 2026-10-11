@@ -45,7 +45,7 @@ Each tool needs:
 - CSP domain: update generate-headers.ts + BaseLayout.astro (platform)
 - New Supabase table: migration + lib module + admin page (all agents)
 - Agent-surface uplift: update AGENTS.md + CLAUDE.md + .cursor/rules + .agents/skills + .codex/config.toml together, then validate TOML/YAML/diff hygiene
-- Codex + Cursor handoff: create `.tmp/<task>-handoff.md` with allowed files, forbidden files, acceptance criteria, and verification commands for Cursor to run; include `bun run check` when full confidence is needed; use Cursor multi-agent/multitask only for non-overlapping file ownership
+- Codex + Cursor handoff: create `.tmp/<task>-handoff.md` with allowed files, forbidden files, acceptance criteria, and verification commands for Cursor to run; select checks and evidence requirements through docs/agents/validation.md; use Cursor multi-agent/multitask only for non-overlapping file ownership
 - Code implementation lane: default bounded implementation to `codex-spark`; escalate to the smarter Codex lane if Spark output is buggy, misses repo rules, cannot reach production-grade quality, or the task is high-risk/complex
 - Engineering skill defaults: use `debug-mantra` for debugging plans, `scrutinize` for plan/code-change sanity checks, and `post-mortem` only after validated fixes
 - Branded SEO plan: use `seo-metadata-check`; inspect built/source output for

@@ -12,10 +12,10 @@ Smallest correct change that doesn't create future problems. Allergic to:
 - Abstractions serving hypothetical future needs
 - Changes that require explaining more than the original problem
 
-## Architecture Knowledge (v3.9.1)
+## Architecture Knowledge
 
 ### Site Structure
-- 27 Astro route files; current release build generates 38 static HTML pages (Astro 6, no SSR)
+- 27 Astro route files; current release build generates 38 static HTML pages (Astro 7, no SSR)
 - 14 src/lib domain folders with 522 unit tests at 100% coverage
 - 13 interactive tools (all client-side compute, no backend needed), including guided practitioner decision journeys
 - Admin panel (Cloudflare Access + Supabase Auth dual-layer)
@@ -52,7 +52,7 @@ No external dependencies. No runtime. Pure TypeScript compute in the browser.
 ## Release Flow
 feature branch → PR to development → CI → merge → release PR (dev→main) → annotated tag → GitHub Release
 
-QA + Security gates mandatory before every release to main.
+QA + Security gates must pass before every release merge to main. Draft release PRs may collect merge-candidate CI first. Scope review and reuse evidence through docs/agents/validation.md; refresh dependency advisories for application releases and verify active production before reporting deployment success.
 
 ## Browser Automation
 
@@ -77,7 +77,7 @@ Use Playwright MCP for browser interaction and visual verification. Do not use C
 - Ask Cursor to write `.tmp/<task>-cursor-result.md` with worktree path, changed files, commands run, exit status, key output lines, deviations from the handoff, and unresolved risks.
 - Use Cursor multi-agent/multitask mode only when file ownership is clearly non-overlapping.
 - After Cursor edits, review the real worktree status, repo diff, changed files, Cursor result note, and Cursor's test evidence before accepting the result.
-- For Cursor-assisted work, delegate checks to Cursor, including `bun run check` when full confidence is needed; rerun tests directly only if Cursor cannot run them, evidence is incomplete, or the user asks.
+- For Cursor-assisted work, delegate checks to Cursor, selected through `docs/agents/validation.md`; consume matching successful evidence once and repeat affected checks only for changed inputs/environment, missing evidence, unresolved failure or explicit request.
 - After accepted Cursor-assisted implementation, remove temporary `.tmp/*-handoff.md` and `.tmp/*-cursor-result.md` files once evidence is captured in the final response or durable docs.
 - If Cursor context is noisy, start a fresh Cursor conversation and point it at the current handoff file, worktree path, branch, allowed file list, and latest result note.
 
@@ -90,7 +90,7 @@ Use Playwright MCP for browser interaction and visual verification. Do not use C
 - Use `technical_writer` when starting, outlining, drafting, or reviewing public content. Pair it with `product-manager` for topic selection and with `blog-content-strategy` / `document-writer` for blog execution.
 
 ## Commands
-- `bun run check` — full pipeline (the definitive "is it ready?" check)
+- `bun run check` — full pipeline; use docs/agents/validation.md for local scope and reusable evidence
 - `bun run dev` — dev server for visual verification
 - `bun run coverage` — the test gate
 """

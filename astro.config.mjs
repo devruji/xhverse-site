@@ -7,6 +7,8 @@ const site = resolveSiteUrl(process.env);
 
 export default defineConfig({
   site,
+  // Preserve Astro 6's inline whitespace instead of Astro 7's new JSX default.
+  compressHTML: true,
   integrations: [
     sitemap({
       filter: (page) => !page.includes("/admin/"),

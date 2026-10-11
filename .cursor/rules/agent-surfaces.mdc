@@ -18,6 +18,8 @@ Use this rule when changing repo instructions, skills, sub-agent cards, Codex co
 
 ## Codex + Cursor Surface Sync
 
+- `docs/agents/validation.md` owns check selection and evidence reuse. Guidance-only work receives document/surface validation; unchanged read-only review runs no automatic runtime checks.
+
 - Keep the Codex-managed/Cursor-implemented workflow synchronized in `AGENTS.md`, `CLAUDE.md`, `.cursor/rules/codex-cursor-handoff.mdc`, `.agents/skills/xhverse-dev/SKILL.md`, and relevant `.codex/agents/*.toml`.
 - Use `.tmp/*-handoff.md` as the shared instruction surface between Codex and Cursor.
 - Codex does not operate Cursor through Computer Use for this repo; Codex prepares handoffs, the user runs Cursor Agent locally, and Cursor writes `.tmp/*-cursor-result.md` for review context.

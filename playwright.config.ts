@@ -8,11 +8,11 @@ export default defineConfig({
     trace: "on-first-retry",
   },
   webServer: {
-    command: process.env.CI
-      ? "bun run preview --host 127.0.0.1 --port 4321"
-      : "bun run build && bun run preview --host 127.0.0.1 --port 4321",
+    command: "bun run preview --host 127.0.0.1 --port 4321",
+    // Astro 7 detaches previews when an AI agent is detected; Playwright must own this process.
+    env: { ASTRO_PREVIEW_BACKGROUND: "0" },
     url: "http://127.0.0.1:4321",
-    reuseExistingServer: !process.env.CI,
+    reuseExistingServer: false,
   },
   projects: [
     { name: "chromium", use: { ...devices["Desktop Chrome"] } },

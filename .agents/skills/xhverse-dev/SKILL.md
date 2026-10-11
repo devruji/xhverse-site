@@ -9,9 +9,9 @@ This skill provides the full context for working productively in xhverse-site â€
 
 ## Stack
 
-- **Framework**: Astro 6, static output
+- **Framework**: Astro 7, static output
 - **Styling**: Tailwind CSS v4 via `@tailwindcss/vite` plugin
-- **Runtime**: Bun (package manager + scripts), Node 22.16.0 (pinned in `.node-version`)
+- **Runtime**: Bun (package manager + scripts), Node 22.23.3 (pinned in `.node-version`)
 - **Data**: Static TypeScript modules in `src/data/`; Supabase `posts` is the blog source of truth when build credentials are configured
 - **Deploy**: Cloudflare Pages via Git integration (no manual deploys)
 
@@ -24,8 +24,11 @@ bun run build            # Production build â†’ ./dist/
 bun run typecheck        # Astro type/content checks
 bun run test             # Unit tests (vitest)
 bun run coverage         # Unit tests + 100% coverage enforcement
-bun run test:e2e         # E2E (Playwright builds site first)
-bun run check            # Full pipeline: typecheck + build + coverage + e2e
+bun run test:e2e         # Standalone E2E; builds first
+bun run test:e2e:built   # E2E against an existing validated build
+bun run check            # Full pipeline: typecheck + one build + coverage + e2e:built
+bun run validate:surfaces # Guidance Markdown/YAML/TOML validation
+bun run test:delivery    # Delivery-script fixture tests
 ```
 
 Single test file: `bunx vitest run src/data/blog.test.ts`
@@ -42,6 +45,7 @@ Use Playwright MCP for browser interaction and visual verification. Do not use C
    - Tag the merged `main` commit: `git tag -a vX.Y.Z -m "message"`
    - Push the tag and create a GitHub Release marked as Latest
 4. **Never** commit directly to `main` or `development`
+5. Draft release PRs may collect candidate CI first; QA/security must pass before merge. Use `docs/agents/validation.md` for scope, fresh application-release advisories, visible browser review vs guidance document review, and verified Cloudflare production reporting.
 
 ## Architecture Decisions
 
@@ -105,7 +109,7 @@ Use Playwright MCP for browser interaction and visual verification. Do not use C
 - Cursor should write `.tmp/<task>-cursor-result.md` with worktree path, changed files, commands run, exit status, key output lines, deviations from the handoff, and unresolved risks.
 - Use Cursor multi-agent/multitask mode only for non-overlapping file ownership.
 - After Cursor edits, review the actual worktree `git status`, `git diff`, changed files, Cursor result note, and Cursor's test evidence before accepting any summary.
-- For Cursor-assisted work, ask Cursor to run the relevant checks, including `bun run check` when full confidence is needed; Codex reruns tests directly only if Cursor cannot run them, evidence is incomplete, or the user asks.
+- Select checks through `docs/agents/validation.md`. Record checked revision or dirty fingerprint including relevant untracked inputs, environment/tool versions, commands and results. Codex inspects actual inputs and evidence once; repeat affected checks only for changed inputs/environment, missing evidence, unresolved failure or explicit request.
 - After accepted Cursor-assisted implementation, remove temporary `.tmp/*-handoff.md` and `.tmp/*-cursor-result.md` files once evidence is captured in the final response or durable docs.
 - If Cursor chat context gets noisy, open a fresh Cursor conversation and point it at the current handoff file, worktree path, branch, allowed file list, and latest result note.
 
@@ -146,9 +150,10 @@ Use Playwright MCP for browser interaction and visual verification. Do not use C
 
 ## Verification Checklist
 
-Before marking work done:
-1. `bun run typecheck` passes
-2. `bun run coverage` passes (100% thresholds)
-3. If touching pages/layouts: `bun run test:e2e` passes
-4. For full confidence: `bun run check`
-5. Report only checks that were actually run
+Follow `docs/agents/validation.md`:
+1. Reuse complete successful evidence when relevant inputs and environment match; unchanged read-only review runs no automatic runtime checks.
+2. Guidance-only changes: document review, changed-surface validation and whitespace checks.
+3. Application changes: targeted local checks or relevant broader checks; full PR pipeline and 100% coverage remain required.
+4. Visible changes: user browser review of affected pages in both themes/mobile before push.
+5. Draft release PRs may collect merge-candidate CI; QA/security must pass before merge. Refresh application-release dependency advisories and verify active production after promotion.
+6. Report evidence source and actual results; deployment success requires Cloudflare commit/deployment confirmation and route/metadata/header smoke checks.

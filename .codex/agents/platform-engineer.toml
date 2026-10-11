@@ -42,7 +42,7 @@ To add a domain: update BOTH layers → `bun run build && grep "domain" dist/_he
 - Git integration: auto-deploy from main
 - Build command: bun run build
 - Output directory: dist
-- Node version: 22.16.0 (pinned in .node-version)
+- Node version: 22.23.3 (pinned in .node-version)
 - Admin routes: /admin/* behind Cloudflare Access (Zero Trust, email OTP)
 
 ## Repo MCP & Connector Policy
@@ -63,12 +63,11 @@ Deploy: `bunx supabase functions deploy <name>`
 Secrets: `bunx supabase secrets set RESEND_API_KEY=re_xxxxx`
 
 ## GitHub Actions CI
-Runs on every PR to development and main:
-1. bun install --frozen-lockfile
-2. bun run typecheck
-3. bun run build
-4. bun run coverage (100% required)
-5. bun run test:e2e (Playwright, chromium + mobile)
+Required Test and Build job runs on every PR to development and main. Guidance-only changes validate surfaces; mixed/unknown/delivery changes run full validation. Application PRs install frozen dependencies, typecheck, build once, enforce 100% coverage and run test:e2e:built (desktop/mobile). No development-push duplicate full run and no automatic test-result caching across commits. Main-push verifies deployment instead of repeating full validation.
+
+Follow docs/agents/validation.md for local checks and evidence reuse. Record input revision/fingerprint including relevant untracked content, environment/tool versions, commands and results. Export non-secret Cloudflare settings before narrow changes, preserve bindings/domains/environment/hooks, and compare readback. Keep human/development previews, exclude Dependabot and known guidance watch paths, enable build caching while preserving fresh Astro builds/Supabase reads.
+
+Never report deployment success from a synthetic status: poll read-only Cloudflare API every 10 seconds for up to 15 minutes, confirm expected commit is active successful canonical production, then smoke-test homepage/blog/tools/affected public routes, canonical/indexing metadata and required headers. Failure, credentials missing, timeout or supersession cannot pass. Guidance-only promotions report deployment not required.
 
 ## Rules
 - Never add unsafe-eval to CSP

@@ -85,11 +85,11 @@ fallback path when live credentials are unavailable.
 ## Verification
 
 - If touching `src/data/blog.ts` or related types, update `src/data/blog.test.ts`
-  and run coverage. Normal Supabase-ready content drafts do not require code
+  and obtain matching coverage evidence under `docs/agents/validation.md`. Normal Supabase-ready content drafts do not require code
   tests because they should not edit the repo.
 - For Codex-published Supabase posts, read back the `posts` row, confirm the
   cover URL/path resolves, confirm the rebuild/deployment result, and verify the
   live article route after deployment.
-- If touching blog pages, run typecheck and at least the blog route E2E coverage
-  if available.
-- Full sign-off still requires `bun run check`.
+- If touching blog pages, obtain matching typecheck and focused blog-route E2E
+  evidence under `docs/agents/validation.md`.
+- Full application PR CI remains required; local sign-off and evidence reuse follow `docs/agents/validation.md`. Supabase-only editorial changes require a fresh rebuild and blog/article verification.

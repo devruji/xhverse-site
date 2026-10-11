@@ -4,6 +4,9 @@ globs: ["src/**/*.astro", "scripts/**", "public/_headers"]
 ---
 
 ## Rocket Loader Constraints
+
+Follow `docs/agents/validation.md` for local checks, preview exclusions and verified production reporting. Git integration remains; guidance-only changes require no deployment. Application promotions require expected commit/active Cloudflare confirmation plus public-route metadata/header smoke checks before success.
+
 - All `<script is:inline>` MUST have `data-cfasync="false"`
 - No inline `onclick`/`onchange`/`onsubmit`/`onX` handlers — use `addEventListener`
 - Module scripts (`<script>` without is:inline) compile to `type="module"` and may not execute on first load with View Transitions

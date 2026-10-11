@@ -9,9 +9,9 @@ Personal portfolio, blog, and interactive tools site for [Rujikorn Ngoensaard](h
 
 ## Tech Stack
 
-- **Framework:** [Astro 6](https://astro.build/) (static output)
+- **Framework:** [Astro 7](https://astro.build/) (static output)
 - **Styling:** [Tailwind CSS v4](https://tailwindcss.com/) via Vite plugin
-- **Runtime:** [Bun](https://bun.sh/) + Node 22.16.0
+- **Runtime:** [Bun](https://bun.sh/) + Node 22.23.3
 - **Testing:** [Vitest](https://vitest.dev/) (100% coverage) & [Playwright](https://playwright.dev/) (E2E)
 - **Database:** [Supabase](https://supabase.com/) (blog CMS/source of truth, client-side benchmarks, CV gate)
 - **Blog Analytics:** Cloudflare Pages Functions + D1 for anonymous aggregate blog views
@@ -81,7 +81,7 @@ For the blog view-count runtime, see [docs/blog-analytics.md](docs/blog-analytic
 ### Prerequisites
 
 - [Bun](https://bun.sh/) (v1.2+)
-- [Node.js](https://nodejs.org/) 22.16.0 (pinned in `.node-version`)
+- [Node.js](https://nodejs.org/) 22.23.3 (pinned in `.node-version`)
 
 ### Installation
 
@@ -102,9 +102,14 @@ bun run dev          # http://localhost:4321
 ```sh
 bun run typecheck    # Astro type/content checks
 bun run coverage     # Unit tests + 100% coverage enforcement
-bun run test:e2e     # Playwright (chromium desktop + mobile)
-bun run check        # Full pipeline: typecheck + build + coverage + e2e
+bun run test:e2e     # Standalone Playwright; builds first (desktop + mobile)
+bun run test:e2e:built # Playwright against an existing validated build
+bun run check        # Full pipeline: typecheck + one build + coverage + e2e:built
+bun run validate:surfaces # Guidance Markdown/YAML/TOML validation
+bun run test:delivery # Delivery-script fixture tests
 ```
+
+Local check selection and reusable review evidence follow [validation policy](docs/agents/validation.md). Application PRs keep the full pipeline and 100% coverage; guidance-only changes use surface validation.
 
 ### Building for Production
 

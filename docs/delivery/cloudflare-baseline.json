@@ -1,0 +1,144 @@
+{
+  "name": "xhverse-site-git",
+  "production_branch": "main",
+  "source": {
+    "type": "github",
+    "config": {
+      "owner": "devruji",
+      "owner_id": "43924465",
+      "repo_name": "xhverse-site",
+      "repo_id": "1176479061",
+      "production_branch": "main",
+      "pr_comments_enabled": true,
+      "deployments_enabled": true,
+      "production_deployments_enabled": true,
+      "preview_deployment_setting": "all",
+      "preview_branch_includes": [
+        "*"
+      ],
+      "preview_branch_excludes": [],
+      "path_includes": [
+        "*"
+      ],
+      "path_excludes": []
+    }
+  },
+  "build_config": {
+    "build_command": "bun install --frozen-lockfile && bun run build",
+    "destination_dir": "dist",
+    "build_caching": false,
+    "root_dir": "",
+    "web_analytics_tag": "012c876009f441d8a53604129297f5db"
+  },
+  "deployment_configs": {
+    "preview": {
+      "env_vars": {
+        "CLOUDFLARE_ACCOUNT_ID": {
+          "type": "plain_text"
+        },
+        "CLOUDFLARE_API_TOKEN": {
+          "type": "secret_text"
+        },
+        "CLOUDFLARE_PAGES_PROJECT_NAME": {
+          "type": "plain_text"
+        },
+        "CLOUDFLARE_PAGES_REBUILD_BRANCH": {
+          "type": "plain_text"
+        },
+        "PUBLIC_PRODUCTION_BRANCH": {
+          "type": "plain_text"
+        },
+        "PUBLIC_SUPABASE_PUBLISHABLE_KEY": {
+          "type": "plain_text"
+        },
+        "PUBLIC_SUPABASE_URL": {
+          "type": "plain_text"
+        },
+        "SUPABASE_SECRET_KEY": {
+          "type": "secret_text"
+        },
+        "SUPABASE_URL": {
+          "type": "plain_text"
+        }
+      },
+      "d1_databases": {
+        "BLOG_ANALYTICS_DB": {
+          "id": "98b72639-4215-4d74-861b-42b5bd7ff543"
+        }
+      },
+      "fail_open": true,
+      "always_use_latest_compatibility_date": false,
+      "compatibility_date": "2026-03-13",
+      "compatibility_flags": [],
+      "build_image_major_version": 3,
+      "usage_model": "standard"
+    },
+    "production": {
+      "env_vars": {
+        "CLOUDFLARE_ACCOUNT_ID": {
+          "type": "plain_text"
+        },
+        "CLOUDFLARE_API_TOKEN": {
+          "type": "secret_text"
+        },
+        "CLOUDFLARE_PAGES_PROJECT_NAME": {
+          "type": "plain_text"
+        },
+        "CLOUDFLARE_PAGES_REBUILD_BRANCH": {
+          "type": "plain_text"
+        },
+        "PUBLIC_PRODUCTION_BRANCH": {
+          "type": "plain_text"
+        },
+        "PUBLIC_SITE_URL": {
+          "type": "plain_text"
+        },
+        "PUBLIC_SUPABASE_PUBLISHABLE_KEY": {
+          "type": "plain_text"
+        },
+        "PUBLIC_SUPABASE_URL": {
+          "type": "plain_text"
+        },
+        "SUPABASE_SECRET_KEY": {
+          "type": "secret_text"
+        },
+        "SUPABASE_URL": {
+          "type": "plain_text"
+        }
+      },
+      "d1_databases": {
+        "BLOG_ANALYTICS_DB": {
+          "id": "327bf2b2-c4cb-410d-a191-4f30a255b84c"
+        }
+      },
+      "fail_open": true,
+      "always_use_latest_compatibility_date": false,
+      "compatibility_date": "2026-03-13",
+      "compatibility_flags": [],
+      "build_image_major_version": 3,
+      "usage_model": "standard"
+    }
+  },
+  "domains": [
+    "xhverse-site-git.pages.dev",
+    "xhverse.co"
+  ],
+  "canonical_deployment": {
+    "id": "8cea046d-72de-4dbe-aeff-2b12c0404432",
+    "environment": "production",
+    "latest_stage": {
+      "name": "deploy",
+      "started_on": "2026-10-04T17:55:22.080303Z",
+      "ended_on": "2026-10-04T17:55:36.20228Z",
+      "status": "success"
+    },
+    "created_on": "2026-10-04T17:54:57.455538Z",
+    "metadata": {
+      "branch": "main",
+      "commit_hash": "9ee99678d2bc7f27bc133b33c2bbfe08ac337c60",
+      "commit_message": "Merge pull request #323 from devruji/development\n\nRelease v3.9.8: engineering skills and Playwright workflow",
+      "commit_dirty": false
+    },
+    "url": "https://8cea046d.xhverse-site-git.pages.dev"
+  }
+}
