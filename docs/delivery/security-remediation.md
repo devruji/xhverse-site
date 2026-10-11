@@ -47,7 +47,7 @@ Observed checks on the updated graph:
 
 - Fresh `bun audit`: zero advisory findings.
 - Bun 1.2.21 frozen-lockfile installation: exit 0 with no lockfile change; format remains version 1.
-- Bounded TOML regression: four checks passed in 36ms; the old-parser reproduction timed out at two seconds.
+- Bounded TOML regression: the malformed fixture was rejected in about 36ms and all four file checks passed; the old-parser reproduction timed out at two seconds.
 - `bun run typecheck`: zero errors. `bun run build`: 46 static pages. `bun run coverage`: 585 tests, 100% on all four metrics. `bun run test:delivery`: 68 passed.
 - Corrected `bun run test:e2e:built`: 84 checks passed in 12.2s across Chromium desktop and Pixel 5 projects.
 - Isolated build without environment credentials: 41 static pages. The difference from the configured 46-page build reflects the local fallback editorial dataset.
