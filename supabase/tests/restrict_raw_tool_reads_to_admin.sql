@@ -60,7 +60,7 @@ select public.assert_count((select count(*) from public.data_platform_maturity_s
 select public.assert_count((select count(*) from public.scd_design_lab_events), 1, 'baseline exposes events');
 reset role;
 
-\ir ../migrations/20261012042431_restrict_raw_tool_reads_to_admin.sql
+\ir ../migrations/20261012043426_restrict_raw_tool_reads_to_admin.sql
 
 set local role authenticated;
 select public.assert_count((select count(*) from public.data_platform_maturity_submissions), 0, 'live policy replaced');
@@ -70,7 +70,7 @@ reset role;
 -- Tracked history never created the live-only maturity read policy. A recovery
 -- replay must also work when that policy is absent. Events already exists.
 drop policy authenticated_select_maturity on public.data_platform_maturity_submissions;
-\ir ../migrations/20261012042431_restrict_raw_tool_reads_to_admin.sql
+\ir ../migrations/20261012043426_restrict_raw_tool_reads_to_admin.sql
 
 set local role authenticated;
 select public.assert_count((select count(*) from public.data_platform_maturity_submissions), 0, 'non-admin cannot read maturity');
