@@ -6,6 +6,13 @@ updates:
       interval: "weekly"
     target-branch: "development"
     open-pull-requests-limit: 10
+    groups:
+      minor-and-patch:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
     labels:
       - "dependencies"
       - "security"
@@ -18,6 +25,13 @@ updates:
       interval: "weekly"
     target-branch: "development"
     open-pull-requests-limit: 10
+    groups:
+      minor-and-patch:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
     labels:
       - "dependencies"
       - "security"
