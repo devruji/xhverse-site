@@ -34,10 +34,10 @@
     "@playwright/test": "^1.64.0",
     "@types/node": "^25.9.4",
     "@types/sanitize-html": "^2.16.2",
-    "@vitest/coverage-v8": "4.1.11",
+    "@vitest/coverage-v8": "5.0.3",
     "supabase": "2.120.0",
     "typescript": "^6.0.3",
-    "vitest": "4.1.11",
+    "vitest": "5.0.3",
     "wrangler": "4.149.0"
   },
   "overrides": {
