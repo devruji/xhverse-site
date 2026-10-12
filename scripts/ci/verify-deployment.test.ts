@@ -51,7 +51,13 @@ function harness(fixtures: Fixture[], smoke: (route: string) => Response = html)
     }
     if (url.startsWith('https://api.cloudflare.com/')) {
       assert.equal(new Headers(init.headers).get('authorization'), 'Bearer private-cf-token');
-      if (url.includes('/deployments?')) return json({ success: true, result: fixture.candidates ?? [] });
+      if (url.includes('/deployments?')) {
+        // Observed Pages API contract: 25 entries succeeds; 26 and 100 return HTTP 400.
+        if (Number(new URL(url).searchParams.get('per_page')) > 25) {
+          return json({ success: false, errors: [{ code: 8000024, message: 'Invalid list options' }] }, 400);
+        }
+        return json({ success: true, result: fixture.candidates ?? [] });
+      }
       projectReads++;
       return json({ success: true, result: { canonical_deployment: fixture.active ?? null } });
     }
@@ -113,6 +119,25 @@ describe('production deployment verification', () => {
       return original(url, init);
     };
     await assert.rejects(verifyDeployment(options, test.deps), /failure/);
+  });
+  it('continues a full supported Pages batch without pagination metadata', async () => {
+    const test = harness([{ active: deployment(OLD_SHA) }]);
+    const original = test.deps.fetch;
+    const pages: string[] = [];
+    test.deps.fetch = async (url, init) => {
+      if (url.includes('/deployments?')) {
+        const query = new URL(url).searchParams;
+        assert.equal(query.get('per_page'), '25');
+        const page = query.get('page')!;
+        pages.push(page);
+        return json({ success: true, result: page === '1'
+          ? Array.from({ length: 25 }, (_, index) => deployment(OLD_SHA, 'success', 'production', `old-${index}`))
+          : [deployment(SHA, 'failure')] });
+      }
+      return original(url, init);
+    };
+    await assert.rejects(verifyDeployment(options, test.deps), /failure at build/);
+    assert.deepEqual(pages, ['1', '2']);
   });
   it('rejects authentication failures without logging server bodies or credentials', async () => {
     const test = harness([]);

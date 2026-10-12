@@ -1,11 +1,11 @@
 ---
-description: Project-wide rule for xhverse site (v3.9.9 release candidate)
+description: Project-wide rule for xhverse site (v3.9.9)
 alwaysApply: true
 ---
 
-# xhverse-site v3.9.9 release candidate
+# xhverse-site v3.9.9
 
-Production promotion is pending QA/security gates and release-candidate CI.
+Production release: [v3.9.9](https://github.com/devruji/xhverse-site/releases/tag/v3.9.9). Verification evidence and the separate pending pagination correction are recorded in `docs/delivery/validation-rollout.md`.
 
 Follow `AGENTS.md` and `CLAUDE.md` as primary sources of truth.
 
