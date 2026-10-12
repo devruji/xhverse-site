@@ -1,6 +1,6 @@
 # Dependency security remediation
 
-[Issue #327](https://github.com/devruji/xhverse-site/issues/327) tracks the dependency advisory findings that blocked [draft release PR #326](https://github.com/devruji/xhverse-site/pull/326). The user approved the remediation on 2026-10-11. The branch starts from development `9748fdf0692a01b5c8fe2146b18ea3ed2df4b541`; v3.9.9 is release-candidate metadata, with production promotion pending.
+[Issue #327](https://github.com/devruji/xhverse-site/issues/327) tracks the dependency advisory findings that initially blocked [release PR #326](https://github.com/devruji/xhverse-site/pull/326). The user approved remediation on 2026-10-11, starting from development `9748fdf0692a01b5c8fe2146b18ea3ed2df4b541`. The remediation is published in [v3.9.9](https://github.com/devruji/xhverse-site/releases/tag/v3.9.9). Current production commit/deployment verification and the separate pending verifier pagination correction are recorded in [validation-rollout.md](./validation-rollout.md#current-release).
 
 The release-preparation audit reported 57 issues: 1 critical, 28 high, 23 moderate and 5 low. This is the pre-remediation snapshot, not a current pass or a confirmed count of exploitable production defects.
 
@@ -10,7 +10,7 @@ The release-preparation audit reported 57 issues: 1 critical, 28 high, 23 modera
 - Raise the `smol-toml` override to 1.9.0. A bounded subprocess regression captured the old parser failing to finish within a two-second timeout; validate the same fixture against the patched parser.
 - Apply the remaining advisory fixes within the approved dependency scope; the resolved graph and observed checks are recorded below.
 
-Astro 7 uses Vite 8; remove the old forced Vite 7 override so the framework resolves its supported bundler. Review the compiler, HTML whitespace, Markdown and transition changes against the [official Astro 7 migration guide](https://docs.astro.build/en/guides/upgrade-to/v7/). The supported dependency graph requires Node 22.19.0 or newer: Astro’s Unifont chain declares Undici 8, whose patched version raises the runtime floor. Remove the forced Undici 7 override rather than violating that dependency range. The repository/CI pin is 22.23.3; Cloudflare builds read `.node-version`, so this does not require a live environment-variable change. Production adoption remains pending release promotion.
+Astro 7 uses Vite 8; remove the old forced Vite 7 override so the framework resolves its supported bundler. Review the compiler, HTML whitespace, Markdown and transition changes against the [official Astro 7 migration guide](https://docs.astro.build/en/guides/upgrade-to/v7/). The supported dependency graph requires Node 22.19.0 or newer: Astro’s Unifont chain declares Undici 8, whose patched version raises the runtime floor. Remove the forced Undici 7 override rather than violating that dependency range. The repository/CI pin is 22.23.3; Cloudflare builds read `.node-version`, so this does not require a live environment-variable change. Production adoption completed with the verified v3.9.9 promotion.
 
 `compressHTML: true` explicitly retains Astro 6 inline whitespace behavior rather than adopting Astro 7’s new JSX whitespace default. Rendered output and navigation checks are recorded below.
 
@@ -56,7 +56,7 @@ Observed checks on the updated graph:
 
 The literal `bun run check` attempts first failed on the missing tag and later on detached preview ownership. All selected component checks passed after the minimal compatibility fixes; this is not a claim that a final literal `bun run check` invocation passed. The local pipeline retains one build per successful full check.
 
-The remediation feature PR must pass fresh merge-candidate CI before merging to development. Draft release PR #326 still targets the previous candidate and remains blocked until remediation reaches development and the updated release candidate passes CI and its gates. After production promotion, verify the expected commit is active successful Cloudflare production and smoke-test public routes/metadata/headers. No production migration or timing improvement is claimed.
+[Remediation PR #328](https://github.com/devruji/xhverse-site/pull/328) merged to development, and [release merge-candidate CI](https://github.com/devruji/xhverse-site/actions/runs/38136749703) passed before release PR #326 promoted v3.9.9. Scoped QA/security and the fresh advisory audit passed. Production commit/deployment and public smoke verification are recorded in [validation-rollout.md](./validation-rollout.md#current-release). The verifier waiting-path pagination correction remains separate and pending; v3.9.9 does not include it. No timing improvement is claimed.
 
 ## Rollback
 
