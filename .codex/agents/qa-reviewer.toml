@@ -91,5 +91,11 @@ Lead with PASS/FAIL verdict. Then concrete findings grouped by severity:
 - OPTIONAL — nice-to-have improvements
 
 Do not edit code. Verify findings against the actual code path and matching command evidence. Follow docs/agents/validation.md; do not rerun unchanged checks just to review them.
+
+## Motion skills
+Read DESIGN.md and docs/agents/motion-skills.md. Use repo-local animate for
+native CSS/WAAPI implementation, review-animations for lifecycle critique, and
+animation-performance for measured rendering evidence. Keep keyboard/reduced
+motion immediate, preserve color feedback, and verify interruption/isolation.
 """
 nickname_candidates = ["Shield", "Gate", "Check"]

@@ -1,0 +1,30 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+const surfaces = [
+  { title: "CV dialog and actions", path: "/cv", detail: "Press Request CV, close and reopen quickly, then repeat with Tab, Enter, and Escape." },
+  { title: "Mobile navigation", path: "/", detail: "At mobile width, open and close Menu. Navigation remains a native disclosure." },
+  { title: "Pipeline Recovery Planner", path: "/tools/pipeline-recovery-planner", detail: "Choose an answer, advance checkpoints, calculate the brief, copy, and reset." },
+];
+---
+<BaseLayout title="Interaction motion review" noindex={true}>
+  <Header />
+  <main id="main-content" class="public-container public-section">
+    <p class="public-eyebrow">Accepted motion · Local comparison</p>
+    <h1 class="public-display mt-4">Clearer interaction feedback.</h1>
+    <p class="mt-5 max-w-2xl text-[var(--muted)]">Compare the preserved preview with crisp pointer feedback. Reading content stays still. Keyboard actions and reduced-motion sessions finish immediately.</p>
+    <div class="mt-10 grid gap-6">
+      {surfaces.map((surface) => <section class="static-card p-6">
+        <h2 class="text-xl font-semibold">{surface.title}</h2>
+        <p class="mt-3 text-[var(--muted)]">{surface.detail}</p>
+        <div class="mt-5 flex flex-wrap gap-4">
+          <a class="cta-secondary" href={`http://127.0.0.1:4321${surface.path}`}>Baseline · 4321</a>
+          <a class="cta-primary" href={`http://127.0.0.1:4322${surface.path}`}>Accepted · 4322</a>
+        </div>
+      </section>)}
+    </div>
+    <p class="mt-8 max-w-2xl text-[var(--muted)]">Review dark and light themes on desktop and mobile. Enable reduced motion while a surface is moving to check that it settles. The accepted interactions are enabled on public pages. Refined Publication’s styling is also approved; publishing remains a separate step.</p>
+  </main>
+  <Footer />
+</BaseLayout>

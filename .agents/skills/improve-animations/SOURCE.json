@@ -1,0 +1,20 @@
+{
+  "repository": "https://github.com/emilkowalski/skills",
+  "commit": "2d228630ba1446365f614a108cb8252f1feda202",
+  "upstream_path": "skills/improve-animations",
+  "installed_at": "2026-10-14",
+  "installer": "skill-installer/scripts/install-skill-from-github.py --method download --dest <worktree>/.agents/skills",
+  "original_sha256": {
+    "AUDIT.md": "551c8473e20e5f4774680bc24d45e1c68e50992582720905c6b077756b7b5a55",
+    "SKILL.md": "73962447464433476343e2c12cd08ab39cc99a9e5f3c118c5fb54ed897574ef6",
+    "PLAN-TEMPLATE.md": "0a08ac8e23fd2082d7ffb86aeed7b789de77328c3cf874b16f1a755f2ef0a6ad"
+  },
+  "shared_upstream_sha256": {
+    "LICENSE": "4ff5bdb7887ec1435c9cab0e8d1a7caee704d894d65c2a008ccc68b1cc2f260b"
+  },
+  "adaptations": [
+    "Original SKILL.md archived unchanged in references/upstream-skill.md",
+    "Concise local entrypoint replaces active instructions; project motion guidance supplies overrides",
+    "Root MIT notice retained unchanged"
+  ]
+}

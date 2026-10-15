@@ -10,19 +10,20 @@ import Footer from "../../components/Footer.astro";
 >
   <div class="min-h-screen bg-[var(--bg-page)] font-sans text-[var(--text)]">
     <Header current="/tools" />
-    <main class="mx-auto max-w-7xl px-5 py-6 sm:px-8 sm:py-8 lg:px-10">
-      <section class="py-10 sm:py-14">
-        <p class="text-[12px] uppercase tracking-[0.32em] text-emerald-200">Architecture tool</p>
-        <h1 class="mt-4 max-w-3xl text-[2.4rem] font-semibold leading-[0.98] tracking-tight text-white sm:text-[3.8rem]">
+    <main id="main-content" class="public-container tool-page">
+      <a href="/tools" class="text-link tool-back-link mt-6 inline-flex text-sm">← All tools</a>
+      <section class="tool-hero">
+        <p class="public-kicker">Architecture tool</p>
+        <h1 class="tool-heading mt-4">
           Architecture Decision Roulette
         </h1>
-        <p class="mt-6 max-w-2xl text-base leading-8 text-zinc-300 sm:text-lg">
-          10 real-world scenarios. Pick your approach, then see how XH would call it.
+        <p class="public-intro mt-5 max-w-2xl">
+          Work through 10 data platform scenarios. Choose an approach, then compare your reasoning with mine.
         </p>
       </section>
 
-      <section class="border-t border-white/10 py-10">
-        <div id="start-panel" class="border border-white/10 bg-white/[0.03] p-6 text-center sm:p-10">
+      <section class="border-t border-[var(--border-subtle)] py-10">
+        <div id="start-panel" class="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-elevated)] p-6 text-center sm:p-10">
           <p class="text-sm text-zinc-400">Ready to test your architecture instincts?</p>
           <button
             id="start-button"
@@ -34,19 +35,19 @@ import Footer from "../../components/Footer.astro";
         </div>
 
         <div id="game-panel" class="hidden space-y-6">
-          <div class="flex items-center justify-between border border-white/10 bg-white/[0.03] px-5 py-3">
+          <div class="flex items-center justify-between rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-elevated)] px-5 py-3">
             <p id="progress-label" class="text-sm font-medium text-zinc-400">Scenario 1 / 10</p>
             <div id="progress-dots" class="flex gap-1.5"></div>
           </div>
 
-          <div class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+          <div class="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-elevated)] p-5 sm:p-6">
             <h2 id="scenario-title" class="text-xl font-semibold tracking-tight text-white sm:text-2xl"></h2>
             <p id="scenario-situation" class="mt-4 text-sm leading-7 text-zinc-300"></p>
           </div>
 
           <div id="options-container" class="grid gap-3"></div>
 
-          <div id="reveal-panel" class="hidden border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+          <div id="reveal-panel" class="hidden rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-elevated)] p-5 sm:p-6">
             <div id="reveal-header" class="flex items-center gap-3">
               <span id="reveal-badge" class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wider"></span>
               <span id="reveal-pick-label" class="text-sm text-zinc-400"></span>
@@ -63,22 +64,22 @@ import Footer from "../../components/Footer.astro";
         </div>
       </section>
 
-      <section id="result-panel" class="hidden border-t border-white/10 py-10" aria-live="polite">
+      <section id="result-panel" class="hidden border-t border-[var(--border-subtle)] py-10" aria-live="polite">
         <div class="grid gap-6 lg:grid-cols-[1fr_1fr]">
-          <div class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
-            <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Result</p>
-            <div class="mt-4 border border-white/10 bg-black/20 p-5">
-              <p class="text-sm text-zinc-500">Agreement rate</p>
+          <div class="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-elevated)] p-5 sm:p-6">
+            <p class="text-[12px] uppercase tracking-[0.32em] text-[var(--muted)]">Result</p>
+            <div class="mt-4 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-card)] p-5">
+              <p class="text-sm text-[var(--muted)]">Agreement rate</p>
               <p id="agreement-score" class="mt-2 text-5xl font-semibold tracking-tight text-white">0%</p>
             </div>
             <p id="agreement-summary" class="mt-4 text-sm leading-7 text-zinc-400"></p>
           </div>
 
           <div class="space-y-6">
-            <div class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+            <div class="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-elevated)] p-5 sm:p-6">
               <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Brief</p>
+                  <p class="text-[12px] uppercase tracking-[0.32em] text-[var(--muted)]">Brief</p>
                   <h2 class="mt-2 text-xl font-semibold tracking-tight text-white">Copyable summary</h2>
                 </div>
                 <button
@@ -92,9 +93,9 @@ import Footer from "../../components/Footer.astro";
               <textarea
                 id="brief-textarea"
                 readonly
-                class="mt-4 min-h-[10rem] w-full resize-y border border-white/10 bg-black/30 p-4 font-mono text-xs leading-6 text-zinc-300 outline-none"
+                class="mt-4 min-h-[10rem] w-full resize-y rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-card)] p-4 font-mono text-xs leading-6 text-zinc-300 outline-none"
               ></textarea>
-              <p id="copy-status" class="mt-3 text-xs text-zinc-500"></p>
+              <p id="copy-status" class="mt-3 text-xs text-[var(--muted)]"></p>
             </div>
 
             <button

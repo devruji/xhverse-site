@@ -1,137 +1,64 @@
 ---
-type NavLink = { href: string; label: string };
-
-interface Props {
-  current?: string;
-  links?: NavLink[];
-}
-
-const defaultLinks: NavLink[] = [
-  { href: "/", label: "Profile" },
-  { href: "/about", label: "About" },
+import ThemeToggle from "./ThemeToggle.astro";
+interface Props { current?: string; }
+const { current = "/" } = Astro.props;
+const links = [
+  { href: "/#work", label: "Work" },
   { href: "/blog", label: "Writing" },
   { href: "/tools", label: "Tools" },
-  { href: "/cv", label: "CV" },
-  { href: "/services", label: "Advisory" },
-  { href: "/gallery", label: "Gallery" },
-  { href: "#contact", label: "Contact" },
+  { href: "/about", label: "About" },
+  { href: "/#contact", label: "Contact" },
 ];
-
-const { current, links = defaultLinks } = Astro.props;
 ---
-
-<header class="border-b border-white/10">
-  <div class="mx-auto flex max-w-7xl items-center justify-between gap-5 px-5 pb-5 pt-6 sm:px-8 lg:px-10">
-    <a href="/" class="group">
-      <p class="text-[11px] uppercase tracking-[0.35em] text-zinc-500">xhverse.co</p>
-      <span class="mt-1 block text-[1.35rem] font-semibold tracking-tight text-white sm:text-[1.55rem]">
-        XHVERSE
-      </span>
-    </a>
-    <nav class="hidden items-center gap-4 text-sm text-zinc-400 lg:gap-6 md:flex" aria-label="Primary navigation">
-      {links.map((link) => (
-        <a
-          href={link.href}
-          class:list={[
-            "relative py-1 transition hover:text-white",
-            current === link.href
-              ? "text-white after:absolute after:bottom-0 after:left-0 after:h-px after:w-full after:bg-emerald-300/60"
-              : "",
-          ]}
-        >
-          {link.label}
-        </a>
-      ))}
+<header class="public-header">
+  <div class="public-container public-header-inner">
+    <a href="/" class="public-wordmark" aria-label="xhverse home">xhverse<span aria-hidden="true">.</span></a>
+    <nav class="public-desktop-nav" aria-label="Primary navigation">
+      {links.map((link) => <a href={link.href} aria-current={current === link.href ? "page" : undefined}>{link.label}</a>)}
     </nav>
-    <button
-      id="nav-menu-toggle"
-      type="button"
-      class="flex flex-col gap-[5px] p-2 md:hidden"
-      aria-label="Open menu"
-      aria-expanded="false"
-    >
-      <span class="block h-px w-5 bg-zinc-400 transition"></span>
-      <span class="block h-px w-5 bg-zinc-400 transition"></span>
-    </button>
+    <div class="public-header-controls">
+      <ThemeToggle />
+      <details class="public-mobile-menu" id="public-menu">
+        <summary>Menu <span aria-hidden="true">+</span></summary>
+        <nav aria-label="Mobile navigation">
+          {links.map((link) => <a href={link.href} aria-current={current === link.href ? "page" : undefined}>{link.label}</a>)}
+        </nav>
+      </details>
+    </div>
   </div>
 </header>
-
-<div
-  id="nav-drawer-backdrop"
-  class="fixed inset-0 z-40 hidden bg-black/60 backdrop-blur-sm"
-  aria-hidden="true"
-></div>
-
-<nav
-  id="nav-drawer"
-  class="fixed inset-y-0 right-0 z-50 w-[260px] translate-x-full border-l border-white/10 bg-[var(--bg-page)] transition-transform duration-200 ease-out"
-  aria-label="Mobile navigation"
->
-  <div class="flex items-center justify-between border-b border-white/10 px-5 py-5">
-    <p class="text-[10px] uppercase tracking-[0.35em] text-zinc-500">Menu</p>
-    <button
-      id="nav-drawer-close"
-      type="button"
-      class="p-1.5 text-zinc-400 transition hover:text-white"
-      aria-label="Close menu"
-    >
-      <svg class="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12" />
-      </svg>
-    </button>
-  </div>
-  <ul class="flex flex-col px-5 py-6">
-    {links.map((link) => (
-      <li>
-        <a
-          href={link.href}
-          class:list={[
-            "nav-drawer-link block border-b border-white/5 py-3.5 text-xs uppercase tracking-[0.22em] transition hover:text-white",
-            current === link.href ? "text-white" : "text-zinc-400",
-          ]}
-        >
-          {link.label}
-        </a>
-      </li>
-    ))}
-  </ul>
-</nav>
-
-<script is:inline data-cfasync="false">
-  function initNavDrawer() {
-    var toggle = document.getElementById("nav-menu-toggle");
-    var drawer = document.getElementById("nav-drawer");
-    var backdrop = document.getElementById("nav-drawer-backdrop");
-    var close = document.getElementById("nav-drawer-close");
-
-    if (!toggle || !drawer) return;
-
-    function open() {
-      drawer.classList.remove("translate-x-full");
-      backdrop.classList.remove("hidden");
-      toggle.setAttribute("aria-expanded", "true");
-      document.body.style.overflow = "hidden";
+<script>
+  import { createUiMotion } from "../lib/ui-motion";
+  function initPublicNavigation() {
+    const menu = document.querySelector<HTMLDetailsElement>("#public-menu");
+    if (!menu || menu.dataset.bound) return;
+    menu.dataset.bound = "true";
+    if (document.documentElement.hasAttribute("data-ui-motion")) {
+      const motion = createUiMotion(true, window.matchMedia("(prefers-reduced-motion: reduce)"));
+      const summary = menu.querySelector("summary");
+      const nav = menu.querySelector("nav");
+      summary?.addEventListener("click", (event) => {
+        if (!nav) return;
+        motion.cancel(nav);
+        // Native summary activation will open the disclosure after this listener.
+        if (!menu.open) motion.animate(nav, [
+          { opacity: 0, transform: "translateY(-4px) scale(0.97)" },
+          { opacity: 1, transform: "translateY(0) scale(1)" },
+        ], 200, motion.eligible(event));
+      });
+      menu.addEventListener("toggle", () => { if (!menu.open && nav) motion.cancel(nav); });
+      document.addEventListener("astro:before-swap", () => motion.dispose(), { once: true });
     }
-
-    function shut() {
-      drawer.classList.add("translate-x-full");
-      backdrop.classList.add("hidden");
-      toggle.setAttribute("aria-expanded", "false");
-      document.body.style.overflow = "";
-    }
-
-    toggle.addEventListener("click", open);
-    if (close) close.addEventListener("click", shut);
-    if (backdrop) backdrop.addEventListener("click", shut);
-
-    document.addEventListener("keydown", function (e) {
-      if (e.key === "Escape" && !drawer.classList.contains("translate-x-full")) shut();
+    menu.querySelectorAll<HTMLAnchorElement>("a").forEach((link) => {
+      link.addEventListener("click", () => { menu.open = false; });
     });
-
-    var links = drawer.querySelectorAll(".nav-drawer-link");
-    links.forEach(function (l) { l.addEventListener("click", shut); });
+    menu.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && menu.open) {
+        menu.open = false;
+        menu.querySelector("summary")?.focus();
+      }
+    });
   }
-
-  initNavDrawer();
-  document.addEventListener("astro:page-load", initNavDrawer);
+  initPublicNavigation();
+  document.addEventListener("astro:page-load", initPublicNavigation);
 </script>

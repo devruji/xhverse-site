@@ -1,0 +1,48 @@
+---
+import ReviewLayout from "../components/design-review/ReviewLayout.astro";
+import Candidate from "../components/design-review/Candidate.astro";
+import { createReviewSnapshot } from "../data/design-review";
+import { posts } from "../data/blog";
+import { createSupabaseClientForBuild, loadPublishedPostsForBuild } from "../lib/blog/load-posts";
+
+export async function getStaticPaths() {
+  const client = createSupabaseClientForBuild(import.meta.env);
+  // Resolve once for the entire route family, never once per candidate.
+  const collection = await loadPublishedPostsForBuild(client, posts);
+  const snapshot = createReviewSnapshot(collection);
+  return ["compare", "dossier", "publication", "publication-refined", "studio"].map((direction) => ({
+    params: { direction }, props: { snapshot, source: client ? "published" : "local" },
+  }));
+}
+const direction = Astro.params.direction as "compare" | "dossier" | "publication" | "publication-refined" | "studio";
+const { snapshot, source } = Astro.props;
+const names = { compare: "Compare Publication styling", dossier: "Professional dossier", publication: "Original Publication", "publication-refined": "Refined Publication", studio: "Practitioner studio" };
+const concepts = [
+  { slug: "publication-refined", title: names["publication-refined"], description: "The approved Publication composition with graphite, blue, neutral structure, and brief interaction feedback." },
+  { slug: "publication", title: names.publication, description: "The selected composition in its original warm charcoal and paper tones. Preserved for comparison." },
+];
+const alternatives = [
+  { slug: "dossier", title: names.dossier, description: "A portrait-led identity rail and structured professional record. Graphite, clear blue, precise alignment." },
+  { slug: "studio", title: names.studio, description: "An introduction beside a working example, followed by career context and public artifacts. Deep ink and teal." },
+];
+---
+<ReviewLayout title={names[direction]} direction={direction}>
+  {direction === "compare" ? (
+    <main id="main-content" class="review-compare">
+      <p class="review-kicker">Refined Publication approved</p>
+      <h1>Publication,<br />refined.</h1>
+      <p class="review-intro">Compare the refined and original Publication homepages with the same profile, tool examples, and writing. Try the links and switch between dark and light.</p>
+      <div class="review-options">
+        {concepts.map((concept) => <a class={`review-option ${concept.slug}`} href={`/design-review/${concept.slug}`}><h2>{concept.title}</h2><p>{concept.description}</p><span class="review-open">Open homepage →</span></a>)}
+      </div>
+      <nav class="review-alternatives" aria-label="Other homepage compositions">{alternatives.map((concept) => <a href={`/design-review/${concept.slug}`}>{concept.title} →</a>)}</nav>
+      <aside class="review-notes">
+        <h2>What to compare</h2>
+        <p>Start with identity and first impression. Then compare experience, tool examples, writing, and contact at desktop and mobile widths.</p>
+        <p>Refined Publication’s palette and complete-page styling are approved in both themes. Earlier directions remain here for comparison. The four interaction treatments are also accepted.</p>
+        <p>{source === "published" ? "Writing uses the published collection loaded for this build." : "Writing uses the repository’s local fallback collection. Live publication status has not been verified for this preview."}</p>
+        <a href="http://127.0.0.1:4321/">Open the preserved homepage preview</a>
+      </aside>
+    </main>
+  ) : <Candidate direction={direction === "publication-refined" ? "publication" : direction} refined={direction === "publication-refined"} snapshot={snapshot} />}
+</ReviewLayout>

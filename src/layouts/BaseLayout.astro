@@ -3,8 +3,9 @@ import { buildCanonicalUrl, site } from "../data/site";
 import { shouldNoIndexDeployment } from "../data/seo.js";
 import { serializeJsonLd } from "../lib/json-ld";
 import { ClientRouter } from "astro:transitions";
-import ThemeToggle from "../components/ThemeToggle.astro";
 import "../styles/global.css";
+import "../styles/public.css";
+import UiMotion from "../components/UiMotion.astro";
 
 const deploymentSite = (Astro.site ?? site.siteUrl).toString();
 const defaultNoindex = shouldNoIndexDeployment(
@@ -47,7 +48,7 @@ const canonicalUrl = buildCanonicalUrl(Astro.url.pathname, deploymentSite);
 const socialImage = new URL(image, deploymentSite).toString();
 ---
 
-<html lang="en">
+<html lang="en" data-public-site data-ui-motion>
   <head>
     <script is:inline data-cfasync="false">
       (function(){
@@ -58,6 +59,7 @@ const socialImage = new URL(image, deploymentSite).toString();
     </script>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/geist-sans.woff2" crossorigin />
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalUrl} />
     {noindex && <meta name="robots" content="noindex, nofollow" />}
@@ -109,78 +111,27 @@ const socialImage = new URL(image, deploymentSite).toString();
       />
     )}
     <ClientRouter />
+    <UiMotion />
   </head>
   <body class={bodyClass}>
+    <a href="#main-content" class="public-skip-link">Skip to content</a>
     <div class="page">
       <slot />
     </div>
-    <ThemeToggle />
-    <script is:inline data-cfasync="false">
-      function initPageEffects() {
-        var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-        // Scroll-reveal + stagger observer
-        var els = document.querySelectorAll('.animate-on-scroll:not(.is-visible)');
-        if (!reduced && els.length) {
-          // Add will-animate so CSS hides them (progressive enhancement)
-          els.forEach(function(el) { el.classList.add('will-animate'); });
-          var observer = new IntersectionObserver(function(entries) {
-            entries.forEach(function(entry) {
-              if (entry.isIntersecting) {
-                entry.target.classList.add('is-visible');
-                observer.unobserve(entry.target);
-              }
-            });
-          }, { threshold: 0.05, rootMargin: '0px 0px 0px 0px' });
-          els.forEach(function(el) { observer.observe(el); });
-        }
-
-        // Cursor spotlight
-        var spotlight = document.querySelector('.hero-spotlight');
-        if (spotlight && !reduced && !spotlight._spotlightInit) {
-          spotlight._spotlightInit = true;
-          spotlight.addEventListener('mousemove', function(e) {
-            var rect = spotlight.getBoundingClientRect();
-            spotlight.style.setProperty('--spotlight-x', (e.clientX - rect.left) + 'px');
-            spotlight.style.setProperty('--spotlight-y', (e.clientY - rect.top) + 'px');
-            spotlight.classList.add('spotlight-active');
-          });
-          spotlight.addEventListener('mouseleave', function() {
-            spotlight.classList.remove('spotlight-active');
-          });
-        }
-
-        // Parallax on hero avatar
-        var parallax = document.querySelector('.hero-parallax');
-        if (parallax && !reduced && !window._parallaxInit) {
-          window._parallaxInit = true;
-          window.addEventListener('scroll', function() {
-            var p = document.querySelector('.hero-parallax');
-            if (p) {
-              var scroll = window.scrollY;
-              if (scroll < 800) p.style.transform = 'translateY(' + (scroll * 0.08) + 'px)';
-            }
-          }, { passive: true });
-        }
-
-        // Reading progress bar
-        var progressBar = document.querySelector('.reading-progress');
-        if (progressBar && !window._progressInit) {
-          window._progressInit = true;
-          window.addEventListener('scroll', function() {
-            var bar = document.querySelector('.reading-progress');
-            if (bar) {
-              var scrollTop = window.scrollY;
-              var docHeight = document.documentElement.scrollHeight - window.innerHeight;
-              bar.style.width = (docHeight > 0 ? (scrollTop / docHeight) * 100 : 0) + '%';
-            }
-          }, { passive: true });
-        }
+    <script>
+      let progressFrame = 0;
+      function updateReadingProgress() {
+        cancelAnimationFrame(progressFrame);
+        progressFrame = requestAnimationFrame(() => {
+          const bar = document.querySelector<HTMLElement>(".reading-progress");
+          if (!bar) return;
+          const height = document.documentElement.scrollHeight - window.innerHeight;
+          bar.style.width = `${height > 0 ? (window.scrollY / height) * 100 : 0}%`;
+        });
       }
-
-      // Run on initial load and after View Transitions
-      initPageEffects();
-      document.addEventListener('astro:page-load', initPageEffects);
+      document.addEventListener("scroll", updateReadingProgress, { passive: true });
+      document.addEventListener("astro:page-load", updateReadingProgress);
+      updateReadingProgress();
     </script>
   </body>
 </html>

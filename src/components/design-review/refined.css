@@ -1,0 +1,49 @@
+@import "../../styles/publication-palette.css";
+
+html[data-review-direction="publication-refined"][data-review-direction],
+html[data-review-direction="publication-refined"][data-review-direction].light {
+  --refined-page: var(--publication-page);
+  --refined-surface: var(--publication-surface);
+  --refined-text: var(--publication-text);
+  --refined-secondary: var(--publication-secondary);
+  --refined-divider: var(--publication-divider);
+  --refined-control: var(--publication-control);
+  --refined-accent: var(--publication-accent);
+  --refined-hover: var(--publication-hover);
+  --refined-on-accent: var(--publication-on-accent);
+  --review-bg: var(--refined-page);
+  --review-surface: var(--refined-surface);
+  --review-text: var(--refined-text);
+  --review-muted: var(--refined-secondary);
+  --review-border: var(--refined-divider);
+  --review-accent: var(--refined-accent);
+  scroll-behavior: auto;
+}
+/* Color feedback belongs to controls; focus and geometry stay immediate. */
+html[data-review-direction="publication-refined"] :is(a, button) {
+  transition: color 110ms ease-out, background-color 110ms ease-out,
+    border-color 110ms ease-out, text-decoration-color 110ms ease-out;
+}
+html[data-review-direction="publication-refined"] a:hover {
+  color: var(--refined-hover);
+}
+html[data-review-direction="publication-refined"] .public-theme-toggle {
+  border-color: var(--refined-control);
+  background: transparent;
+}
+html[data-review-direction="publication-refined"] .public-theme-toggle:hover {
+  color: var(--refined-hover);
+  border-color: var(--refined-hover);
+  background: var(--refined-surface);
+}
+html[data-review-direction="publication-refined"] :is(.review-header nav a, .review-controls > a) {
+  text-decoration: underline;
+  text-decoration-color: var(--refined-control);
+}
+html[data-review-direction="publication-refined"] :is(.review-header nav a, .review-controls > a):hover {
+  text-decoration-color: currentColor;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-review-direction="publication-refined"] :is(a, button) { transition: none; }
+}

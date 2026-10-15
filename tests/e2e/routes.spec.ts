@@ -47,18 +47,20 @@ async function expectArticleCoverMetadata(page: Page): Promise<string> {
 test("about page loads expected sections", async ({ page }) => {
   await page.goto("/about");
   await expect(
-    page.getByRole("heading", { name: /Senior Data Engineer/i }),
+    page.getByRole("heading", { name: "Rujikorn Ngoensaard", level: 1 }),
   ).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Platform direction" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "From engineering to platform delivery." })).toBeVisible();
   await expect(
-    page.getByRole("heading", { name: "Architecture statement" }),
+    page.getByRole("heading", { name: "Make the decisions clear." }),
   ).toBeVisible();
+  await expect(page.getByText("AI tools I use: Cursor · Codex · Databricks Genie", { exact: true })).toBeVisible();
+  await expect(page.locator('img[src*="ai-stack"]')).toHaveCount(0);
 });
 
 test("blog page loads posts", async ({ page }) => {
   await page.goto("/blog");
   await expect(
-    page.getByRole("heading", { name: "Writing by Rujikorn Ngoensaard" }),
+    page.getByRole("heading", { name: "Writing", exact: true, level: 1 }),
   ).toBeVisible();
   await expect(page.locator("article").first()).toBeVisible();
   await expect(page.getByText("Read article").first()).toBeVisible();
@@ -70,6 +72,8 @@ test("blog article page renders markdown body", async ({ page }) => {
   await expect(page).toHaveURL(/\/blog\/[^/]+\/?$/);
   await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
   await expect(page.locator(".article-body")).toBeVisible();
+  const mobileContents = page.locator(".mobile-contents");
+  if (await mobileContents.isVisible()) await mobileContents.locator("summary").click();
   await expect(page.getByRole("navigation", { name: "Table of contents" })).toBeVisible();
   await expect(page.locator(".article-body :is(h2, h3)[id]").first()).toBeVisible();
   await expect(page.locator("[data-blog-view-count]").first()).toHaveAttribute(
@@ -184,14 +188,14 @@ test("cv page gates CV access via email capture modal", async ({ page }) => {
   await page.goto("/cv");
   await expect(page).toHaveTitle(/Rujikorn Ngoensaard CV/i);
   await expect(
-    page.getByRole("heading", { name: "Rujikorn Ngoensaard" }),
+    page.getByRole("heading", { name: "Request CV", level: 1 }),
   ).toBeVisible();
   const getCopyBtn = page.getByRole("button", { name: /Request CV/i }).first();
   await expect(getCopyBtn).toBeVisible();
   await getCopyBtn.click();
   const modal = page.locator("#cv-request-modal");
   await expect(modal).toBeVisible();
-  await expect(modal.getByRole("heading", { name: "Get the CV in your inbox" })).toBeVisible();
+  await expect(modal.getByRole("heading", { name: "Request CV" })).toBeVisible();
   await modal.locator("#cv-email").fill("requester@example.com");
   await modal.getByRole("button", { name: "Request CV" }).click();
   await expect(modal.locator("#cv-form-error")).toHaveText(
@@ -244,13 +248,13 @@ test("about and cv pages point profile schema at the shared person identity", as
       path: "/about",
       canonical: "https://xhverse.co/about",
       type: "AboutPage",
-      heading: /Senior Data Engineer/i,
+      heading: "Rujikorn Ngoensaard",
     },
     {
       path: "/cv",
       canonical: "https://xhverse.co/cv",
       type: "ProfilePage",
-      heading: "Rujikorn Ngoensaard",
+      heading: "Request CV",
     },
   ] as const;
 
@@ -291,7 +295,7 @@ test("blog and tools pages reinforce branded search identity", async ({ page }) 
     "content",
     /Rujikorn Ngoensaard.*XH.*bossruji/,
   );
-  await expect(page.getByRole("heading", { name: "Writing by Rujikorn Ngoensaard" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Writing", exact: true, level: 1 })).toBeVisible();
   await expect(page.getByText(/Practical notes from XH \/ bossruji/i)).toBeVisible();
   const blogJsonLd = getJsonLdByType(await readJsonLd(page), "CollectionPage");
   expect(blogJsonLd?.["@id"]).toBe("https://xhverse.co/blog#collection");
@@ -307,8 +311,8 @@ test("blog and tools pages reinforce branded search identity", async ({ page }) 
     "content",
     /Rujikorn Ngoensaard.*XH.*bossruji/,
   );
-  await expect(page.getByRole("heading", { name: "Data platform tools by Rujikorn Ngoensaard" })).toBeVisible();
-  await expect(page.getByText(/free tools from XH \/ bossruji/i)).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Tools", exact: true, level: 1 })).toBeVisible();
+  await expect(page.getByText(/free tools by Rujikorn Ngoensaard \(XH \/ bossruji\)/i)).toBeVisible();
   const toolsJsonLd = getJsonLdByType(await readJsonLd(page), "CollectionPage");
   expect(toolsJsonLd?.["@id"]).toBe("https://xhverse.co/tools#collection");
   expect(toolsJsonLd?.name).toBe("XHVERSE tools by Rujikorn Ngoensaard");
@@ -337,4 +341,26 @@ test("crawl surfaces expose public URLs and keep admin routes out", async ({ pag
   expect(sitemapXml).toContain("https://xhverse.co/services/");
   expect(sitemapXml).toContain("https://xhverse.co/tools/");
   expect(sitemapXml).not.toContain("/admin/");
+});
+
+
+test("advisory retains engagement scope and delivery boundaries", async ({ page }) => {
+  await page.goto("/services");
+  await expect(page.getByRole("heading", { name: "Data platform advisory.", level: 1 })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Architecture Review" })).toBeVisible();
+  await expect(page.getByText("1–2 weeks", { exact: true })).toBeVisible();
+  await expect(page.getByText("2–4 weeks", { exact: true })).toBeVisible();
+  await expect(page.getByText("Ongoing advisory", { exact: true })).toBeVisible();
+  await expect(page.getByText("You need hands-on engineering (building pipelines, writing Spark jobs)", { exact: true })).toBeVisible();
+  await expect(page.getByText("Available alongside my full-time enterprise work.", { exact: true })).toBeVisible();
+});
+
+test("404 offers public recovery paths and remains noindex", async ({ page }) => {
+  await page.goto("/404");
+  await expect(page.getByRole("heading", { name: "Page not found", level: 1 })).toBeVisible();
+  const recovery = page.getByRole("navigation", { name: "Find another page" });
+  await expect(recovery.getByRole("link", { name: "Home", exact: true })).toHaveAttribute("href", "/");
+  await expect(recovery.getByRole("link", { name: "Writing", exact: true })).toHaveAttribute("href", "/blog");
+  await expect(recovery.getByRole("link", { name: "Tools", exact: true })).toHaveAttribute("href", "/tools");
+  await expect(page.locator('meta[name="robots"][content*="noindex"]')).toHaveCount(1);
 });

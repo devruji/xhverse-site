@@ -10,19 +10,20 @@ import Footer from "../../components/Footer.astro";
 >
   <div class="min-h-screen bg-[var(--bg-page)] font-sans text-[var(--text)]">
     <Header current="/tools" />
-    <main class="mx-auto max-w-7xl px-5 py-6 sm:px-8 sm:py-8 lg:px-10">
-      <section class="py-10 sm:py-14">
-        <p class="text-[12px] uppercase tracking-[0.32em] text-emerald-200">SQL tool</p>
-        <h1 class="mt-4 max-w-3xl text-[2.4rem] font-semibold leading-[0.98] tracking-tight text-white sm:text-[3.8rem]">
+    <main id="main-content" class="public-container tool-page">
+      <a href="/tools" class="text-link tool-back-link mt-6 inline-flex text-sm">← All tools</a>
+      <section class="tool-hero">
+        <p class="public-kicker">SQL tool</p>
+        <h1 class="tool-heading mt-4">
           SQL Deathmatch
         </h1>
-        <p class="mt-6 max-w-2xl text-base leading-8 text-zinc-300 sm:text-lg">
-          15 rounds. Two queries. One winner. Pick wisely.
+        <p class="public-intro mt-5 max-w-2xl">
+          Compare two Spark SQL queries across 15 rounds and explore the execution-plan reasoning behind each answer.
         </p>
       </section>
 
-      <section class="border-t border-white/10 py-10">
-        <div id="start-panel" class="border border-white/10 bg-white/[0.03] p-6 text-center sm:p-10">
+      <section class="border-t border-[var(--border-subtle)] py-10">
+        <div id="start-panel" class="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-elevated)] p-6 text-center sm:p-10">
           <p class="text-sm text-zinc-400">Each round presents two SQL approaches to the same problem. Pick the one that performs better.</p>
           <button
             id="start-button"
@@ -34,30 +35,30 @@ import Footer from "../../components/Footer.astro";
         </div>
 
         <div id="game-panel" class="hidden space-y-6">
-          <div class="flex items-center justify-between border border-white/10 bg-white/[0.03] px-5 py-3">
+          <div class="flex items-center justify-between rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-elevated)] px-5 py-3">
             <p id="progress-label" class="text-sm font-medium text-zinc-400">Round 1 / 15</p>
             <div id="progress-dots" class="flex gap-1"></div>
           </div>
 
-          <div class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+          <div class="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-elevated)] p-5 sm:p-6">
             <h2 id="round-title" class="text-xl font-semibold tracking-tight text-white"></h2>
             <p id="round-context" class="mt-3 text-sm leading-7 text-zinc-300"></p>
           </div>
 
-          <div id="queries-container" class="grid gap-4 lg:grid-cols-2">
-            <button id="query-a-btn" type="button" class="query-button group border border-white/10 bg-white/[0.03] p-4 text-left transition hover:border-emerald-300/50">
-              <p class="text-xs font-semibold uppercase tracking-wider text-zinc-500">Query A</p>
+          <div id="queries-container" class="grid min-w-0 grid-cols-1 gap-4 lg:grid-cols-2">
+            <button id="query-a-btn" type="button" class="query-button group min-w-0 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-elevated)] p-4 text-left transition hover:border-emerald-300/50">
+              <p class="text-xs font-semibold uppercase tracking-wider text-[var(--muted)]">Query A</p>
               <p id="query-a-label" class="mt-2 text-sm font-medium text-white"></p>
-              <pre class="mt-3 overflow-x-auto rounded bg-black/40 p-3"><code id="query-a-sql" class="text-xs leading-6 text-emerald-300/80"></code></pre>
+              <pre class="mt-3 max-w-full overflow-x-auto rounded bg-[var(--bg-elevated)] p-3"><code id="query-a-sql" class="text-xs leading-6 text-[var(--text)]"></code></pre>
             </button>
-            <button id="query-b-btn" type="button" class="query-button group border border-white/10 bg-white/[0.03] p-4 text-left transition hover:border-emerald-300/50">
-              <p class="text-xs font-semibold uppercase tracking-wider text-zinc-500">Query B</p>
+            <button id="query-b-btn" type="button" class="query-button group min-w-0 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-elevated)] p-4 text-left transition hover:border-emerald-300/50">
+              <p class="text-xs font-semibold uppercase tracking-wider text-[var(--muted)]">Query B</p>
               <p id="query-b-label" class="mt-2 text-sm font-medium text-white"></p>
-              <pre class="mt-3 overflow-x-auto rounded bg-black/40 p-3"><code id="query-b-sql" class="text-xs leading-6 text-emerald-300/80"></code></pre>
+              <pre class="mt-3 max-w-full overflow-x-auto rounded bg-[var(--bg-elevated)] p-3"><code id="query-b-sql" class="text-xs leading-6 text-[var(--text)]"></code></pre>
             </button>
           </div>
 
-          <div id="reveal-panel" class="hidden border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+          <div id="reveal-panel" class="hidden rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-elevated)] p-5 sm:p-6">
             <div id="reveal-header" class="flex items-center gap-3">
               <span id="reveal-badge" class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wider"></span>
               <span id="reveal-winner-label" class="text-sm text-zinc-400"></span>
@@ -74,34 +75,34 @@ import Footer from "../../components/Footer.astro";
         </div>
       </section>
 
-      <section id="result-panel" class="hidden border-t border-white/10 py-10" aria-live="polite">
+      <section id="result-panel" class="hidden border-t border-[var(--border-subtle)] py-10" aria-live="polite">
         <div class="grid gap-6 lg:grid-cols-[1fr_1fr]">
           <div class="space-y-6">
-            <div class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
-              <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Result</p>
+            <div class="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-elevated)] p-5 sm:p-6">
+              <p class="text-[12px] uppercase tracking-[0.32em] text-[var(--muted)]">Result</p>
               <div class="mt-4 grid gap-4 sm:grid-cols-2">
-                <div class="border border-white/10 bg-black/20 p-5">
-                  <p class="text-sm text-zinc-500">Score</p>
+                <div class="rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-card)] p-5">
+                  <p class="text-sm text-[var(--muted)]">Score</p>
                   <p id="final-score" class="mt-2 text-5xl font-semibold tracking-tight text-white">0/15</p>
                 </div>
-                <div class="border border-white/10 bg-black/20 p-5">
-                  <p class="text-sm text-zinc-500">Tier</p>
+                <div class="rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-card)] p-5">
+                  <p class="text-sm text-[var(--muted)]">Tier</p>
                   <p id="final-tier" class="mt-2 text-2xl font-semibold tracking-tight text-emerald-200"></p>
                 </div>
               </div>
             </div>
 
-            <div class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
-              <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Common gaps</p>
+            <div class="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-elevated)] p-5 sm:p-6">
+              <p class="text-[12px] uppercase tracking-[0.32em] text-[var(--muted)]">Common gaps</p>
               <ul id="mistakes-list" class="mt-4 space-y-3"></ul>
             </div>
           </div>
 
           <div class="space-y-6">
-            <div class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+            <div class="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-elevated)] p-5 sm:p-6">
               <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Brief</p>
+                  <p class="text-[12px] uppercase tracking-[0.32em] text-[var(--muted)]">Brief</p>
                   <h2 class="mt-2 text-xl font-semibold tracking-tight text-white">Copyable summary</h2>
                 </div>
                 <button
@@ -115,9 +116,9 @@ import Footer from "../../components/Footer.astro";
               <textarea
                 id="brief-textarea"
                 readonly
-                class="mt-4 min-h-[10rem] w-full resize-y border border-white/10 bg-black/30 p-4 font-mono text-xs leading-6 text-zinc-300 outline-none"
+                class="mt-4 min-h-[10rem] w-full resize-y rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-card)] p-4 font-mono text-xs leading-6 text-zinc-300 outline-none"
               ></textarea>
-              <p id="copy-status" class="mt-3 text-xs text-zinc-500"></p>
+              <p id="copy-status" class="mt-3 text-xs text-[var(--muted)]"></p>
             </div>
 
             <button

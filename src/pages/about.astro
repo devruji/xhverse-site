@@ -5,72 +5,48 @@ import Footer from "../components/Footer.astro";
 import { profile } from "../data/profile";
 import { site } from "../data/site";
 import { buildAboutPageJsonLd } from "../lib/seo/structured-data";
-
 const deploymentSite = (Astro.site ?? site.siteUrl).toString();
-const aboutStructuredData = buildAboutPageJsonLd(deploymentSite);
 ---
-
-<BaseLayout
-  title={`About ${profile.fullName}`}
-  description={profile.longBio}
-  image={profile.avatar}
-  structuredData={aboutStructuredData}
->
-  <div class="min-h-screen bg-[var(--bg-page)] font-sans text-[var(--text)]">
+<BaseLayout title={`About ${profile.fullName}`} description={profile.longBio} image={profile.avatar} structuredData={buildAboutPageJsonLd(deploymentSite)}>
   <Header current="/about" />
-  <main>
-    <div class="mx-auto max-w-7xl px-5 py-14 sm:px-8 sm:py-20 lg:px-10">
-      <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">About</p>
-      <h1 class="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl lg:text-5xl">
-        {profile.title}
-      </h1>
-      <p class="mt-2 text-sm font-medium uppercase tracking-[0.22em] text-emerald-200">
-        {profile.fullName} · XH / bossruji
-      </p>
-
-      <div class="mt-12 grid gap-12 lg:grid-cols-[1.2fr_0.8fr]">
-        <div class="space-y-8">
-          <section>
-            <h2 class="text-xl font-semibold text-white">Platform direction</h2>
-            <p class="mt-3 leading-relaxed text-zinc-300">{profile.longBio}</p>
-          </section>
-
-          <section>
-            <h2 class="text-xl font-semibold text-white">Architecture statement</h2>
-            <blockquote class="mt-3 border-l-2 border-emerald-300/40 pl-4 text-zinc-300 italic">
-              {profile.bio}
-            </blockquote>
-          </section>
-        </div>
-
-        <aside class="space-y-6 lg:self-start">
-          <div class="static-card p-5 sm:p-6">
-            <img
-              src={profile.avatar}
-              alt={profile.fullName}
-              width="960"
-              height="960"
-              class="aspect-square w-24 rounded-full object-cover"
-              loading="eager"
-            />
-            <h3 class="mt-4 text-lg font-semibold text-white">{profile.name}</h3>
-            <p class="mt-1 text-sm text-zinc-400">{profile.title}</p>
-            <p class="mt-3 text-sm leading-relaxed text-zinc-400">{profile.bio}</p>
-          </div>
-
-          <div class="static-card p-5 sm:p-6">
-            <h3 class="text-sm font-semibold uppercase tracking-wider text-zinc-500">Connect</h3>
-            <div class="mt-3 flex flex-col gap-2 text-sm">
-              <a href={site.github} target="_blank" rel="noreferrer" class="text-link external-link">GitHub</a>
-              <a href={site.linkedin} target="_blank" rel="noreferrer" class="text-link external-link">LinkedIn</a>
-              <a href={site.medium} target="_blank" rel="noreferrer" class="text-link external-link">Medium</a>
-              <a href={`mailto:${site.email}`} class="text-link">{site.email}</a>
-            </div>
-          </div>
-        </aside>
-      </div>
-    </div>
+  <main id="main-content" class="public-container">
+    <section class="public-section about-intro">
+      <div><p class="public-kicker">About / XH · bossruji</p><h1 class="public-heading">Rujikorn Ngoensaard</h1><p class="role">{profile.title}</p><p class="public-intro">I work on the architecture, governance, and delivery of enterprise data platforms. I care about what happens after launch: who owns the system, how teams use it, and how they keep it running.</p></div>
+      <img src={profile.avatar} alt={profile.fullName} width="960" height="960" loading="eager" decoding="async" />
+    </section>
+    <section class="public-section about-section" aria-labelledby="experience-heading">
+      <p class="public-kicker">Experience</p>
+      <div><h2 id="experience-heading" class="public-heading">From engineering to platform delivery.</h2><p>I have 5+ years of experience in cloud data engineering and enterprise platform delivery across retail, real estate, e-commerce, manufacturing, and loyalty.</p><div class="experience-row"><p class="public-kicker">Oct 2024–Present</p><h3>Central Pattana</h3><p>I lead platform delivery, reporting migration, and governance standards across Azure, Databricks, and Microsoft Fabric. My work includes managing engineers and coordinating vendors.</p></div><a href="/cv" class="text-link">View experience and request my CV →</a></div>
+    </section>
+    <section class="public-section about-section" aria-labelledby="method-heading">
+      <p class="public-kicker">How I work</p>
+      <div><h2 id="method-heading" class="public-heading">Make the decisions clear.</h2><ul class="principles"><li><h3>Start with the context.</h3><p>Understand the business need, platform constraints, and the people who will operate the system.</p></li><li><h3>Write down the boundaries.</h3><p>Make ownership, access, and architecture decisions explicit so teams have something they can use and review.</p></li><li><h3>Plan for the handover.</h3><p>Build maintainable systems and leave enough documentation for the next engineer.</p></li></ul></div>
+    </section>
+    <section class="public-section about-section" aria-labelledby="stack-heading">
+      <p class="public-kicker">Tools I use</p>
+      <div><h2 id="stack-heading" class="public-heading">Tools follow the problem.</h2><p>I work across Azure, Databricks, Microsoft Fabric, Spark, and Power BI for platform engineering and analytics delivery.</p><p class="ai-tools">AI tools I use: Cursor · Codex · Databricks Genie</p></div>
+    </section>
+    <section class="public-section about-section" aria-labelledby="connect-heading">
+      <p class="public-kicker">Connect</p>
+      <div><h2 id="connect-heading" class="public-heading">Find me here.</h2><div class="connect-links"><a href={`mailto:${site.email}`} class="text-link">{site.email}</a><a href={site.linkedin} target="_blank" rel="noopener noreferrer" class="text-link external-link">LinkedIn</a><a href={site.github} target="_blank" rel="noopener noreferrer" class="text-link external-link">GitHub</a><a href={site.medium} target="_blank" rel="noopener noreferrer" class="text-link external-link">Medium</a></div><p>Advisory is available alongside my full-time enterprise work. <a href="/services" class="text-link">See the engagement options</a>.</p></div>
+    </section>
   </main>
   <Footer />
-  </div>
 </BaseLayout>
+<style>
+  .about-intro { display: grid; gap: 36px; align-items: center; }
+  h1 { margin-top: 20px; }
+  .role { color: var(--text-heading); margin-top: 16px; line-height: 1.7; }
+  .about-intro .public-intro { margin-top: 24px; }
+  .about-intro img { width: min(100%, 320px); border-radius: 12px; aspect-ratio: 1; object-fit: cover; }
+  .about-section { display: grid; gap: 24px; border-top: 1px solid var(--border-subtle); }
+  .about-section p:not(.public-kicker) { margin-top: 20px; max-width: 65ch; color: var(--muted); line-height: 1.8; }
+  .experience-row { margin: 32px 0; border-left: 1px solid var(--border-subtle); padding-left: 24px; }
+  h3 { margin-top: 12px; font-size: 22px; color: var(--text-heading); font-weight: 550; }
+  .principles { list-style: none; padding: 0; margin-top: 32px; }
+  .principles li + li { margin-top: 28px; }
+  .principles p { margin-top: 8px !important; }
+  .ai-tools { font-size: 14px; }
+  .connect-links { display: flex; flex-wrap: wrap; gap: 20px; margin-top: 28px; overflow-wrap: anywhere; }
+  @media (min-width: 900px) { .about-intro { grid-template-columns: minmax(0, 1.4fr) minmax(0, .8fr); gap: 80px; } .about-intro img { justify-self: end; } .about-section { grid-template-columns: minmax(0, .45fr) minmax(0, 1fr); gap: 40px; } }
+</style>
