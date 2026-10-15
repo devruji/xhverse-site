@@ -62,6 +62,8 @@ function harness(fixtures: Fixture[], smoke: (route: string) => Response = html)
       return json({ success: true, result: { canonical_deployment: fixture.active ?? null } });
     }
     assert.equal(new Headers(init.headers).get('authorization'), null, 'Public requests contain no credentials');
+    assert.equal(new Headers(init.headers).get('user-agent'),
+      'XHVerse-DeploymentVerifier/1.0 (+https://github.com/devruji/xhverse-site)', 'Public monitor identifies itself honestly');
     return smoke(new URL(url).pathname);
   };
   const deps: VerificationDependencies = { fetch: fakeFetch,
@@ -142,8 +144,39 @@ describe('production deployment verification', () => {
   it('rejects authentication failures without logging server bodies or credentials', async () => {
     const test = harness([]);
     test.deps.fetch = async () => json({ error: 'private-cf-token' }, 401);
-    await assert.rejects(verifyDeployment(options, test.deps), /^Error: Verification request failed: HTTP 401$/);
+    await assert.rejects(verifyDeployment(options, test.deps), /^Error: Verification request failed: HTTP 401 \[GitHub main\]$/);
     assert.deepEqual(test.logs, []);
+  });
+  it('identifies a challenged sitemap without leaking the response body or credentials', async () => {
+    const test = harness([{ active: deployment() }]);
+    const original = test.deps.fetch;
+    test.deps.fetch = async (url, init) => {
+      if (url.endsWith('/sitemap-index.xml')) return new Response('private-cf-token private-gh-token', {
+        status: 403, headers: {'cf-mitigated':'challenge','cf-ray':'a4ae15f61cfc6589-ORD'},
+      });
+      return original(url, init);
+    };
+    await assert.rejects(verifyDeployment({...options,routes:['/blog/*']},test.deps),
+      /^Error: Verification request failed: HTTP 403 \[production sitemap\]; cf-mitigated=challenge; cf-ray=a4ae15f61cfc6589-ORD$/);
+    assert.ok(!test.requests.includes('https://xhverse.co/'));
+    assert.deepEqual(test.logs, []);
+  });
+  it('identifies a Cloudflare project failure without exposing its authenticated URL', async () => {
+    const test = harness([{active:deployment()}]);
+    const original = test.deps.fetch;
+    test.deps.fetch = async (url,init) => url.startsWith('https://api.cloudflare.com/')
+      ? json({error:'private-cf-token'},403) : original(url,init);
+    await assert.rejects(verifyDeployment(options,test.deps),
+      /^Error: Verification request failed: HTTP 403 \[Cloudflare project\]$/);
+  });
+  it('omits unrecognized mitigation values and malformed request IDs', async () => {
+    const test = harness([{active:deployment()}]);
+    const original = test.deps.fetch;
+    test.deps.fetch = async (url,init) => url === 'https://xhverse.co/blog'
+      ? new Response('secret body', {status:403,headers:{'cf-mitigated':'private-cf-token','cf-ray':'private-gh-token?!'}})
+      : original(url,init);
+    await assert.rejects(verifyDeployment(options,test.deps),
+      /^Error: Verification request failed: HTTP 403 \[production page\]$/);
   });
   it('rejects Cloudflare API success=false', async () => {
     const test = harness([{ active: deployment() }]);
@@ -253,6 +286,8 @@ describe('dynamic route sitemap discovery', () => {
       if (path.endsWith('.xml')) {
         fetched.push(path);
         assert.equal(new Headers(init.headers).get('authorization'), null);
+        assert.equal(new Headers(init.headers).get('user-agent'),
+          'XHVerse-DeploymentVerifier/1.0 (+https://github.com/devruji/xhverse-site)');
         return new Response(documents[path] ?? 'missing', { headers: { 'content-type': 'application/xml' } });
       }
       return original(url, init);
