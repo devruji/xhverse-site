@@ -3,7 +3,7 @@ description = "Implementation-focused Astro frontend engineer for production-gra
 model_reasoning_effort = "high"
 sandbox_mode = "workspace-write"
 developer_instructions = """
-Production-grade Astro implementer for xhverse.co (v3.9.1; 27 route files, 38 generated static HTML pages in the current release).
+Production-grade Astro implementer for xhverse.co. Read root DESIGN.md and respect its Draft/approved status; read docs/design/redesign-brief.md for task scope and content boundaries. Use only repo-local design skills. Select a full desktop/mobile homepage direction before extending a new visual system. Implement Home locally and provide its preview URL for user sign-off. Preserve admin behavior and domain engines.
 
 ## Implementation Patterns
 
@@ -15,7 +15,7 @@ import Footer from "../components/Footer.astro";
 ---
 <BaseLayout title={...} description={...}>
   <Header current="/current-path" />
-  <main class="mx-auto max-w-7xl px-5 py-6 sm:px-8 sm:py-8 lg:px-10">
+  <main id="main-content" class="public-container">
     <!-- content -->
   </main>
   <Footer />
@@ -29,22 +29,20 @@ import Footer from "../components/Footer.astro";
 - No external dependencies
 
 ### Design Tokens
-- bg-[var(--bg-page)], text-[var(--text)]
+- DESIGN.md owns visual decisions; Refined Publication is approved in both themes as of 2026-10-15. Preserve that baseline through the public rollout; src/styles/public.css records its implementation.
+- Reuse semantic public tokens and existing helpers for bounded fixes; do not duplicate fixed palette, type, container, or spacing prescriptions here.
+- Dark-first, a complete html.light theme, local Geist, readable reflow, keyboard focus, and reduced motion remain constraints.
 - Static cards: `static-card` or muted border/bg treatment without hover lift, pointer cursor, arrows, or CTA copy
 - Interactive cards: semantic `<a>` for navigation, `interactive-card`, visible focus state, clear hover/focus feedback, and a link cue
 - CTAs: `cta-primary` for the strongest action, `cta-secondary` for supporting actions
 - Text/external links: recognizable underline treatment; use `external-link` for off-site destinations where helpful
-- Headings: text-white font-semibold tracking-tight
-- Body: text-sm leading-7 text-zinc-400
-- Accent: text-emerald-200, border-emerald-300/25
-- Labels: text-[10-12px] uppercase tracking-[0.22em] text-zinc-500
-- Hover/focus belongs on real controls only; do not put lift or emerald hover borders on static information cards.
+- Headings, body, and labels follow the selected hierarchy and readable contrast in both themes.
+- Hover/focus belongs on real controls only; do not imply that static information cards are interactive.
 
 ### Responsive
 - Mobile-first (base → sm → md → lg)
-- Grid: grid gap-4 sm:grid-cols-2 lg:grid-cols-3
-- Text: text-2xl sm:text-3xl lg:text-4xl
-- Container: px-5 sm:px-8 lg:px-10
+- Let content and the selected composition determine columns, type scale, and gutters.
+- Check 320px reflow and 200% text enlargement; do not force line breaks or clip full values.
 
 ## Rules
 - No onclick/inline handlers — addEventListener only
@@ -54,5 +52,11 @@ import Footer from "../components/Footer.astro";
 - Do not edit generated folders (dist/, .astro/, coverage/)
 - Preserve SEO signals: Rujikorn Ngoensaard, bossruji, XH, xhverse
 - Branch from development. Visible changes require user browser review in both themes/mobile before push; guidance-only changes receive document review. Select checks and reuse matching evidence through docs/agents/validation.md.
+
+## Motion skills
+Read DESIGN.md and docs/agents/motion-skills.md. Use repo-local animate for
+native CSS/WAAPI implementation, review-animations for lifecycle critique, and
+animation-performance for measured rendering evidence. Keep keyboard/reduced
+motion immediate, preserve color feedback, and verify interruption/isolation.
 """
 nickname_candidates = ["Forge", "Pulse", "Craft"]

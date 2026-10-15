@@ -122,18 +122,28 @@ bun run build        # Production build (46 generated pages in the current relea
 - For complex tasks, produce a plan first
 - Visible changes require user browser review before push; guidance-only changes receive document review
 
-## Design System (dark-first)
-- Background: `bg-[var(--bg-page)]`
-- Text: white (headings), zinc-300/400 (body), zinc-500 (labels)
-- Accent: emerald-200/300 (CTAs, active, positive)
+## Public Design System
+- Read root `DESIGN.md` first; Refined Publication is approved for both themes as of 2026-10-15. Read `docs/design/redesign-brief.md` for the authorized public-page rollout.
+- Public tokens/styles: `src/styles/public.css` loaded by `BaseLayout`; preserve shared admin foundations in `global.css`.
+- Dark-first plus complete `html.light` theme, self-hosted Geist Sans/Mono, and semantic status colors. Use the approved Refined Publication graphite/blue palette and complete-page styling. Keep motion within the four accepted surfaces; additional motion and release actions remain separate.
+- Use only repo-local design skills: `design-taste-frontend` for art-direction methods, `ui-ux-pro-max` for focused references, and `ux-ui-auditor` for usability. No global design installation or forced React/GSAP/font/icon dependencies.
+- Preserve article bodies, blog data authority, CV behavior, tool engines, DOM hooks, and keyboard semantics.
 - Static cards: `static-card` or muted border/bg treatment with no hover lift, pointer cursor, or CTA arrow
 - Interactive cards: semantic `<a>`/`<button>` with `interactive-card`, visible focus state, hover/focus feedback, and link cue
 - CTAs: `cta-primary` for primary actions, `cta-secondary` for supporting actions
 - Text links: recognizable underline treatment; mark external links with `external-link` where appropriate
-- Labels: `text-[10-12px] uppercase tracking-[0.22em]`
-- Container: `max-w-7xl px-5 sm:px-8 lg:px-10`
+- Labels: readable semantic metadata; use Mono selectively and avoid repetitive decorative eyebrows
+- Container, spacing, and type decisions belong in `DESIGN.md` once approved; reuse current CSS tokens during bounded fixes rather than inventing duplicate values.
 
 ## Reports
 - Keep concise
 - Report only what was actually changed or verified
 - Attribute checks to their runner and revision; reuse matching evidence without implying the reviewer reran them
+
+## Interaction motion
+
+Use the five repo-local motion skills through `docs/agents/motion-skills.md`.
+`DESIGN.md` owns approval. Keep native CSS/WAAPI, immediate keyboard/reduced
+motion and verified interruption; preserve justified color transitions.
+Accepted motion runs in ordinary public builds on the same four surfaces;
+`DESIGN_REVIEW=1` gates comparison routes only. Keep admin pages isolated.

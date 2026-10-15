@@ -88,7 +88,7 @@ The five practitioner assessment tools share `src/lib/practitioner-tools/` and a
 
 ## Agent skills
 
-Repo-local `tdd`, `codebase-design`, and `domain-modeling` are available under `.agents/skills/`. Read `docs/agents/skills.md` for usage, compatibility, and the pinned upstream source.
+Repo-local engineering and design skills live under `.agents/skills/`. Read `docs/agents/skills.md` for usage, compatibility, and pinned sources. For public design work, read `DESIGN.md` first and respect its Draft/approved status. Core `design-taste-frontend` supplies art-direction methods, `ui-ux-pro-max` supplies focused UX references, and `ux-ui-auditor` evaluates usability. Use only repo-local design skills for this project; do not install design skills globally. Repository rules govern implementation and delivery.
 
 GitHub Issues configuration lives in `docs/agents/issue-tracker.md`; single-context glossary and ADR rules live in `docs/agents/domain.md`.
 
@@ -182,6 +182,15 @@ Follow `docs/agents/validation.md` for check selection and evidence reuse. Uncha
 - **Notion**: Not used by xhverse; keep it out of repo config.
 - **Secrets**: Never commit bearer tokens, service-role keys, or `.env` files. Use env var references only.
 
+## Public Portfolio Design
+
+- Visual baseline and approval status: root `DESIGN.md`; the user approved Refined Publication's complete homepage and graphite/blue styling in both themes on 15 October 2026 and authorized public-page extension. Use `docs/design/publication-rollout-validation.md` for rollout evidence and final browser-review status; `docs/design/redesign-brief.md` records scope and continuing boundaries.
+- Identity leads; experience, writing and tools substantiate it. Keep platform text contextual and copy factual and direct.
+- Dark-first plus full light theme and local Geist Sans/Mono remain constraints. Follow the approved Publication/refined reference through shared `PublicationHome.astro`, `publication-palette.css` and public styles; preserve the accepted four-surface motion. Additional motion needs separate approval.
+- Public styles in `src/styles/public.css` through `BaseLayout`; protect admin styling and behavior.
+- Preserve tool DOM hooks, domain engines, CV gate behavior, blog data authority, and existing article bodies.
+- Preserve factual material and verify each public-page adaptation in both themes and desktop/mobile. Record matching checks and a running preview URL; the existing PR/release process still applies.
+
 ## Content & Identity
 
 - **Title**: Senior Data Engineer | Platform Architecture
@@ -200,3 +209,19 @@ Follow `docs/agents/validation.md` for check selection and evidence reuse. Uncha
 - Final summary includes: changed files, risks, verification status
 
 For docs, rule, skill, or Codex-config-only changes, validate the relevant Markdown/YAML/TOML surfaces and state clearly that app runtime tests were not run.
+
+## Interaction motion skills
+
+Use the five repo-local Emil Kowalski skills (`animate`, `improve-animations`,
+`find-animation-opportunities`, `review-animations`, `animation-performance`)
+for bounded motion work. Read [project motion guidance](docs/agents/motion-skills.md)
+and `DESIGN.md` first. Native CSS/WAAPI, immediate keyboard/reduced motion,
+verified interruption and preserved color feedback are the project defaults.
+The user accepted the four-surface motion on 15 October 2026 for ordinary
+public-site builds: action/icon press feedback, native mobile menu, CV dialog,
+and Recovery Planner checkpoint/result entrances. Admin pages are excluded;
+only comparison routes require `DESIGN_REVIEW=1`. See the
+[rollout record](docs/design/motion-rollout-validation.md) for verification.
+Refined Publication's palette and complete-page styling are separately approved
+for public-page extension. Additional motion remains pending; these approvals
+do not authorize push, PR, merge or production release.

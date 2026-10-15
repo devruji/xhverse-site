@@ -54,14 +54,15 @@ const scdTypeGuide = [
 >
   <div class="scd-lab-root min-h-screen bg-[var(--bg-page)] font-sans text-[var(--text)]">
     <Header current="/tools" />
-    <main class="mx-auto max-w-7xl px-5 py-6 sm:px-8 sm:py-8 lg:px-10">
-      <section class="grid gap-8 py-10 sm:py-14 lg:grid-cols-[1fr_0.75fr] lg:items-end">
+    <main id="main-content" class="public-container tool-page">
+      <a href="/tools" class="text-link tool-back-link mt-6 inline-flex text-sm">← All tools</a>
+      <section class="tool-hero grid gap-8 lg:grid-cols-[1fr_0.75fr] lg:items-end">
         <div>
-          <p class="text-[12px] uppercase tracking-[0.32em] text-emerald-200">Data modeling tool</p>
-          <h1 class="mt-4 max-w-4xl text-[2.45rem] font-semibold leading-[0.98] tracking-tight text-white sm:text-[4rem]">
+          <p class="public-kicker">Data modeling tool</p>
+          <h1 class="tool-heading mt-4">
             SCD Design Lab
           </h1>
-          <p class="mt-6 max-w-2xl text-base leading-8 text-zinc-300 sm:text-lg">
+          <p class="public-intro mt-5 max-w-2xl">
             Practice how customer, product, and membership changes should land in a dimension table. Choose a
             strategy, inspect the rows, and see how the reporting answer changes.
           </p>
@@ -75,10 +76,10 @@ const scdTypeGuide = [
         </aside>
       </section>
 
-      <section class="grid gap-6 border-t border-white/10 py-8 lg:grid-cols-[0.85fr_1.12fr_0.88fr]">
+      <section class="grid gap-6 border-t border-[var(--border-subtle)] py-8 lg:grid-cols-[0.85fr_1.12fr_0.88fr]">
         <aside class="space-y-6">
-          <section class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
-            <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Mode</p>
+          <section class="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-elevated)] p-5 sm:p-6">
+            <p class="text-[12px] uppercase tracking-[0.32em] text-[var(--muted)]">Mode</p>
             <div class="scd-mode-control mt-4 p-2">
               <div id="mode-selector" class="scd-mode-selector grid gap-2" aria-label="Lab mode" aria-describedby="mode-help">
                 <button type="button" data-mode="guided" aria-pressed="true" class="mode-button scd-mode-button scd-mode-active min-h-11 border px-3 py-2 font-semibold uppercase transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-300/70">
@@ -97,10 +98,10 @@ const scdTypeGuide = [
             </div>
           </section>
 
-          <section class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+          <section class="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-elevated)] p-5 sm:p-6">
             <div class="flex items-center justify-between gap-4">
-              <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Scenario</p>
-              <span id="progress-count" class="text-xs text-zinc-500">1 / {scdScenarios.length}</span>
+              <p class="text-[12px] uppercase tracking-[0.32em] text-[var(--muted)]">Scenario</p>
+              <span id="progress-count" class="text-xs text-[var(--muted)]">1 / {scdScenarios.length}</span>
             </div>
             <div id="scenario-list" class="mt-5 grid gap-2">
               {scdScenarios.map((scenario, index) => (
@@ -111,57 +112,57 @@ const scdTypeGuide = [
                     "scenario-button min-h-11 border px-3 py-2 text-left text-sm transition",
                     index === 0
                       ? "border-emerald-300/70 bg-emerald-300/10 text-white"
-                      : "border-white/10 bg-black/20 text-zinc-400 hover:border-emerald-300/50 hover:text-white",
+                      : "border-[var(--border-subtle)] bg-[var(--bg-card)] text-zinc-400 hover:border-emerald-300/50 hover:text-white",
                   ]}
                 >
-                  <span class="block text-[10px] uppercase tracking-[0.16em] text-zinc-500">{scenario.entity}</span>
+                  <span class="block text-[10px] uppercase tracking-[0.16em] text-[var(--muted)]">{scenario.entity}</span>
                   <span class="mt-1 block font-medium">{scenario.title}</span>
                 </button>
               ))}
             </div>
           </section>
 
-          <section class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
-            <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Progress</p>
+          <section class="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-elevated)] p-5 sm:p-6">
+            <p class="text-[12px] uppercase tracking-[0.32em] text-[var(--muted)]">Progress</p>
             <div class="mt-4 grid grid-cols-5 gap-1" id="progress-dots" aria-label="Scenario progress"></div>
             <p id="progress-help" class="mt-4 text-sm leading-7 text-zinc-400">Answer each scenario to build your SCD design score.</p>
           </section>
         </aside>
 
         <section class="space-y-6">
-          <article class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+          <article class="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-elevated)] p-5 sm:p-6">
             <div class="flex flex-wrap items-center gap-2">
               <span id="entity-badge" class="border border-cyan-300/30 bg-cyan-300/8 px-2 py-1 text-[10px] uppercase tracking-[0.16em] text-cyan-100"></span>
-              <span id="change-date" class="border border-white/10 bg-black/20 px-2 py-1 text-[10px] uppercase tracking-[0.16em] text-zinc-400"></span>
+              <span id="change-date" class="rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-card)] px-2 py-1 text-[10px] uppercase tracking-[0.16em] text-zinc-400"></span>
             </div>
             <h2 id="scenario-title" class="mt-4 text-2xl font-semibold tracking-tight text-white"></h2>
             <p id="scenario-summary" class="mt-3 text-sm leading-7 text-zinc-300"></p>
-            <div class="mt-5 border border-white/10 bg-black/20 p-4">
-              <p class="text-[11px] uppercase tracking-[0.22em] text-zinc-500">Business question</p>
+            <div class="mt-5 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-card)] p-4">
+              <p class="text-[11px] uppercase tracking-[0.22em] text-[var(--muted)]">Business question</p>
               <p id="business-question" class="mt-2 text-sm leading-7 text-emerald-100"></p>
             </div>
           </article>
 
           <section class="grid gap-6">
-            <div class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
-              <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Before</p>
+            <div class="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-elevated)] p-5 sm:p-6">
+              <p class="text-[12px] uppercase tracking-[0.32em] text-[var(--muted)]">Before</p>
               <div id="before-table" class="mt-4 overflow-x-auto"></div>
             </div>
-            <div class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
-              <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">After preview</p>
+            <div class="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-elevated)] p-5 sm:p-6">
+              <p class="text-[12px] uppercase tracking-[0.32em] text-[var(--muted)]">After preview</p>
               <p id="preview-explanation" class="mt-3 text-sm leading-7 text-zinc-400"></p>
               <div id="after-table" class="mt-4 overflow-x-auto"></div>
             </div>
           </section>
 
-          <section class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
-            <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Reporting impact</p>
+          <section class="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-elevated)] p-5 sm:p-6">
+            <p class="text-[12px] uppercase tracking-[0.32em] text-[var(--muted)]">Reporting impact</p>
             <h3 id="impact-title" class="mt-3 text-lg font-semibold tracking-tight text-white"></h3>
             <p id="impact-help" class="mt-2 text-sm leading-7 text-zinc-400"></p>
             <div id="fact-impact" class="mt-4 grid gap-3 sm:grid-cols-2"></div>
           </section>
 
-          <section id="feedback-panel" class="hidden border border-white/10 bg-white/[0.03] p-5 sm:p-6" aria-live="polite">
+          <section id="feedback-panel" class="hidden rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-elevated)] p-5 sm:p-6" aria-live="polite">
             <div class="flex flex-wrap items-center gap-3">
               <span id="verdict-badge" class="border px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em]"></span>
               <span id="recommended-label" class="text-sm text-zinc-400"></span>
@@ -172,16 +173,16 @@ const scdTypeGuide = [
         </section>
 
         <aside class="space-y-6 lg:sticky lg:top-6 lg:self-start">
-          <form id="decision-form" class="isolate border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+          <form id="decision-form" class="isolate rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-elevated)] p-5 sm:p-6">
             <fieldset class="relative z-0 min-w-0">
-              <legend class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Decision</legend>
+              <legend class="text-[12px] uppercase tracking-[0.32em] text-[var(--muted)]">Decision</legend>
               <p id="hint-text" class="mt-3 text-sm leading-7 text-zinc-400"></p>
               <div class="mt-5 grid gap-2">
                 {scdStrategies.map((strategy) => (
-                  <label class="block min-h-11 cursor-pointer border border-white/10 bg-black/20 p-3 transition has-[:checked]:border-emerald-300/80 has-[:checked]:bg-emerald-300/10">
+                  <label class="block min-h-11 cursor-pointer rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-card)] p-3 transition has-[:checked]:border-emerald-300/80 has-[:checked]:bg-emerald-300/10">
                     <input class="peer sr-only" type="radio" name="strategy" value={strategy} />
                     <span class="block text-sm font-semibold text-white">{strategyLabels[strategy]}</span>
-                    <span class="mt-1 block text-xs leading-5 text-zinc-500 peer-checked:text-zinc-300">
+                    <span class="mt-1 block text-xs leading-5 text-[var(--muted)] peer-checked:text-zinc-300">
                       {strategy === "type_1" && "Overwrite and keep only the latest value."}
                       {strategy === "type_2" && "Expire the old row and insert a new current row."}
                       {strategy === "type_3" && "Keep current value plus one previous value."}
@@ -212,30 +213,30 @@ const scdTypeGuide = [
             <p class="text-[12px] uppercase tracking-[0.32em] text-emerald-200">Lab result</p>
             <p id="final-score" class="mt-4 text-4xl font-semibold tracking-tight text-white"></p>
             <p id="final-tier" class="mt-2 text-lg font-semibold text-emerald-100"></p>
-            <textarea id="brief-textarea" readonly class="mt-5 min-h-[10rem] w-full resize-y border border-white/10 bg-black/30 p-4 font-mono text-xs leading-6 text-zinc-300 outline-none"></textarea>
+            <textarea id="brief-textarea" readonly class="mt-5 min-h-[10rem] w-full resize-y rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-card)] p-4 font-mono text-xs leading-6 text-zinc-300 outline-none"></textarea>
             <button id="copy-brief" type="button" class="cta-secondary mt-3 min-h-11 w-full px-4 py-2">
               Copy brief
             </button>
-            <p id="copy-status" class="mt-3 text-xs text-zinc-500"></p>
+            <p id="copy-status" class="mt-3 text-xs text-[var(--muted)]"></p>
           </section>
 
-          <form id="join-form" class="hidden border border-white/10 bg-white/[0.03] p-5 sm:p-6">
-            <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Join the lab</p>
+          <form id="join-form" class="hidden rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-elevated)] p-5 sm:p-6">
+            <p class="text-[12px] uppercase tracking-[0.32em] text-[var(--muted)]">Join the lab</p>
             <p class="mt-3 text-sm leading-7 text-zinc-400">
               Save your design signal so XH can see who is practicing the lab. This is optional.
             </p>
             <div class="mt-4 grid gap-3">
               <label class="block">
                 <span class="text-sm font-medium text-zinc-200">Email</span>
-                <input id="join-email" type="email" autocomplete="email" required class="mt-2 w-full border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-emerald-300/70" placeholder="you@example.com" />
+                <input id="join-email" type="email" autocomplete="email" required class="mt-2 w-full rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-card)] px-4 py-3 text-sm text-white outline-none transition placeholder:text-[var(--muted)] focus:border-emerald-300/70" placeholder="you@example.com" />
               </label>
               <label class="block">
                 <span class="text-sm font-medium text-zinc-200">Name</span>
-                <input id="join-name" type="text" autocomplete="name" class="mt-2 w-full border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-emerald-300/70" placeholder="Optional" />
+                <input id="join-name" type="text" autocomplete="name" class="mt-2 w-full rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-card)] px-4 py-3 text-sm text-white outline-none transition placeholder:text-[var(--muted)] focus:border-emerald-300/70" placeholder="Optional" />
               </label>
               <label class="block">
                 <span class="text-sm font-medium text-zinc-200">Company / role</span>
-                <input id="join-context" type="text" class="mt-2 w-full border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-emerald-300/70" placeholder="Optional" />
+                <input id="join-context" type="text" class="mt-2 w-full rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-card)] px-4 py-3 text-sm text-white outline-none transition placeholder:text-[var(--muted)] focus:border-emerald-300/70" placeholder="Optional" />
               </label>
               <label class="flex items-start gap-3 text-sm leading-6 text-zinc-300">
                 <input id="join-consent" type="checkbox" class="mt-1 accent-emerald-300" required />
@@ -245,15 +246,15 @@ const scdTypeGuide = [
             <button type="submit" class="cta-primary mt-4 min-h-11 w-full">
               Save my lab result
             </button>
-            <p id="join-status" class="mt-3 text-xs leading-6 text-zinc-500"></p>
+            <p id="join-status" class="mt-3 text-xs leading-6 text-[var(--muted)]"></p>
           </form>
         </aside>
       </section>
 
-      <section id="scd-type-guide" class="border-t border-white/10 py-10 sm:py-14">
+      <section id="scd-type-guide" class="border-t border-[var(--border-subtle)] py-10 sm:py-14">
         <div class="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Knowledge guide</p>
+            <p class="text-[12px] uppercase tracking-[0.32em] text-[var(--muted)]">Knowledge guide</p>
             <h2 class="mt-3 text-3xl font-semibold tracking-tight text-white">What each SCD type means.</h2>
           </div>
           <p class="max-w-2xl text-sm leading-7 text-zinc-400">
@@ -263,21 +264,21 @@ const scdTypeGuide = [
 
         <div class="mt-8 grid gap-4 lg:grid-cols-5">
           {scdTypeGuide.map((item) => (
-            <article class="border border-white/10 bg-white/[0.03] p-5">
+            <article class="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-elevated)] p-5">
               <p class="text-[11px] uppercase tracking-[0.2em] text-emerald-200">{item.type}</p>
               <h3 class="mt-3 text-lg font-semibold tracking-tight text-white">{item.name}</h3>
               <p class="mt-3 text-sm leading-7 text-zinc-300">{item.behavior}</p>
               <dl class="mt-4 space-y-3 text-sm leading-6">
                 <div>
-                  <dt class="text-[10px] uppercase tracking-[0.16em] text-zinc-500">Use when</dt>
+                  <dt class="text-[10px] uppercase tracking-[0.16em] text-[var(--muted)]">Use when</dt>
                   <dd class="mt-1 text-zinc-300">{item.useWhen}</dd>
                 </div>
                 <div>
-                  <dt class="text-[10px] uppercase tracking-[0.16em] text-zinc-500">Avoid when</dt>
+                  <dt class="text-[10px] uppercase tracking-[0.16em] text-[var(--muted)]">Avoid when</dt>
                   <dd class="mt-1 text-zinc-400">{item.avoidWhen}</dd>
                 </div>
                 <div>
-                  <dt class="text-[10px] uppercase tracking-[0.16em] text-zinc-500">Example</dt>
+                  <dt class="text-[10px] uppercase tracking-[0.16em] text-[var(--muted)]">Example</dt>
                   <dd class="mt-1 text-emerald-100">{item.example}</dd>
                 </div>
               </dl>

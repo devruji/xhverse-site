@@ -11,39 +11,28 @@ Full-stack UX/UI audit and implementation for xhverse.co. This skill operates in
 
 ## Design System Reference
 
-The site uses a dark, minimal, professional aesthetic. Any changes must respect these foundations:
+Read root [DESIGN.md](../../../DESIGN.md) first and respect its Draft/approved
+status. Refined Publication is approved for both themes as of 2026-10-15. The
+[task brief](../../../docs/design/redesign-brief.md) records scope and the current
+experiment. Use only repo-local design skills: Taste for art-direction methods,
+Pro Max for focused references, and this auditor for measured usability.
 
-### Colors
-- Background: `--bg: #020617` (near-black navy)
-- Accent: `--accent: #f97316` (orange, used sparingly for primary CTAs)
-- Text: `--text: #e5e7eb` (light gray)
-- Muted: `--muted: #9ca3af` (secondary text)
-- Interactive: Emerald (`#10b981` → `#059669`) for success/interactive states
-- Borders: `rgba(148, 163, 184, 0.3)` (subtle, never harsh)
+Public tokens, type helpers, spacing, and layout implementation live in
+`src/styles/public.css` through `BaseLayout`; `global.css` retains shared admin
+foundations. Read actual values there rather than maintaining duplicate tables.
+Approved visual decisions belong in `DESIGN.md`, not an auditor preset.
 
-### Typography
-- System font stack (no web fonts — zero CLS from loading)
-- Fluid scale: h1 `clamp(2.5rem, 4vw, 3.4rem)`, h2 `clamp(1.5rem, 2.3vw, 2rem)`
-- Line-height: `1.7` for body text (generous for readability)
-- Letter-spacing: `-0.03em` on large headings, `0.18em` on eyebrow text
-
-### Spacing
-- Section padding: `4.5rem 0` desktop, `3.25rem 0` mobile
-- Container: `max-width: 1120px`, padding `0 1.5rem`
-- Consistent scale: 0.5rem, 1rem, 1.5rem, 2.5rem, 3rem, 4.5rem
-
-### Interactive States
-- Hover transitions: `0.18s ease-out` (fast, subtle)
-- Nav underline: width 0 → 100% animation
-- Clickable cards: semantic links/buttons, pointer affordance, visible focus, subtle lift, border/background change, and optional arrow movement
-- Static cards: no hover lift, no pointer cursor, no CTA arrow, and more muted border/background
-- Buttons: use shared CTA variants and keep hover/focus feedback clear but restrained
-- Text links: recognizable underline treatment; distinguish external links where appropriate
-
-### Layout Patterns
-- Tailwind CSS v4 utilities + custom CSS in `global.css`
-- Grid with `auto-fit` + `minmax()` for responsive card layouts
-- Mobile-first: base styles are mobile, `md:` / `lg:` add complexity
+- Dark-first and complete light themes; self-hosted Geist with system fallbacks.
+- Measure normal text contrast at 4.5:1 and large text at 3:1 in both themes.
+- Preserve semantic status/chart colors and never rely on color alone.
+- Assess hierarchy, reading measure, density, and natural wrapping against
+  actual content and the selected direction, not a mandatory card or grid genre.
+- Verify font loading and layout stability in the browser.
+- Distinguish native links/buttons from static information; provide visible
+  focus and clear interaction states without implying false interactivity.
+- Check 320px reflow, 200% text enlargement, and reduced-motion behavior.
+- Passing automated checks does not establish visual approval or usability-study
+  results; retain raw Taste findings and explain project exceptions separately.
 
 ## Audit Framework
 
@@ -53,32 +42,29 @@ Evaluate in this order. Each category has specific signals to check against the 
 
 **What to check:**
 - Does the page have a clear visual flow? (Primary → secondary → tertiary content)
-- Is the h1 the most prominent element?
+- Is the page purpose prominent and its h1 easy to identify?
 - Do sections have adequate breathing room (section padding, margins)?
 - Is the grid appropriate for the content density?
-- Are cards/containers consistently sized and aligned?
+- Are repeated elements aligned consistently where their content and composition require it?
 - Does the hero section communicate the site's purpose within 3 seconds?
 
 **Common issues in this project:**
 - First viewport blank space on mobile (Hero grid collapse)
 - Inconsistent card padding between pages
 - Section headers misaligned with content below
-- Visual monotony: identical section rhythm (border-t → eyebrow → heading → cards) repeated without variation breaks the scanning flow. Alternate patterns (full-bleed, asymmetric grids, pull quotes) at least once per page.
+- Visual monotony: assess whether repeated section rhythm obscures the reading path. Evaluate section variation against actual content and the selected direction rather than imposing a full-bleed block, asymmetric grid, or pull quote on every page.
 
 ### 2. Typography & Readability
 
 **What to check:**
-- Max line length (should be 55-75 characters, ~58rem with current font)
+- Evaluate prose line length with the actual font and viewport against the selected hierarchy; `DESIGN.md` owns the approved reading measure
 - Heading hierarchy is logical (h1 > h2 > h3, no skipping)
-- Contrast ratio: text on `#020617` background meets WCAG AA (4.5:1 minimum)
+- Normal text meets 4.5:1 against its actual background in both themes; large text and meaningful non-text controls use the applicable 3:1 threshold
 - Muted text (`--muted`) still meets 4.5:1 against the background
 - Font sizes scale appropriately on mobile (no text that's too small to read)
 - Blog post body is comfortable to read (line-height, paragraph spacing)
 
-**Contrast math for this project:**
-- `#e5e7eb` on `#020617` = 14.3:1 (excellent)
-- `#9ca3af` on `#020617` = 7.2:1 (passes AA and AAA)
-- `#f97316` on `#020617` = 5.8:1 (passes AA)
+Measure actual token pairs from `src/styles/public.css`, including semantic status colors, composed backgrounds, and focused/hovered controls. Do not reuse contrast calculations from an earlier palette.
 
 ### 3. Navigation & Information Architecture
 
@@ -93,7 +79,7 @@ Evaluate in this order. Each category has specific signals to check against the 
 ### 4. Mobile Experience
 
 **What to check:**
-- Touch targets are minimum 44x44px (Apple HIG) / 48x48px (Material)
+- Assess touch targets in CSS pixels using applicable web guidance and exceptions; native Apple HIG/Material dimensions are not blanket web requirements
 - No horizontal scroll on any viewport 320px+
 - Images don't overflow their containers
 - Text is readable without zooming (minimum 16px effective body size)
@@ -139,14 +125,14 @@ Evaluate in this order. Each category has specific signals to check against the 
 - Font loading doesn't cause flash of invisible text (FOIT)
 - Skeleton states or placeholders for async content
 
-### 8. Conversion & Intent
+### 8. Portfolio Intent
 
 **What to check:**
-- Primary CTA (contact, CV download) is discoverable without scrolling
+- Primary paths to work, writing, and tools are easy to find; contact and career context remain reachable
 - The value proposition is clear on first viewport
 - Trust signals are present (real photo, credentials, links to profiles)
 - The journey from "who is this person" to "how do I contact them" is short
-- Blog posts link back to relevant services/contact
+- Articles offer relevant next reading or tool paths; advisory and contact remain secondary
 
 ## Output Format — Audit Mode
 
@@ -180,8 +166,8 @@ Evaluate in this order. Each category has specific signals to check against the 
 
 When implementing fixes, follow these rules:
 - Use Tailwind utilities where possible (project uses v4)
-- Fall back to `global.css` custom properties for design tokens
-- Maintain the dark aesthetic — never introduce light backgrounds
+- Use public semantic custom properties in `src/styles/public.css`; protect shared admin tokens
+- Follow `DESIGN.md` and its approval status; preserve dark-first and complete light themes through `html.light`
 - Respect existing spacing scale (don't invent new arbitrary values)
 - Test at 375px and 1280px minimum
 - Select checks and reuse matching evidence through `docs/agents/validation.md`; targeted local typechecks/affected-page checks and full application PR CI remain required. Unchanged read-only review runs no automatic tests/builds.
@@ -193,20 +179,21 @@ Produce:
 
 ## Anti-Patterns to Flag
 
-These specifically break the xhverse design language:
-- Light mode elements or white backgrounds
-- Rounded rectangles with heavy shadows (this isn't a SaaS dashboard)
-- Gradients that aren't from the established palette
-- Animation durations > 300ms (the site is deliberately fast/subtle)
+Evaluate these against the content, accessibility baseline, and selected direction:
+- Unintended theme inversions or unreadable text in either theme
+- Decorative effects, repeated cards, or surfaces that obscure hierarchy
+- Unmotivated motion, scroll hijacking, or required content hidden by reveal animations
 - Generic stock photography or illustrations
-- More than 2 accent colors on one page
-- Centered text blocks longer than 3 lines
+- Decorative accent proliferation; semantic status/chart colors may remain distinct
+- Long centered reading blocks, clipped text, or forced line breaks that fail at zoom
 
 ## Key Files
 
 | Concern | File |
 |---------|------|
-| Design tokens & base styles | `src/styles/global.css` |
+| Visual decisions and approval status | `DESIGN.md` |
+| Public design tokens & styles | `src/styles/public.css` |
+| Shared admin foundations | `src/styles/global.css` |
 | Page shell & meta | `src/layouts/BaseLayout.astro` |
 | Navigation | `src/components/Header.astro` |
 | Footer | `src/components/Footer.astro` |
@@ -215,3 +202,10 @@ These specifically break the xhverse design language:
 | Interactive tool | `src/pages/tools/data-platform-maturity-checker.astro` |
 | Blog layout | `src/pages/blog/[slug].astro` |
 | Gallery layout | `src/pages/gallery.astro` |
+
+## Bounded motion work
+
+Read `DESIGN.md` and `docs/agents/motion-skills.md`. Use repo-local `animate`
+for implementation; use `review-animations` for lifecycle critique and
+`animation-performance` for measured rendering evidence. Preserve color feedback,
+native semantics, immediate keyboard/reduced motion and interruption.

@@ -1,6 +1,7 @@
 import { expect, test } from "@playwright/test";
 import type { Page } from "@playwright/test";
 import { toolCatalog } from "../../src/data/tools";
+import { toolGroups } from "../../src/data/portfolio";
 import { practitionerToolDefinitions } from "../../src/lib/practitioner-tools/definitions";
 
 const journeyThemeCopy: Record<string, string> = {
@@ -30,9 +31,9 @@ test("tools catalog links to all live tools", async ({ page }) => {
   await page.goto("/tools");
 
   await expect(
-    page.getByRole("heading", { name: "Data platform tools by Rujikorn Ngoensaard" }),
+    page.getByRole("heading", { name: "Tools", exact: true }),
   ).toBeVisible();
-  await expect(page.getByText("15 free tools from XH / bossruji")).toBeVisible();
+  await expect(page.getByText("15 free tools by Rujikorn Ngoensaard", { exact: false })).toBeVisible();
 
   for (const tool of toolCatalog) {
     await expect(
@@ -41,23 +42,21 @@ test("tools catalog links to all live tools", async ({ page }) => {
   }
 });
 
-test("tools catalog lists newest practitioner tools first", async ({ page }) => {
+test("tools catalog groups every tool once and exposes native category jumps", async ({ page }) => {
   await page.goto("/tools");
 
   const visibleToolTitles = await page
-    .locator("main .interactive-card h2")
+    .locator("main .catalog-tool h3")
     .evaluateAll((headings) =>
       headings.map((heading) => heading.textContent?.trim() ?? ""),
     );
 
-  expect(visibleToolTitles.slice(0, 6)).toEqual([
-    "Cloud Egress Pricing Calculator",
-    "Workload Placement Simulator",
-    "Data Product Contract Builder",
-    "Access Model Simulator",
-    "Lakehouse Table Layout Advisor",
-    "Power BI Semantic Model Doctor",
-  ]);
+  expect(visibleToolTitles).toEqual(toolGroups.flatMap((group) => group.tools.map((tool) => tool.title)));
+  expect(new Set(visibleToolTitles).size).toBe(toolCatalog.length);
+  for (const group of toolGroups) {
+    await expect(page.getByRole("navigation", { name: "Tool categories" }).getByRole("link", { name: new RegExp(group.title) })).toHaveAttribute("href", `#${group.id}`);
+    await expect(page.locator(`#${group.id}`).getByRole("heading", { level: 2 })).toHaveText(group.title);
+  }
 });
 
 test("generated practitioner tools initialize after catalog navigation", async ({

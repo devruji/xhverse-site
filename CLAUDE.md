@@ -76,11 +76,15 @@ To add a new external domain: update both layers + test with `bun run build && g
 
 ### Theme System
 
-- Dark (default): CSS variables in `:root` in `src/styles/global.css`
-- Light: CSS variables in `html.light`
+- Dark editorial (default) and light public tokens: `src/styles/public.css`, loaded by `BaseLayout`; shared admin foundations remain in `src/styles/global.css`
+- Light: public CSS variables in `html.light`; preserve existing theme persistence
 - Anti-FOUC: Inline `<script is:inline data-cfasync="false">` reads localStorage before paint
 - Theme persistence across View Transitions: `astro:before-swap` event sets class on `newDocument`
 - Icon swap: `.theme-dark-only` / `.theme-light-only` CSS classes (no JS toggle)
+
+### Public Portfolio Direction
+
+Read root `DESIGN.md` before public visual or copy changes. The user approved Refined Publication's complete homepage and graphite/blue styling in both themes on 15 October 2026 and authorized public-page extension. Use `docs/design/publication-rollout-validation.md` for rollout evidence and final browser-review status. Shared `PublicationHome.astro`, `publication-palette.css` and public styles implement the approved Publication/refined reference, preserving the separately accepted four-surface motion. Identity leads; experience, writing and tools substantiate it. Use factual, direct wording and contextual platform text. Dark-first, a complete light theme, and self-hosted Geist remain constraints. `docs/design/redesign-brief.md` records scope and continuing boundaries. Use only repo-local design skills: `design-taste-frontend` for art-direction methods, `ui-ux-pro-max` for targeted references, and `ux-ui-auditor` for usability. They do not change architecture, dependencies, admin behavior, CV workflows, or blog data authority. Existing article bodies stay intact. Source revisions, local commands, and limitations live in `docs/agents/skills.md`.
 
 ### CV Download Gate
 
@@ -278,6 +282,8 @@ For new blog posts, technical docs, release notes, page copy, or article-series 
 | `security-audit-expert` | Security audit (pre-release + on demand) |
 | `seo-metadata-check` | Branded-query SEO, metadata, structured data, sitemap/robots, canonical, and Search Console follow-up review |
 | `ux-ui-auditor` | Visual + accessibility audit |
+| `design-taste-frontend` | Public portfolio art-direction methods guided by root `DESIGN.md` and its approval status |
+| `ui-ux-pro-max` | Focused local UX/accessibility and Astro reference searches |
 
 Skill frontmatter must stay valid YAML. Use `description: >-` for long descriptions that contain colons, quotes, or branch names.
 
@@ -391,7 +397,7 @@ Repo MCP policy:
 
 ## Agent skills
 
-Repo-local `tdd`, `codebase-design`, and `domain-modeling` usage, compatibility, and source revision are recorded in `docs/agents/skills.md`.
+Repo-local engineering and design skill usage, compatibility, source revisions, and local adaptations are recorded in `docs/agents/skills.md`. Design skills remain inside this repo; no global installer or runtime dependency is required.
 
 ### Issue tracker
 
@@ -400,3 +406,19 @@ Issues and specs live in GitHub Issues for `devruji/xhverse-site`, managed throu
 ### Domain docs
 
 Use a single-context layout: root `GLOSSARY.md` and `docs/adr/`. See `docs/agents/domain.md`.
+
+## Interaction motion skills
+
+Use the five repo-local Emil Kowalski skills (`animate`, `improve-animations`,
+`find-animation-opportunities`, `review-animations`, `animation-performance`)
+for bounded motion work. Read [project motion guidance](docs/agents/motion-skills.md)
+and `DESIGN.md` first. Native CSS/WAAPI, immediate keyboard/reduced motion,
+verified interruption and preserved color feedback are the project defaults.
+The user accepted the four-surface motion on 15 October 2026 for ordinary
+public-site builds: action/icon press feedback, native mobile menu, CV dialog,
+and Recovery Planner checkpoint/result entrances. Admin pages are excluded;
+only comparison routes require `DESIGN_REVIEW=1`. See the
+[rollout record](docs/design/motion-rollout-validation.md) for verification.
+Refined Publication's palette and complete-page styling are separately approved
+for public-page extension. Additional motion remains pending; these approvals
+do not authorize push, PR, merge or production release.
