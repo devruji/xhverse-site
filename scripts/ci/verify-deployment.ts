@@ -4,6 +4,7 @@ import { dirname } from 'node:path';
 const PRODUCTION_URL = 'https://xhverse.co';
 const DEFAULT_ROUTES = ['/', '/blog', '/tools'];
 const DEPLOYMENT_PAGE_SIZE = 25;
+const PUBLIC_USER_AGENT = 'XHVerse-DeploymentVerifier/1.0 (+https://github.com/devruji/xhverse-site)';
 type JsonObject = Record<string, unknown>;
 export type Fetcher = (url: string, init: RequestInit) => Promise<Response>;
 
@@ -229,7 +230,7 @@ export async function verifyDeployment(options: VerificationOptions,
   const ghHeaders = { Authorization: `Bearer ${options.githubToken}`,
     Accept: 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28' };
 
-  async function request<T>(url: string, headers: Record<string, string>,
+  async function request<T>(context: string, url: string, headers: Record<string, string>,
     consume: (response: Response) => Promise<T>): Promise<T> {
     const remaining = deadline - deps.now();
     if (remaining <= 0) throw new Error('Deployment verification timed out');
@@ -238,33 +239,40 @@ export async function verifyDeployment(options: VerificationOptions,
     try {
       const response = await deps.fetch(url, { headers, signal: controller.signal,
         redirect: headers.Authorization ? 'error' : 'follow' });
-      if (!response.ok) throw new Error(`Verification request failed: HTTP ${response.status}`);
+      if (!response.ok) {
+        // Only controlled labels and allowlisted response metadata leave this boundary.
+        // Authenticated URLs, raw response bodies and arbitrary headers may contain secrets.
+        const mitigation = response.headers.get('cf-mitigated') === 'challenge' ? '; cf-mitigated=challenge' : '';
+        const ray = response.headers.get('cf-ray') ?? '';
+        const requestId = /^[a-f0-9]{16}(?:-[A-Z]{3})?$/.test(ray) ? `; cf-ray=${ray}` : '';
+        throw new Error(`Verification request failed: HTTP ${response.status} [${context}]${mitigation}${requestId}`);
+      }
       return await consume(response);
     } catch (error) {
       // Fetch errors can contain authorization details; only controlled errors leave this boundary.
       if (error instanceof Error && /^(Verification request failed: HTTP|Smoke |Invalid production sitemap)/.test(error.message)) throw error;
-      throw new Error(controller.signal.aborted ? 'Verification request timed out' : 'Verification request failed');
+      throw new Error(`${controller.signal.aborted ? 'Verification request timed out' : 'Verification request failed'} [${context}]`);
     } finally { clearTimeout(timer); }
   }
-  async function api(url: string): Promise<JsonObject> {
-    const value = await request(url, cfHeaders, (response) => response.json() as Promise<unknown>);
+  async function api(context: string, url: string): Promise<JsonObject> {
+    const value = await request(context, url, cfHeaders, (response) => response.json() as Promise<unknown>);
     const envelope = object(value, 'Cloudflare');
     if (envelope.success !== true) throw new Error('Cloudflare API reported failure');
     return envelope;
   }
   async function assertMain(): Promise<void> {
-    const data = object(await request(`https://api.github.com/repos/${options.repository}/commits/main`,
+    const data = object(await request('GitHub main', `https://api.github.com/repos/${options.repository}/commits/main`,
       ghHeaders, (response) => response.json() as Promise<unknown>), 'GitHub main');
     if (typeof data.sha !== 'string') throw new Error('GitHub main commit is missing');
     if (data.sha !== options.sha) throw new Error('Release superseded: GitHub main no longer matches the expected commit');
   }
   async function activeDeployment() {
-    const project = object((await api(base)).result, 'Cloudflare project');
+    const project = object((await api('Cloudflare project', base)).result, 'Cloudflare project');
     return project.canonical_deployment == null ? undefined : deploymentDetails(project.canonical_deployment);
   }
   async function findCandidate() {
     for (let page = 1; ; page++) {
-      const envelope = await api(`${base}/deployments?env=production&per_page=${DEPLOYMENT_PAGE_SIZE}&page=${page}`);
+      const envelope = await api('Cloudflare deployment list', `${base}/deployments?env=production&per_page=${DEPLOYMENT_PAGE_SIZE}&page=${page}`);
       if (!Array.isArray(envelope.result)) throw new Error('Invalid Cloudflare deployments response');
       for (const entry of envelope.result) {
         const deployment = deploymentDetails(entry);
@@ -292,7 +300,7 @@ export async function verifyDeployment(options: VerificationOptions,
       if (visited.has(url)) continue;
       if (visited.size >= 20) throw new Error('Invalid production sitemap: too many child sitemaps');
       visited.add(url);
-      const sitemap = await request(url, { 'Cache-Control': 'no-cache' }, async (response) => {
+      const sitemap = await request('production sitemap', url, { 'Cache-Control': 'no-cache', 'User-Agent': PUBLIC_USER_AGENT }, async (response) => {
         if (response.url && new URL(response.url).origin !== PRODUCTION_URL) {
           throw new Error('Invalid production sitemap: redirected to a foreign origin');
         }
@@ -329,7 +337,7 @@ export async function verifyDeployment(options: VerificationOptions,
     if (successful(active) && active) {
       await discoverDynamicRoutes();
       for (const route of routes) {
-        await request(new URL(route, PRODUCTION_URL).href, { 'Cache-Control': 'no-cache' }, async (response) => {
+        await request('production page', new URL(route, PRODUCTION_URL).href, { 'Cache-Control': 'no-cache', 'User-Agent': PUBLIC_USER_AGENT }, async (response) => {
           verifySmokeResponse(route, response, await response.text(), options.securityHeaders);
         });
       }
