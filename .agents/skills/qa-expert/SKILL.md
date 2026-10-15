@@ -51,3 +51,10 @@ Lead with PASS, FAIL or BLOCKED and the decision's scope. Include validated inpu
 - Social images: use raster OG assets.
 - Shared Header/Footer and tools navigation: verify affected links/components.
 - Brand assets: inspect both themes when logo/background styling changes.
+
+## Bounded motion work
+
+Read `DESIGN.md` and `docs/agents/motion-skills.md`. Use repo-local `animate`
+for implementation; use `review-animations` for lifecycle critique and
+`animation-performance` for measured rendering evidence. Preserve color feedback,
+native semantics, immediate keyboard/reduced motion and interruption.

@@ -1,0 +1,23 @@
+{
+  "repository": "https://github.com/emilkowalski/skills",
+  "commit": "2d228630ba1446365f614a108cb8252f1feda202",
+  "upstream_path": "skills/animation-performance",
+  "installed_at": "2026-10-14",
+  "installer": "skill-installer/scripts/install-skill-from-github.py --method download --dest <worktree>/.agents/skills",
+  "original_sha256": {
+    "SKILL.md": "ceb9dd3fe912615830f725a0120ccf8d012d15a6218001a5cd6c15d38e39a957"
+  },
+  "shared_upstream_sha256": {
+    "LICENSE": "4ff5bdb7887ec1435c9cab0e8d1a7caee704d894d65c2a008ccc68b1cc2f260b",
+    "performance-cheatsheet.md": "016c7294ddd5fa17fd97b7125ffb799ffb94e27a9b465a6fbaedfd92685d4583"
+  },
+  "adaptations": [
+    "Original SKILL.md archived unchanged in references/upstream-skill.md",
+    "Concise local entrypoint replaces active instructions; project motion guidance supplies overrides",
+    "Root MIT notice retained unchanged",
+    "Normalized trailing blank lines in performance-cheatsheet.md for the repository whitespace gate; original upstream hash retained."
+  ],
+  "local_file_sha256": {
+    "performance-cheatsheet.md": "e55d085e0c418f880b5d86ff830ce4cf65f592997b1b8a3b49b50820bf068ab7"
+  }
+}

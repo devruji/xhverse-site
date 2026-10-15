@@ -1,5 +1,7 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
+import Header from "../../components/Header.astro";
+import Footer from "../../components/Footer.astro";
 import {
   assessmentOptions,
   assessmentQuestions,
@@ -26,28 +28,18 @@ const categoryDescriptions = {
 ---
 
 <BaseLayout title={pageTitle} description={pageDescription}>
-  <main class="min-h-screen bg-[var(--bg-page)] font-sans text-[var(--text)] selection:bg-emerald-300/30 selection:text-white">
-    <div class="mx-auto max-w-7xl px-5 py-6 sm:px-8 sm:py-8 lg:px-10">
-      <header class="flex items-start justify-between gap-5 border-b border-white/10 pb-5 sm:items-center">
-        <a href="/" class="group">
-          <p class="text-[11px] uppercase tracking-[0.35em] text-zinc-500">xhverse.co</p>
-          <span class="mt-1 block text-[1.35rem] font-semibold tracking-tight text-white sm:text-[1.55rem]">
-            XHVERSE
-          </span>
-        </a>
-        <nav class="flex items-center gap-5 text-sm text-zinc-400" aria-label="Tool navigation">
-          <a href="/" class="transition hover:text-white">Home</a>
-          <a href="/blog" class="transition hover:text-white">Writing</a>
-        </nav>
-      </header>
+  <Header current="/tools" />
+  <main id="main-content" class="min-h-screen bg-[var(--bg-page)] font-sans text-[var(--text)] selection:bg-emerald-300/30 selection:text-white">
+    <div class="public-container tool-page">
 
-      <section class="grid gap-10 py-10 sm:py-12 lg:grid-cols-[0.95fr_1.05fr] lg:py-14">
+      <a href="/tools" class="text-link tool-back-link mt-6 inline-flex text-sm">← All tools</a>
+      <section class="tool-hero grid gap-10 lg:grid-cols-[0.95fr_1.05fr]">
         <div>
-          <p class="text-[12px] uppercase tracking-[0.32em] text-emerald-200">Data platform tool</p>
-          <h1 class="mt-4 max-w-4xl text-[2.6rem] font-semibold leading-[0.98] tracking-tight text-white sm:text-[4.4rem]">
+          <p class="public-kicker">Data platform tool</p>
+          <h1 class="tool-heading mt-4">
             Data Platform Maturity Checker
           </h1>
-          <p class="mt-6 max-w-2xl text-base leading-8 text-zinc-300 sm:text-lg">
+          <p class="public-intro mt-5 max-w-2xl">
             A lightweight assessment for platform architecture, governance, analytics delivery, operations, and
             documentation. Use it as a directional signal, not a final judgment.
           </p>
@@ -57,11 +49,11 @@ const categoryDescriptions = {
           </div>
         </div>
 
-        <aside class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
-          <p class="text-[11px] uppercase tracking-[0.24em] text-zinc-500">What this checks</p>
+        <aside class="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-elevated)] p-5 sm:p-6">
+          <p class="text-[11px] uppercase tracking-[0.24em] text-[var(--muted)]">What this checks</p>
           <div class="mt-5 grid gap-3">
             {maturityCategories.map((category) => (
-              <div class="border border-white/10 bg-black/20 p-4">
+              <div class="rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-card)] p-4">
                 <h2 class="text-base font-semibold tracking-tight text-white">{categoryLabels[category]}</h2>
                 <p class="mt-2 text-sm leading-6 text-zinc-400">{categoryDescriptions[category]}</p>
               </div>
@@ -70,10 +62,10 @@ const categoryDescriptions = {
         </aside>
       </section>
 
-      <section class="grid gap-8 border-t border-white/10 py-10 lg:grid-cols-[1fr_21rem]">
+      <section class="grid gap-8 border-t border-[var(--border-subtle)] py-10 lg:grid-cols-[1fr_21rem]">
         <form id="maturity-form" class="space-y-6" data-testid="maturity-form">
-          <div class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
-            <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Assessment</p>
+          <div class="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-elevated)] p-5 sm:p-6">
+            <p class="text-[12px] uppercase tracking-[0.32em] text-[var(--muted)]">Assessment</p>
             <h2 class="mt-3 text-3xl font-semibold tracking-tight text-white">Rate the current operating reality.</h2>
             <p class="mt-4 text-sm leading-7 text-zinc-400">
               Choose the closest answer for each question. Avoid sensitive internal names, architecture details, system
@@ -82,7 +74,7 @@ const categoryDescriptions = {
           </div>
 
           {assessmentQuestions.map((question, index) => (
-            <fieldset class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+            <fieldset class="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-elevated)] p-5 sm:p-6">
               <legend class="text-sm font-semibold text-emerald-200">
                 {String(index + 1).padStart(2, "0")} · {categoryLabels[question.category]}
               </legend>
@@ -90,7 +82,7 @@ const categoryDescriptions = {
               <p class="mt-2 text-sm leading-6 text-zinc-400">{question.helpText}</p>
               <div class="mt-5 grid gap-2 sm:grid-cols-5">
                 {assessmentOptions.map((option) => (
-                  <label class="block cursor-pointer border border-white/10 bg-black/20 p-3 transition has-[:checked]:border-emerald-300/80 has-[:checked]:bg-emerald-300/10">
+                  <label class="block cursor-pointer focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-[var(--accent)] rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-card)] p-3 transition has-[:checked]:border-emerald-300/80 has-[:checked]:bg-emerald-300/10">
                     <input
                       class="peer sr-only"
                       type="radio"
@@ -100,7 +92,7 @@ const categoryDescriptions = {
                       data-testid={`answer-${question.id}-${option.value}`}
                     />
                     <span class="block text-sm font-semibold text-white">{option.value}. {option.label}</span>
-                    <span class="mt-1 block text-xs leading-5 text-zinc-500 peer-checked:text-zinc-300">
+                    <span class="mt-1 block text-xs leading-5 text-[var(--muted)] peer-checked:text-zinc-300">
                       {option.description}
                     </span>
                   </label>
@@ -109,7 +101,7 @@ const categoryDescriptions = {
             </fieldset>
           ))}
 
-          <section class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+          <section class="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-elevated)] p-5 sm:p-6">
             <label class="flex items-start gap-3 text-sm leading-6 text-zinc-300">
               <input id="follow-up-consent" type="checkbox" class="mt-1 accent-emerald-300" />
               <span>I want follow-up about an architecture review and choose to provide my email.</span>
@@ -121,11 +113,11 @@ const categoryDescriptions = {
                 type="email"
                 autocomplete="email"
                 disabled
-                class="mt-2 w-full border border-white/10 bg-black/30 px-4 py-3 text-sm text-white outline-none transition placeholder:text-zinc-600 focus:border-emerald-300/70"
+                class="mt-2 w-full rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-card)] px-4 py-3 text-sm text-white outline-none transition placeholder:text-[var(--muted)] focus:border-emerald-300/70"
                 placeholder="you@example.com"
               />
             </div>
-            <p class="mt-4 text-xs leading-6 text-zinc-500">
+            <p class="mt-4 text-xs leading-6 text-[var(--muted)]">
               No auth, no company name, and no hidden tracking. Email is optional and only included when you explicitly
               enable follow-up.
             </p>
@@ -148,8 +140,8 @@ const categoryDescriptions = {
           </div>
         </form>
 
-        <aside class="h-fit border border-white/10 bg-white/[0.03] p-5 text-sm leading-7 text-zinc-400 lg:sticky lg:top-6">
-          <p class="text-[11px] uppercase tracking-[0.24em] text-zinc-500">Positioning</p>
+        <aside class="h-fit rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-elevated)] p-5 text-sm leading-7 text-zinc-400 lg:sticky lg:top-6">
+          <p class="text-[11px] uppercase tracking-[0.24em] text-[var(--muted)]">Positioning</p>
           <p class="mt-4">
             This checker gives a lightweight maturity signal and directional public benchmark. Enterprise-grade
             comparison requires deeper architecture context across operating model, governance, delivery, security, and
@@ -164,27 +156,27 @@ const categoryDescriptions = {
         </aside>
       </section>
 
-      <section id="result-panel" class="hidden border-t border-white/10 py-10" data-testid="result-panel" aria-live="polite">
+      <section id="result-panel" class="hidden border-t border-[var(--border-subtle)] py-10" data-testid="result-panel" aria-live="polite">
         <div class="grid gap-6 lg:grid-cols-[1fr_0.9fr]">
-          <div class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
-            <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Result</p>
+          <div class="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-elevated)] p-5 sm:p-6">
+            <p class="text-[12px] uppercase tracking-[0.32em] text-[var(--muted)]">Result</p>
             <div class="mt-4 grid gap-4 sm:grid-cols-2">
-              <div class="border border-white/10 bg-black/20 p-5">
-                <p class="text-sm text-zinc-500">Overall score</p>
+              <div class="rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-card)] p-5">
+                <p class="text-sm text-[var(--muted)]">Overall score</p>
                 <p id="overall-score" class="mt-2 text-5xl font-semibold tracking-tight text-white">0/100</p>
               </div>
-              <div class="border border-white/10 bg-black/20 p-5">
-                <p class="text-sm text-zinc-500">Maturity tier</p>
+              <div class="rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-card)] p-5">
+                <p class="text-sm text-[var(--muted)]">Maturity tier</p>
                 <p id="maturity-tier" class="mt-2 text-3xl font-semibold tracking-tight text-emerald-200">Foundational</p>
               </div>
             </div>
             <div class="mt-5 grid gap-3 sm:grid-cols-2">
-              <div class="border border-white/10 bg-black/20 p-4">
-                <p class="text-xs uppercase tracking-[0.2em] text-zinc-500">Strongest category</p>
+              <div class="rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-card)] p-4">
+                <p class="text-xs uppercase tracking-[0.2em] text-[var(--muted)]">Strongest category</p>
                 <p id="strongest-category" class="mt-2 text-base font-semibold text-white"></p>
               </div>
-              <div class="border border-white/10 bg-black/20 p-4">
-                <p class="text-xs uppercase tracking-[0.2em] text-zinc-500">Weakest category</p>
+              <div class="rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-card)] p-4">
+                <p class="text-xs uppercase tracking-[0.2em] text-[var(--muted)]">Weakest category</p>
                 <p id="weakest-category" class="mt-2 text-base font-semibold text-white"></p>
               </div>
             </div>
@@ -196,20 +188,20 @@ const categoryDescriptions = {
               <h2 class="text-xl font-semibold tracking-tight text-white">Recommended next actions</h2>
               <ul id="next-actions" class="mt-4 space-y-2"></ul>
             </div>
-            <p id="save-status" class="mt-5 text-xs leading-6 text-zinc-500"></p>
+            <p id="save-status" class="mt-5 text-xs leading-6 text-[var(--muted)]"></p>
           </div>
 
           <div class="grid gap-6">
-            <section class="border border-white/10 bg-white/[0.03] p-5 sm:p-6" data-testid="benchmark-panel">
-              <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Anonymous benchmark</p>
+            <section class="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-elevated)] p-5 sm:p-6" data-testid="benchmark-panel">
+              <p class="text-[12px] uppercase tracking-[0.32em] text-[var(--muted)]">Anonymous benchmark</p>
               <p id="benchmark-message" class="mt-4 text-lg font-semibold leading-7 text-white"></p>
               <div class="mt-5 grid gap-3 sm:grid-cols-2">
-                <div class="border border-white/10 bg-black/20 p-4">
-                  <p class="text-sm text-zinc-500">Average overall score</p>
+                <div class="rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-card)] p-4">
+                  <p class="text-sm text-[var(--muted)]">Average overall score</p>
                   <p id="benchmark-average" class="mt-2 text-3xl font-semibold tracking-tight text-white">Not available</p>
                 </div>
-                <div class="border border-white/10 bg-black/20 p-4">
-                  <p class="text-sm text-zinc-500">Submission count</p>
+                <div class="rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-card)] p-4">
+                  <p class="text-sm text-[var(--muted)]">Submission count</p>
                   <p id="benchmark-count" class="mt-2 text-3xl font-semibold tracking-tight text-white">0</p>
                 </div>
               </div>
@@ -223,10 +215,10 @@ const categoryDescriptions = {
               </div>
             </section>
 
-            <section class="border border-white/10 bg-white/[0.03] p-5 sm:p-6">
+            <section class="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-elevated)] p-5 sm:p-6">
               <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Architecture Readiness Brief</p>
+                  <p class="text-[12px] uppercase tracking-[0.32em] text-[var(--muted)]">Architecture Readiness Brief</p>
                   <h2 class="mt-2 text-xl font-semibold tracking-tight text-white">Copyable summary</h2>
                 </div>
                 <button
@@ -241,15 +233,16 @@ const categoryDescriptions = {
                 id="readiness-brief"
                 readonly
                 data-testid="readiness-brief"
-                class="mt-4 min-h-[22rem] w-full resize-y border border-white/10 bg-black/30 p-4 font-mono text-xs leading-6 text-zinc-300 outline-none"
+                class="mt-4 min-h-[22rem] w-full resize-y rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-card)] p-4 font-mono text-xs leading-6 text-zinc-300 outline-none"
               ></textarea>
-              <p id="copy-status" class="mt-3 text-xs text-zinc-500"></p>
+              <p id="copy-status" class="mt-3 text-xs text-[var(--muted)]"></p>
             </section>
           </div>
         </div>
       </section>
     </div>
   </main>
+  <Footer />
 
   <script>
     import {

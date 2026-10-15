@@ -1,0 +1,23 @@
+/* Approved Refined Publication roles; shared by public pages and their comparison. */
+html[data-public-site], html[data-review-direction="publication-refined"] {
+  --publication-page: #17191c;
+  --publication-surface: #202328;
+  --publication-text: #f1f2f4;
+  --publication-secondary: #afb4bd;
+  --publication-divider: #343942;
+  --publication-control: #737c8a;
+  --publication-accent: #a8bff2;
+  --publication-hover: #c4d2f8;
+  --publication-on-accent: #172544;
+}
+html[data-public-site].light, html[data-review-direction="publication-refined"].light {
+  --publication-page: #f8f9fb;
+  --publication-surface: #ffffff;
+  --publication-text: #20242b;
+  --publication-secondary: #555e6c;
+  --publication-divider: #d8dde5;
+  --publication-control: #7a8493;
+  --publication-accent: #34568e;
+  --publication-hover: #274271;
+  --publication-on-accent: #ffffff;
+}

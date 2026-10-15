@@ -1,0 +1,98 @@
+---
+import ThemeToggle from "../ThemeToggle.astro";
+import "./refined.css";
+interface Props { title: string; direction: "compare" | "dossier" | "publication" | "publication-refined" | "studio" }
+const { title, direction } = Astro.props;
+const candidate = direction !== "compare";
+---
+<!doctype html>
+<html lang="en" data-review-direction={direction}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="description" content="Draft homepage directions for Rujikorn Ngoensaard. Local design comparison." />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'" />
+    <title>{title} · XHVerse design review</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preload" as="font" type="font/woff2" href="/fonts/geist-sans.woff2" crossorigin />
+    <script is:inline data-cfasync="false">
+      // A stored choice is shared with the public site; review defaults to dark.
+      if (localStorage.getItem('theme') === 'light') document.documentElement.classList.add('light');
+    </script>
+  </head>
+  <body>
+    <a class="review-skip" href="#main-content">Skip to content</a>
+    <header class="review-header">
+      <a class="review-brand" href={candidate ? "#main-content" : "/design-review/compare"}>xhverse<span>Rujikorn / XH</span></a>
+      {candidate && <nav aria-label="Main navigation"><a href="#experience">Experience</a><a href="#tools">Tools</a><a href="#writing">Writing</a></nav>}
+      <div class="review-controls">{candidate && <a href="/design-review/compare">Compare</a>}<ThemeToggle /></div>
+    </header>
+    <slot />
+    {!candidate && <footer class="review-footer"><span>xhverse · Rujikorn Ngoensaard</span><a href="/design-review/compare">Compare styling</a><span>Refined Publication approved</span></footer>}
+  </body>
+</html>
+<style is:global>
+  @font-face { font-family: "Geist Sans"; src: url("/fonts/geist-sans.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+  @font-face { font-family: "Geist Mono"; src: url("/fonts/geist-mono.woff2") format("woff2"); font-weight: 100 900; font-display: swap; }
+  html[data-review-direction] { --review-bg:#15181e; --review-surface:#1b212b; --review-text:#f0f3f8; --review-muted:#b0bccd; --review-accent:#8db9ff; --review-border:#3a4658; color-scheme:dark; background:var(--review-bg); scroll-behavior:smooth; }
+  html[data-review-direction].light { --review-bg:#f4f6f9; --review-surface:#fff; --review-text:#142033; --review-muted:#4c5c70; --review-accent:#174fa6; --review-border:#b5c1d2; color-scheme:light; }
+  html[data-review-direction="publication"] { --review-bg:#211f1c; --review-surface:#2c2924; --review-text:#f4ede2; --review-muted:#bfb5a6; --review-accent:#e5b78b; --review-border:#655e52; }
+  html[data-review-direction="publication"].light { --review-bg:#f5f0e7; --review-surface:#fffcf4; --review-text:#27241f; --review-muted:#665c4e; --review-accent:#87431d; --review-border:#bfb3a1; }
+  html[data-review-direction="studio"] { --review-bg:#101d24; --review-surface:#102a30; --review-text:#eaf6f4; --review-muted:#a6c3c5; --review-accent:#6de4d0; --review-border:#3e646b; }
+  html[data-review-direction="studio"].light { --review-bg:#eff5f3; --review-surface:#fff; --review-text:#102e32; --review-muted:#456669; --review-accent:#086c61; --review-border:#9fbcb7; }
+  [data-review-direction] * { box-sizing:border-box; }
+  [data-review-direction] body { margin:0; color:var(--review-text); font:1rem/1.65 "Geist Sans",system-ui,sans-serif; -webkit-font-smoothing:antialiased; }
+  [data-review-direction] :is(h1,h2,h3,p,figure) { margin:0; }
+  [data-review-direction] :is(h1,h2,h3) { line-height:1.12; letter-spacing:-.04em; font-weight:550; text-wrap:balance; }
+  [data-review-direction] :is(p,a,h1,h2,h3,li) { overflow-wrap:anywhere; }
+  [data-review-direction] a { color:inherit; text-underline-offset:.25em; }
+  [data-review-direction] a:hover { color:var(--review-accent); }
+  [data-review-direction] img { display:block; max-width:100%; height:auto; }
+  [data-review-direction] :is(a,button,summary):focus-visible { outline:3px solid var(--review-accent); outline-offset:5px; }
+  [data-review-direction] [id] { scroll-margin-top:24px; }
+  .review-skip { position:absolute; top:8px; left:12px; padding:12px; transform:translateY(-200%); background:var(--review-surface); z-index:10; }
+  .review-skip:focus { transform:none; }
+  .review-header { max-width:1440px; margin:auto; padding:24px 64px; display:flex; align-items:center; gap:32px; border-bottom:1px solid var(--review-border); }
+  .review-brand { text-decoration:none; font-size:24px; font-weight:650; letter-spacing:-.05em; }
+  .review-brand span { display:block; color:var(--review-muted); font-size:12px; letter-spacing:0; font-weight:400; }
+  .review-header nav { display:flex; gap:24px; margin-left:auto; }
+  .review-header nav a,.review-controls>a { font-size:14px; text-decoration:none; padding-block:10px; }
+  .review-controls { display:flex; align-items:center; gap:18px; margin-left:auto; }
+  .review-header nav + .review-controls { margin-left:0; }
+  [data-review-direction] .public-theme-toggle { display:grid; place-items:center; width:44px; height:44px; color:var(--review-text); background:var(--review-surface); border:1px solid var(--review-border); border-radius:50%; cursor:pointer; }
+  [data-review-direction] .theme-icon-dark { display:none; }
+  [data-review-direction].light .theme-icon-dark { display:block; }
+  [data-review-direction].light .theme-icon-light { display:none; }
+  .review-footer { max-width:1240px; margin:0 auto; padding:28px 0; border-top:1px solid var(--review-border); display:flex; flex-wrap:wrap; justify-content:space-between; gap:16px 28px; font-size:13px; color:var(--review-muted); }
+  .review-compare { max-width:1240px; padding:70px 0; margin:auto; }
+  .review-kicker { color:var(--review-accent); font:13px/1.6 "Geist Mono",monospace; }
+  .review-compare h1 { margin-top:24px; font-size:clamp(2.6rem,6vw,5.5rem); max-width:18ch; }
+  .review-intro { max-width:64ch; color:var(--review-muted); margin-top:28px!important; font-size:18px; }
+  .review-options { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px; margin-top:56px; }
+  .review-alternatives { display:flex; flex-wrap:wrap; gap:16px 32px; margin-top:28px; font-size:14px; color:var(--review-muted); }
+  .review-option { display:flex; flex-direction:column; border:1px solid var(--review-border); padding:30px; text-decoration:none; background:var(--review-surface); }
+  .review-option:hover { border-color:var(--review-accent); }
+  .review-option-mark { display:block; font-size:44px; color:var(--review-accent); padding-bottom:36px; }
+  .review-option h2 { font-size:28px; }
+  .review-option p { margin-top:18px; color:var(--review-muted); }
+  .review-open { display:block; padding-top:30px; margin-top:auto; text-decoration:underline; }
+  .review-notes { margin-top:56px; max-width:75ch; }
+  .review-notes h2 { font-size:24px; }
+  .review-notes p { margin-top:16px; color:var(--review-muted); }
+  .review-notes a { display:inline-block; margin-top:20px; }
+  @media(max-width:1100px) { .review-header { padding-inline:32px; } }
+  @media(max-width:1304px) { .review-compare,.review-footer { margin-inline:32px; } }
+  @media(max-width:700px) {
+    .review-header { padding:16px 20px; flex-wrap:wrap; gap:12px; }
+    .review-header nav { order:3; width:100%; margin:0; justify-content:space-between; gap:12px; }
+    .review-header nav + .review-controls { margin-left:auto; }
+    .review-compare,.review-footer { margin-inline:20px; }
+    .review-compare { padding-block:40px; }
+    .review-options { grid-template-columns:1fr; margin-top:32px; }
+    .review-option-mark { padding-bottom:20px; }
+    .review-controls { gap:12px; }
+    .review-footer { flex-direction:column; }
+  }
+  @media(prefers-reduced-motion:reduce) { html[data-review-direction] { scroll-behavior:auto; } }
+</style>

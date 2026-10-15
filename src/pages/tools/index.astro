@@ -5,6 +5,7 @@ import Footer from "../../components/Footer.astro";
 import { profile } from "../../data/profile";
 import { site } from "../../data/site";
 import { liveToolCount, toolCatalog } from "../../data/tools";
+import { toolGroups } from "../../data/portfolio";
 import { buildCollectionPageJsonLd } from "../../lib/seo/structured-data";
 
 const deploymentSite = (Astro.site ?? site.siteUrl).toString();
@@ -25,6 +26,15 @@ const toolsStructuredData = buildCollectionPageJsonLd({
     operatingSystem: "Web",
   })),
 });
+
+const groupIcons: Record<string, string> = {
+  architecture: "M4 5h6v6H4zM22 5h6v6h-6zM13 21h6v6h-6zM10 8h12M7 11v5h9v5M25 11v5h-9",
+  governance: "M16 3 5 7v8c0 7 11 14 11 14s11-7 11-14V7L16 3ZM11 16l3 3 7-8",
+  modeling: "M4 6h24v20H4zM4 13h24M12 13v13M20 13v13",
+  operations: "M4 17h6l3-9 6 17 3-8h6M25 5l3 3-3 3",
+  cost: "M6 26V15h5v11M14 26V9h5v17M22 26V4h5v22",
+  practice: "m12 8-8 8 8 8m8-16 8 8-8 8m-2-20-4 24",
+};
 ---
 
 <BaseLayout
@@ -34,45 +44,229 @@ const toolsStructuredData = buildCollectionPageJsonLd({
 >
   <div class="min-h-screen bg-[var(--bg-page)] font-sans text-[var(--text)]">
   <Header current="/tools" />
-  <main>
-    <div class="mx-auto max-w-7xl px-5 py-14 sm:px-8 sm:py-20 lg:px-10">
-      <p class="text-[12px] uppercase tracking-[0.32em] text-zinc-500">Toolbox</p>
-      <h1 class="mt-3 text-3xl font-semibold tracking-tight text-white sm:text-4xl lg:text-5xl">
-        Data platform tools by Rujikorn Ngoensaard
-      </h1>
-      <p class="mt-4 max-w-xl text-sm leading-7 text-zinc-400">
-        {liveToolCount} free tools from XH / bossruji for data platform teams —
-        assessments, challenges, calculators, visualizers, and practical
-        learning labs. Fast, anonymous, and useful without context.
-      </p>
-
-      <div class="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {toolCatalog.map((tool) => (
-          <a
-            href={`/tools/${tool.slug}`}
-            class="interactive-card group relative flex flex-col rounded-2xl p-6"
-          >
-            <div class="mb-3 flex items-center justify-between">
-              <span class="rounded-full border border-emerald-300/25 bg-emerald-300/8 px-2.5 py-0.5 text-[10px] uppercase tracking-wider text-emerald-200">
-                {tool.status}
-              </span>
-              <span class="text-[10px] uppercase tracking-wider text-zinc-500">{tool.category}</span>
-            </div>
-            <h2 class="text-lg font-semibold leading-snug text-white">
-              {tool.title}
-            </h2>
-            <p class="mt-2 flex-1 text-sm leading-relaxed text-zinc-400">{tool.description}</p>
-            <div class="mt-5">
-              <span class="link-cue text-sm font-medium">
-                Open tool →
-              </span>
-            </div>
-          </a>
-        ))}
-
+  <main id="main-content" class="public-container editorial-tools">
+    <section class="tools-introduction" aria-labelledby="tools-heading">
+      <div>
+        <p class="public-kicker">XHVERSE / Practical tools</p>
+        <h1 id="tools-heading">Tools</h1>
+        <p class="tools-standfirst">Start with the problem.</p>
+        <p class="public-intro">
+          {liveToolCount} free tools by Rujikorn Ngoensaard (XH / bossruji).
+          Compare a design choice, check a risk, or work through a technical idea.
+        </p>
       </div>
-    </div>
+      <aside class="starting-points" aria-labelledby="starting-points-heading">
+        <p id="starting-points-heading" class="public-kicker">Where to begin</p>
+        <a href="#architecture"><span>Deciding where a workload belongs?</span><span aria-hidden="true">01 ↘</span></a>
+        <a href="#governance"><span>Reviewing ownership or access?</span><span aria-hidden="true">02 ↘</span></a>
+        <a href="#practice"><span>Learning by trying it yourself?</span><span aria-hidden="true">06 ↘</span></a>
+      </aside>
+    </section>
+
+    <nav class="group-navigation" aria-label="Tool categories">
+      {toolGroups.map((group, index) => (
+        <a href={`#${group.id}`}>
+          <span class="group-number" aria-hidden="true">{String(index + 1).padStart(2, "0")}</span>
+          {group.title}
+        </a>
+      ))}
+    </nav>
+
+    {toolGroups.map((group, index) => (
+      <section id={group.id} class={`tool-group tool-group--${group.id}`} aria-labelledby={`${group.id}-heading`}>
+        <header class="group-heading">
+          <div class="group-marker" aria-hidden="true">
+            <span>{String(index + 1).padStart(2, "0")}</span>
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+              <path d={groupIcons[group.id]} />
+            </svg>
+          </div>
+          <div>
+            <h2 id={`${group.id}-heading`}>{group.title}</h2>
+            <p>{group.description}</p>
+          </div>
+        </header>
+
+        <div class="group-tools">
+          {group.tools.map((tool) => (
+            <a href={`/tools/${tool.slug}`} class="catalog-tool">
+              <div class="tool-copy">
+                <span class="tool-category">{tool.category}</span>
+                <h3>{tool.title}</h3>
+                <p>{tool.description}</p>
+                {tool.slug === "workload-placement-simulator" ? (
+                  <svg class="placement-sketch" viewBox="0 0 440 138" fill="none" aria-hidden="true">
+                    <path d="M220 39V70H68V96M220 70V96M220 70H372V96" stroke="var(--border-control)" />
+                    <rect x="166" y="5" width="108" height="34" rx="4" stroke="var(--accent)" />
+                    <text x="220" y="27" text-anchor="middle">Workload</text>
+                    <rect x="13" y="96" width="110" height="34" rx="4" stroke="var(--border-control)" />
+                    <rect x="165" y="96" width="110" height="34" rx="4" stroke="var(--border-control)" />
+                    <rect x="317" y="96" width="110" height="34" rx="4" stroke="var(--border-control)" />
+                    <text x="68" y="118" text-anchor="middle">Databricks</text>
+                    <text x="220" y="118" text-anchor="middle">Fabric</text>
+                    <text x="372" y="118" text-anchor="middle">Power BI</text>
+                  </svg>
+                ) : null}
+              </div>
+              <span class="tool-action">Open tool <span aria-hidden="true">↗</span></span>
+            </a>
+          ))}
+        </div>
+      </section>
+    ))}
+
+    <aside class="tools-boundary">
+      <p class="public-kicker">A starting point for your review</p>
+      <p>Assessments and estimates provide direction. Check their assumptions against your own environment, and keep confidential details out of tool inputs.</p>
+    </aside>
   </main>
   <Footer />
   </div>
 </BaseLayout>
+
+<style>
+  .tools-introduction {
+    display: grid;
+    gap: 40px;
+    padding-block: 56px 48px;
+  }
+  .tools-introduction h1 {
+    margin-block: 14px 20px;
+    color: var(--text-heading);
+    font-size: clamp(3.5rem, 9vw, 7rem);
+    font-weight: 550;
+    line-height: 1;
+    letter-spacing: -.065em;
+  }
+  .tools-standfirst {
+    margin-bottom: 14px;
+    font-size: clamp(1.5rem, 3vw, 2.125rem);
+    font-weight: 450;
+    line-height: 1.25;
+    letter-spacing: -.035em;
+    color: var(--text-heading);
+  }
+  .placement-sketch { width: 100%; max-width: 440px; height: auto; margin-top: 28px; color: var(--muted); }
+  .placement-sketch text { fill: currentColor; font: 12px var(--font-sans); }
+  .starting-points {
+    align-self: end;
+    padding-left: 24px;
+    border-left: 1px solid var(--border-subtle);
+  }
+  .starting-points > p { margin-bottom: 12px; }
+  .starting-points a {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 20px;
+    min-height: 48px;
+    padding-block: 12px;
+    border-bottom: 1px solid var(--border-subtle);
+    color: var(--text);
+    font-size: 14px;
+    line-height: 1.6;
+    text-decoration: underline;
+    text-decoration-color: var(--border-control);
+    text-underline-offset: 4px;
+  }
+  .starting-points a > span:last-child {
+    flex: 0 0 auto;
+    font: 12px/1.6 var(--font-mono);
+    color: var(--accent);
+  }
+  .group-navigation {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 28px;
+    padding-block: 18px;
+    border-block: 1px solid var(--border-subtle);
+  }
+  .group-navigation a {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    color: var(--text-heading);
+    font-size: 14px;
+    text-decoration: underline;
+    text-decoration-color: var(--border-control);
+    text-underline-offset: 5px;
+  }
+  .group-number { font: 11px/1.6 var(--font-mono); color: var(--muted); }
+  .tool-group { padding-block: 44px; border-bottom: 1px solid var(--border-subtle); }
+  .group-heading { display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 16px; margin-bottom: 28px; }
+  .group-marker { display: flex; flex-direction: column; gap: 14px; color: var(--muted); }
+  .group-marker > span { font: 12px/1.6 var(--font-mono); }
+  .group-heading h2 {
+    margin-bottom: 10px;
+    color: var(--text-heading);
+    font-size: clamp(1.75rem, 3vw, 2.375rem);
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: -.035em;
+  }
+  .group-heading p { max-width: 60ch; color: var(--muted); font-size: 16px; line-height: 1.75; }
+  .group-tools { display: grid; gap: 16px; }
+  .catalog-tool {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    gap: 24px;
+    padding: 24px;
+    border: 1px solid var(--border-subtle);
+    border-radius: 12px;
+    color: var(--text);
+    transition: border-color 180ms ease, background-color 180ms ease;
+  }
+  .catalog-tool h3 {
+    margin-block: 12px 14px;
+    color: var(--text-heading);
+    font-size: 21px;
+    font-weight: 500;
+    line-height: 1.3;
+    letter-spacing: -.025em;
+    text-decoration: underline;
+    text-decoration-color: var(--border-control);
+    text-underline-offset: 5px;
+    text-decoration-thickness: 1px;
+  }
+  .catalog-tool p { max-width: 65ch; color: var(--muted); font-size: 15px; line-height: 1.8; }
+  .tool-category { font: 11px/1.6 var(--font-mono); color: var(--muted); }
+  .tool-action { display: inline-flex; align-items: center; gap: 14px; margin-top: auto; color: var(--accent); font-size: 14px; font-weight: 500; }
+  .tool-action > span { font-size: 20px; }
+  .catalog-tool:hover, .catalog-tool:focus-visible { border-color: var(--accent); background: var(--accent-soft); }
+  .tool-group--architecture .catalog-tool:first-child { background: var(--bg-elevated); border-left: 3px solid var(--accent); }
+  .tool-group--architecture .catalog-tool:first-child h3 { font-size: clamp(1.6rem, 3vw, 2.25rem); }
+  .tool-group--governance .catalog-tool { background: var(--bg-elevated); }
+  .tool-group--cost .catalog-tool { border-top: 3px solid var(--accent); }
+  .tool-group--modeling .catalog-tool,
+  .tool-group--operations .catalog-tool,
+  .tool-group--practice .catalog-tool { border-width: 0 0 1px; border-radius: 0; padding-inline: 0; }
+  .tool-group--modeling .catalog-tool:hover,
+  .tool-group--operations .catalog-tool:hover,
+  .tool-group--practice .catalog-tool:hover { background: transparent; }
+  .tools-boundary { display: grid; gap: 12px; padding-block: 36px 56px; }
+  .tools-boundary > p:last-child { max-width: 75ch; color: var(--muted); font-size: 14px; line-height: 1.8; }
+  @media (min-width: 768px) {
+    .tools-introduction { grid-template-columns: minmax(0, 1.4fr) minmax(0, .8fr); gap: 64px; padding-block: 80px 56px; }
+    .tool-group { padding-block: 56px; }
+    .group-heading { grid-template-columns: 64px minmax(0, 1fr); gap: 24px; margin-bottom: 32px; }
+    .group-marker { flex-direction: row; align-items: center; gap: 10px; }
+    .group-marker svg { width: 28px; height: 28px; }
+    .tool-group--architecture .group-tools,
+    .tool-group--governance .group-tools,
+    .tool-group--cost .group-tools { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .tool-group--architecture .catalog-tool:first-child { grid-row: span 2; justify-content: space-between; padding: 32px; }
+    .tool-group--modeling .catalog-tool,
+    .tool-group--operations .catalog-tool,
+    .tool-group--practice .catalog-tool { flex-direction: row; align-items: center; justify-content: space-between; gap: 40px; }
+    .tool-group--modeling .tool-copy,
+    .tool-group--operations .tool-copy,
+    .tool-group--practice .tool-copy { max-width: 72%; }
+    .tool-group--modeling .tool-action,
+    .tool-group--operations .tool-action,
+    .tool-group--practice .tool-action { flex: 0 0 auto; margin-top: 0; }
+    .tools-boundary { grid-template-columns: 240px minmax(0, 1fr); gap: 32px; padding-block: 40px 72px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .catalog-tool { transition: none; } }
+</style>

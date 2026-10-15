@@ -19,7 +19,7 @@ export const engagementTypes: EngagementType[] = [
     title: "Architecture Review",
     duration: "1–2 weeks",
     description:
-      "A focused assessment of your current data platform architecture — identifying structural gaps, governance risks, and opportunities to simplify before scaling.",
+      "I assess your current data platform architecture, identify structural gaps and governance risks, and recommend where to simplify.",
     deliverables: [
       "Architecture assessment document",
       "Risk and gap analysis",
@@ -33,7 +33,7 @@ export const engagementTypes: EngagementType[] = [
     title: "Governance Design",
     duration: "2–4 weeks",
     description:
-      "Designing the access model, ownership patterns, naming standards, and operating rules that make your platform governable at scale — not just today, but as the team grows.",
+      "I design access models, ownership patterns, naming standards, and operating rules for your data platform.",
     deliverables: [
       "Governance framework document",
       "Access and ownership model",
@@ -47,7 +47,7 @@ export const engagementTypes: EngagementType[] = [
     title: "Platform Strategy",
     duration: "Ongoing advisory",
     description:
-      "A longer-term partnership for teams navigating complex platform decisions — migration paths, vendor evaluations, capability roadmaps, and the communication that gets stakeholders aligned.",
+      "Ongoing advice on migration paths, vendor evaluations, capability roadmaps, and stakeholder communication.",
     deliverables: [
       "Platform capability roadmap",
       "Migration or consolidation strategy",
@@ -63,19 +63,19 @@ export const processSteps: ProcessStep[] = [
     label: "01",
     title: "Scope",
     description:
-      "We start with a short conversation to understand your platform context, constraints, and what success looks like. No proposals until I understand the problem.",
+      "We discuss your platform context, constraints, and what success looks like before agreeing on scope.",
   },
   {
     label: "02",
     title: "Deliver",
     description:
-      "Focused execution against a clear scope. You get working documents, architecture decisions, and practical recommendations — not slide decks.",
+      "I work against the agreed scope and deliver documents, architecture decisions, and recommendations your team can review.",
   },
   {
     label: "03",
     title: "Handover",
     description:
-      "Everything is designed for your team to own and operate. Clear documentation, recorded decisions, and enough context that the work outlives the engagement.",
+      "I hand over the documentation, recorded decisions, and context your team needs to own and operate the outputs.",
   },
 ];
 

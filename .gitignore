@@ -33,6 +33,9 @@ test-results/
 # agent evaluation workspaces (iteration outputs, timing, grading)
 .agents/skills/*-workspace/
 
+# project-local design exploration, history, and inspection output
+.taste-skill/
+
 # supabase local temp
 supabase/.temp/
 
@@ -40,3 +43,6 @@ supabase/.temp/
 docs/agent-prompts.md
 .claude/worktrees/
 .claude/settings.local.json
+
+# Local design review builds, screenshots, and validation evidence
+.tmp/

@@ -5,6 +5,7 @@ import Footer from "../../components/Footer.astro";
 import { posts as staticFallback } from "../../data/blog";
 import { site } from "../../data/site";
 import { profile } from "../../data/profile";
+import { portfolioTopics } from "../../data/portfolio";
 import {
   extractTableOfContents,
   renderMarkdownToHtml,
@@ -45,6 +46,7 @@ const metaDescription = post.seoDescription ?? post.excerpt;
 const articleImage = new URL(post.coverImageUrl ?? site.ogImage, deploymentSite).toString();
 const relatedToolCtas = post.relatedToolCtas ?? [];
 const personId = getPersonId(deploymentSite);
+const articleTopic = portfolioTopics.find((topic) => topic.articleSlug === post.slug);
 
 const articleStructuredData = {
   "@context": "https://schema.org",
@@ -83,156 +85,187 @@ const articleStructuredData = {
   type="article"
   structuredData={articleStructuredData}
 >
-  <div class="min-h-screen bg-[var(--bg-page)] font-sans text-[var(--text)]">
-  <div class="reading-progress"></div>
+  <div class="reading-progress" aria-hidden="true"></div>
   <Header current="/blog" />
-  <main>
-    <div class="mx-auto max-w-7xl px-5 py-14 sm:px-8 sm:py-20 lg:px-10">
-      <a href="/blog" class="inline-flex min-h-10 items-center gap-1.5 text-xs text-zinc-500 transition hover:text-white">
-        ← Writing hub
-      </a>
+  <main id="main-content" class="public-container editorial-article">
+    <div class="article-wayfinding">
+      <a href="/blog" class="text-link">← All writing</a>
+      <span class="article-index" aria-hidden="true">Writing / Field notes</span>
+    </div>
+    <article>
+      <header class="article-masthead">
+        <div class="article-heading">
+          <p class="article-eyebrow">{post.tags[0] ?? "Data platforms"}</p>
+          <h1>{post.title}</h1>
+          <p class="article-excerpt">{post.excerpt}</p>
+        </div>
+        <div class="article-byline">
+          <a href="/about" class="author-link">{profile.fullName}</a>
+          <p>Senior Data Engineer<br />Platform Architecture</p>
+          <dl class="article-metadata">
+            <div><dt>Published</dt><dd><time datetime={post.date}>{post.date}</time></dd></div>
+            {post.updatedAt && post.updatedAt !== post.date ? <div><dt>Updated</dt><dd><time datetime={post.updatedAt}>{post.updatedAt}</time></dd></div> : null}
+            <div><dt>Reading time</dt><dd>{post.readingTime}</dd></div>
+          </dl>
+          <span class="hidden" data-blog-view-wrapper>
+            <span
+              data-blog-view-count={post.slug}
+              data-blog-view-increment="true"
+              aria-live="polite"
+              aria-atomic="true"
+              aria-busy="true"
+            >
+              -- views
+            </span>
+          </span>
+          {post.mediumUrl ? <a href={post.mediumUrl} target="_blank" rel="noreferrer" class="text-link external-link medium-link">Also on Medium ↗</a> : null}
+        </div>
+      </header>
 
-      <div class="mt-8 grid gap-10 lg:grid-cols-[minmax(0,44rem)_minmax(15rem,1fr)] lg:items-start">
-        <article class="min-w-0">
-          <header>
-            <h1 class="max-w-3xl text-3xl font-semibold text-white sm:text-4xl lg:text-[2.75rem]">
-              {post.title}
-            </h1>
+      <div class="article-reading-layout">
+        <div class="article-reading-column">
+          {post.coverImageUrl ? (
+            <figure class="article-cover">
+              <img src={post.coverImageUrl} alt={post.coverImageAlt ?? ""} width="1200" height="675" loading="eager" decoding="async" />
+              {post.coverImageAlt ? <figcaption>{post.coverImageAlt}</figcaption> : null}
+            </figure>
+          ) : null}
 
-            <p class="mt-5 max-w-2xl text-base leading-8 text-zinc-400">{post.excerpt}</p>
-
-            <div class="mt-5 flex flex-wrap items-center gap-3 text-sm text-zinc-500">
-              <time>{post.date}</time>
-              <span>·</span>
-              <span>{post.readingTime}</span>
-              {post.updatedAt && post.updatedAt !== post.date ? (
-                <>
-                  <span>·</span>
-                  <span>Updated {post.updatedAt}</span>
-                </>
-              ) : null}
-              <span class="hidden" data-blog-view-wrapper>
-                <span>·</span>
-                <span
-                  data-blog-view-count={post.slug}
-                  data-blog-view-increment="true"
-                  aria-live="polite"
-                  aria-atomic="true"
-                  aria-busy="true"
-                >
-                  -- views
-                </span>
-              </span>
-            </div>
-
-            {post.tags.length > 0 && (
-              <div class="mt-5 flex flex-wrap gap-2">
-                {post.tags.map((tag) => (
-                  <span class="rounded-full border border-white/10 px-2.5 py-1 text-[11px] text-zinc-500">{tag}</span>
-                ))}
-              </div>
-            )}
-
-            {post.mediumUrl && (
-              <p class="mt-5">
-                <a href={post.mediumUrl} target="_blank" rel="noreferrer" class="inline-flex min-h-10 items-center text-sm text-zinc-500 underline underline-offset-2 transition hover:text-white">
-                  Also on Medium ↗
-                </a>
-              </p>
-            )}
-
-            {post.coverImageUrl ? (
-              <figure class="mt-8">
-                <img
-                  src={post.coverImageUrl}
-                  alt={post.coverImageAlt ?? ""}
-                  loading="eager"
-                  decoding="async"
-                  class="aspect-[16/9] w-full border border-white/10 object-cover"
-                />
-                {post.coverImageAlt ? (
-                  <figcaption class="mt-2 text-xs leading-5 text-zinc-500">{post.coverImageAlt}</figcaption>
-                ) : null}
-              </figure>
-            ) : null}
-          </header>
-
-          <article class="article-body article-body--reader" set:html={html} />
-
-          <nav class="mt-12 grid gap-3 border-t border-white/10 pt-6 sm:grid-cols-2" aria-label="Adjacent articles">
-            {adjacent.prev ? (
-              <a href={`/blog/${adjacent.prev.slug}`} class="interactive-card block rounded-xl p-4">
-                <span class="text-[11px] uppercase tracking-[0.18em] text-zinc-500">Previous</span>
-                <span class="mt-2 block text-sm font-semibold text-white">{adjacent.prev.title}</span>
-              </a>
-            ) : <span></span>}
-            {adjacent.next ? (
-              <a href={`/blog/${adjacent.next.slug}`} class="interactive-card block rounded-xl p-4 sm:text-right">
-                <span class="text-[11px] uppercase tracking-[0.18em] text-zinc-500">Next</span>
-                <span class="mt-2 block text-sm font-semibold text-white">{adjacent.next.title}</span>
-              </a>
-            ) : null}
-          </nav>
-        </article>
-
-        <aside class="lg:sticky lg:top-24">
           {toc.length > 0 ? (
-            <nav class="border border-white/10 bg-white/[0.03] p-5" aria-label="Table of contents">
-              <p class="text-[11px] uppercase tracking-[0.22em] text-zinc-500">In this article</p>
-              <ol class="mt-4 space-y-2">
-                {toc.map((entry) => (
-                  <li class={entry.level === 3 ? "pl-4" : ""}>
-                    <a href={`#${entry.id}`} class="block min-h-8 text-sm leading-6 text-zinc-400 transition hover:text-white">
-                      {entry.text}
-                    </a>
-                  </li>
-                ))}
-              </ol>
-            </nav>
+            <details class="mobile-contents">
+              <summary>In this article <span aria-hidden="true">+</span></summary>
+              <nav aria-label="Table of contents">
+                <ol>{toc.map((entry) => <li class:list={["contents-entry", { "contents-subentry": entry.level === 3 }]}><a href={`#${entry.id}`}>{entry.text}</a></li>)}</ol>
+              </nav>
+            </details>
           ) : null}
 
-          {relatedPosts.length > 0 ? (
-            <section class="mt-5 border border-white/10 bg-white/[0.03] p-5">
-              <p class="text-[11px] uppercase tracking-[0.22em] text-zinc-500">Related</p>
-              <div class="mt-4 space-y-3">
-                {relatedPosts.map((related) => (
-                  <a href={`/blog/${related.slug}`} class="block text-sm leading-6 text-zinc-400 transition hover:text-white">
-                    {related.title}
-                  </a>
-                ))}
-              </div>
-            </section>
-          ) : null}
+          <div class="article-body article-body--reader" set:html={html} />
 
-          {relatedToolCtas.length > 0 ? (
-            <section class="mt-5 border border-emerald-300/25 bg-emerald-300/8 p-5" aria-labelledby="practice-next-heading">
-              <p class="text-[11px] uppercase tracking-[0.22em] text-emerald-200">Practice this next</p>
-              <h2 id="practice-next-heading" class="mt-2 text-base font-semibold text-white">
-                Try the related tools
-              </h2>
-              <div class="mt-4 grid gap-2">
-                {relatedToolCtas.map((tool) => (
-                  <a
-                    href={tool.href}
-                    class:list={[
-                      "w-full justify-between focus-visible:ring-2 focus-visible:ring-emerald-300 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-page)]",
-                      tool.variant === "primary" ? "cta-primary" : "cta-secondary",
-                    ]}
-                  >
-                    <span>{tool.label}</span>
-                    <span aria-hidden="true">→</span>
-                  </a>
-                ))}
-              </div>
-            </section>
-          ) : null}
+          <div class="article-endnote">
+            <p class="article-eyebrow">Continue exploring</p>
+            <a href={articleTopic ? `/tools#${articleTopic.id}` : "/tools"} class="text-link">{articleTopic ? `Explore ${articleTopic.title.toLowerCase()} tools` : "Explore tools"} <span aria-hidden="true">→</span></a>
+            {post.tags.length > 0 ? <ul class="article-topics" aria-label="Article topics">{post.tags.map((tag) => <li>{tag}</li>)}</ul> : null}
+          </div>
+
+          <nav class="adjacent-articles" aria-label="Adjacent articles">
+            {adjacent.prev ? <a href={`/blog/${adjacent.prev.slug}`}><span class="article-eyebrow">← Previous</span><span>{adjacent.prev.title}</span></a> : <span></span>}
+            {adjacent.next ? <a href={`/blog/${adjacent.next.slug}`}><span class="article-eyebrow">Next →</span><span>{adjacent.next.title}</span></a> : null}
+          </nav>
+        </div>
+
+        <aside class="article-rail">
+          <div class="article-rail-content">
+            {toc.length > 0 ? (
+              <nav class="desktop-contents" aria-label="Table of contents">
+                <p class="article-eyebrow"><span class="rail-number" aria-hidden="true">01 / </span>In this article</p>
+                <ol>{toc.map((entry) => <li class:list={["contents-entry", { "contents-subentry": entry.level === 3 }]}><a href={`#${entry.id}`}>{entry.text}</a></li>)}</ol>
+              </nav>
+            ) : null}
+
+            {relatedToolCtas.length > 0 ? (
+              <section class="article-practice" aria-labelledby="practice-next-heading">
+                <p class="article-eyebrow"><span class="rail-number" aria-hidden="true">02 / </span>Practice this next</p>
+                <h2 id="practice-next-heading">Try the related tools</h2>
+                <div class="related-tool-links">{relatedToolCtas.map((tool) => <a href={tool.href} class:list={["article-tool-link", { "article-tool-primary": tool.variant === "primary" }]}><span>{tool.label}</span><span aria-hidden="true">↗</span></a>)}</div>
+              </section>
+            ) : null}
+
+            {relatedPosts.length > 0 ? (
+              <section class="article-related">
+                <p class="article-eyebrow"><span class="rail-number" aria-hidden="true">03 / </span>Related writing</p>
+                <div>{relatedPosts.map((related) => <a href={`/blog/${related.slug}`}>{related.title}<span aria-hidden="true"> ↗</span></a>)}</div>
+              </section>
+            ) : null}
+          </div>
         </aside>
       </div>
-    </div>
+    </article>
   </main>
   <Footer />
-  </div>
   <script>
     import "../../scripts/blog-view-counts";
   </script>
 </BaseLayout>
+
+<style>
+  .editorial-article { padding-bottom: 64px; }
+  .article-wayfinding { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 16px; padding-block: 24px; border-bottom: 1px solid var(--border-subtle); }
+  .article-wayfinding a { display: inline-flex; align-items: center; min-height: 44px; font-size: 14px; }
+  .article-index, .article-eyebrow { color: var(--muted); font: 12px/1.6 var(--font-mono, monospace); letter-spacing: .025em; }
+  .article-masthead { display: grid; gap: 32px; padding-block: 40px; }
+  .article-heading { min-width: 0; }
+  .article-heading > .article-eyebrow { display: flex; align-items: center; gap: 12px; }
+  .article-heading > .article-eyebrow::before { content: ""; width: 32px; height: 1px; background: var(--border-subtle); flex-shrink: 0; }
+  h1 { max-width: 24ch; color: var(--text-heading); font-size: clamp(2.25rem, 5.25vw, 4.5rem); font-weight: 550; line-height: 1.06; letter-spacing: -.05em; margin-top: 20px; overflow-wrap: anywhere; }
+  .article-excerpt { max-width: 60ch; color: var(--muted); margin-top: 24px; font-size: clamp(17px, 1.6vw, 20px); line-height: 1.7; }
+  .article-byline { padding-left: 20px; border-left: 1px solid var(--border-subtle); }
+  .author-link { display: inline-flex; min-height: 36px; align-items: center; color: var(--text-heading); font-size: 15px; font-weight: 600; text-decoration: underline; text-decoration-color: var(--border-control); text-underline-offset: 5px; }
+  .author-link:hover { color: var(--accent); }
+  .article-byline > p { color: var(--muted); font-size: 13px; line-height: 1.8; margin-top: 4px; }
+  .article-metadata { display: flex; flex-wrap: wrap; gap: 20px 28px; margin-top: 24px; }
+  .article-metadata dt { color: var(--muted); font: 11px/1.6 var(--font-mono, monospace); }
+  .article-metadata dd { color: var(--text); font-size: 13px; margin-top: 4px; }
+  .medium-link { display: inline-flex; align-items: center; min-height: 44px; margin-top: 12px; font-size: 13px; }
+  .article-reading-layout { display: grid; gap: 48px; border-top: 1px solid var(--border-subtle); padding-top: 32px; }
+  .article-reading-column, .article-rail { min-width: 0; }
+  .article-cover { margin: 0 0 32px; }
+  .article-cover img { display: block; width: 100%; height: auto; aspect-ratio: 16/9; object-fit: contain; background: var(--bg-elevated); border-radius: 4px; }
+  .article-cover figcaption { color: var(--muted); font-size: 12px; line-height: 1.7; margin-top: 12px; }
+  .mobile-contents { border-block: 1px solid var(--border-subtle); margin-block: 24px 36px; }
+  .mobile-contents summary { display: flex; align-items: center; justify-content: space-between; gap: 20px; min-height: 56px; list-style: none; color: var(--text-heading); font-size: 14px; cursor: pointer; }
+  .mobile-contents summary::-webkit-details-marker { display: none; }
+  .mobile-contents[open] summary > span { transform: rotate(45deg); }
+  .mobile-contents nav { padding-bottom: 20px; }
+  .desktop-contents { display: none; }
+  .article-rail :is(h2, .article-eyebrow) { margin: 0; }
+  .article-rail-content > section { padding-top: 24px; border-top: 1px solid var(--border-subtle); }
+  .article-rail-content > section + section { margin-top: 32px; }
+  .rail-number { color: var(--muted); }
+  .desktop-contents ol, .mobile-contents ol { list-style: none; margin-top: 16px; padding: 0; }
+  .contents-entry a { display: block; padding: 8px 0; color: var(--muted); font-size: 13px; line-height: 1.7; text-decoration: underline; text-decoration-color: var(--border-control); text-underline-offset: 4px; }
+  .contents-entry a:hover { color: var(--accent); }
+  .contents-subentry { padding-left: 16px; }
+  .article-practice h2 { margin-top: 12px; font-size: 18px; font-weight: 550; line-height: 1.4; color: var(--text-heading); }
+  .related-tool-links { display: grid; gap: 4px; margin-top: 16px; }
+  .article-tool-link { display: flex; justify-content: space-between; gap: 12px; padding-block: 12px; min-height: 44px; color: var(--text); font-size: 14px; line-height: 1.65; text-decoration: underline; text-underline-offset: 5px; }
+  .article-tool-primary { color: var(--accent); }
+  .article-tool-link:hover { color: var(--accent); }
+  .article-related > div { margin-top: 16px; }
+  .article-related a { display: block; padding-block: 10px; color: var(--muted); font-size: 14px; line-height: 1.65; text-decoration: underline; text-decoration-color: var(--border-control); text-underline-offset: 4px; }
+  .article-related a:hover { color: var(--accent); }
+  .article-endnote { border-top: 1px solid var(--border-subtle); padding-top: 24px; margin-top: 48px; }
+  .article-endnote > a { display: inline-flex; min-height: 44px; align-items: center; margin-top: 12px; }
+  .article-topics { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 20px; color: var(--muted); font: 12px/1.6 var(--font-mono, monospace); }
+  .adjacent-articles { display: grid; gap: 24px; border-block: 1px solid var(--border-subtle); padding-block: 24px; margin-top: 32px; }
+  .adjacent-articles a { display: flex; flex-direction: column; gap: 12px; color: var(--text-heading); line-height: 1.6; text-decoration: underline; text-decoration-color: var(--border-control); text-underline-offset: 5px; }
+  .adjacent-articles a:hover { color: var(--accent); }
+  .editorial-article :global(.article-body--reader) { max-width: 68ch; width: 100%; min-width: 0; font-size: 17px; line-height: 1.9; color: var(--text); overflow-wrap: anywhere; margin-top: 0; }
+  .editorial-article :global(.article-body--reader p) { margin-bottom: 24px; }
+  .editorial-article :global(.article-body--reader h2) { font-size: clamp(1.5rem, 2.4vw, 2rem); font-weight: 550; margin: 48px 0 20px; line-height: 1.3; scroll-margin-top: 32px; }
+  .editorial-article :global(.article-body--reader h3) { font-size: 1.3rem; font-weight: 550; margin: 32px 0 16px; line-height: 1.4; scroll-margin-top: 32px; }
+  .editorial-article :global(.article-body--reader :is(h2, h3):first-child) { margin-top: 0; }
+  .editorial-article :global(.article-body--reader a) { color: var(--accent); }
+  .editorial-article :global(.article-body--reader a:hover) { color: var(--text-heading); }
+  .editorial-article :global(.article-body--reader li) { margin-bottom: 12px; }
+  .editorial-article :global(.article-body--reader ul > li::before) { border-color: var(--accent); background: var(--accent); width: 4px; height: 4px; border-radius: 50%; transform: translateY(-50%); }
+  .editorial-article :global(.article-body--reader blockquote) { border-color: var(--accent); margin-block: 32px; padding-left: 24px; }
+  .editorial-article :global(.article-body--reader pre) { max-width: 100%; overflow-x: auto; white-space: pre; overflow-wrap: normal; font-size: 13px; line-height: 1.8; padding: 20px; border-radius: 4px; }
+  .editorial-article :global(.article-body--reader code) { overflow-wrap: anywhere; }
+  .editorial-article :global(.article-body--reader pre code) { overflow-wrap: normal; }
+  .editorial-article :global(.article-body--reader .article-table-scroll) { max-width: 100%; overflow-x: auto; border-radius: 4px; margin-block: 32px; }
+  .editorial-article :global(.article-body--reader table) { width: 100%; font-size: 14px; line-height: 1.65; }
+  .editorial-article :global(.article-body--reader :is(th, td)) { padding: 14px 16px; }
+  @media (min-width: 700px) { .adjacent-articles { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px; } }
+  @media (min-width: 1040px) {
+    .editorial-article { padding-bottom: 96px; }
+    .article-masthead { grid-template-columns: minmax(0, 1fr) 240px; align-items: end; gap: 64px; padding-block: 56px; }
+    .article-metadata { display: grid; gap: 16px; }
+    .article-reading-layout { grid-template-columns: minmax(0, 68ch) minmax(0, 1fr); gap: 64px; padding-top: 40px; }
+    .mobile-contents { display: none; }
+    .desktop-contents { display: block; }
+    .desktop-contents ol { max-height: none; overflow: visible; }
+    .article-rail-content { position: sticky; top: 32px; max-height: calc(100dvh - 64px); overflow-y: auto; padding: 8px; scrollbar-gutter: stable; }
+    .article-rail-content > section { margin-top: 32px; }
+  }
+</style>

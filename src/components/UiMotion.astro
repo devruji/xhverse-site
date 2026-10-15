@@ -1,0 +1,53 @@
+<script>
+  import { createUiMotion } from "../lib/ui-motion";
+
+  function initMotionActions() {
+    if (!document.documentElement.hasAttribute("data-ui-motion")) return;
+    const motion = createUiMotion(true, window.matchMedia("(prefers-reduced-motion: reduce)"));
+    const listeners = new AbortController();
+    const options = { signal: listeners.signal };
+    let pressed: HTMLElement | null = null;
+    let pointerId: number | null = null;
+    const selector = ".cta-primary, .cta-secondary, .public-theme-toggle, #cv-modal-close, [data-journey-step], [data-journey-prev], [data-journey-next]";
+    document.addEventListener("pointerdown", (event) => {
+      if (event.button !== 0 || !event.isPrimary || !(event.target instanceof Element)) return;
+      const target = event.target.closest<HTMLElement>(selector);
+      if (!target || target.matches(":disabled") || target.closest("[inert]")) return;
+      if (pressed) motion.cancel(pressed);
+      pressed = target;
+      pointerId = event.pointerId;
+      motion.animate(target, [{ transform: "scale(1)" }, { transform: "scale(0.97)" }], 160, true, undefined, true);
+    }, options);
+    const release = (event: PointerEvent) => {
+      if (!pressed || event.pointerId !== pointerId) return;
+      motion.animate(pressed, [{ transform: "scale(0.97)" }, { transform: "scale(1)" }], 120, true);
+      pressed = null;
+      pointerId = null;
+    };
+    document.addEventListener("pointerup", release, options);
+    document.addEventListener("pointercancel", release, options);
+    window.addEventListener("blur", () => { motion.cancelAll(); pressed = null; pointerId = null; }, options);
+    document.addEventListener("keydown", () => { motion.cancelAll(); pressed = null; pointerId = null; }, options);
+    document.addEventListener("astro:before-swap", () => { listeners.abort(); motion.dispose(); }, { once: true });
+  }
+  document.addEventListener("astro:page-load", initMotionActions);
+</script>
+<style is:global>
+  html[data-ui-motion] .public-mobile-menu nav { transform-origin: top right; }
+  /* Focus is immediate; existing color feedback keeps its existing duration. */
+  html[data-ui-motion] :is(a, button, input, select, textarea, summary, label, [tabindex]) {
+    transition-property: color, background-color, border-color, text-decoration-color;
+    transition-duration: 110ms;
+    transition-timing-function: ease-out;
+  }
+  /* Preserve the normal 20px rhythm while allowing text-only enlargement. */
+  html[data-ui-motion] [data-tool-slug="pipeline-recovery-planner"] label > span.text-xs.leading-5 {
+    line-height: 1.6666666667;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html[data-ui-motion] :is(a, button, input, select, textarea, summary, label, [tabindex]) {
+      transition-duration: 0s !important;
+      transition-delay: 0s !important;
+    }
+  }
+</style>
