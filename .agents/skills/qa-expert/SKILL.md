@@ -58,3 +58,11 @@ Read `DESIGN.md` and `docs/agents/motion-skills.md`. Use repo-local `animate`
 for implementation; use `review-animations` for lifecycle critique and
 `animation-performance` for measured rendering evidence. Preserve color feedback,
 native semantics, immediate keyboard/reduced motion and interruption.
+
+## Mobile interaction evidence
+
+For mobile bug reports, follow [the mobile interaction
+workflow](../../../docs/agents/mobile-interaction-validation.md). Require real touch input
+and rendered visibility assertions, repeated text/icon activation, and the reported browser
+engine where available. Record cached-browser versions and physical-device gaps; a Chromium
+mobile project is not iOS verification. Keep unreproduced reports unresolved.

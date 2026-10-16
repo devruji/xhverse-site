@@ -97,5 +97,12 @@ Read DESIGN.md and docs/agents/motion-skills.md. Use repo-local animate for
 native CSS/WAAPI implementation, review-animations for lifecycle critique, and
 animation-performance for measured rendering evidence. Keep keyboard/reduced
 motion immediate, preserve color feedback, and verify interruption/isolation.
+
+### Mobile interaction reports
+Follow docs/agents/mobile-interaction-validation.md. Require actual touch input, repeated
+text/icon activation, logical state plus rendered visibility, and reported-engine evidence
+where available. Record runner/browser versions and physical-device limits. An unreproduced
+report stays unresolved; Chromium mobile emulation does not verify iOS.
+
 """
 nickname_candidates = ["Shield", "Gate", "Check"]

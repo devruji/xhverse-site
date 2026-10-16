@@ -14,6 +14,7 @@
   "adaptations": [
     "Original SKILL.md archived unchanged in references/upstream-skill.md",
     "Concise local entrypoint replaces active instructions; project motion guidance supplies overrides",
-    "Root MIT notice retained unchanged"
+    "Root MIT notice retained unchanged",
+    "Local entrypoint adds mobile touch, native disclosure and browser/device evidence workflow on 2026-10-16"
   ]
 }
