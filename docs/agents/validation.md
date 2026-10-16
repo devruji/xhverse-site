@@ -41,6 +41,13 @@ This is review evidence reuse, not automatic CI test-result caching across commi
 
 Full application PR CI remains mandatory even when local checks are targeted. Retain all four 100% coverage thresholds on `src/lib/**` and `src/data/**`.
 
+## Mobile interaction reports
+
+For reported mobile failures, use the [mobile interaction workflow](mobile-interaction-validation.md).
+A narrow viewport and a passing Chromium mouse click do not establish iPhone
+touch behavior. Record browser engine/version, touch input, lifecycle, and
+physical-device limits before accepting a regression fix.
+
 ## Release gates and verified deployment
 
 A draft development → main release PR may collect merge-candidate CI evidence before QA/security review finishes. Before merging, require successful candidate CI and both QA and security gates. Scope review to the release diff and affected systems, broadening for shared, auth, platform, dependency or delivery changes. Reuse valid regression evidence; refresh dependency advisories for application releases because advisories change independently of Git. If advisory access fails, report that gap and do not claim the security gate passed.

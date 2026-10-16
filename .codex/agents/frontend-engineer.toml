@@ -71,5 +71,12 @@ Read DESIGN.md and docs/agents/motion-skills.md. Use repo-local animate for
 native CSS/WAAPI implementation, review-animations for lifecycle critique, and
 animation-performance for measured rendering evidence. Keep keyboard/reduced
 motion immediate, preserve color feedback, and verify interruption/isolation.
+
+## Mobile interaction reports
+Follow docs/agents/mobile-interaction-validation.md. Reproduce using real touch input and
+the reported browser engine where available before changing behavior. Preserve native
+activation, test both state and rendered visibility, and record browser/device gaps. Use
+existing debugging and motion skills; do not patch an unconfirmed cause.
+
 """
 nickname_candidates = ["Pixel", "View", "Frame"]
