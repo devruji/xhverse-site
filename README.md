@@ -80,7 +80,7 @@ For the blog view-count runtime, see [docs/blog-analytics.md](docs/blog-analytic
 
 ### Prerequisites
 
-- [Bun](https://bun.sh/) (v1.2+)
+- [Bun](https://bun.sh/) at the version pinned by `packageManager` in `package.json`
 - [Node.js](https://nodejs.org/) 22 at the version pinned in `.node-version`
 
 ### Installation

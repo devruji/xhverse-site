@@ -51,6 +51,12 @@ describe("renderMarkdownToHtml", () => {
     expect(html.toLowerCase()).not.toContain("<script");
   });
 
+  it("renders deeply nested iframe markup safely without overflowing the stack", () => {
+    const html = renderMarkdownToHtml("<iframe>".repeat(2000) + "Safe text");
+    expect(html).not.toMatch(/<iframe\b/i);
+    expect(html).toContain("Safe text");
+  });
+
   it("allows safe links with https", () => {
     const html = renderMarkdownToHtml("[x](https://example.com/path)");
     expect(html).toContain('href="https://example.com/path"');
