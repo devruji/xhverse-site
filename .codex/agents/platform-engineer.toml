@@ -42,7 +42,7 @@ To add a domain: update BOTH layers → `bun run build && grep "domain" dist/_he
 - Git integration: auto-deploy from main
 - Build command: bun run build
 - Output directory: dist
-- Node version: 22.23.3 (pinned in .node-version)
+- Node version: read from .node-version
 - Admin routes: /admin/* behind Cloudflare Access (Zero Trust, email OTP)
 
 ## Repo MCP & Connector Policy

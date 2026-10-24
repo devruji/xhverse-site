@@ -11,7 +11,7 @@ This skill provides the full context for working productively in xhverse-site â€
 
 - **Framework**: Astro 7, static output
 - **Styling**: Tailwind CSS v4 via `@tailwindcss/vite` plugin
-- **Runtime**: Bun (package manager + scripts), Node 22.23.3 (pinned in `.node-version`)
+- **Runtime**: Bun (package manager + scripts), Node 22 (version pinned in `.node-version`)
 - **Data**: Static TypeScript modules in `src/data/`; Supabase `posts` is the blog source of truth when build credentials are configured
 - **Deploy**: Cloudflare Pages via Git integration (no manual deploys)
 
