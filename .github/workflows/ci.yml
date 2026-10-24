@@ -33,7 +33,7 @@ jobs:
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version: 1.2.21
+          bun-version-file: package.json
 
       - name: Cache Bun dependencies
         uses: actions/cache@v6
@@ -133,7 +133,7 @@ jobs:
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
         with:
-          bun-version: 1.2.21
+          bun-version-file: package.json
 
       - name: Classify promotion
         id: changes
