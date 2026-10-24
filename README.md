@@ -11,7 +11,7 @@ Personal portfolio, blog, and interactive tools site for [Rujikorn Ngoensaard](h
 
 - **Framework:** [Astro 7](https://astro.build/) (static output)
 - **Styling:** [Tailwind CSS v4](https://tailwindcss.com/) via Vite plugin
-- **Runtime:** [Bun](https://bun.sh/) + Node 22.23.3
+- **Runtime:** [Bun](https://bun.sh/) + Node 22 (version pinned in `.node-version`)
 - **Testing:** [Vitest](https://vitest.dev/) (100% coverage) & [Playwright](https://playwright.dev/) (E2E)
 - **Database:** [Supabase](https://supabase.com/) (blog CMS/source of truth, client-side benchmarks, CV gate)
 - **Blog Analytics:** Cloudflare Pages Functions + D1 for anonymous aggregate blog views
@@ -81,7 +81,7 @@ For the blog view-count runtime, see [docs/blog-analytics.md](docs/blog-analytic
 ### Prerequisites
 
 - [Bun](https://bun.sh/) (v1.2+)
-- [Node.js](https://nodejs.org/) 22.23.3 (pinned in `.node-version`)
+- [Node.js](https://nodejs.org/) 22 at the version pinned in `.node-version`
 
 ### Installation
 

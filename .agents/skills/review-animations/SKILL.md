@@ -21,3 +21,12 @@ installation. Keyboard activation and reduced-motion sessions settle immediately
 active execution contract. Its relative resource links refer to files in this
 skill's root. See `SOURCE.json` for the immutable pin and original file hashes;
 retain `LICENSE` and supporting resources when updating.
+
+## Touch and disclosure review
+
+Follow [the mobile interaction
+workflow](../../../docs/agents/mobile-interaction-validation.md) for mobile reports. Trace
+native default activation alongside listeners and animation cancellation. Verify logical
+state and rendered visibility with actual touch input, repeated text/icon taps, keyboard,
+and no-JavaScript navigation. Distinguish Chromium emulation, WebKit automation, and
+physical-device evidence.

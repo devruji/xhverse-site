@@ -96,7 +96,8 @@ User clicks "Get a Copy" → CvRequestModal opens
 |-------|-----------|
 | Edge headers | `public/_headers` → CSP, HSTS, X-Frame-Options, CORP (generated at build) |
 | HTML meta | `BaseLayout.astro` → CSP `connect-src` from env (production only) |
-| Admin access | Cloudflare Access (Zero Trust) → email OTP for `/admin/*` routes |
+| Production admin access | Cloudflare Access email OTP protects `xhverse.co/admin/*`; allowed emails include `admin@xhverse.co` |
+| Preview access | Cloudflare Access email OTP protects `*.xhverse-site-git.pages.dev`; allowlist contains `admin@xhverse.co` and the existing member |
 | Admin analytics API | Cloudflare Access protects `/admin/api/*`; API returns aggregate D1 rollups only |
 | Admin rebuild API | Cloudflare Access protects `/admin/api/*`; deploy hook URL or scoped Cloudflare API token is stored server-side only |
 | Blog view API | Same-origin Pages Function validates known published slugs and stores aggregate counters |
@@ -105,6 +106,9 @@ User clicks "Get a Copy" → CvRequestModal opens
 | Storage | Public read on `documents` bucket; no write access via client |
 | Build read key | `PUBLIC_SUPABASE_PUBLISHABLE_KEY` reads published blog rows through public RLS; `SUPABASE_SECRET_KEY` remains an optional legacy server-side fallback |
 | Edge Function secrets | `RESEND_API_KEY` set via `bunx supabase secrets set` |
+
+Passing Cloudflare Access does not grant Supabase application or database
+permissions; Supabase authentication, grants, and RLS govern those separately.
 
 ## Pages
 
