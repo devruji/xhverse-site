@@ -55,7 +55,7 @@ Why `'unsafe-inline'` for scripts? Astro generates inline scripts for islands an
 - **Preview deploys**: Every PR gets a preview URL (auto-noindexed)
 - **Build command**: `bun install --frozen-lockfile && bun run build`
 - **Output**: `dist/`
-- **Node version**: Read from `.node-version` (22.16.0)
+- **Node version**: Read from `.node-version`
 
 ### Rocket Loader — Why It Matters
 

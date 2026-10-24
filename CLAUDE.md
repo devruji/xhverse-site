@@ -37,7 +37,7 @@ Kill dev server: `lsof -ti :4321 | xargs kill -9 2>/dev/null`
 ### Stack
 - **Astro 7** (static output only — no SSR, no server runtime)
 - **Tailwind CSS v4** via `@tailwindcss/vite` plugin (CSS-first config, no tailwind.config.js)
-- **Bun** (package manager + script runner), Node 22.23.3 (pinned in `.node-version`)
+- **Bun** (package manager + script runner), Node 22 (version pinned in `.node-version`)
 - **Cloudflare Pages** (Git integration auto-deploy from `main`)
 - **Supabase** (blog CMS/source of truth + runtime for CV requests, leads, tool benchmarks)
 - **Cloudflare Turnstile** (bot protection — Non-interactive mode on CV request form)
@@ -388,7 +388,7 @@ Repo MCP policy:
 - Preserve identity SEO signals for "Rujikorn Ngoensaard", "bossruji", "XH", "xhverse"
 - Do not promise a specific Google ranking or recrawl timeline; use Search
   Console and live search results as evidence with clear uncertainty.
-- Keep `.node-version`, CI, and Cloudflare Pages runtime aligned (currently Node 22.23.3)
+- Keep `.node-version`, CI, and Cloudflare Pages build runtime aligned; use the pinned Node 22 version
 - Keep `bun.lock` in sync — never bypass `--frozen-lockfile`
 - Supabase config lives in ONE place: `src/data/supabase-config.ts`
 - Site must build successfully without Supabase env vars (static fallback), but Supabase is authoritative when build credentials are configured
