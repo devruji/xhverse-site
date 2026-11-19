@@ -22,24 +22,24 @@
     "check": "bun run typecheck && bun run build && bun run coverage && bun run test:delivery && bun run test:e2e:built"
   },
   "dependencies": {
-    "@astrojs/sitemap": "^3.7.4",
-    "@supabase/supabase-js": "2.117.3",
-    "@tailwindcss/vite": "^4.3.3",
-    "astro": "7.3.8",
-    "marked": "^18.1.0",
-    "sanitize-html": "2.18.1",
-    "tailwindcss": "^4.3.3"
+    "@astrojs/sitemap": "^3.7.5",
+    "@supabase/supabase-js": "2.119.0",
+    "@tailwindcss/vite": "^4.3.5",
+    "astro": "7.4.12",
+    "marked": "^18.2.0",
+    "sanitize-html": "2.18.2",
+    "tailwindcss": "^4.3.5"
   },
   "devDependencies": {
-    "@astrojs/check": "^0.9.10",
-    "@playwright/test": "^1.64.0",
+    "@astrojs/check": "^0.9.12",
+    "@playwright/test": "^1.65.1",
     "@types/node": "^22.20.5",
     "@types/sanitize-html": "^2.16.2",
-    "@vitest/coverage-v8": "5.0.3",
+    "@vitest/coverage-v8": "5.1.0",
     "supabase": "2.120.0",
     "typescript": "^6.0.3",
-    "vitest": "5.0.3",
-    "wrangler": "4.149.0"
+    "vitest": "5.1.0",
+    "wrangler": "4.162.0"
   },
   "overrides": {
     "devalue": "5.9.4",
